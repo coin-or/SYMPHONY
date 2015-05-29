@@ -6,7 +6,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -694,14 +694,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
       update_solve_parameters(p);
 
-      if (p->mip->mip_inf){
-	 if(1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) < 0.2 || 
-	    1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) > 0.8){
-	    if(p->bc_level <= 10){
-	       max_solves *= 3;
-	       max_solves_since_impr *= 2;
-	       rel_threshold *=2;
-	    }
+      if(1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) < 0.2 || 
+      	 1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) > 0.8){
+	 if(p->bc_level <= 10){
+	    max_solves *= 3;
+	    max_solves_since_impr *= 2;
+	    rel_threshold *=2;
 	 }
       }
       
@@ -966,16 +964,14 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	      violation_cnt_diff = cand_v - best_v;	      
 	   }
 
-	   if(p->mip->mip_inf){
-	      sos_diff = p->mip->mip_inf->cols[branch_var].sos_num - 
-		 p->mip->mip_inf->cols[best_var].sos_num;
+	   if(p->mip->mip_inf)
+	     sos_diff = p->mip->mip_inf->cols[branch_var].sos_num - 
+	       p->mip->mip_inf->cols[best_var].sos_num;
 
-	      //frac_cnt_diff = frac_cnt[branch_var] - frac_cnt[best_var];
-	      frac_cnt_diff = (int)(p->var_rank[branch_var] -
-				    p->var_rank[best_var]);
-	      nz_diff = p->mip->mip_inf->cols[branch_var].nz -
-		 p->mip->mip_inf->cols[best_var].nz;
-	   }
+	    //frac_cnt_diff = frac_cnt[branch_var] - frac_cnt[best_var];
+	    frac_cnt_diff = (int)(p->var_rank[branch_var] - p->var_rank[best_var]);
+	    nz_diff = p->mip->mip_inf->cols[branch_var].nz -
+	       p->mip->mip_inf->cols[best_var].nz;
 	 }
 	 
 	 int tot_var_score = 0; 

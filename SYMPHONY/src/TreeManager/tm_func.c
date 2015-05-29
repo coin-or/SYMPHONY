@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -334,9 +334,9 @@ int solve(tm_prob *tm)
 #pragma omp parallel default(shared) private(now, then2, then3)
 {
 #ifdef _OPENMP
-      int i, ret, thread_num = omp_get_thread_num(), scand_num;
+      int i, ret, thread_num = omp_get_thread_num();
 #else
-      int i, ret, thread_num = 0, scand_num;
+      int i, ret, thread_num = 0;
 #endif
       tm->termcodes[thread_num] = TM_UNFINISHED;
       then  = wall_clock(NULL);
@@ -359,15 +359,7 @@ int solve(tm_prob *tm)
 		     tm->lp_stat.ip_sols > 0) &&
 		!(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit) &&
 		c_count <= 0){
-#pragma omp critical (tree_update)
-            {
-            scand_num = tm->samephase_candnum;
-            }
-	    if (scand_num > 0
-#ifndef __PVM__
-		&& (thread_num != 0 || tm->par.max_active_nodes == 1)
-#endif
-		){
+	    if (tm->samephase_candnum > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
 	       i = start_node(tm, thread_num);
 	    }else{
 	       i = NEW_NODE__NONE;
@@ -571,9 +563,9 @@ OPENMP_ATOMIC_WRITE
 	    write_log_files(tm);
 	    then3 = now;
 	 }
-} // pragma
+}
       }
-} // pragma
+}
 
       if (tm->termcode == TM_UNBOUNDED){
 	 break;
@@ -3891,18 +3883,18 @@ void sym_catch_c(int num)
    sigprocmask(SIG_SETMASK, &mask_set, &old_set);
    
    strcpy(temp, "");
-   fprintf(stderr, "\nDo you want to abort immediately, exit gracefully (from the current solve call only), or continue? [a/e/c]: ");
-   fflush(stderr);   
+   printf("\nDo you want to abort immediately, exit gracefully (from the current solve call only), or continue? [a/e/c]: ");
+   fflush(stdout);   
    fgets(temp, MAX_LINE_LENGTH, stdin);
    if(temp[1] == '\n' && (temp[0] == 'a' || temp[0] == 'A')){
-      fprintf(stderr, "\nTerminating...\n");
-      fflush(stderr);
+      printf("\nTerminating...\n");
+      fflush(stdout);
       exit(0);
    }else if(temp[1] == '\n' && (temp[0] == 'e' || temp[0] == 'E')){    
       c_count++;	    
    } else{
-      fprintf(stderr, "\nContinuing...\n");
-      fflush(stderr);
+      printf("\nContinuing...\n");
+      fflush(stdout);
       c_count = 0;      
    }
 

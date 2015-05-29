@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* The author of this file is Menal Guzelsoy                                 */
 /*                                                                           */
@@ -39,15 +39,11 @@ int sym_presolve(sym_environment *env)
       FREE(env->prep_mip);
    }
 
-   if (env->par.multi_criteria){
-      p_level = env->par.prep_par.level = 0;
-   }
-
    /* 
     * if preprocessing level > 2, then create a copy. otherwise change the
     * existing data.
     */
-   if (p_level > 2 && env->mip->matbeg){
+   if (p_level > 2){
       P->orig_mip = env->orig_mip = create_copy_mip_desc(env->mip);
       P->mip = env->prep_mip = env->mip;
    } else {
@@ -121,16 +117,15 @@ int prep_update_rootdesc(sym_environment *env)
 {
    int i, user_size = env->rootdesc->uind.size;// uind = 0;
    int *user_ind = env->rootdesc->uind.list;
-   int bvarnum = env->base->varnum;
    
-   if (user_size + bvarnum != env->mip->n){
+   if (user_size != env->mip->n){
       for (i = 0; i < env->mip->n; i++){
 	 user_ind[i] = i;
       }
-      env->rootdesc->uind.size = env->mip->n;
    }
    
    env->base->cutnum = env->mip->m;
+   env->rootdesc->uind.size = env->mip->n;
    
    if (env->par.multi_criteria && !env->par.lp_par.mc_find_supported_solutions){
       env->base->cutnum += 2;
@@ -158,49 +153,46 @@ int prep_solve_desc (PREPdesc * P)
    int verbosity = params.verbosity;
    int p_level = params.level;
 
-   if (!P->mip->matbeg){
-      return termcode;
-   }
-   
-   if (p_level <= 0) {
+   if (p_level < 0) {
      /* preprocessing is not carried out. mipinfo data structures are still
       * filled up */
      PRINT(verbosity, -1, ("Skipping Preprocessor\n"));
-   }else{
-      PRINT(verbosity, -2, ("Starting Preprocessing...\n"));
    }
 
    double start_time = wall_clock(NULL);
 
    /* Start with Basic Preprocessing */
-   P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
-   int max_mn = MAX(mip->n, mip->m);
-   P->tmpi = (int *)malloc(ISIZE*max_mn);
-   P->tmpd = (double *)malloc(DSIZE*max_mn);
-   P->tmpc = (char *)malloc(CSIZE*max_mn);
-   
+   if (p_level >= 0){
+      PRINT(verbosity, -2, ("Starting Preprocessing...\n"));
+      P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
+      int max_mn = MAX(mip->n, mip->m);
+      P->tmpi = (int *)malloc(ISIZE*max_mn);
+      P->tmpd = (double *)malloc(DSIZE*max_mn);
+      P->tmpc = (char *)malloc(CSIZE*max_mn);
+   }
+
    /* need to fill in the row ordered vars of mip */
    /* these will be needed for both basic and advanced prep functions
       so we call them here */
-   
+
    termcode = prep_fill_row_ordered(P);
-   
+
    if (PREP_QUIT(termcode)) {
-      return termcode;
+     return termcode;
    }
-   
+
    /* find some information about the mip: type of rows, cols, variables etc. */
    termcode = prep_initialize_mipinfo(P);//mip, params, &(P->stats));   
    //   if (PREP_QUIT(termcode)) {
    //     return termcode;
    //   }
-   
+
    /* no changes so far on column based mip */
    /* call the main sub function of presolver */
    if (p_level > 2 && !PREP_QUIT(termcode)){
-      termcode = prep_basic(P);
+     termcode = prep_basic(P);
    }
-   
+
    if(termcode == PREP_SOLVED){
       prep_merge_solution(P->orig_mip, P->mip, &(P->xlength), 
 			  &(P->xind), &(P->xval));
@@ -214,7 +206,6 @@ int prep_solve_desc (PREPdesc * P)
       PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 
 			   wall_clock(NULL) - start_time));   
    }
-
    return termcode; 
 }
  

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* The OSI interface in this file was written by Menal Guzelsoy.             */
 /* The OSL interface was written by Ondrej Medek.                            */
@@ -23,6 +23,9 @@
 #include "omp.h"
 #endif
 
+#define USE_BACH
+#define BACH_DEBUG
+
 #include "sym_lp.h"
 #include "sym_master.h" 
 #include "sym_proccomm.h"
@@ -31,7 +34,9 @@
 #include "sym_macros.h"
 #include "sym_types.h"
 #include "sym_lp_solver.h"
+#ifdef COMPILE_IN_LP
 #include "sym_primal_heuristics.h"
+#endif
 #include "sym_qsort.h"
 #ifdef USE_CGL_CUTS
 #include "sym_cg.h"
@@ -487,11 +492,7 @@ int create_subproblem_u(lp_prob *p)
    rhs = lp_data_mip->rhs;
    rngval = lp_data_mip->rngval;
    sense = lp_data_mip->sense;
-   if (p->par.multi_criteria){
-      assert(bcutnum == p->mip->m+2);
-   }else{
-      assert(bcutnum == p->mip->m);
-   }
+   assert(bcutnum == p->mip->m);
    for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;
@@ -824,9 +825,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    double *x;
    int n = lp_data->n;
    double gran_round;
-   int do_primal_heuristic = FALSE, check_ls = TRUE;
-   double t_lb = p->lp_data->objval;   
-
+   int do_primal_heuristic = FALSE, check_ls = TRUE; 
    //get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
    indices = lp_data->tmp.i1; /* n */
@@ -852,17 +851,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
     case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
-      if (feasible == IP_HEUR_FEASIBLE){
-	 memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	 if(true_objval > t_lb + lpetol100){
-	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-			     p->mip->obj_sense);
-	 }else{
-	    dual_gap = 1e-4;
-	 }
-	 apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
-	 check_ls = FALSE;
-      }
       break;
     case USER_DEFAULT: /* set the default */
       user_res = TEST_INTEGRALITY;
@@ -907,9 +895,10 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 #ifdef COMPILE_IN_LP
 
    if(p->bc_index < 1 && p->lp_stat.lp_calls < 2){
-     memcpy(p->root_lp, lp_data->x, DSIZE*n);
+     memcpy(p->root_lp, x, DSIZE*n);
    }
 
+   double t_lb = p->lp_data->objval;   
    if(p->tm->stat.analyzed > 1){      
       //find_tree_lb(p->tm);
       t_lb = MIN(t_lb, p->tm->lb);
@@ -937,7 +926,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 true_objval = p->ub;	 
       }
       
-      do_primal_heuristic = TRUE;
+      //do_primal_heuristic = TRUE;
    }
 
    if(do_primal_heuristic){
@@ -1492,6 +1481,34 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 #else
    user_res = USER_DEFAULT;
 #endif
+
+  
+  // BACH HERE!
+    #ifdef USE_BACH
+      // Obtain objective value and condition number
+      double objval = lp_data->objval;
+      double conditionNumber = bach_condition_number(lp_data);
+      
+      // Send value to the records
+      bach_record_value(p->bc_index, p->bnode, objval, conditionNumber);
+      
+      // Get decision to branch or continue
+      int bachcode = bach_should_we_branch(p->bnode);
+      
+      // If it says branch, then return the function
+      if(bachcode==BACH_BRANCH) {
+        PRINT(p->par.verbosity, 1, ("Branching because of ill-conditioned basis matrix.\n"));
+        action = USER__DO_BRANCH; // 1
+        //user_res = USER__DO_NOT_BRANCH; // 0
+        //user_res = USER__BRANCH_IF_TAILOFF; // 3
+        //user_res = USER__BRANCH_IF_MUST; // 2
+        user_res = USER__DO_BRANCH;
+      } else if(bachcode==BACH_CONTINUE) {
+        user_res = USER__DO_NOT_BRANCH;
+      }
+    #endif
+    
+  
 
    switch (user_res){
     case USER_SUCCESS:

@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[trunk],[symphony@list.coin-or.org])
+AC_INIT([SYMPHONY],[5.6.2],[symphony@list.coin-or.org])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -61,7 +61,7 @@ AC_CANONICAL_BUILD
 # the source root directory contains definition of where to find those
 # externals.  The following macro ensures that those externals are
 # retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT(SYMPHONY)
+AC_COIN_PROJECTDIR_INIT(SYMPHONY,9:2:6)
 
 # Check if user wants to produce debugging code
 AC_COIN_DEBUG_COMPILE(SYMPHONY)
@@ -707,16 +707,9 @@ if test $in_tm = yes; then
   MASTEREXT="_tm$TMEXT"
 fi 
 
-WHATTOMAKELIBS="libSym.la"
-WHATTOMAKEBINS="symphony$EXEEXT"
-if test $sym_appl = yes ; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-   WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
-   if test $dependency_linking = yes ; then
-       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
-   fi
-fi
-WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
+WHATTOMAKELIBS=
+WHATTOINSTALLLIBS=
+WHATTOMAKEBINS=
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
@@ -751,6 +744,7 @@ if test $sym_enable_parallel = true; then
     MASTEREXT="_m$MASTEREXT"
     WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
     WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
     if test $sym_appl = yes ; then 
        WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
        WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl$MASTEREXT.la"
@@ -758,7 +752,19 @@ if test $sym_enable_parallel = true; then
        	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
        fi
     fi
+else
+    MASTEREXT="_m"
+    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
+    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
     WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
+
+    if test $sym_appl = yes ; then 
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
+       if test $dependency_linking = yes ; then
+       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+       fi
+    fi
 fi
 
 AC_SUBST(WHATTOMAKELIBS)
@@ -786,13 +792,6 @@ AC_ARG_ENABLE([openmp],
    ;;
 esac],
 [sym_openmp=auto])
-
-if test $sym_enable_parallel = true; then
-   if test $sym_openmp = true; then
-      AC_MSG_ERROR(Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP)
-   fi
-   sym_openmp=false
-fi
 
 if test $sym_openmp = auto; then 
    AC_MSG_CHECKING([whether compiler supports OpenMP])
@@ -825,15 +824,6 @@ if test $sym_openmp = auto; then
 fi
 
 AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
-AC_SUBST(SYM_OPENMP_FLAGS)
-AC_SUBST(SYM_OPENMP_LIBS)
-if test $sym_openmp = true; then
-  SYM_OPENMP_FLAGS=-fopenmp
-  SYM_OPENMP_LIBS=-lgomp
-else
-  SYM_OPENMP_FLAGS= 
-  SYM_OPENMP_LIBS=
-fi
 
 #############################################################################
 #                       Other third party software                          #
@@ -923,7 +913,6 @@ AC_CONFIG_FILES([Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile
-		 Applications/MISOCO/Makefile
 		 Applications/MPP/Makefile
 		 Applications/SPP/Makefile
 		 Applications/SPP+CUTS/Makefile
@@ -945,8 +934,6 @@ AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/MCKP/README
                     Applications/MCKP/INSTALL
                     Applications/MCKP/sample.mckp
-                    Applications/MISOCO/README
-                    Applications/MISOCO/INSTALL
                     Applications/MPP/README
                     Applications/MPP/INSTALL
                     Applications/MPP/sample.mpp

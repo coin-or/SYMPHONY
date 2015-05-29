@@ -7,7 +7,7 @@
 /*                                                                           */
 /* The author of this file is Menal Guzelsoy                                 */
 /*                                                                           */
-/* (c) Copyright 2005-2015 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2005-2014 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -28,10 +28,8 @@ int main(int argc, char **argv)
    /* Read in the problem */
    si.loadProblem();
 
-   si.setSymParam(OsiSymGapLimit,.05);
-
    /* Solve the problem */
-   si.initialSolve();
+   si.branchAndBound();
 
    return(0);
 }

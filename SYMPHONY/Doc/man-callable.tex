@@ -5,7 +5,7 @@
 % SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         %
 % Laci Ladanyi (ladanyi@us.ibm.com).                                        %
 %                                                                           %
-% (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  %
+% (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  %
 %                                                                           %
 % SYMPHONY is licensed under the Eclipse Public License. Please see         %
 % accompanying file for terms.                                              %
@@ -1765,79 +1765,7 @@ This routine is used to get the post-solution column values.
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
 {\tt double *colsol} & OUT & Pointer to a double type array to be filled by 
 the solution vector. Note that, the size of this array has to be at least 
-the number of columns. \\
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-\et  
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_get_sp_size
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_get\_sp\_size}
-\sindex[f]{sym\_get\_sp\_size}
-\begin{verbatim}
-int sym_get_sp_size(sym_environment *env, int *size)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to get the size of the solution pool available after the
-solve. the solution pool contains additional (possibly su optimal) solutions
-generated during the solution procedure.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
-{\tt int *size} & OUT & Pointer to the location in which the size of the
-solution pool will be stored after the function call. \\
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-\et  
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_get_sp_solution
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_get\_sp\_solution}
-\sindex[f]{sym\_get\_sp\_solution}
-\begin{verbatim}
-int sym_get_sp_solution(sym_environment *env, int index, double *colsol, 
-                        double *objval)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to get the solution indexed by \texttt{index} from the
-solution pool. 
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
-{\tt int *size} & OUT & Index of the solution in the solution pool, \\
-{\tt double *colsol} & OUT & Pointer to a double type array to be filled by 
-the solution vector. Note that, the size of this array has to be at least 
-the number of columns. \\
-{\tt double *colsol} & OUT & Pointer to a double to the location that will
-contain the value of the solution after the function call. \\
+the number of columns.
 \et
 
 \returns

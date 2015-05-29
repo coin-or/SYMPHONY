@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -1442,10 +1442,6 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    int old_cut_name = 0;
 
    node->bobj = *can;
-   //A pointer to can->solutions has been transferred to node->bobj
-   //Rather than copying the memory over, we just zero out the original one
-   //to transfer ownership and avoid a double free
-   can->solutions = NULL;
 
    switch (can->type){
     case CANDIDATE_VARIABLE:
@@ -1475,21 +1471,23 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 			    action, dive, keep, i);
 
    if (*keep >= 0 && (p->dive == CHECK_BEFORE_DIVE || p->dive == DO_DIVE)){
+      *can = node->bobj;
+
 #ifndef MAX_CHILDREN_NUM
-      node->bobj.sense = malloc(node->bobj.child_num);
-      node->bobj.rhs = (double *) malloc(node->bobj.child_num * DSIZE);
-      node->bobj.range = (double *) malloc(node->bobj.child_num * DSIZE);
-      node->bobj.branch = (int *) malloc(node->bobj.child_num * ISIZE);
-      memcpy(node->bobj.sense, bobj->sense, bobj->child_num);
-      memcpy((char *)node->bobj.rhs, (char *)bobj->rhs, bobj->child_num*DSIZE);
-      memcpy((char *)node->bobj.range, (char *)bobj->range, bobj->child_num*DSIZE);
-      memcpy((char *)node->bobj.branch, (char *)bobj->branch, bobj->child_num*ISIZE);
+      can->sense = malloc(can->child_num);
+      can->rhs = (double *) malloc(can->child_num * DSIZE);
+      can->range = (double *) malloc(can->child_num * DSIZE);
+      can->branch = (int *) malloc(can->child_num * ISIZE);
+      memcpy(can->sense, bobj->sense, bobj->child_num);
+      memcpy((char *)can->rhs, (char *)bobj->rhs, bobj->child_num*DSIZE);
+      memcpy((char *)can->range, (char *)bobj->range, bobj->child_num*DSIZE);
+      memcpy((char *)can->branch, (char *)bobj->branch, bobj->child_num*ISIZE);
 #endif   
       p->dive = fractional_dive ? olddive : dive;
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE /*next time*/){
 	 /* get the new node index */
 	 p->bc_index = node->children[*keep]->bc_index;
-	 if (node->bobj.type == CANDIDATE_CUT_IN_MATRIX &&
+	 if (can->type == CANDIDATE_CUT_IN_MATRIX &&
 	     bobj->name == -p->base.cutnum-1){
 	    /* in this case we must have a branching cut */
 	    lp_data->rows[pos].cut->name = bobj->name;

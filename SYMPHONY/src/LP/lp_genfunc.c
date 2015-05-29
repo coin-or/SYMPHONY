@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -14,9 +14,15 @@
 
 #define COMPILE_FOR_LP
 
+
 #ifdef _OPENMP
 #include "omp.h"
 #endif
+
+
+#define USE_BACH
+#define BACH_DEBUG
+
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
@@ -185,8 +191,18 @@ int process_chain(lp_prob *p)
 	 printf("****************************************************\n\n");
 	 PRINT(p->par.verbosity, 4, ("Diving set to %i\n\n", p->dive));
       }
+      
+      #ifdef USE_BACH
+        bach_init_node(p->bc_index, p->par.verbosity, p->par.bach_method, &(p->bnode));
+      #endif
+      
       termcode = fathom_branch(p);
-
+      
+      #ifdef USE_BACH
+        bach_free_node(p->bnode);
+      #endif
+     
+        
 #ifdef COMPILE_IN_LP
 OPENMP_ATOMIC_UPDATE
       p->tm->stat.chains++;
@@ -221,6 +237,7 @@ OPENMP_ATOMIC_UPDATE
 
 int fathom_branch(lp_prob *p)
 {
+   int function_status;
    LPdata *lp_data = p->lp_data;
    node_times *comp_times = &p->comp_times;
    char first_in_loop = TRUE;
@@ -242,6 +259,10 @@ int fathom_branch(lp_prob *p)
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
    
+   
+   
+   
+   
    // TODO: replace check_bounds with a better preprocessor
    termcode = LP_OPTIMAL; // just to initialize
    check_bounds(p, &termcode);
@@ -254,11 +275,13 @@ int fathom_branch(lp_prob *p)
    }
 
   
+  
+  
    /*------------------------------------------------------------------------*\
     * The main loop -- continue solving relaxations until no new cuts
     * are found
-   \*------------------------------------------------------------------------*/
-
+   \*------------------------------------------------------------------------*/    
+    
 #ifdef COMPILE_IN_LP
    while (p->tm->termcode == TM_UNFINISHED){
 #else
@@ -338,6 +361,28 @@ int fathom_branch(lp_prob *p)
       p->lp_stat.lp_calls++;
       p->lp_stat.lp_node_calls++;
 
+      
+      /* #ifdef USE_BACH
+        // Obtain objective value and condition number
+        double objval = lp_data->objval;
+        double conditionNumber = bach_condition_number(lp_data);
+        
+        // Send value to the records
+        bach_record_value(p->bc_index, p->bnode, objval, conditionNumber);
+        
+        // Get decision to branch or continue
+        int bachcode = bach_should_we_branch(p->bnode);
+        
+        // If it says branch, then return the function
+        if(bachcode==BACH_BRANCH) {
+          PRINT(verbosity, 1, ("Branching because of ill-conditioned basis matrix.\n"));
+          return(ERROR__USER);
+        }
+      #endif */
+      
+      
+      
+      
 #ifdef COMPILE_IN_LP
 OPENMP_ATOMIC_UPDATE
       p->tm->lp_stat.lp_iter_num += iterd;
@@ -543,7 +588,7 @@ OPENMP_ATOMIC_UPDATE
 	 /*------------------------------------------------------------------*\
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
-
+        //printf("Genfunc | Receive Cuts: %d\n", p->bc_index);
 #ifdef USE_SYM_APPLICATION
 	    if ((cut_term = receive_cuts(p, first_in_loop,
                         no_more_cuts_count)) >=0 ){
@@ -585,6 +630,9 @@ OPENMP_ATOMIC_UPDATE
       }else{
 	 PRINT(verbosity, 2, ("... %i violated cuts were added\n", cuts));
       }
+      
+      
+      
       
       comp_times->lp += used_time(&p->tt);
 
@@ -711,6 +759,7 @@ OPENMP_ATOMIC_UPDATE
       }
 #endif
    }
+   
    
    comp_times->lp += used_time(&p->tt);
 
@@ -1749,12 +1798,6 @@ int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
          }
       }
    } else {
-      if (desc->bnd_change) {
-         FREE(desc->bnd_change->index);
-         FREE(desc->bnd_change->lbub);
-         FREE(desc->bnd_change->value);
-         FREE(desc->bnd_change);
-      }
       desc->bnd_change = NULL;
    }
 #endif
@@ -2820,6 +2863,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
    int should_generate = FALSE;
    double total_time, cut_time;   
    
+   
    /* two times is necessary */
    cut_time     = used_time(&total_time);
    cut_time     = used_time(&total_time);
@@ -3581,3 +3625,263 @@ int check_bounds(lp_prob *p, int *termcode)
 }
 /*===========================================================================*/
 /*===========================================================================*/
+
+
+
+//////////////////////     BACH FUNCTIONS     \\\\\\\\\\\\\\\\\
+
+#ifdef USE_BACH
+    
+int bach_init_node(int nodeID, int verbosity, int mode, bach_node** bnode ) {
+    bach_node* bachnode;
+
+    PRINT(verbosity,2,("New BACH Node: %i\n", nodeID));
+    bachnode = (bach_node*) calloc(1, sizeof(bach_node));
+    bachnode->objvalues = (double*) calloc(50, sizeof(double));
+    bachnode->conditions = (double*) calloc(50, sizeof(double));
+    bachnode->counter = 0;
+    bachnode->id = nodeID;
+    bachnode->size = 50;
+    bachnode->verbosity = verbosity;
+    bachnode->method = mode;
+    
+    *bnode = bachnode;
+    
+    return 1;
+}
+
+int bach_record_value(int ID, bach_node* bachnode, double objval, double conditionnumber) {
+    
+  #ifdef BACH_DEBUG
+    printf(" BACH New Record [Node %i | %i] (Obj: %g, Condition: %g) @%i\n",ID,bachnode->id, objval,conditionnumber,bachnode->counter);
+  #endif
+  
+  // If node is a child of an earlier node, start a new bach node
+    if(ID!=bachnode->id) {
+      //bach_print_all_values(bachnode);
+      int verbosity = bachnode->verbosity;
+      int method = bachnode->method;
+      bach_free_node(bachnode);
+      bach_init_node(ID,verbosity,method,&bachnode);
+    }
+    
+    // Initialize variables
+    int i;
+    int size;
+    
+    i = bachnode->counter;
+    size = bachnode->size;
+    
+    // If current array sizes are not sufficient, request more memory
+    if(i>=size) { // resize arrays
+        printf("Resizing\n");
+        bachnode->objvalues = (double*) realloc(bachnode->objvalues, size*2*sizeof(double));
+        bachnode->conditions = (double*) realloc(bachnode->conditions, size*2*sizeof(double));
+        bachnode->size = size*2;
+    }
+    
+    // Record the values to the array
+    bachnode->objvalues[i] = objval;
+    bachnode->conditions[i] = conditionnumber;
+    bachnode->counter++;
+    
+    // Return success message
+    return 1;
+}
+
+double bach_condition_number(LPdata* lp_data) {
+
+  // Initialize variables
+  double condNumber = 0;
+  int status = -100;
+  CoinWarmStartBasis* warm = lp_data->si->getPointerToWarmStart();
+  const CoinPackedMatrix* columnCopy = lp_data->si->getMatrixByCol();
+  
+  int numberRows=columnCopy->getNumRows();
+  int numberColumns=columnCopy->getNumCols(); 
+  
+  // Init factorization
+  CoinFactorization factorization;
+  int * rowIsBasic = new int[numberRows];
+  int * columnIsBasic = new int[numberColumns];
+  int i;
+  int numberBasic=0;
+  for (i=0;i<numberRows;i++) {
+    if (warm->getArtifStatus(i) == CoinWarmStartBasis::basic) {
+      rowIsBasic[i]=1;
+      numberBasic++;
+    } else {
+      rowIsBasic[i]=-1;
+    }
+  }
+  for (i=0;i<numberColumns;i++) {
+    if (warm->getStructStatus(i) == CoinWarmStartBasis::basic) {
+      columnIsBasic[i]=1;
+      numberBasic++;
+    } else {
+      columnIsBasic[i]=-1;
+    }
+  }
+  
+  
+  while (status<-98) {
+    status=factorization.factorize(*columnCopy,
+           rowIsBasic, columnIsBasic);
+    if (status==-99) factorization.areaFactor(factorization.areaFactor() * 2.0);
+  }
+  
+  // Get the condition number
+  condNumber = factorization.conditionNumber();
+  
+  delete[] rowIsBasic;
+  delete[] columnIsBasic;
+  
+  return condNumber;
+}
+
+int bach_should_we_branch(bach_node* bachnode) {
+  
+  int verbosity = bachnode->verbosity;
+  
+  if(bachnode->method<1) {
+    printf("Do not use BACH!\n");
+    return 1; // do not use BACH
+  }
+  
+  // If we don't have enough iteration, return continue
+  int n = bachnode->counter-1;
+  if(n<0) {
+    return BACH_CONTINUE;
+  }
+  
+  // If condition number is not that high, we can continue
+  double last_cond = bachnode->conditions[n];
+  if(last_cond < 100 && bachnode->method!=3) {
+    return BACH_CONTINUE;
+  }
+  
+  // Now, we will decide based on chosen method
+  
+  int method = bachnode->method;
+  
+  if(method == 1) {
+    // Method 1: Absolute improvement less than threshold
+    double score = 0;
+    score = (bachnode->objvalues[n] - bachnode->objvalues[n-1]) / last_cond;
+    PRINT(verbosity,2,("BACH Method 1, score: %e\n", score));
+    if (score<BACH_ALPHA) {
+      return BACH_BRANCH;
+    } else {
+      return BACH_CONTINUE;
+    }
+  } else if(method == 2) {
+    // Method 2: Average of improvement is less than relative threshold
+    double avg = 0;
+    int i=0;
+    for(i=1; i<=n; i++) {
+      double diff = bachnode->objvalues[i]-bachnode->objvalues[i-1];
+      avg += diff /  bachnode->conditions[i];
+    }
+    avg = avg / n;
+    double first = 0;
+    first = (bachnode->objvalues[1] - bachnode->objvalues[0]) / bachnode->conditions[1];
+    
+    PRINT(verbosity,2,("BACH Method 2, avg: %e\n", avg));
+    if ( avg < (1+first)*BACH_BETA ) {
+      return BACH_BRANCH;
+    } else {
+      return BACH_CONTINUE;
+    }
+  } else if(method == 3) {
+    // Method 3: Forecasted
+    double multip = 0;
+    multip = (bachnode->objvalues[1] - bachnode->objvalues[0]) * bachnode->conditions[1];
+    
+    double expected = multip / bachnode->conditions[n];
+    double actual = bachnode->objvalues[n] - bachnode->objvalues[n-1];
+    
+    PRINT(verbosity,2,("BACH Method 3, expected: %e\n", expected));
+    if(actual < BACH_GAMMA * expected) {
+      return BACH_BRANCH;
+    } else {
+      return BACH_CONTINUE;
+    }
+    
+    
+  } else if(method == 4) {
+    PRINT(verbosity,3,("BACH Method 3\n"));
+    if(last_cond > 1000) {
+      return BACH_BRANCH;
+    }
+  } else {
+    // dont use BACH
+  }
+  
+  return BACH_CONTINUE;
+  
+}
+
+int bach_print_all_values(bach_node* bachnode) {
+
+    // Initialize the variables
+    int i;
+    int size;
+    int verbosity;
+    
+    i = 0;
+    size = bachnode->counter;
+    verbosity = bachnode->verbosity;
+    
+    // If we have any records in the arrays
+    if(size>0) {
+    
+      // If current verbosity level is sufficient, list all the values in the arrays.
+      
+      PRINT(verbosity, 3, ("\n-----\nBACH RECORDS CHECKOUT\nIter\tObjective\tCondition Number\n"));
+      for(i=0; i<size; i++) {
+          PRINT(verbosity, 3, ("%d\t%g\t\t%g\n",i,bachnode->objvalues[i],bachnode->conditions[i]));
+      }
+      PRINT(verbosity, 3, ("-----\n\n"));
+      
+    }
+    
+    return 1;
+}
+
+int bach_free_node(bach_node* bachnode ) {
+    // Print out all values before they are freed
+    bach_print_all_values(bachnode);
+    
+    // Free arrays
+    free(bachnode->objvalues);
+    free(bachnode->conditions);
+    
+    // Free node itself
+    free(bachnode);
+    
+    // Tell that node is gone.. forever..
+    printf("Freed BACH Node\n");
+    
+    // Return with a sad success message.. it will be remembered..
+    return 1;
+}
+
+
+/* int bach_print(char* message, int verbosity) {
+  printf("Test Message from BACH!\n");
+  return 1;
+} */
+    
+    
+    
+#endif
+
+
+
+
+
+
+
+
+
+

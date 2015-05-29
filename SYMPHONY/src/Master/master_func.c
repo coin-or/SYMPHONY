@@ -7,7 +7,7 @@
 /*                                                                           */
 /* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -31,6 +31,7 @@
 #include "sym_pack_array.h"
 #include "sym_lp_solver.h"
 //#include "sym_lp.h"
+//#include "sym_bach.h"
 #include "sym_tm.h"
 
 /*===========================================================================*/
@@ -2170,7 +2171,6 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "keep_description_of_pruned") == 0 ||
 	    strcmp(key, "TM_keep_description_of_pruned") == 0){
       READ_INT_PAR(tm_par->keep_description_of_pruned);
-      lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
       return(0);
    }
    else if(strcmp(key, "keep_warm_start") == 0){
@@ -2514,6 +2514,11 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->discard_slack_cuts);
       return(0);
    }
+   else if (strcmp(key, "bach_method") == 0){
+      READ_INT_PAR(lp_par->bach_method);
+      return(0);
+   }
+
    
    /* timeouts on receiving cuts */
    else if (strcmp(key, "first_lp_first_cut_time_out") == 0 ||
@@ -3417,7 +3422,7 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(prep_par->time_limit);
       return(0);
    }
-
+   
    return(FUNCTION_TERMINATED_ABNORMALLY);
 }
 
@@ -3525,6 +3530,7 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
       mip->cru_vars = 0;
       mip->orig_sense = 0;
       mip->orig_ind = 0;
+#if 0
       if (mip->row_matbeg){
 	 mip_copy->row_matbeg  = (int *) malloc(ISIZE * (mip_copy->m + 1));
 	 mip_copy->row_matind = (int *)    malloc(ISIZE*mip_copy->nz);
@@ -3539,6 +3545,7 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 memcpy(mip_copy->row_lengths, mip->row_lengths, ISIZE*mip_copy->m);
 	 memcpy(mip_copy->col_lengths, mip->col_lengths, ISIZE * mip_copy->n);
       }
+#endif
       
       if (mip->colname){
 	 mip_copy->colname = (char**)calloc(sizeof(char*), mip_copy->n);
@@ -3580,7 +3587,6 @@ sym_environment *create_copy_environment (sym_environment *env)
    cp_cut_data *cp_cut;
    cut_data *cut;
 #endif
-   sp_desc *sp;
    
    if (!env){
       printf("create_copy_sym_environment(): The given problem is empty!\n");
@@ -3652,42 +3658,13 @@ sym_environment *create_copy_environment (sym_environment *env)
 
    /*========================================================================*/
 
-   /* Copy solution pool */
-
-   if (env->sp){
-      sp = env_copy->sp = (sp_desc *) malloc (sizeof(sp_desc));
-      memcpy (sp, env->sp, sizeof(sp_desc));
-      sp->solutions =
-	 (sp_solution **) calloc (sp->max_solutions, sizeof(sp_solution *));
-      for (i = 0; i < sp->num_solutions; i ++){
-	 sp->solutions[i] = (sp_solution *) malloc(sizeof(sp_solution));
-	 sp->solutions[i]->xlength = env->sp->solutions[i]->xlength;
-	 if (sp->solutions[i]->xlength){
-	    sp->solutions[i]->xind =
-	       (int *)malloc(ISIZE * sp->solutions[i]->xlength);
-	    sp->solutions[i]->xval =
-	       (double *)malloc(DSIZE * sp->solutions[i]->xlength);
-	    memcpy(sp->solutions[i]->xind, env->sp->solutions[i]->xind,
-		   ISIZE*sp->solutions[i]->xlength);
-	    memcpy(sp->solutions[i]->xval, env->sp->solutions[i]->xval,
-		   DSIZE*sp->solutions[i]->xlength);
-	 }
-      }   
-   }
-   
-   /*========================================================================*/
-
    /* copy mip */
    if (env->mip){
       //free_mip_desc(env_copy->mip);
       if(env->prep_mip){
 	 env_copy->prep_mip = create_copy_mip_desc(env->prep_mip);
-	 if (env->orig_mip){
-	    env_copy->orig_mip = create_copy_mip_desc(env->orig_mip);
-	    env_copy->mip = env_copy->orig_mip;
-	 }else{
-	    env_copy->mip = create_copy_mip_desc(env->mip);
-	 }
+	 env_copy->orig_mip = create_copy_mip_desc(env->orig_mip);
+	 env_copy->mip = env_copy->orig_mip;
       }else{
 	 env_copy->mip = create_copy_mip_desc(env->mip);
 	 env_copy->prep_mip = env_copy->orig_mip = 0;

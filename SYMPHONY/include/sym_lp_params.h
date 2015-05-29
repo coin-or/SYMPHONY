@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -332,6 +332,10 @@ typedef struct LP_PARAMS{
 
    /* to avoid nested for loops, check if userind's are in order */
    int               is_userind_in_order;
+   
+   /* BACH Package variables */
+   int               bach_method;
+   
 }lp_params;
 
 #endif

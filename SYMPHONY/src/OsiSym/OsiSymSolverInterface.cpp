@@ -1472,28 +1472,18 @@ double OsiSymSolverInterface::getInfinity() const
 
 const double * OsiSymSolverInterface::getColSolution() const
 {
-   double *tmp_sol = NULL;
+
    int n = getNumCols();
 
-   if (n == 0){
-      return (0);
-   }
-
    if(!colsol_){      
-      tmp_sol = new double[n];
-      if (sym_get_col_solution(env_, tmp_sol) ==
-	  FUNCTION_TERMINATED_ABNORMALLY){
-	 //SYMPHONY doesn't have a stored solution, return a NULL pointer
-	 freeCacheDouble(tmp_sol);
-      }else{
-	 colsol_ = tmp_sol;
-      }
-   }else{
-      //Either over-write colsol_ with stored solution or return the chached 
-      //one. 
-      sym_get_col_solution(env_, colsol_);
+      colsol_ = new double[n];
    }
-  
+   if (sym_get_col_solution(env_, colsol_)){
+      if (!getNumCols()){
+	 return (0);
+      }
+   }
+   
    return (colsol_);
 }
 
@@ -1506,36 +1496,11 @@ const double * OsiSymSolverInterface::getRowActivity() const
    if(!rowact_){
       rowact_ = new double[getNumRows()];
    }
-   if (sym_get_row_activity(env_, rowact_) == FUNCTION_TERMINATED_ABNORMALLY){
-      //This means SYMPHONY has no stored solution, so we use the cached one
-      //This is a bit silly and just required to pass unit test
-      if (colsol_){
-	 int m = getNumRows();
-	 int n = getNumCols();
-	 int nz = getNumElements();
 
-	 int *matbeg = new int[n + 1];
-	 int *matind = new int[nz];
-	 double *matval = new double[nz];
-   
-	 sym_get_matrix(env_, &nz, matbeg, matind, matval);
-
-	 memset(rowact_, 0, DSIZE*m);
-   
-	 for(int i = 0; i < n; i++){
-	    for(int j = matbeg[i]; j < matbeg[i+1]; j++){
-	       rowact_[matind[j]] += matval[j] * colsol_[i];
-	    }
-	 }
-	 delete[] matbeg;
-	 delete[] matind;
-	 delete[] matval;
-	 return (rowact_);
-      }else{
-	 return (0);
-      }
-   }else{
+   if(!sym_get_row_activity(env_, rowact_)){
       return (rowact_);
+   } else {
+      return (0);
    }
 }
 
@@ -1662,18 +1627,8 @@ void OsiSymSolverInterface::setObjSense(double s)
 
 void OsiSymSolverInterface::setColSolution(const double *colsol)
 {
-   if (sym_set_col_solution(env_, const_cast<double *>(colsol)) ==
-       FUNCTION_TERMINATED_ABNORMALLY){
-      //This means the user asked SYMPHONY to store an infeasible solution
-      //We are then forced to cache the solution per Osi's requirement
-      int n = getNumCols();
-      if(!colsol_){      
-	 colsol_ = new double[n];
-      }
-      memcpy(colsol_, colsol, n*sizeof(double));
-   }else{
-      freeCachedResults();
-   }
+   freeCachedResults();
+   sym_set_col_solution(env_, const_cast<double *>(colsol));
 }
 
 /*===========================================================================*/

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -35,6 +35,11 @@
 #ifdef COMPILE_IN_LP
 #include "sym_tm.h"
 #endif
+
+#ifdef USE_BACH
+#include "sym_bach.h"
+#endif
+
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -183,6 +188,11 @@ typedef struct LP_PROB{
    double          cgl_impr;
    int             cgl_impr_cnt; 
    int             is_diving; 
+   
+   #ifdef USE_BACH
+    bach_node*  bnode;
+   #endif
+   
 }lp_prob;
 
 /*===========================================================================*/
