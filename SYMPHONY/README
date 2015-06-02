@@ -1,4 +1,4 @@
-SYMPHONY Version 5.6.10 README
+SYMPHONY Version 5.6.11 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
@@ -244,6 +244,9 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 
 WHAT'S NEW
 ==========
+
+# Release 5.6.11
+  * Updating dependencies
 
 # Release 5.6.10
   * Fixed bug with using more the 1 process in PVM

@@ -1,4 +1,4 @@
-# SYMPHONY Version 5.6.10 README
+# SYMPHONY Version 5.6.11 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
@@ -227,6 +227,9 @@ https://projects.coin-or.org/SYMPHONY/newticket
 Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
+
+### Release 5.6.11
+  * Updating dependencies
 
 ### Release 5.6.10
   * Fixed bug with using more the 1 process in PVM
