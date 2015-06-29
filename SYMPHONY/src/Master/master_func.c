@@ -988,7 +988,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 
    
    if(env->mip->var_type_modified == TRUE) {
-      for(i = root->sol_size; i >=0; i++){
+      for(i = root->sol_size; i >=0; i--){
 	 if(mip->is_int[root->sol_ind[i]]){
 	    valuesi = root->sol[i];
 	    if (valuesi-floor(valuesi) > lpetol &&
