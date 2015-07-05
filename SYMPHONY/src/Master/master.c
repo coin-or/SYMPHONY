@@ -1066,20 +1066,39 @@ int sym_solve(sym_environment *env)
 #endif
 #endif
 
-   // Check stored solution to see if it is still feasible
-
-   if (best_sol->has_sol){
-      tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-      for (i = 0; i < best_sol->xlength; i++){
-	 tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
-      }
-      sym_set_col_solution(env, tmp_sol);
-      FREE(tmp_sol);
+#if 0
+   if (!best_sol->has_sol){
+      env->has_ub = FALSE;
+      env->ub = 0.0;
+      
+      env->warm_start->has_ub = env->best_sol.has_sol = 
+	 env->warm_start->best_sol.has_sol = FALSE;
+      env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+      env->warm_start->lb = -MAXDOUBLE;
+      env->warm_start->best_sol.xlength = 0;
+      FREE(env->warm_start->best_sol.xind);
+      FREE(env->warm_start->best_sol.xval);
+   }else {
+      env->has_ub = env->warm_start->has_ub;
+      env->ub = env->warm_start->ub;
+      env->lb = env->warm_start->lb;
    }
+   env->lb = -MAXDOUBLE;
+#endif
    
-   //   memset(&(env->best_sol), 0, sizeof(lp_sol));
-
    if (env->warm_start && env->par.tm_par.warm_start){
+      //check stored solution for feasibility
+      if (env->warm_start->best_sol.has_sol){
+	 tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+	 for (i = 0; i < env->warm_start->best_sol.xlength; i++){
+	    tmp_sol[env->warm_start->best_sol.xind[i]] =
+	       env->warm_start->best_sol.xval[i];
+	 }
+	 sym_set_col_solution(env, tmp_sol);
+	 FREE(tmp_sol);
+      }
+      //   memset(&(env->best_sol), 0, sizeof(lp_sol));
+
       /* Load warm start info */
       tm->rootnode = env->warm_start->rootnode;
       tm->cuts = env->warm_start->cuts;
@@ -1088,9 +1107,9 @@ int sym_solve(sym_environment *env)
       tm->stat = env->warm_start->stat;
       tm->comp_times = env->warm_start->comp_times;
       tm->lb = env->warm_start->lb;
-      if (env->warm_start->has_ub){
-	 if (env->warm_start->ub < tm->ub || !tm->has_ub){
-	    tm->ub = env->warm_start->ub;
+      if (env->has_ub){
+	 if (env->ub < tm->ub || !tm->has_ub){
+	    tm->ub = env->ub;
 	 }
 	 tm->has_ub = TRUE;
       }
@@ -1116,6 +1135,7 @@ int sym_solve(sym_environment *env)
 	 FREE(env->warm_start->cuts);
       }
    }
+ 
    /* Now the tree manager owns everything */
    FREE(env->warm_start);
    
@@ -1590,24 +1610,28 @@ int sym_warm_solve(sym_environment *env)
 	return(sym_solve(env));
       }
       
+#if 0
+      //This doesn't seem to be the right thing, although it's been here for
+      //a long time!
       if(env->mip->change_num){
+
 	 env->has_ub = FALSE;
 	 env->ub = 0.0;
 	 env->lb = -MAXDOUBLE;
 	 
-	 env->warm_start->has_ub = env->best_sol.has_sol = 
-	    env->warm_start->best_sol.has_sol = FALSE;
-	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
-	 env->warm_start->lb = -MAXDOUBLE;
-	 env->warm_start->best_sol.xlength = 0;
-	 FREE(env->warm_start->best_sol.xind);
-	 FREE(env->warm_start->best_sol.xval);
+	 //env->warm_start->has_ub = env->best_sol.has_sol = 
+	 //   env->warm_start->best_sol.has_sol = FALSE;
+	 //env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+	 //env->warm_start->lb = -MAXDOUBLE;
+	 //env->warm_start->best_sol.xlength = 0;
+	 //FREE(env->warm_start->best_sol.xind);
+	 //FREE(env->warm_start->best_sol.xval);
       }else {
 	 env->has_ub = env->warm_start->has_ub;
 	 env->ub = env->warm_start->ub;
 	 env->lb = env->warm_start->lb;
       }
-
+#endif
       if(env->par.multi_criteria){
 	 env->has_ub = env->has_mc_ub;
 	 env->ub = env->mc_ub;
