@@ -2298,6 +2298,30 @@ int set_param(sym_environment *env, char *line)
       printf("         features enabled in order to use them.\n\n");
 #endif
       return(0);
+   }
+   else if (strcmp(key, "sensitivity_bounds") == 0 ||
+	    strcmp(key, "TM_sensitivity_bounds") == 0 ){
+#ifdef SENSITIVITY_ANALYSIS
+      READ_INT_PAR(tm_par->sensitivity_bounds);
+      lp_par->sensitivity_bounds = tm_par->sensitivity_bounds;
+#else
+      printf("Warning: Sensitivity analysis features are not currently\n");
+      printf("         enabled. You must rebuild SYMPHONY with these\n");
+      printf("         features enabled in order to use them.\n\n");
+#endif
+      return(0);
+   }
+   else if (strcmp(key, "sensitivity_rhs") == 0 ||
+	    strcmp(key, "TM_sensitivity_rhs") == 0 ){
+#ifdef SENSITIVITY_ANALYSIS
+      READ_INT_PAR(tm_par->sensitivity_rhs);
+      lp_par->sensitivity_rhs = tm_par->sensitivity_rhs;
+#else
+      printf("Warning: Sensitivity analysis features are not currently\n");
+      printf("         enabled. You must rebuild SYMPHONY with these\n");
+      printf("         features enabled in order to use them.\n\n");
+#endif
+      return(0);
    }else if (strcmp(key, "output_mode") == 0 ||
 	    strcmp(key, "TM_output_mode") == 0){
       READ_INT_PAR(tm_par->output_mode);
@@ -2344,6 +2368,11 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "should_warmstart_chain") == 0 ||
 	    strcmp(key, "LP_should_warmstart_chain") == 0){
       READ_INT_PAR(lp_par->should_warmstart_chain);
+      return(0);
+   }
+   else if (strcmp(key, "should_warmstart_node") == 0 ||
+	    strcmp(key, "LP_should_warmstart_node") == 0){
+      READ_INT_PAR(lp_par->should_warmstart_node);
       return(0);
    }
    else if (strcmp(key, "should_reuse_lp") == 0 ||

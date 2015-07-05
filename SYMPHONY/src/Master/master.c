@@ -252,6 +252,8 @@ int sym_set_defaults(sym_environment *env)
    // tm_par->gap_limit = 0.0;
    tm_par->find_first_feasible = FALSE;
    tm_par->sensitivity_analysis = FALSE;
+   tm_par->sensitivity_bounds = FALSE;
+   tm_par->sensitivity_rhs = FALSE;
    tm_par->rs_mode_enabled = FALSE; 
    tm_par->rs_lp_iter_limit = 1000000;
    tm_par->output_mode = 1;
@@ -269,6 +271,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
    lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
    lp_par->should_warmstart_chain = TRUE; /* see header file for description */
+   lp_par->should_warmstart_node = TRUE; /* see header file for description */
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #ifdef COMPILE_IN_LP
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
@@ -442,6 +445,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
    lp_par->sensitivity_analysis = FALSE;
+   lp_par->sensitivity_bounds = FALSE;
+   lp_par->sensitivity_rhs = FALSE;
    lp_par->use_sos_branching = FALSE;
    lp_par->sos_branching_max_level = 10;
 
@@ -1619,10 +1624,26 @@ int sym_warm_solve(sym_environment *env)
 		  printf("for now!\n"); 
 		  return(FUNCTION_TERMINATED_ABNORMALLY);   
 	       }
-	    } else{
-	       if(env->par.lp_par.cgl.generate_cgl_cuts){
-		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
-		  printf("rhs or column bounds change when cuts exist, for now!\n"); 
+	    } else if (change_type == COL_BOUNDS_CHANGED){
+	       int prob_type;
+	       if (env->prep_mip){
+		  prob_type = env->prep_mip->mip_inf->prob_type;
+	       }else{
+		  prob_type = env->mip->mip_inf->prob_type;
+	       }
+	       if(env->par.lp_par.cgl.generate_cgl_cuts &&
+		  prob_type != BINARY_TYPE &&
+		  prob_type != BIN_CONT_TYPE &&
+		  prob_type != BIN_INT_TYPE){
+		  printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
+		  printf("column bound changes when cuts exist unless the\n");
+		  printf("problem is binary\n");
+		  return(FUNCTION_TERMINATED_ABNORMALLY);
+	       } 
+	    } else if (change_type == RHS_CHANGED){
+	       if(env->par.lp_par.cgl.generate_cgl_cuts){ 
+		  printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
+		  printf("RHS changes when cuts exist\n");
 		  return(FUNCTION_TERMINATED_ABNORMALLY);
 	       } 
 	    }
@@ -1678,7 +1699,7 @@ int sym_warm_solve(sym_environment *env)
 	       env->warm_start->ub += etol;
 	    }
 	    
-	    if(cut_num > 0){
+	    if (cut_num > 0){
 	       upd_cuts = (cut_data **)malloc(sizeof(cut_data *)*env->warm_start->allocated_cut_num);
 	       tmp_ind = (int *)malloc(ISIZE*ws_cnum);
 	       for(i = 0; i < ws_cnum; i++){
@@ -5359,6 +5380,16 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
       *value = tm_par->sensitivity_analysis;
       return(0);
+   }
+   else if (strcmp(key, "sensitivity_bounds") == 0 ||
+	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
+      *value = tm_par->sensitivity_analysis;
+      return(0);
+   }
+   else if (strcmp(key, "sensitivity_rhs") == 0 ||
+	    strcmp(key, "TM_sensitivity_rhs") == 0 ){
+      *value = tm_par->sensitivity_analysis;
+      return(0);
    }else if (strcmp(key, "output_mode") == 0 ||
 	    strcmp(key, "TM_output_mode") == 0){
       *value = tm_par->output_mode;
@@ -5398,6 +5429,11 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "should_warmstart_chain") == 0 ||
 	    strcmp(key, "LP_should_warmstart_chain") == 0){
       *value = lp_par->should_warmstart_chain;
+      return(0);
+   }
+   else if (strcmp(key, "should_warmstart_node") == 0 ||
+	    strcmp(key, "LP_should_warmstart_node") == 0){
+      *value = lp_par->should_warmstart_node;
       return(0);
    }
    else if (strcmp(key, "should_reuse_lp") == 0 ||
@@ -5883,6 +5919,64 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "check_which") == 0 ||
          strcmp(key, "CP_check_which") == 0){
       *value = cp_par->check_which;
+   }
+   /*************************************************************************
+    ***                     preprocessing - parameters                    ***
+    *************************************************************************/ 
+
+   if (strcmp(key, "prep_level") == 0){
+      *value = env->par.prep_par.level;
+   }
+   else if (strcmp(key, "prep_dive_level") == 0){
+      *value = env->par.prep_par.dive_level;
+   }
+   else if (strcmp(key, "prep_impl_dive_level") == 0){
+      *value = env->par.prep_par.impl_dive_level;
+   }
+   else if (strcmp(key, "prep_impl_limit") == 0){
+      *value = env->par.prep_par.impl_limit;
+   }
+   else if (strcmp(key, "prep_iter_limit") == 0){
+      *value = env->par.prep_par.iteration_limit;
+   }
+   else if (strcmp(key, "prep_do_probing") == 0){
+      *value = env->par.prep_par.do_probe;
+   }
+   else if (strcmp(key, "prep_do_sr") == 0){
+      *value = env->par.prep_par.do_single_row_rlx;
+   }
+   else if (strcmp(key, "prep_verbosity") == 0){
+      *value = env->par.prep_par.verbosity;
+   }
+   else if (strcmp(key, "prep_reduce_mip") == 0){
+      *value = env->par.prep_par.reduce_mip;
+   }
+   else if (strcmp(key, "prep_probing_verbosity") == 0){
+      *value = env->par.prep_par.probe_verbosity;
+   }
+   else if (strcmp(key, "prep_probing_level") == 0){
+      *value = env->par.prep_par.probe_level;
+   }
+   else if (strcmp(key, "prep_display_stats") == 0){
+      *value = env->par.prep_par.display_stats;
+   }
+   else if (strcmp(key, "max_sr_cnt") == 0){
+      *value = env->par.prep_par.max_sr_cnt;
+   }
+   else if (strcmp(key, "max_aggr_row_cnt") == 0){
+      *value = env->par.prep_par.max_aggr_row_cnt;
+   }
+   else if (strcmp(key, "keep_row_ordered") == 0){
+      *value = env->par.prep_par.keep_row_ordered;
+   }
+   else if (strcmp(key, "write_mps") == 0){
+      *value = env->par.prep_par.write_mps;
+   }
+   else if (strcmp(key, "write_lp") == 0){
+      *value = env->par.prep_par.write_lp;
+   }
+   else if (strcmp(key, "prep_time_limit") == 0){
+      *value = env->par.prep_par.time_limit;
    }
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
