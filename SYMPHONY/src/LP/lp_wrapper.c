@@ -1950,6 +1950,7 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
 {
    int user_res;
    int ind, i;
+   double max = -SYM_INFINITY, min = SYM_INFINITY;
 
 #ifdef DO_TESTS
    char sense;
