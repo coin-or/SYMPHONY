@@ -306,8 +306,13 @@ int sym_get_dual_pruned PROTO((sym_environment *env,
 			       int MAX_ALLOWABLE_NUM_PIECES));
 
 
-int sym_get_lb_for_new_rhs PROTO((sym_environment *env, int cnt, 
-				  int *new_rhs_ind, double *new_rhs_val,
+int sym_get_lb_for_new_rhs PROTO((sym_environment *env,
+				  int rhs_cnt, int *new_rhs_ind,
+				  double *new_rhs_val,
+				  int lb_cnt, int *new_lb_ind,
+				  double *new_lb_val,
+				  int ub_cnt, int *new_ub_ind,
+				  double *new_ub_val,
 				  double *lb_for_new_rhs));
 int sym_get_ub_for_new_rhs PROTO((sym_environment *env, int cnt, 
 				  int *new_rhs_ind, double *new_rhs_val,

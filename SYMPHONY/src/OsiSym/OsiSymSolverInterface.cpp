@@ -121,11 +121,17 @@ double** OsiSymSolverInterface::getDualPruned(double** dual_pieces,
 /*===========================================================================*/
 /*===========================================================================*/
 
-double OsiSymSolverInterface::getLbForNewRhs(int cnt, int *index, 
-						  double * value)
+double OsiSymSolverInterface::getLbForNewRhs(int rhs_cnt, 
+					     int *rhs_ind, double *rhs_val,
+					     int lb_cnt, 
+					     int *lb_ind, double *lb_val,
+					     int ub_cnt, 
+					     int *ub_ind, double *ub_val)
 {
    double newBound;
-   if (!sym_get_lb_for_new_rhs(env_, cnt, index, value, &newBound)){
+   if (!sym_get_lb_for_new_rhs(env_, rhs_cnt, rhs_ind, rhs_val,
+			       lb_cnt, lb_ind, lb_val, ub_cnt, ub_ind, ub_val,
+			       &newBound)){
       return (newBound);
    } else {
       return (-sym_get_infinity());

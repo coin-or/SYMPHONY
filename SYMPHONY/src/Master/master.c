@@ -6375,48 +6375,39 @@ sym_environment * sym_create_copy_environment (sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
-			      double *new_rhs_val, double *lb_for_new_rhs)
+int sym_get_lb_for_new_rhs(sym_environment *env,
+			   int rhs_cnt, int *new_rhs_ind, double *new_rhs_val,
+			   int lb_cnt, int *new_lb_ind, double *new_lb_val,
+			   int ub_cnt, int *new_ub_ind, double *new_ub_val,
+			   double *lb_for_new_rhs)
 {
 #ifdef SENSITIVITY_ANALYSIS
-#ifdef USE_CGL_CUTS
-   printf("sym_get_lb_for_new_rhs():\n");
-   printf("SYMPHONY can not do sensitivity analysis when cuts are present, for now!\n"); 
-   return(FUNCTION_TERMINATED_ABNORMALLY);
-#else
    if (!env || !env->mip || 
       !env->par.tm_par.sensitivity_analysis){ 
       printf("sym_get_lb_for_new_rhs():\n");
       printf("Trying to read an empty problem, an empty problem description"); 
       printf(" or tree nodes were not kept in memory!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else if (!env->par.tm_par.sensitivity_rhs && rhs_cnt != 0){
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("RHS analysis parameter not set, cannot change RHS\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else if (!env->par.tm_par.sensitivity_bounds &&
+	     (lb_cnt != 0 || ub_cnt != 0)){
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("RHS analysis parameter not set, cannot change RHS.\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else if (!env->warm_start){
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("Bounds analysis parameter not set, cannot change bounds.\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else{
+      *lb_for_new_rhs = get_lb_for_new_rhs(env->warm_start->rootnode, env->mip,
+					   rhs_cnt, new_rhs_ind, new_rhs_val,
+					   lb_cnt, new_lb_ind, new_lb_val,
+					   ub_cnt, new_ub_ind, new_ub_val);
+      return(FUNCTION_TERMINATED_NORMALLY);
    }
-   else{
-      if (!env->warm_start){
-	 printf("sym_get_lb_for_new_rhs():\n");
-	 printf("No available warm start data to do sens. analysis. \n");
-	 return(FUNCTION_TERMINATED_ABNORMALLY);
-      }
-      else{
-	 /* check if we only have the root node, then no need to call 
-	    recursive algorithm */
-	 int i; 
-	 if(env->warm_start->stat.analyzed == 1) {
-	    *lb_for_new_rhs =  env->warm_start->rootnode->lower_bound;
-	    for(i=0; i<cnt; i++){ 
-	       *lb_for_new_rhs += 
-		  env->warm_start->rootnode->duals[new_rhs_ind[i]]*
-		  (new_rhs_val[i] - env->mip->rhs[new_rhs_ind[i]]);
-	    }	    
-	 } else {
-	    *lb_for_new_rhs =  
-	       get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
-				  new_rhs_ind, new_rhs_val);
-	 }
-      }
-      return(FUNCTION_TERMINATED_NORMALLY);	 
-   }
-#endif
 #else
    printf("sym_get_lb_for_new_rhs():\n");
    printf("Sensitivity analysis features are not enabled.\n");

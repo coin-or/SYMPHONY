@@ -73,8 +73,9 @@ public:
 				  int MAX_ALLOWABLE_NUM_PIECES);
 
    /// Get a lower bound for the new rhs problem using the warm start tree.
-   virtual double getLbForNewRhs(int cnt, int *index, 
-				 double * value);
+   virtual double getLbForNewRhs(int rhs_cnt, int *rhs_index, double * rhs_val,
+				 int lb_cnt, int *lb_index, double * lb_val,
+				 int ub_cnt, int *ub_index, double * ub_val);
    /// Get an upper bound for the new rhs problem using the warm start tree.
    virtual double getUbForNewRhs(int cnt, int *index, 
 				 double * value);

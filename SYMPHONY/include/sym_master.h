@@ -152,8 +152,13 @@ sym_environment *create_copy_environment PROTO((sym_environment *env));
 void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 			       double ** dual_pieces, int *num_pieces,
 			       int MAX_ALLOWABLE_NUM_PIECES));
-double get_lb_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
-				 int *ind, double *val));
+double get_lb_for_new_rhs PROTO((bc_node *node, MIPdesc *mip,
+				 int rhs_cnt, int *new_rhs_ind,
+				 double *new_rhs_val,
+				 int lb_cnt, int *new_lb_ind,
+				 double *new_lb_val,
+				 int ub_cnt, int *new_ub_ind,
+				 double *new_ub_val));
 double get_ub_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
 #if 0
@@ -162,7 +167,14 @@ double get_lb_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt,
 #endif
 double get_ub_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
-int check_feasibility_new_rhs PROTO((bc_node * node, MIPdesc * mip, 
-					int cnt, int *ind, double *val));
+double check_feasibility_new_rhs PROTO((bc_node *node, MIPdesc *mip,
+					bc_node **path, branch_desc *bpath,
+					int rhs_cnt,
+					int *new_rhs_ind, double *new_rhs_val,
+					int lb_cnt,
+					int *new_lb_ind, double *new_lb_val,
+					int ub_cnt,
+					int *new_ub_ind, double *new_ub_val,
+					double *objval));
 int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
 #endif

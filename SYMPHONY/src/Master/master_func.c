@@ -3979,83 +3979,209 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 
 /*===========================================================================*/
 /*===========================================================================*/
-double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind, 
-			  double *val)
+double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
+			  int rhs_cnt, int *new_rhs_ind, double *new_rhs_val,
+			  int lb_cnt, int *new_lb_ind, double *new_lb_val,
+			  int ub_cnt, int *new_ub_ind, double *new_ub_val)
 {
 #ifdef SENSITIVITY_ANALYSIS
-   int i, j, retval;
-   double min = SYM_INFINITY;
+   int i, j, k,retval;
+   double min = -SYM_INFINITY;
    bc_node * child;
-
-   if(root){   
-
-      root->C_LP = root->lower_bound;
-      for(i=0; i<cnt; i++){ 
-	 root->C_LP += root->duals[ind[i]]*(val[i] - mip->rhs[ind[i]]);
-      }
-
-      for(i = 0; i < root->bobj.child_num; i++){
-
-	 child = root->children[i];
-	 child->C_LP = 0.0;
-
-	 if(child->node_status == NODE_STATUS__PRUNED){
-	    if(child->feasibility_status == FEASIBLE_PRUNED ||
-	       child->feasibility_status == OVER_UB_PRUNED){
-	       
-	       if (child->feasibility_status == FEASIBLE_PRUNED){
-		  for(j = 0; j< child->sol_size; j++){
-		     child->C_LP += mip->obj[child->sol_ind[j]] * child->sol[j];
-		  }
-	       } else{
-		  printf("OVER_UB_PRUNED!\n");
-		  child->C_LP = child->lower_bound;
-	       }
-
-	       for(j=0; j<cnt; j++){
-		  child->C_LP += child->duals[ind[j]] *
-		     (val[j]- mip->rhs[ind[j]]);
-	       }
-	       child->B_IP = child->C_LP; 
-	    }			    
-	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
-	       
-	       child->B_IP = SYM_INFINITY;
-	       retval = check_feasibility_new_rhs(child, mip, cnt, ind, val);
-	       /* if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
-		   retval == LP_D_INFEASIBLE){
-		   child->B_IP = SYM_INFINITY;
-	       } */
-	       if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM || 
-		  retval == LP_D_ITLIM){
-		  child->B_IP = -SYM_INFINITY;
-	       }
-	    }
-	    else {
-	       printf("get_lb_for_new_rhs(): Unknown error!\n");
-	       exit(1);
-	    } 	 
-	 }
-	 else {
-	    child->B_IP = get_lb_for_new_rhs(child, mip, cnt, ind, val); 
-	 }
-	 
-	 if(child->B_IP < min)
-	    min = child->B_IP;
-      }     
-
-      if(root->C_LP > min )
-	 return (root->C_LP);
-      else
-	 return (min);
+   double lb = 0, objval = -SYM_INFINITY;
+   int level = node->bc_level;
+   bc_node **path, *n;
+   branch_desc *bpath ;
+   branch_obj * bobj;
+   
+   if(!node){
+      printf("Warning: NULL pointer in get_lb_for_new_rhs()\n");
+      return(-SYM_INFINITY);
    }
 
-   return (min);
+   path = (bc_node **) malloc((2*(level+1)+BB_BUNCH)*sizeof(bc_node *));
+   bpath = (branch_desc *) malloc 
+      ((2*(level+1)+BB_BUNCH)*sizeof(branch_desc));
+
+   for (i = level, n = node; i >= 0; n = n->parent, i--)
+      path[i] = n;
+
+   for (i = 0; i < level; i++){
+      for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
+	 if (path[i]->children[j] == path[i+1])
+	    break;
+      bobj = &path[i]->bobj;
+      bpath[i].type = bobj->type;
+      bpath[i].name = bobj->name;
+      bpath[i].sense = bobj->sense[j];
+      bpath[i].rhs = bobj->rhs[j];
+      bpath[i].range = bobj->range[j];
+      bpath[i].branch = bobj->branch[j];
+   }
+
+   //Start with the previous bound
+   if(node->feasibility_status == FEASIBLE_PRUNED ||
+      node->feasibility_status == OVER_UB_PRUNED ||
+      node->feasibility_status == NODE_BRANCHED_ON){
+      node->C_LP = node->lower_bound;
+#ifdef CHECK_DUAL_SOLUTION
+      for (i = 0; i < mip->m; i++){
+	 lb += node->duals[i]*mip->rhs[i];
+      }
+      for (i = 0; i < mip->n; i++){
+	 if (node->dj[i] >= 0){
+	    lb += node->dj[i]*mip->lb[i];
+	 }else{
+	    lb += node->dj[i]*mip->ub[i];
+	 }
+      }
+      //This is just to check the lower bound value
+      for (i = 0; i < level; i++, bpath++){
+	 if (bpath->type == BRANCHING_VARIABLE){
+	    switch (bpath->sense){
+	     case 'E':
+	       if (bpath->rhs < mip->ub[j]){
+		  lb += node->dj[j] * (bpath->rhs - mip->ub[j]);
+	       }else{
+		  lb += node->dj[j] * (bpath->rhs - mip->lb[j]);
+	       }
+	       break;
+	     case 'L':
+	       if (node->dj[j] <= 0){
+		  lb += node->dj[j] * (bpath->rhs - mip->ub[j]);
+	       }
+	       break;
+	     case 'G':
+	       if (node->dj[j] >= 0){
+		  lb += node->dj[j] * (bpath->rhs - mip->lb[j]);
+	       }
+	       break;
+	     case 'R':
+	       printf("Warning: Ranged constraints not handled!\n");
+	       exit(1);
+	       break;
+	    }
+	 }else{ /* BRANCHING_CUT */
+	    printf("Warning: Branching cuts not handled!\n");
+	    exit(1);
+	 }
+      }
+      if (fabs(node->lower_bound - lb) >= .5){
+	 printf("Error!\n");
+      }
+#endif
+      
+      //Modify
+      char sense;
+      for (i = 0; i < lb_cnt; i++){
+	 if (node->dj[new_lb_ind[i]] <= 0){
+	    continue;
+	 }
+	 for (j = 0; j < level; j++){
+	    if (bpath[j].type == BRANCHING_VARIABLE){
+	       k = bpath[j].name;   //assuming no extra vars!
+	       sense = bpath[j].sense;
+	       if ((new_lb_ind[i] == k) && ((sense == 'G') ||
+					    (sense == 'E'))){
+		  if (new_lb_val[i] > bpath[j].rhs){
+		     node->C_LP +=
+			node->dj[k]*(new_lb_val[i] - bpath[j].rhs);
+		     break;
+		  }
+	       }
+	    }
+	    if (j < level){
+	       node->C_LP += node->dj[new_lb_ind[i]] *
+		  (new_lb_val[i]- mip->lb[new_lb_ind[i]]);
+	    }
+	 }
+      }
+      for (i = 0; i < ub_cnt; i++){
+	 if (node->dj[new_ub_ind[i]] >= 0){
+	    continue;
+	 }
+	 for (j = 0; j < level; j++){
+	    if (bpath[j].type == BRANCHING_VARIABLE){
+	       k = bpath[j].name;   //assuming no extra vars!
+	       sense = bpath[j].sense;
+	       if ((new_ub_ind[i] == k) && ((sense == 'L') ||
+					    (sense == 'E'))){
+		  if (new_ub_val[i] < bpath[j].rhs){
+		     node->C_LP +=
+			node->dj[k]*(new_ub_val[i] - bpath[j].rhs);
+		     break;
+		  }
+	       }
+	    }
+	    if (j < level){
+	       node->C_LP += node->dj[new_ub_ind[i]] *
+		  (new_ub_val[i]- mip->ub[new_ub_ind[i]]);
+	    }
+	 }
+      }
+      for (i = 0; i < rhs_cnt; i++){ 
+	 node->C_LP += node->duals[new_rhs_ind[i]]*
+	    (new_rhs_val[i] - mip->rhs[new_rhs_ind[i]]);
+      }
+      node->B_IP = node->C_LP;
+   }else if (node->feasibility_status == INFEASIBLE_PRUNED){
+      
+      node->B_IP = SYM_INFINITY;
+      retval = check_feasibility_new_rhs(node, mip, path, bpath,
+					 rhs_cnt,
+					 new_rhs_ind, new_rhs_val,
+					 lb_cnt,
+					 new_lb_ind, new_lb_val,
+					 ub_cnt,
+					 new_ub_ind, new_ub_val,
+					 &objval); 
+      /* if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
+	 retval == LP_D_INFEASIBLE){
+	 node->B_IP = SYM_INFINITY;
+	 } */
+      if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM ||
+	 retval == LP_D_ITLIM){
+	 node->B_IP = objval;
+      }else{
+	 node->B_IP = SYM_INFINITY;
+      }
+   }else {
+      printf("get_lb_for_new_rhs(): Unknown feasiblility status!\n");
+      exit(1);
+   }
+
+   if (node->bobj.child_num > 0){
+      min = SYM_INFINITY;
+   }
+   for (i = 0; i < node->bobj.child_num; i++){
+      
+      child = node->children[i];
+      
+      child->B_IP = get_lb_for_new_rhs(child, mip,
+				       rhs_cnt, new_rhs_ind, new_rhs_val,
+				       lb_cnt, new_lb_ind, new_lb_val,
+				       ub_cnt, new_ub_ind, new_ub_val); 
+      
+      if(child->B_IP < min){
+	 min = child->B_IP;
+      }
+   }     
+
+#ifdef CHECK_DUAL_SOLUTION
+   if (node->bobj.child_num == 0){
+      printf("%.3f %.3f %.3f\n", node->B_IP, node->lower_bound, lb);
+   }
+#endif
+
+   return (node->B_IP > min ? node->B_IP : min);
+
 #else
+
    printf("get_lb_for_new_rhs():\n");
    printf("Sensitivity analysis features are not enabled.\n"); 
    printf("Please rebuild SYMPHONY with these features enabled\n");
    return(-SYM_INFINITY);
+
 #endif
 } 
 
@@ -4063,7 +4189,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 /*===========================================================================*/
 
 double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt, 
-				int *ind, double *val)
+			  int *ind, double *val)
 {
 #ifdef SENSITIVITY_ANALYSIS
    int i, j, n;
@@ -4249,44 +4375,31 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip, 
-				 int cnt, int *ind, double *val)
+double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip,
+				 bc_node **path, branch_desc *bpath,
+				 int rhs_cnt,
+				 int *new_rhs_ind, double *new_rhs_val,
+				 int lb_cnt,
+				 int *new_lb_ind, double *new_lb_val,
+				 int ub_cnt,
+				 int *new_ub_ind, double *new_ub_val,
+				 double *objval)
 {
 #ifdef SENSITIVITY_ANALYSIS
    int i, j;
    int level = node->bc_level;
-   bc_node **path, *n;
-   branch_desc *bpath ;
    branch_obj * bobj;
    int retval, iterd;
    LPdata * lp_data;
+   double lb, ub;
 
    double * old_obj = mip->obj;
    //   mip->obj = (double*)calloc(mip->n, DSIZE);
    
-   lp_data = (LPdata *) malloc (sizeof(LPdata));
+   lp_data = (LPdata *) calloc (1, sizeof(LPdata));
    lp_data->mip = mip;
    lp_data->n = mip->n;
    lp_data->m = mip->m;
-
-   path = (bc_node **) malloc((2*(level+1)+BB_BUNCH)*sizeof(bc_node *));
-   bpath = (branch_desc *) malloc 
-      ((2*(level+1)+BB_BUNCH)*sizeof(branch_desc));
-
-   for (i = level, n = node; i >= 0; n = n->parent, i--)
-      path[i] = n;
-
-   for (i = 0; i < level; i++, bpath++){
-      for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
-	 if (path[i]->children[j] == path[i+1])
-	    break;
-      bobj = &path[i]->bobj;
-      bpath->type = bobj->type;
-      bpath->name = bobj->name;
-      bpath->sense = bobj->sense[j];
-      bpath->rhs = bobj->rhs[j];      bpath->range = bobj->range[j];
-      bpath->branch = bobj->branch[j];
-   }
 
    //load_the problem
 
@@ -4300,45 +4413,61 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
    lp_data->tmp.c = (char*) calloc(mip->m, CSIZE);
    lp_data->tmp.d = (double*) calloc(mip->m, DSIZE);
 
-   change_rhs(lp_data, cnt, ind, val);
+   change_rhs(lp_data, rhs_cnt, new_rhs_ind, new_rhs_val);
+   for (i = 0; i < lb_cnt; i++){
+      change_lbub(lp_data, new_lb_ind[i],
+		  new_lb_val[i], mip->lb[new_lb_ind[i]]);
+   }
+   for (i = 0; i < ub_cnt; i++){
+      change_lbub(lp_data, new_ub_ind[i],
+		  mip->lb[new_ub_ind[i]], new_ub_val[i]);
+   }
    
    //add the branching changes
 
-   bpath = bpath - level;   
-   if(level){
-      for (i = 0; i < level; i++, bpath++){
-	 //	 bpath = bpath + i;
-	 if (bpath->type == BRANCHING_VARIABLE){
-	    j = bpath->name;   //assuming no extra vars! 
-	    switch (bpath->sense){
-	    case 'E':
-	       change_lbub(lp_data, j, bpath->rhs, bpath->rhs);
-	       break;
-	     case 'L':
-	       change_ub(lp_data, j, bpath->rhs);
-	       break;
-	     case 'G':
-	       change_lb(lp_data, j, bpath->rhs);
-	       break;
-	     case 'R':
-	       change_lbub(lp_data, j, bpath->rhs, bpath->rhs + bpath->range);
-	       break;
+   for (i = 0; i < level; i++){
+      if (bpath[i].type == BRANCHING_VARIABLE){
+	 j = bpath[i].name;   //assuming no extra vars! 
+	 switch (bpath[i].sense){
+	  case 'E':
+	    change_lbub(lp_data, j, bpath[i].rhs, bpath[i].rhs);
+	    break;
+	  case 'L':
+	    get_ub(lp_data, j, &ub);
+	    if (bpath[i].rhs < ub){
+	       change_ub(lp_data, j, bpath[i].rhs);
 	    }
-	 }else{ /* BRANCHING_CUT */
-	    j = bpath->name;
-	    change_row(lp_data, j, bpath->sense, bpath->rhs, bpath->range);
+	    break;
+	  case 'G':
+	    get_lb(lp_data, j, &lb);
+	    if (bpath[i].rhs > lb){
+	       change_lb(lp_data, j, bpath[i].rhs);
+	    }
+	    break;
+	  case 'R':
+	    change_lbub(lp_data, j, bpath[i].rhs,
+			bpath[i].rhs + bpath[i].range);
+	    break;
 	 }
+      }else{ /* BRANCHING_CUT */
+	 j = bpath[i].name;
+	 change_row(lp_data, j, bpath[i].sense,
+		    bpath[i].rhs, bpath[i].range);
       }
    }
     
    //see whether it is feasible!   
-   
-   retval = dual_simplex(lp_data, &iterd);
+
+   size_lp_arrays(lp_data, FALSE, TRUE, mip->m, mip->n, mip->nz);
+   //get_slacks call crashes here, but we can turn it off by deallocating
+   FREE(lp_data->slacks);
+   if ((retval = dual_simplex(lp_data, &iterd)) == LP_OPTIMAL){
+      *objval = lp_data->objval;
+   }
    close_lp_solver(lp_data);   
 
    lp_data->mip = NULL;
    FREE(lp_data);
-   bpath -= level;
    FREE(bpath);
 
    for(i=0; i<(level+1); i++){
