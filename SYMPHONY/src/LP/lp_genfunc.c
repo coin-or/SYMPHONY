@@ -333,6 +333,22 @@ int fathom_branch(lp_prob *p)
       } else {
 	 termcode = dual_simplex(lp_data, &iterd);
       }
+      p->objval = lp_data->objval;
+      #ifdef SENSITIVITY_ANALYSIS
+      // Save for later, since they get over-written during branching
+      if (p->par.sensitivity_rhs){
+	 if (!p->dualsol){
+	    p->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+	 }
+	 memcpy(p->dualsol, lp_data->dualsol, lp_data->maxm * DSIZE);
+      }
+      if (p->par.sensitivity_bounds){
+	 if(!p->dj){
+	    p->dj = (double *) malloc(lp_data->maxn * DSIZE);
+	 }
+	 memcpy(p->dj, lp_data->dj, lp_data->maxn * DSIZE);
+      }
+      #endif
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
          if (p->par.should_reuse_lp == TRUE) {

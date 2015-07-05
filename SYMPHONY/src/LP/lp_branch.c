@@ -1519,13 +1519,21 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          }
 
 #ifdef SENSITIVITY_ANALYSIS
-         if (p->tm->par.sensitivity_analysis){      
-            can->duals = (double **) calloc(maxnum, sizeof(double *));
+	 if (p->par.sensitivity_rhs){
+	    can->duals = (double **) calloc(maxnum, sizeof(double *));
 	    //Anahita
 	    can->rays = (double **) calloc(maxnum, sizeof(double *));
-         }else{
-            can->duals = NULL;
-	    can->rays = NULL; //Anahita	 
+	 }else{
+	    can->duals = NULL;
+	    //Anahita
+	    can->rays = NULL;
+	 }
+	 if (p->par.sensitivity_bounds){
+	    //Ted
+	    can->dj = (double **) calloc(maxnum, sizeof(double *));
+	 }else{
+	    //Ted
+	    can->dj = NULL; 
          }
 #endif
 #ifdef COMPILE_FRAC_BRANCHING
@@ -1544,14 +1552,21 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          }
 
 #ifdef SENSITIVITY_ANALYSIS
-         if (p->par.sensitivity_analysis){      
+         if (p->par.sensitivity_rhs){      
             can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
 	    //Anahita
 	    can->rays = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
-         }else{
-	    //Anahita
+	 }else{
             can->duals = NULL;
-	    can->rays = NULL;	 
+	    //Anahita
+	    can->rays = NULL;
+	 }
+         if (p->par.sensitivity_bounds){      
+            //Ted
+	    can->dj = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+         }else{
+	    //Ted
+	    can->dj = NULL;
          }
 #endif
 #endif
@@ -1601,7 +1616,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		     
 		  } else {
 		     load_basis(lp_data, cstat, rstat);
-		     can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+		     can->termcode[j] = initial_lp_solve(lp_data, can->iterd+j);
 		     total_iters+=*(can->iterd+j);
 		     
 		  }
@@ -1672,16 +1687,25 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
                   get_dj_pi(lp_data);
-                  can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
-                  memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-
-		  //Anahita
-		  if (can->termcode[j] == LP_D_UNBOUNDED){ 
-		     get_dual_farkas_ray(lp_data);
-		     if (lp_data->raysol){
-			can->rays[j] = (double *) malloc (DSIZE*p->base.cutnum);
-			memcpy(can->rays[j], lp_data->raysol, DSIZE*p->base.cutnum);
+		  if (p->par.sensitivity_rhs){
+		     can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
+		     memcpy(can->duals[j], lp_data->dualsol,
+			    DSIZE*p->base.cutnum);
+		     //Anahita
+		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
+			get_dual_farkas_ray(lp_data);
+			if (lp_data->raysol){
+			   can->rays[j] =
+			      (double *) malloc(DSIZE*p->base.cutnum);
+			   memcpy(can->rays[j], lp_data->raysol,
+				  DSIZE*p->base.cutnum);
+			}
 		     }
+		  }
+		  if (p->par.sensitivity_bounds){
+		     //Ted
+		     can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
+		     memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
 		  }
 	       }
 #endif
@@ -1783,21 +1807,29 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 	       //Anahita
 	       can->intcpt[j] = lp_data->intcpt;
-               //get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
                   get_dj_pi(lp_data);
-                  can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
-                  memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-
-		  //Anahita
-		  if (can->termcode[j] == LP_D_UNBOUNDED){ 
-		     get_dual_farkas_ray(lp_data);
-		     if (lp_data->raysol){
-			can->rays[j] = (double *) malloc (DSIZE*p->base.cutnum);
-			memcpy(can->rays[j], lp_data->raysol, DSIZE*p->base.cutnum);
+		  if (p->par.sensitivity_rhs){
+		     can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
+		     memcpy(can->duals[j], lp_data->dualsol,
+			    DSIZE*p->base.cutnum);
+		     //Anahita
+		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
+			get_dual_farkas_ray(lp_data);
+			if (lp_data->raysol){
+			   can->rays[j] =
+			      (double *) malloc(DSIZE*p->base.cutnum);
+			   memcpy(can->rays[j], lp_data->raysol,
+				  DSIZE*p->base.cutnum);
+			}
 		     }
+		  }
+		  if (p->par.sensitivity_bounds){
+		     //Ted
+		     can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
+		     memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
 		  }
 	       }
 #endif

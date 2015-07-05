@@ -1440,6 +1440,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }
 
 	 child->node_status = NODE_STATUS__PRUNED;
+
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
 	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -1561,7 +1562,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       //Anahita
       child->intcpt = bobj->intcpt[i];
 #ifdef SENSITIVITY_ANALYSIS
-      if (tm->par.sensitivity_analysis){ //&& //Anahita 
+      if (tm->par.sensitivity_rhs){ //&& //Anahita 
 	  //action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
 	 child->duals = bobj->duals[i];
 	 bobj->duals[i] = 0;
@@ -1570,6 +1571,11 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    child->rays = bobj->rays[i];
 	    bobj->rays[i] = 0;
 	 }
+      }
+      if (tm->par.sensitivity_bounds){
+	 //Ted
+	 child->dj = bobj->dj[i];
+	 bobj->dj[i] = 0;
       }
       
 #endif
@@ -1600,8 +1606,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	    }
 	    //Anahita to keep status of over_ub 
-	    if ((action[i] == PRUNE_THIS_CHILD_INFEASIBLE) &&
-		(!tm->par.sensitivity_analysis)){
+	    if ((action[i] == PRUNE_THIS_CHILD_INFEASIBLE)
+		&& (!tm->par.sensitivity_analysis)
+		){
 	      child->feasibility_status = INFEASIBLE_PRUNED;
 	    }
 	 }
@@ -2235,6 +2242,9 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	       } else {
 		  purge_pruned_nodes(tm, node, VBC_PRUNED);
 	       }
+	    }
+	    if (tm->par.sensitivity_analysis){
+	       node->feasibility_status = OVER_UB_PRUNED;
 	    }
 	 }
 	 if (has_exchanged) {
@@ -3721,6 +3731,8 @@ void free_tree_node(bc_node *n)
    FREE(n->duals);
    //Anahita
    FREE(n->duals);
+   //Ted
+   FREE(n->dj);
 #endif
    FREE(n->children);
 

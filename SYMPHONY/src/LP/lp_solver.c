@@ -2584,6 +2584,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 
+   si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
     
    si->initialSolve();
    
@@ -2620,33 +2621,24 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       lp_data->objval = si->getObjValue();
 
       /* Get relevant data */
-
-
-      if (lp_data->dualsol && lp_data->dj) {
-
-	 get_dj_pi(lp_data);
-	 
-      }else{ //Anahita
+      if (!lp_data->dualsol){
       	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-      	 get_dj_pi(lp_data);
       }
+      if (!lp_data->dj){
+      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+      }
+      get_dj_pi(lp_data);
       
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
-
-      
-
       
       //Anahita
       if (term == LP_D_UNBOUNDED) {
 	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
 	    lp_data->maxm * DSIZE);
-
 	 get_dual_farkas_ray(lp_data);
       }
-      //
       
       get_x(lp_data);
 
@@ -2660,7 +2652,21 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 
       lp_data->intcpt = intercept;
 
-
+#ifdef CHECK_DUAL_SOLUTION
+      //This code checks the dual solution values
+      double lb = 0;
+      for (int i = 0; i <lp_data->m; i++){
+	 if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	 }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	 }
+      }
+      
+      if (fabs(intercept + lb - lp_data->objval) >= 0.1){
+	 printf("Dual solution appears to be incorrect!\n");
+      }
+#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }
@@ -2700,6 +2706,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    si->getModelPtr()->setPerturbation(50);    
    //si->getModelPtr()->setFactorizationFrequency(150); 
    //si->getModelPtr()->setSubstitution(3);
+   si->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 #endif
    si->resolve();
    
@@ -2736,28 +2743,25 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       lp_data->objval = si->getObjValue();
 
 
-      // Get relevant data
-      if (lp_data->dualsol && lp_data->dj) {
-      	 get_dj_pi(lp_data);
-      }else{ //Anahita
+      /* Get relevant data */
+      if (!lp_data->dualsol){
       	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-      	 get_dj_pi(lp_data);
       }
-
+      if (!lp_data->dj){
+      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+      }
+      get_dj_pi(lp_data);
       
       if (lp_data->slacks && term == LP_OPTIMAL) {
-      	 get_slacks(lp_data);
+	 get_slacks(lp_data);
       }
+      
       //Anahita
       if (term == LP_D_UNBOUNDED) {
 	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
 	    lp_data->maxm * DSIZE);
-
 	 get_dual_farkas_ray(lp_data);
       }
-      //
-
       
       get_x(lp_data);
 
@@ -2770,13 +2774,22 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       }
 
       lp_data->intcpt = intercept;
-
       
-
-
-
-
-
+#ifdef CHECK_DUAL_SOLUTION
+      //This code checks the dual solution values
+      double lb = 0;
+      for (int i = 0; i <lp_data->m; i++){
+	 if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	 }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	 }
+      }
+      
+      if (fabs(intercept + lb - lp_data->objval) >= 0.1){
+	 printf("Dual solution appears to be incorrect!\n");
+      }
+#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2836,29 +2849,25 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
       
       lp_data->objval = si->getObjValue();
 
-      /* Get relevant data */
+      // Get relevant data
       if (lp_data->dualsol && lp_data->dj) {
-	 get_dj_pi(lp_data);
-
-       }else{ //Anahita
+      	 get_dj_pi(lp_data);
+      }else{ //Anahita
       	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
       	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
       	 get_dj_pi(lp_data);
       }
 
       if (lp_data->slacks && term == LP_OPTIMAL) {
-	 get_slacks(lp_data);
+      	 get_slacks(lp_data);
       }
 
       //Anahita
       if (term == LP_D_UNBOUNDED) {
 	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
 	    lp_data->maxm * DSIZE);
-
 	 get_dual_farkas_ray(lp_data);
       }
-      //
-
       
       get_x(lp_data);
 
@@ -2872,6 +2881,21 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 
       lp_data->intcpt = intercept;
 
+#ifdef CHECK_DUAL_SOLUTION
+      //This code checks the dual solution values
+      double lb = 0;
+      for (int i = 0; i <lp_data->m; i++){
+	 if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	 }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	 }
+      }
+      
+      if (fabs(intercept + lb - lp_data->objval) >= 0.1){
+	 printf("Dual solution appears to be incorrect!\n");
+      }
+#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -3173,8 +3197,9 @@ void get_dual_farkas_ray(LPdata *lp_data)
    }
 }
 
-/*========
 /*===========================================================================*/
+/*===========================================================================*/
+
 void get_slacks(LPdata *lp_data)
 {
    int m = lp_data->m, i = 0;

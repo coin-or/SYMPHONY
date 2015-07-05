@@ -247,6 +247,8 @@ typedef struct LP_PARAMS{
    double            mc_tau;   /* Weight on second objective */
 
    int               sensitivity_analysis;
+   int               sensitivity_bounds;
+   int               sensitivity_rhs;
 
    int               disable_obj; 
    int               no_impr_in_obj; 

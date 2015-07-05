@@ -108,6 +108,30 @@ void free_candidate(branch_obj **cand)
 	    FREE(can->duals[i]);
 	 }
       }
+
+//Anahita
+#ifndef MAX_CHILDREN_NUM
+      if (can->rays){
+	 for (i = can->child_num-1; i >= 0; i--){
+#else
+      if (can->rays){
+	 for (i = MAX_CHILDREN_NUM - 1; i >= 0; i--){
+#endif
+	    FREE(can->rays[i]);
+	 }
+      }
+
+//Ted
+#ifndef MAX_CHILDREN_NUM
+      if (can->dj){
+	 for (i = can->child_num-1; i >= 0; i--){
+#else
+      if (can->dj){
+	 for (i = MAX_CHILDREN_NUM - 1; i >= 0; i--){
+#endif
+	    FREE(can->dj[i]);
+	 }
+      }
 #endif
 
       FREE(can->sol_sizes);
@@ -115,6 +139,8 @@ void free_candidate(branch_obj **cand)
       FREE(can->solutions);
 #ifdef SENSITIVITY_ANALYSIS
       FREE(can->duals);
+      FREE(can->rays); //Anahita
+      FREE(can->dj); //Ted
 #endif
       
       FREE(*cand);

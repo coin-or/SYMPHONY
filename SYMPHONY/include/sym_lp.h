@@ -122,6 +122,9 @@ typedef struct LP_PROB{
    int           bound_changes_in_iter;
    int           vars_recently_fixed_to_ub;
    LPdata       *lp_data;
+   double        objval; /* To save the objective value of the node */
+   double       *dualsol; /* To save the duals of the node */
+   double       *dj; /* To save the reduced costs of the node */
    MIPdesc      *mip; /* Holds the MIP description when read in from MPS */
    
    double        last_gap;
