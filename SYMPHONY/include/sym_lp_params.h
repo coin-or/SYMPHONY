@@ -119,6 +119,13 @@ typedef struct LP_PARAMS{
     */
    int               should_warmstart_chain;
 
+   /* 
+    * should we do initial_solve() or dual_simplex() in each iteration while
+    * processing a node. This option is mainly because some data in Clp
+    * seems to get corrupted when warm starting repeatedly. This option
+    * may be help, particularly when using the sensitivity analysis functions.
+    */
+   int               should_warmstart_node;
 
    int               try_to_recover_from_error;
    /* ZERO_ONE_PROBLEM / INTEGER_PROBLEM / MIXED_INTEGER_PROBLEM */
@@ -240,7 +247,6 @@ typedef struct LP_PARAMS{
    double            mc_tau;   /* Weight on second objective */
 
    int               sensitivity_analysis;
-
 
    int               disable_obj; 
    int               no_impr_in_obj; 

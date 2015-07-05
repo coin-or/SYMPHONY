@@ -324,13 +324,13 @@ int fathom_branch(lp_prob *p)
       //sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
       //write_mps(lp_data, name);
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
-			       p->bc_level < 1))) {
+			       p->bc_level < 1)) ||
+	  p->par.should_warmstart_node == FALSE) {
          if (p->bc_index == 0) {
             PRINT(verbosity, 0, ("solving root lp relaxation\n"));
          }
          termcode = initial_lp_solve(lp_data, &iterd);	 
       } else {
-	 //termcode = initial_lp_solve(lp_data, &iterd);
 	 termcode = dual_simplex(lp_data, &iterd);
       }
       if (p->bc_index < 1 && p->iter_num < 2) {

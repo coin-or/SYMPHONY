@@ -770,7 +770,8 @@ int create_subproblem_u(lp_prob *p)
    \*----------------------------------------------------------------------- */
 
    if (p->par.should_warmstart_chain == TRUE && 
-         desc->basis.basis_exists == TRUE){
+         desc->basis.basis_exists == TRUE &&
+       p->par.should_warmstart_node == TRUE){
       int *rstat, *cstat;
       if (desc->basis.extravars.size == 0){
 	 cstat = desc->basis.basevars.stat;
