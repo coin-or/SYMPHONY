@@ -2004,57 +2004,64 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
 
    switch(user_res){
     case PREFER_LOWER_OBJ_VALUE:
-      for (ind = 0, i = can->child_num-1; i; i--){
-	 if (can->objval[i] < can->objval[ind] - 1e-4)
+      min = SYM_INFINITY;
+      for (ind = can->child_num, i = can->child_num-1; i >= 0; i--){
+	 if (can->objval[i] < min - 1e-4 &&
+	     action[i] != PRUNE_THIS_CHILD_INFEASIBLE &&
+	     action[i] != PRUNE_THIS_CHILD_FATHOMABLE){
 	    ind = i;
+	    min = can->objval[i];
+	 }
       }
-      if (!p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+      if (ind < can->child_num){
 	 action[ind] = KEEP_THIS_CHILD;
-      /* Note that if the lowest objval child is fathomed then everything is */
+      }
       break;
 
     case PREFER_HIGHER_OBJ_VALUE:
-      for (ind = 0, i = can->child_num-1; i; i--){
-	 if ((can->objval[i] > can->objval[ind]) &&
-	     (! p->has_ub ||
-	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
+      max = -SYM_INFINITY;
+      for (ind = can->child_num, i = can->child_num-1; i >= 0; i--){
+	 if ((can->objval[i] > max) &&
+	     action[i] != PRUNE_THIS_CHILD_INFEASIBLE &&
+	     action[i] != PRUNE_THIS_CHILD_FATHOMABLE){
 	    ind = i;
+	    max = can->objval[i];
+	 }
       }
-      if (! p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+      if (ind < can->child_num){
 	 action[ind] = KEEP_THIS_CHILD;
-      /* Note that this selects the highest objval child NOT FATHOMED, thus
-       * if the highest objval child is fathomed then so is everything */
+      }
       break;
       
 #ifdef COMPILE_FRAC_BRANCHING
     case PREFER_MORE_FRACTIONAL:
-      for (ind = 0, i = can->child_num-1; i; i--){
-	 if ((can->frac_num[i] > can->frac_num[ind]) &&
-	     (! p->has_ub ||
-	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
+      max = -SYM_INFINITY;
+      for (ind = can->child_num, i = can->child_num-1; i >= 0; i--){
+	 if ((can->frac_num[i] > max) &&
+	     action[i] != PRUNE_THIS_CHILD_INFEASIBLE &&
+	     action[i] != PRUNE_THIS_CHILD_FATHOMABLE){
 	    ind = i;
+	    max = can->frac_num[i];
+	 }
       }
-      if (! p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+      if (ind < can->child_num){
 	 action[ind] = KEEP_THIS_CHILD;
-      /* Note that this selects the most fractional child NOT FATHOMED, thus
-       * if that child is fathomed then so is everything */
+      }
       break;
 
     case PREFER_LESS_FRACTIONAL:
-      for (ind = 0, i = can->child_num-1; i; i--){
-	 if ((can->frac_num[i] < can->frac_num[ind]) &&
-	     (! p->has_ub ||
-	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
+      min = SYM_INFINITY;
+      for (ind = can->child_num, i = can->child_num-1; i >= 0; i--){
+	 if ((can->frac_num[i] < min) &&
+	     action[i] != PRUNE_THIS_CHILD_INFEASIBLE &&
+	     action[i] != PRUNE_THIS_CHILD_FATHOMABLE){
 	    ind = i;
+	    min = can->frac_num[i];
+	 }
       }
-      if (! p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+      if (ind < can->child_num){
 	 action[ind] = KEEP_THIS_CHILD;
-      /* Note that this selects the least fractional child NOT FATHOMED, thus
-       * if that child is fathomed then so is everything */
+      }
       break;
 #endif
 
