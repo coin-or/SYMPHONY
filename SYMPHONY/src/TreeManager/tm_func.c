@@ -1607,7 +1607,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    }
 	    //Anahita to keep status of over_ub 
 	    if ((action[i] == PRUNE_THIS_CHILD_INFEASIBLE)
-		&& (!tm->par.sensitivity_analysis)
+		//Not sure why we want this. Ted
+		//&& (!tm->par.sensitivity_analysis)
 		){
 	      child->feasibility_status = INFEASIBLE_PRUNED;
 	    }
