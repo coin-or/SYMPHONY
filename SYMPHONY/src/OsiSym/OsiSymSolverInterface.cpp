@@ -1493,18 +1493,28 @@ double OsiSymSolverInterface::getInfinity() const
 
 const double * OsiSymSolverInterface::getColSolution() const
 {
-
+   double *tmp_sol = NULL;
    int n = getNumCols();
 
+   if (n == 0){
+      return (0);
+   }
+
    if(!colsol_){      
-      colsol_ = new double[n];
-   }
-   if (sym_get_col_solution(env_, colsol_)){
-      if (!getNumCols()){
-	 return (0);
+      tmp_sol = new double[n];
+      if (sym_get_col_solution(env_, tmp_sol) ==
+	  FUNCTION_TERMINATED_ABNORMALLY){
+	 //SYMPHONY doesn't have a stored solution, return a NULL pointer
+	 freeCacheDouble(tmp_sol);
+      }else{
+	 colsol_ = tmp_sol;
       }
+   }else{
+      //Either over-write colsol_ with stored solution or return the chached 
+      //one. 
+      sym_get_col_solution(env_, colsol_);
    }
-   
+  
    return (colsol_);
 }
 
@@ -1685,8 +1695,18 @@ void OsiSymSolverInterface::setObjSense(double s)
 
 void OsiSymSolverInterface::setColSolution(const double *colsol)
 {
-   freeCachedResults();
-   sym_set_col_solution(env_, const_cast<double *>(colsol));
+   if (sym_set_col_solution(env_, const_cast<double *>(colsol)) ==
+       FUNCTION_TERMINATED_ABNORMALLY){
+      //This means the user asked SYMPHONY to store an infeasible solution
+      //We are then forced to cache the solution per Osi's requirement
+      int n = getNumCols();
+      if(!colsol_){      
+	 colsol_ = new double[n];
+      }
+      memcpy(colsol_, colsol, n*sizeof(double));
+   }else{
+      freeCachedResults();
+   }
 }
 
 /*===========================================================================*/

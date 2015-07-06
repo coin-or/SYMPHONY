@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -363,7 +363,11 @@ int solve(tm_prob *tm)
             {
             scand_num = tm->samephase_candnum;
             }
-	    if (scand_num > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
+	    if (scand_num > 0
+#ifndef __PVM__
+		&& (thread_num != 0 || tm->par.max_active_nodes == 1)
+#endif
+		){
 	       i = start_node(tm, thread_num);
 	    }else{
 	       i = NEW_NODE__NONE;
@@ -3916,18 +3920,18 @@ void sym_catch_c(int num)
    sigprocmask(SIG_SETMASK, &mask_set, &old_set);
    
    strcpy(temp, "");
-   printf("\nDo you want to abort immediately, exit gracefully (from the current solve call only), or continue? [a/e/c]: ");
-   fflush(stdout);   
+   fprintf(stderr, "\nDo you want to abort immediately, exit gracefully (from the current solve call only), or continue? [a/e/c]: ");
+   fflush(stderr);   
    fgets(temp, MAX_LINE_LENGTH, stdin);
    if(temp[1] == '\n' && (temp[0] == 'a' || temp[0] == 'A')){
-      printf("\nTerminating...\n");
-      fflush(stdout);
+      fprintf(stderr, "\nTerminating...\n");
+      fflush(stderr);
       exit(0);
    }else if(temp[1] == '\n' && (temp[0] == 'e' || temp[0] == 'E')){    
       c_count++;	    
    } else{
-      printf("\nContinuing...\n");
-      fflush(stdout);
+      fprintf(stderr, "\nContinuing...\n");
+      fflush(stderr);
       c_count = 0;      
    }
 

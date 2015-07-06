@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -25,6 +25,7 @@
 #include "sym_master.h"
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
+#include "sym_primal_heuristics.h"
 #ifdef COMPILE_IN_TM
 #include "sym_lp.h"
 #endif
@@ -775,21 +776,24 @@ int process_own_messages_u(sym_environment *env, int msgtag)
 int free_master_u(sym_environment *env)
 {
    int i;
-
+   MIPdesc *tmp;
+   
 #ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_free_master(&env->user) );
 #endif
    FREE(env->best_sol.xind);
    FREE(env->best_sol.xval);
    
-   if (env->mip){
+   if (tmp = env->mip){
       free_mip_desc(env->mip);
       FREE(env->mip);
    }
 
-   if(env->prep_mip){
+   if(env->prep_mip && env->prep_mip != tmp){
       free_mip_desc(env->prep_mip);
       FREE(env->prep_mip);
+   }else{ //We made a copy, so don't free it again
+      env->prep_mip = NULL;
    }
    
    if (env->rootdesc){
@@ -833,8 +837,14 @@ int free_master_u(sym_environment *env)
       FREE(env->cp);
    }
 #endif
+#ifdef COMPILE_IN_LP
+   if (env->sp){
+      sp_free_sp(env->sp);
+      FREE(env->sp);
+   }
 #endif
-      
+#endif
+   
    return(FUNCTION_TERMINATED_NORMALLY);   
 }
 

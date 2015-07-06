@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -546,6 +546,8 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		  tm_par->max_active_nodes = 1;
 	       }
 #endif
+#else
+	       tm_par->max_active_nodes = tmpi;
 #endif
 	    }
 	 }else{
@@ -801,7 +803,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
 		      int has_ub, sp_desc *solpool, int output_mode)
 {
    double gap = 0.0;
-
+   
 #if 0
    static str_int nfstatus[4] = {
       {"NF_CHECK_ALL"           , NF_CHECK_ALL }
@@ -810,80 +812,86 @@ void print_statistics(node_times *tim, problem_stat *stat,
       , {"NF_CHECK_NOTHING"       , NF_CHECK_NOTHING }
    };
 #endif
-
-   initial_time += tim->communication;
-   initial_time += tim->lp;
-   initial_time += tim->lp_setup;
-   initial_time += tim->separation;
-   initial_time += tim->fixing;
-   initial_time += tim->pricing;
-   initial_time += tim->strong_branching;
-   initial_time += tim->cut_pool;
-   initial_time += tim->primal_heur;
+   
+   if (tim){
+      initial_time += tim->communication;
+      initial_time += tim->lp;
+      initial_time += tim->lp_setup;
+      initial_time += tim->separation;
+      initial_time += tim->fixing;
+      initial_time += tim->pricing;
+      initial_time += tim->strong_branching;
+      initial_time += tim->cut_pool;
+      initial_time += tim->primal_heur;
 #if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
-   printf("======================= CP Timing ===========================\n");
-   printf("  Cut Pool                  %.3f\n", tim->cut_pool);
+      printf("======================= CP Timing ===========================\n");
+      printf("  Cut Pool                  %.3f\n", tim->cut_pool);
 #endif
-   printf("====================== LP/CG Timing =========================\n");
+      printf("====================== LP/CG Timing =========================\n");
 #if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
-   printf("  LP Solution Time          %.3f\n", tim->lp);
-   printf("  LP Setup Time             %.3f\n", tim->lp_setup);
-   printf("  Variable Fixing           %.3f\n", tim->fixing);
-   printf("  Pricing                   %.3f\n", tim->pricing);
-   printf("  Strong Branching          %.3f\n", tim->strong_branching);
-   printf("  Separation                %.3f\n", tim->separation); 
-   printf("  Primal Heuristics         %.3f\n", tim->primal_heur); 
-   printf("  Communication             %.3f\n", tim->communication);
+      printf("  LP Solution Time          %.3f\n", tim->lp);
+      printf("  LP Setup Time             %.3f\n", tim->lp_setup);
+      printf("  Variable Fixing           %.3f\n", tim->fixing);
+      printf("  Pricing                   %.3f\n", tim->pricing);
+      printf("  Strong Branching          %.3f\n", tim->strong_branching);
+      printf("  Separation                %.3f\n", tim->separation); 
+      printf("  Primal Heuristics         %.3f\n", tim->primal_heur); 
+      printf("  Communication             %.3f\n", tim->communication);
 #ifndef COMPILE_IN_LP
-   printf("=================== Parallel Overhead ======================\n");
-   printf("  Communication         %.3f\n", tim->communication);
-   printf("  Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
-   printf("  Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
-   printf("  Ramp Down Time        %.3f\n", tim->ramp_down_time);
-   printf("  Idle Time (Node Pack) %.3f\n", tim->start_node);
-   printf("  Idle Time (Nodes)     %.3f\n", tim->idle_node);
-   printf("  Idle Time (Names)     %.3f\n", tim->idle_names);
-   printf("  Idle Time (Diving)    %.3f\n", tim->idle_diving);
-   printf("  Idle Time (Cuts)      %.3f\n", tim->idle_cuts);
+      printf("=================== Parallel Overhead ======================\n");
+      printf("  Communication         %.3f\n", tim->communication);
+      printf("  Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
+      printf("  Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
+      printf("  Ramp Down Time        %.3f\n", tim->ramp_down_time);
+      printf("  Idle Time (Node Pack) %.3f\n", tim->start_node);
+      printf("  Idle Time (Nodes)     %.3f\n", tim->idle_node);
+      printf("  Idle Time (Names)     %.3f\n", tim->idle_names);
+      printf("  Idle Time (Diving)    %.3f\n", tim->idle_diving);
+      printf("  Idle Time (Cuts)      %.3f\n", tim->idle_cuts);
 #endif
+#endif
+   }
+#if !defined(_MSC_VER)
    printf("  Total User Time              %.3f\n", initial_time);
 #endif
    printf("  Total Wallclock Time         %.3f\n\n", finish_time -
 	  start_time);
-   printf("====================== Statistics =========================\n");
-   printf("Number of created nodes :       %i\n", stat->created);
-   printf("Number of analyzed nodes:       %i\n", stat->analyzed);
-   printf("Depth of tree:                  %i\n", stat->max_depth);
-   printf("Size of the tree:               %i\n", stat->tree_size);
-   if (solpool) {
-      printf("Number of solutions found:      %i\n", solpool->total_num_sols_found);
-      printf("Number of solutions in pool:    %i\n", solpool->num_solutions);
-   }
+   if (stat){
+      printf("====================== Statistics =========================\n");
+      printf("Number of created nodes :       %i\n", stat->created);
+      printf("Number of analyzed nodes:       %i\n", stat->analyzed);
+      printf("Depth of tree:                  %i\n", stat->max_depth);
+      printf("Size of the tree:               %i\n", stat->tree_size);
+      if (solpool) {
+	 printf("Number of solutions found:      %i\n", solpool->total_num_sols_found);
+	 printf("Number of solutions in pool:    %i\n", solpool->num_solutions);
+      }
 #ifdef SHOULD_SHOW_MEMORY_USAGE
-   printf("Virtual memory used (MB):       %.2f\n", stat->max_vsize);
+      printf("Virtual memory used (MB):       %.2f\n", stat->max_vsize);
 #endif
-
+      
 #if 0
-   printf("Leaves before trimming:         %i\n",
-	  stat->leaves_before_trimming);
-   printf("Leaves after trimming:          %i\n", stat->leaves_after_trimming);
-   printf("Repriced root's nf_status:      %s\n",
-	  nfstatus[(int)stat->nf_status].str);
-   printf("Not fixed variable num:         %i\n", stat->vars_not_priced);
+      printf("Leaves before trimming:         %i\n",
+	     stat->leaves_before_trimming);
+      printf("Leaves after trimming:          %i\n", stat->leaves_after_trimming);
+      printf("Repriced root's nf_status:      %s\n",
+	     nfstatus[(int)stat->nf_status].str);
+      printf("Not fixed variable num:         %i\n", stat->vars_not_priced);
 #endif
-   printf("Number of Chains:               %i\n", stat->chains);
-   printf("Number of Diving Halts:         %i\n", stat->diving_halts);
-   printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);
-   if (stat->root_lb > -MAXDOUBLE){
-      if (obj_sense == SYM_MAXIMIZE){
-	 printf("Upper Bound in Root:            %.3f\n",
-		-stat->root_lb + obj_offset);
-      }else{
-	 printf("Lower Bound in Root:            %.3f\n",
-		stat->root_lb + obj_offset);
+      printf("Number of Chains:               %i\n", stat->chains);
+      printf("Number of Diving Halts:         %i\n", stat->diving_halts);
+      printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);
+      if (stat->root_lb > -MAXDOUBLE){
+	 if (obj_sense == SYM_MAXIMIZE){
+	    printf("Upper Bound in Root:            %.3f\n",
+		   -stat->root_lb + obj_offset);
+	 }else{
+	    printf("Lower Bound in Root:            %.3f\n",
+		   stat->root_lb + obj_offset);
+	 }
       }
    }
-
+   
    if (lp_stat) {
       printf ("\n======================= LP Solver =========================");
       printf ("\n");
@@ -905,7 +913,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
               "%i\n",lp_stat->prep_nodes_pruned);
       
       if (output_mode < 1) {
-
+	 
 	 printf ("\n==================== Rounding =============================");
 	 printf ("\n");
 	 printf ("Number of rounding heuristic called:                  ");
@@ -1065,231 +1073,231 @@ void print_statistics(node_times *tim, problem_stat *stat,
 	 
 
       } else{
-	printf ("\n==================== Primal Heuristics ====================");	
-	printf ("\n");
-	printf ("%22s %10s %12s %12s\n","","Time","#Called", "#Solutions");
-
-	printf ("%-22s %10.2f ", "Rounding I", tim->rh);
-	if (lp_stat->rh_calls > 0)
-	  printf ("%12i %12i ",lp_stat->rh_calls, lp_stat->rh_num_sols);
-	else 
-	  printf ("%12s %12s ","","");
-	printf ("\n");
-
-	printf ("%-22s %10.2f ", "Rounding II", tim->sh);
-	if (lp_stat->sh_calls > 0)
-	   printf ("%12i %12i ",lp_stat->sh_calls, lp_stat->sh_num_sols);
-	else 
-	   printf ("%12s %12s ","","");
-	printf ("\n");
-	
-	printf ("%-22s %10.2f ", "Diving", tim->ds);
-	if (lp_stat->ds_calls > 0) {
-	  printf ("%12i %12i ",lp_stat->ds_calls, lp_stat->ds_num_sols);	  
-	  printf ("\n");	
-	  for(int i = 0; i < DIVING_HEURS_CNT; i++){
-	    switch(i){
-	    case FRAC_FIX_DIVING: 
-	      printf ("%5s%-17s ", "","FracF_");
-	      break;
-	    case FRAC_DIVING: 
-	      printf ("%5s%-17s ", "","Frac_");
-	      break;
-	    case VLENGTH_FIX_DIVING:
-	      printf ("%5s%-17s ", "","VecLF_");
-	      break;  
-	    case VLENGTH_DIVING:
-	      printf ("%5s%-17s ", "","VecL_");
-	      break;  
-	    case EUC_FIX_DIVING:
-	      printf ("%5s%-17s ", "","EucF_");
-	      break;  
-	    case EUC_DIVING:
-	      printf ("%5s%-17s ", "","Euc_");
-	      break;  
-	    case GUIDED_FIX_DIVING:
-	      printf ("%5s%-17s ", "","GuidedF_");
-	      break;  
-	    case GUIDED_DIVING:
-	      printf ("%5s%-17s ", "","Guided_");
-	      break;  
-	    case CROSSOVER_FIX_DIVING:
-	      printf ("%5s%-17s ", "","COverF_");
-	      break;  
-	    case CROSSOVER_DIVING:
-	      printf ("%5s%-17s ", "","COver_");
-	      break;  
-	    case RANK_FIX_DIVING:
-	      printf ("%5s%-17s ", "","RankF_");
-	      break;  
-	    case RANK_DIVING:
-	      printf ("%5s%-17s ", "","Rank_");
-	      break;  
-	    case COEFF_DIVING:
-	      printf ("%5s%-17s ", "","Coeff_");
-	      break;  
-	    case PC_DIVING:
-	      printf ("%5s%-17s ", "","PseudoC_");
-	      break;  
-	    default:
-	      break;
+	 printf ("\n==================== Primal Heuristics ====================");	
+	 printf ("\n");
+	 printf ("%22s %10s %12s %12s\n","","Time","#Called", "#Solutions");
+	 
+	 printf ("%-22s %10.2f ", "Rounding I", tim->rh);
+	 if (lp_stat->rh_calls > 0)
+	    printf ("%12i %12i ",lp_stat->rh_calls, lp_stat->rh_num_sols);
+	 else 
+	    printf ("%12s %12s ","","");
+	 printf ("\n");
+	 
+	 printf ("%-22s %10.2f ", "Rounding II", tim->sh);
+	 if (lp_stat->sh_calls > 0)
+	    printf ("%12i %12i ",lp_stat->sh_calls, lp_stat->sh_num_sols);
+	 else 
+	    printf ("%12s %12s ","","");
+	 printf ("\n");
+	 
+	 printf ("%-22s %10.2f ", "Diving", tim->ds);
+	 if (lp_stat->ds_calls > 0) {
+	    printf ("%12i %12i ",lp_stat->ds_calls, lp_stat->ds_num_sols);	  
+	    printf ("\n");	
+	    for(int i = 0; i < DIVING_HEURS_CNT; i++){
+	       switch(i){
+		case FRAC_FIX_DIVING: 
+		  printf ("%5s%-17s ", "","FracF_");
+		  break;
+		case FRAC_DIVING: 
+		  printf ("%5s%-17s ", "","Frac_");
+		  break;
+		case VLENGTH_FIX_DIVING:
+		  printf ("%5s%-17s ", "","VecLF_");
+		  break;  
+		case VLENGTH_DIVING:
+		  printf ("%5s%-17s ", "","VecL_");
+		  break;  
+		case EUC_FIX_DIVING:
+		  printf ("%5s%-17s ", "","EucF_");
+		  break;  
+		case EUC_DIVING:
+		  printf ("%5s%-17s ", "","Euc_");
+		  break;  
+		case GUIDED_FIX_DIVING:
+		  printf ("%5s%-17s ", "","GuidedF_");
+		  break;  
+		case GUIDED_DIVING:
+		  printf ("%5s%-17s ", "","Guided_");
+		  break;  
+		case CROSSOVER_FIX_DIVING:
+		  printf ("%5s%-17s ", "","COverF_");
+		  break;  
+		case CROSSOVER_DIVING:
+		  printf ("%5s%-17s ", "","COver_");
+		  break;  
+		case RANK_FIX_DIVING:
+		  printf ("%5s%-17s ", "","RankF_");
+		  break;  
+		case RANK_DIVING:
+		  printf ("%5s%-17s ", "","Rank_");
+		  break;  
+		case COEFF_DIVING:
+		  printf ("%5s%-17s ", "","Coeff_");
+		  break;  
+		case PC_DIVING:
+		  printf ("%5s%-17s ", "","PseudoC_");
+		  break;  
+		default:
+		  break;
+	       }
+	       printf("%10.2f ", tim->ds_type[i]);
+	       if (lp_stat->ds_type_calls[i] > 0)
+		  printf ("%12i %12i",lp_stat->ds_type_calls[i], 
+			  lp_stat->ds_type_num_sols[i]);
+	       //printf ("%12i %12i %12i",lp_stat->ds_type_calls[i], 
+	       //lp_stat->ds_type_num_sols[i], lp_stat->ds_type_num_iter[i]);
+	       printf ("\n");
 	    }
-	    printf("%10.2f ", tim->ds_type[i]);
-	    if (lp_stat->ds_type_calls[i] > 0)
-	       printf ("%12i %12i",lp_stat->ds_type_calls[i], 
-		      lp_stat->ds_type_num_sols[i]);
-	    //printf ("%12i %12i %12i",lp_stat->ds_type_calls[i], 
-	    //lp_stat->ds_type_num_sols[i], lp_stat->ds_type_num_iter[i]);
-	    printf ("\n");
-	  }
-	} else {
-	  printf ("\n");	
-	}	
-
-	printf ("%-22s %10.2f ", "Feasibility Pump", tim->fp);
-	if (lp_stat->fp_calls > 0)
-	   // printf ("%12i %12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols, lp_stat->fp_num_iter);
-	   printf ("%12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols);
-	printf ("\n");	
-
-	printf ("%-22s %10.2f ", "Local Search", tim->ls);
-	if (lp_stat->ls_calls > 0)
-	  printf ("%12i %12i ",lp_stat->ls_calls, lp_stat->ls_num_sols);
-	printf ("\n");	
-	printf ("%-22s %10.2f ", "Restricted Search", tim->fr);
-	if (lp_stat->fr_calls > 0)
-	  printf ("%12i %12i ",lp_stat->fr_calls, lp_stat->fr_num_sols);
-	printf ("\n");	
-	printf ("%-22s %10.2f ", "Rins Search", tim->rs);
-	if (lp_stat->rs_calls > 0)
-	  printf ("%12i %12i ",lp_stat->rs_calls, lp_stat->rs_num_sols);
-	printf ("\n");	
-	printf ("%-22s %10.2f ", "Local Branching", tim->lb);
-	if (lp_stat->lb_calls > 0)
-	  printf ("%12i %12i ",lp_stat->lb_calls, lp_stat->lb_num_sols);
-
-	printf ("\n");	
-	printf ("\n=========================== Cuts ==========================");
-	printf ("\n");
-	printf ("Accepted:                         %d\n",
-		lp_stat->cuts_generated);
-	printf ("Added to LPs:                     %d\n",
-		lp_stat->cuts_added_to_lps);
-	printf ("Deleted from LPs:                 %d\n",
-		lp_stat->cuts_deleted_from_lps);
-	printf ("Removed because of bad coeffs:    %d\n",
-		lp_stat->num_poor_cuts);
-	printf ("Removed because of duplicacy:     %d\n",
-		lp_stat->num_duplicate_cuts);
-	printf ("Insufficiently violated:          %d\n",
-		lp_stat->num_unviolated_cuts);	
-	printf ("In root:                          %d\n",
-		lp_stat->cuts_root);
-	printf ("\n");	
-
-	printf ("Time in cut generation:              %.2f\n", tim->cuts);	
-	printf ("Time in checking quality and adding: %.2f\n", 
-		tim->dupes_and_bad_coeffs_in_cuts);
-
-	printf ("\n");	
-	printf ("%15s %7s %11s %11s %11s\n","","Time", "#Called", "In Root", "Total");
-
-	printf ("%-15s %7.2f ","Gomory",tim->gomory_cuts); 
-	if(lp_stat->gomory_calls)
-	  printf ("%11i %11i %11i ", lp_stat->gomory_calls, lp_stat->gomory_cuts_root, 
-		  lp_stat->gomory_cuts);
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","Knapsack",tim->knapsack_cuts); 
-	if(lp_stat->knapsack_calls)
-	  printf ("%11i %11i %11i ", lp_stat->knapsack_calls, 
-		  lp_stat->knapsack_cuts_root, lp_stat->knapsack_cuts);		  
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","Clique",tim->clique_cuts); 
-	if(lp_stat->clique_calls)
-	  printf ("%11i %11i %11i ", lp_stat->clique_calls, lp_stat->clique_cuts_root, 
-		  lp_stat->clique_cuts);
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","Probing",tim->probing_cuts); 
-	if(lp_stat->probing_calls)
-	  printf ("%11i %11i %11i ", lp_stat->probing_calls, lp_stat->probing_cuts_root, 
-		  lp_stat->probing_cuts);
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","Flowcover",tim->flowcover_cuts); 
-	if(lp_stat->flowcover_calls)
-	  printf ("%11i %11i %11i ", lp_stat->flowcover_calls, 
-		  lp_stat->flowcover_cuts_root, lp_stat->flowcover_cuts);
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","Twomir",tim->twomir_cuts); 
-	if(lp_stat->twomir_calls)
-	  printf ("%11i %11i %11i ", lp_stat->twomir_calls, lp_stat->twomir_cuts_root, 
-		  lp_stat->twomir_cuts);
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","Oddhole",tim->oddhole_cuts); 
-	if(lp_stat->oddhole_calls)
-	  printf ("%11i %11i %11i ", lp_stat->oddhole_calls, lp_stat->oddhole_cuts_root, 
-		  lp_stat->oddhole_cuts);
-	printf ("\n");		
-
-
-	printf ("%-15s %7.2f ","Mir",tim->mir_cuts); 
-	if(lp_stat->mir_calls)
-	  printf ("%11i %11i %11i ", lp_stat->mir_calls, lp_stat->mir_cuts_root, 
-		  lp_stat->mir_cuts);
-	printf ("\n");		
-
-
-	printf ("%-15s %7.2f ","Rounding",tim->rounding_cuts); 
-	if(lp_stat->rounding_calls)
-	  printf ("%11i %11i %11i ", lp_stat->rounding_calls, 
-		  lp_stat->rounding_cuts_root, lp_stat->rounding_cuts);		  
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","LandP-I",tim->lift_and_project_cuts); 
-	if(lp_stat->lift_and_project_calls)
-	  printf ("%11i %11i %11i ", lp_stat->lift_and_project_calls, 
-		  lp_stat->lift_and_project_cuts_root, 
+	 } else {
+	    printf ("\n");	
+	 }	
+	 
+	 printf ("%-22s %10.2f ", "Feasibility Pump", tim->fp);
+	 if (lp_stat->fp_calls > 0)
+	    // printf ("%12i %12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols, lp_stat->fp_num_iter);
+	    printf ("%12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols);
+	 printf ("\n");	
+	 
+	 printf ("%-22s %10.2f ", "Local Search", tim->ls);
+	 if (lp_stat->ls_calls > 0)
+	    printf ("%12i %12i ",lp_stat->ls_calls, lp_stat->ls_num_sols);
+	 printf ("\n");	
+	 printf ("%-22s %10.2f ", "Restricted Search", tim->fr);
+	 if (lp_stat->fr_calls > 0)
+	    printf ("%12i %12i ",lp_stat->fr_calls, lp_stat->fr_num_sols);
+	 printf ("\n");	
+	 printf ("%-22s %10.2f ", "Rins Search", tim->rs);
+	 if (lp_stat->rs_calls > 0)
+	    printf ("%12i %12i ",lp_stat->rs_calls, lp_stat->rs_num_sols);
+	 printf ("\n");	
+	 printf ("%-22s %10.2f ", "Local Branching", tim->lb);
+	 if (lp_stat->lb_calls > 0)
+	    printf ("%12i %12i ",lp_stat->lb_calls, lp_stat->lb_num_sols);
+	 
+	 printf ("\n");	
+	 printf ("\n=========================== Cuts ==========================");
+	 printf ("\n");
+	 printf ("Accepted:                         %d\n",
+		 lp_stat->cuts_generated);
+	 printf ("Added to LPs:                     %d\n",
+		 lp_stat->cuts_added_to_lps);
+	 printf ("Deleted from LPs:                 %d\n",
+		 lp_stat->cuts_deleted_from_lps);
+	 printf ("Removed because of bad coeffs:    %d\n",
+		 lp_stat->num_poor_cuts);
+	 printf ("Removed because of duplicacy:     %d\n",
+		 lp_stat->num_duplicate_cuts);
+	 printf ("Insufficiently violated:          %d\n",
+		 lp_stat->num_unviolated_cuts);	
+	 printf ("In root:                          %d\n",
+		 lp_stat->cuts_root);
+	 printf ("\n");	
+	 
+	 printf ("Time in cut generation:              %.2f\n", tim->cuts);	
+	 printf ("Time in checking quality and adding: %.2f\n", 
+		 tim->dupes_and_bad_coeffs_in_cuts);
+	 
+	 printf ("\n");	
+	 printf ("%15s %7s %11s %11s %11s\n","","Time", "#Called", "In Root", "Total");
+	 
+	 printf ("%-15s %7.2f ","Gomory",tim->gomory_cuts); 
+	 if(lp_stat->gomory_calls)
+	    printf ("%11i %11i %11i ", lp_stat->gomory_calls, lp_stat->gomory_cuts_root, 
+		    lp_stat->gomory_cuts);
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","Knapsack",tim->knapsack_cuts); 
+	 if(lp_stat->knapsack_calls)
+	    printf ("%11i %11i %11i ", lp_stat->knapsack_calls, 
+		    lp_stat->knapsack_cuts_root, lp_stat->knapsack_cuts);		  
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","Clique",tim->clique_cuts); 
+	 if(lp_stat->clique_calls)
+	    printf ("%11i %11i %11i ", lp_stat->clique_calls, lp_stat->clique_cuts_root, 
+		    lp_stat->clique_cuts);
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","Probing",tim->probing_cuts); 
+	 if(lp_stat->probing_calls)
+	    printf ("%11i %11i %11i ", lp_stat->probing_calls, lp_stat->probing_cuts_root, 
+		    lp_stat->probing_cuts);
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","Flowcover",tim->flowcover_cuts); 
+	 if(lp_stat->flowcover_calls)
+	    printf ("%11i %11i %11i ", lp_stat->flowcover_calls, 
+		    lp_stat->flowcover_cuts_root, lp_stat->flowcover_cuts);
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","Twomir",tim->twomir_cuts); 
+	 if(lp_stat->twomir_calls)
+	    printf ("%11i %11i %11i ", lp_stat->twomir_calls, lp_stat->twomir_cuts_root, 
+		    lp_stat->twomir_cuts);
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","Oddhole",tim->oddhole_cuts); 
+	 if(lp_stat->oddhole_calls)
+	    printf ("%11i %11i %11i ", lp_stat->oddhole_calls, lp_stat->oddhole_cuts_root, 
+		    lp_stat->oddhole_cuts);
+	 printf ("\n");		
+	 
+	 
+	 printf ("%-15s %7.2f ","Mir",tim->mir_cuts); 
+	 if(lp_stat->mir_calls)
+	    printf ("%11i %11i %11i ", lp_stat->mir_calls, lp_stat->mir_cuts_root, 
+		    lp_stat->mir_cuts);
+	 printf ("\n");		
+	 
+	 
+	 printf ("%-15s %7.2f ","Rounding",tim->rounding_cuts); 
+	 if(lp_stat->rounding_calls)
+	    printf ("%11i %11i %11i ", lp_stat->rounding_calls, 
+		    lp_stat->rounding_cuts_root, lp_stat->rounding_cuts);		  
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","LandP-I",tim->lift_and_project_cuts); 
+	 if(lp_stat->lift_and_project_calls)
+	    printf ("%11i %11i %11i ", lp_stat->lift_and_project_calls, 
+		    lp_stat->lift_and_project_cuts_root, 
 		  lp_stat->lift_and_project_cuts);
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","LandP-II",tim->landp_cuts); 
-	if(lp_stat->landp_calls)
-	  printf ("%11i %11i %11i ", lp_stat->landp_calls, lp_stat->landp_cuts_root, 
-		  lp_stat->landp_cuts);
-	printf ("\n");		
-
-	printf ("%-15s %7.2f ","Redsplit",tim->redsplit_cuts); 
-	if(lp_stat->redsplit_calls)
-	  printf ("%11i %11i %11i ", lp_stat->redsplit_calls, 
-		  lp_stat->redsplit_cuts_root, lp_stat->redsplit_cuts);		  
-	printf ("\n");	
-	printf ("\n===========================================================");
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","LandP-II",tim->landp_cuts); 
+	 if(lp_stat->landp_calls)
+	    printf ("%11i %11i %11i ", lp_stat->landp_calls, lp_stat->landp_cuts_root, 
+		    lp_stat->landp_cuts);
+	 printf ("\n");		
+	 
+	 printf ("%-15s %7.2f ","Redsplit",tim->redsplit_cuts); 
+	 if(lp_stat->redsplit_calls)
+	    printf ("%11i %11i %11i ", lp_stat->redsplit_calls, 
+		    lp_stat->redsplit_cuts_root, lp_stat->redsplit_cuts);		  
+	 printf ("\n");	
+	 printf ("\n===========================================================");
       }
    }
    if (has_ub){
-     gap = fabs(100*(ub-lb)/ub);
+      gap = fabs(100*(ub-lb)/ub);
    }
 
    if (obj_sense == SYM_MAXIMIZE){
-     if (gap > -1e-07 && gap < 0){
-       printf("\nCurrent Lower Bound:         %.10f", -ub + obj_offset);
-       printf("\nCurrent Upper Bound:         %.10f", -lb + obj_offset);
-       printf("\nGap Percentage:              %.10f\n", -gap);
-     } else if (!has_ub) {
-       printf("\nCurrent Upper Bound:         %.10f\n", -lb + obj_offset);
-     }
+      if (gap > -1e-07 && gap < 0){
+	 printf("\nCurrent Lower Bound:         %.10f", -ub + obj_offset);
+	 printf("\nCurrent Upper Bound:         %.10f", -lb + obj_offset);
+	 printf("\nGap Percentage:              %.10f\n", -gap);
+      } else if (!has_ub) {
+	 printf("\nCurrent Upper Bound:         %.10f\n", -lb + obj_offset);
+      }
    }else{
-     if (gap > 1e-07){
-       printf("\nCurrent Upper Bound:         %.10f", ub + obj_offset);
-       printf("\nCurrent Lower Bound:         %.10f", lb + obj_offset);
-       printf("\nGap Percentage:              %.3f\n", gap);
-     } else if (!has_ub){
-       printf("\nCurrent Lower Bound:         %.10f\n", lb + obj_offset);
-     }
+      if (gap > 1e-07){
+	 printf("\nCurrent Upper Bound:         %.10f", ub + obj_offset);
+	 printf("\nCurrent Lower Bound:         %.10f", lb + obj_offset);
+	 printf("\nGap Percentage:              %.3f\n", gap);
+      } else if (!has_ub){
+	 printf("\nCurrent Lower Bound:         %.10f\n", lb + obj_offset);
+      }
    }
 }

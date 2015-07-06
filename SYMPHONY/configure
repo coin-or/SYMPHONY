@@ -20530,7 +20530,7 @@ fi;
 if test "$dependency_linking" = auto; then
   # On Cygwin and AIX, building DLLs doesn't work
   dependency_linking=no
-  if test x"$enable_shared" = xyes; then
+  if test x"$coin_disable_shared" = xno; then
     case $build in
       *-cygwin* | *-mingw*)
         case "$CC" in
@@ -28798,9 +28798,16 @@ if test $in_tm = yes; then
   MASTEREXT="_tm$TMEXT"
 fi
 
-WHATTOMAKELIBS=
-WHATTOINSTALLLIBS=
-WHATTOMAKEBINS=
+WHATTOMAKELIBS="libSym.la"
+WHATTOMAKEBINS="symphony$EXEEXT"
+if test $sym_appl = yes ; then
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+   WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
+   if test $dependency_linking = yes ; then
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+   fi
+fi
+WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
@@ -28843,20 +28850,6 @@ if test $sym_enable_parallel = true; then
        fi
     fi
     WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
-else
-    MASTEREXT="_m"
-    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
-    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
-
-    if test $sym_appl = yes ; then
-       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
-       if test $dependency_linking = yes ; then
-       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
-       fi
-    fi
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
 
 
@@ -28888,6 +28881,15 @@ esac
 else
   sym_openmp=auto
 fi;
+
+if test $sym_enable_parallel = true; then
+   if test $sym_openmp = true; then
+      { { echo "$as_me:$LINENO: error: Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP" >&5
+echo "$as_me: error: Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP" >&2;}
+   { (exit 1); exit 1; }; }
+   fi
+   sym_openmp=false
+fi
 
 if test $sym_openmp = auto; then
    echo "$as_me:$LINENO: checking whether compiler supports OpenMP" >&5
@@ -29023,7 +29025,7 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MISOCO/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
 
 
 
@@ -29051,6 +29053,8 @@ if test $coin_vpath_config = yes; then
                     Applications/MCKP/README
                     Applications/MCKP/INSTALL
                     Applications/MCKP/sample.mckp
+                    Applications/MISOCO/README
+                    Applications/MISOCO/INSTALL
                     Applications/MPP/README
                     Applications/MPP/INSTALL
                     Applications/MPP/sample.mpp
@@ -30145,6 +30149,7 @@ do
   "Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/CNRP/Makefile" ;;
   "Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MATCH/Makefile" ;;
   "Applications/MCKP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MCKP/Makefile" ;;
+  "Applications/MISOCO/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MISOCO/Makefile" ;;
   "Applications/MPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MPP/Makefile" ;;
   "Applications/SPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/SPP/Makefile" ;;
   "Applications/SPP+CUTS/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/SPP+CUTS/Makefile" ;;

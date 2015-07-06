@@ -7,7 +7,7 @@
 /*                                                                           */
 /* The author of this file is Ashutosh Mahajan                               */
 /*                                                                           */
-/* (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -74,7 +74,6 @@ int sp_initialize(tm_prob *tm);
 #endif
 int sp_free_sp(sp_desc *sp);
 
-#ifdef COMPILE_IN_LP
 /* feasibility pump */
 int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_value, 
 		      double *colSolution, double *betterSolution);		      
@@ -132,5 +131,4 @@ int resize_tmp1_arrays(LPdata *lp_data, int new_size);
 sym_environment * lp_to_sym PROTO ((lp_prob *p, LPdata *lp_data, char use_base, int sym_fixed_cnt,
 				    char *sym_fixed_type, double *sym_fixed_val, 
 				    double *sym_fixed_offset, int *unfix_nz, int *new_ind));
-#endif
 #endif

@@ -6,7 +6,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -2561,6 +2561,9 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue)
 {
+   //Modified
+   *should_continue = TRUE;
+   return(TRUE);
    double allowed_time = 0;
    *should_continue = TRUE;
    int min_cands;

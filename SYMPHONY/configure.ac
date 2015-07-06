@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -32,7 +32,7 @@ AC_COPYRIGHT([
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -707,9 +707,16 @@ if test $in_tm = yes; then
   MASTEREXT="_tm$TMEXT"
 fi 
 
-WHATTOMAKELIBS=
-WHATTOINSTALLLIBS=
-WHATTOMAKEBINS=
+WHATTOMAKELIBS="libSym.la"
+WHATTOMAKEBINS="symphony$EXEEXT"
+if test $sym_appl = yes ; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+   WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
+   if test $dependency_linking = yes ; then
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+   fi
+fi
+WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
@@ -752,20 +759,6 @@ if test $sym_enable_parallel = true; then
        fi
     fi
     WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
-else
-    MASTEREXT="_m"
-    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
-    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
-
-    if test $sym_appl = yes ; then 
-       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
-       if test $dependency_linking = yes ; then
-       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
-       fi
-    fi
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
 
 AC_SUBST(WHATTOMAKELIBS)
@@ -793,6 +786,13 @@ AC_ARG_ENABLE([openmp],
    ;;
 esac],
 [sym_openmp=auto])
+
+if test $sym_enable_parallel = true; then
+   if test $sym_openmp = true; then
+      AC_MSG_ERROR(Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP)
+   fi
+   sym_openmp=false
+fi
 
 if test $sym_openmp = auto; then 
    AC_MSG_CHECKING([whether compiler supports OpenMP])
@@ -923,6 +923,7 @@ AC_CONFIG_FILES([Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile
+		 Applications/MISOCO/Makefile
 		 Applications/MPP/Makefile
 		 Applications/SPP/Makefile
 		 Applications/SPP+CUTS/Makefile
@@ -944,6 +945,8 @@ AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/MCKP/README
                     Applications/MCKP/INSTALL
                     Applications/MCKP/sample.mckp
+                    Applications/MISOCO/README
+                    Applications/MISOCO/INSTALL
                     Applications/MPP/README
                     Applications/MPP/INSTALL
                     Applications/MPP/sample.mpp

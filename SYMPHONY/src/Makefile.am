@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -87,10 +87,8 @@ TM_SRC          = TreeManager/treemanager.c TreeManager/tm_func.c \
 endif
 
 SYM_LP_SRC = LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/lp_sp.c
-if SYM_COMPILE_IN_LP
-SYM_LP_SRC += LP/lp_heuristics.c
-endif
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/lp_sp.c \
+	LP/lp_heuristics.c
 if PSEUDO_COSTS
 SYM_LP_SRC += LP/lp_pseudo_branch.c
 else
@@ -124,10 +122,8 @@ MASTER_SRC     += $(TM_SRC)
 endif
 
 LP_SRC		= LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_sp.c
-if SYM_COMPILE_IN_LP
-LP_SRC += LP/lp_heuristics.c
-endif
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_sp.c \
+	LP/lp_heuristics.c
 if PSEUDO_COSTS
 LP_SRC         += LP/lp_pseudo_branch.c
 else
@@ -502,8 +498,8 @@ symphony_m_tm_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
 symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_lp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
-symphony_m_tm_lp_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
+symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la libSym.la $(PLDADD)
+symphony_m_tm_lp_DEPENDENCIES = libSym$(MASTEREXT).la libSym.la $(DEPENDENCIES)
 
 symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
@@ -514,14 +510,14 @@ symphony_m_tm_cp_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
 symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la $(PLDADD)
-symphony_m_tm_lp_cg_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
+symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la libSym.la $(PLDADD)
+symphony_m_tm_lp_cg_DEPENDENCIES = libSym$(MASTEREXT).la libSym.la $(DEPENDENCIES)
 
 symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
-symphony_m_tm_lp_cg_cp_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
+symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la libSym.la $(PLDADD)
+symphony_m_tm_lp_cg_cp_DEPENDENCIES = libSym$(MASTEREXT).la libSym.la $(DEPENDENCIES)
 
 symphony_tm_SOURCES =
 #symphony_tm_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
@@ -532,8 +528,8 @@ symphony_tm_DEPENDENCIES = libSym_tm$(TMEXT).la $(DEPENDENCIES)
 symphony_tm_lp_SOURCES =
 #symphony_tm_lp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
-symphony_tm_lp_DEPENDENCIES = libSym_tm$(TMEXT).la $(DEPENDENCIES)
+symphony_tm_lp_LDADD = libSym_tm$(TMEXT).la libSym.la $(PLDADD)
+symphony_tm_lp_DEPENDENCIES = libSym_tm$(TMEXT).la libSym.la $(DEPENDENCIES)
 
 symphony_tm_cp_SOURCES =
 #symphony_tm_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
@@ -544,14 +540,14 @@ symphony_tm_cp_DEPENDENCIES = libSym_tm$(TMEXT).la $(DEPENDENCIES)
 symphony_tm_lp_cg_SOURCES =
 #symphony_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_cg_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
-symphony_tm_lp_cg_DEPENDENCIES = libSym_tm$(TMEXT).la $(DEPENDENCIES)
+symphony_tm_lp_cg_LDADD = libSym_tm$(TMEXT).la libSym.la $(PLDADD)
+symphony_tm_lp_cg_DEPENDENCIES = libSym_tm$(TMEXT).la libSym.la $(DEPENDENCIES)
 
 symphony_tm_lp_cg_cp_SOURCES =
 #symphony_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_cg_cp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
-symphony_tm_lp_cg_cp_DEPENDENCIES = libSym_tm$(TMEXT).la $(DEPENDENCIES)
+symphony_tm_lp_cg_cp_LDADD = libSym_tm$(TMEXT).la libSym.la $(PLDADD)
+symphony_tm_lp_cg_cp_DEPENDENCIES = libSym_tm$(TMEXT).la libSym.la $(DEPENDENCIES)
 
 symphony_cp_SOURCES =
 #symphony_cp_DEPENDENCIES = $(LDADD) libSym_cp.la
@@ -562,20 +558,20 @@ symphony_cp_DEPENDENCIES = libSym_cp.la $(DEPENDENCIES)
 symphony_lp_SOURCES =
 #symphony_lp_DEPENDENCIES = $(LDADD) 
 symphony_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
-symphony_lp_DEPENDENCIES = libSym_lp$(LPEXT).la $(DEPENDENCIES)
+symphony_lp_LDADD = libSym_lp$(LPEXT).la libSym.la $(PLDADD)
+symphony_lp_DEPENDENCIES = libSym_lp$(LPEXT).la libSym.la $(DEPENDENCIES)
 
 symphony_lp_cg_SOURCES =
 #symphony_lp_cg_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la 
 symphony_lp_cg__CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_cg_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
-symphony_lp_cg_DEPENDENCIES = libSym_lp$(LPEXT).la $(DEPENDENCIES)
+symphony_lp_cg_LDADD = libSym_lp$(LPEXT).la libSym.la $(PLDADD)
+symphony_lp_cg_DEPENDENCIES = libSym_lp$(LPEXT).la libSym.la $(DEPENDENCIES)
 
 symphony_lp_cg_cp_SOURCES =
 #symphony_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la
 symphony_lp_cg_cp__CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
-symphony_lp_cg_cp_DEPENDENCIES = libSym_lp$(LPEXT).la $(DEPENDENCIES)
+symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la libSym.la $(PLDADD)
+symphony_lp_cg_cp_DEPENDENCIES = libSym_lp$(LPEXT).la libSym.la $(DEPENDENCIES)
 
 ########################################################################
 #                Application Library                                   #    
@@ -645,6 +641,21 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 # List all additionally required libraries
 if DEPENDENCY_LINKING
 libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_lp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_lp_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_lp_cg_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_lp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_lp_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_lp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_lp_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_lp_cg_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
 endif
 
 ########################################################################

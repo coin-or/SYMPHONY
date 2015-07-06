@@ -23,7 +23,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -74,6 +74,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/Applications/CNRP/Makefile.in \
 	$(top_srcdir)/Applications/MATCH/Makefile.in \
 	$(top_srcdir)/Applications/MCKP/Makefile.in \
+	$(top_srcdir)/Applications/MISOCO/Makefile.in \
 	$(top_srcdir)/Applications/MPP/Makefile.in \
 	$(top_srcdir)/Applications/Makefile.Applications.in \
 	$(top_srcdir)/Applications/SPP+CUTS/Makefile.in \
@@ -102,10 +103,11 @@ CONFIG_HEADER = $(top_builddir)/include/config.h \
 CONFIG_CLEAN_FILES = Examples/Makefile \
 	Applications/Makefile.Applications Applications/CNRP/Makefile \
 	Applications/MATCH/Makefile Applications/MCKP/Makefile \
-	Applications/MPP/Makefile Applications/SPP/Makefile \
-	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
-	Applications/VRP/Makefile symphony.pc symphony-app.pc \
-	symphony-uninstalled.pc osi-sym.pc osi-sym-uninstalled.pc
+	Applications/MISOCO/Makefile Applications/MPP/Makefile \
+	Applications/SPP/Makefile Applications/SPP+CUTS/Makefile \
+	Applications/USER/Makefile Applications/VRP/Makefile \
+	symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc \
+	osi-sym-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -515,8 +517,10 @@ CLEANFILES =
 
 # Files that are generated and should be cleaned with make distclean
 DISTCLEANFILES = $(am__append_3) $(VPATH_DISTCLEANFILES)
-DocFiles = README AUTHORS LICENSE
+DocFiles = README AUTHORS LICENSE 
 DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
+COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
+COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
 all: all-recursive
 
 .SUFFIXES:
@@ -589,6 +593,8 @@ Applications/CNRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applicat
 Applications/MATCH/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MATCH/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/MCKP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MCKP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MISOCO/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MISOCO/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/MPP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MPP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -773,7 +779,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/Applications $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
+	$(mkdir_p) $(distdir)/. $(distdir)/Applications $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MISOCO $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -1056,7 +1062,7 @@ uninstall-local: uninstall-doc
 
 install-data-hook:
 	@$(mkdir_p) "$(addlibsdir)"
-@COIN_HAS_PKGCONFIG_TRUE@	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
+@COIN_HAS_PKGCONFIG_TRUE@	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@:$(DESTDIR)$(pkgconfiglibdir) \
 @COIN_HAS_PKGCONFIG_TRUE@	$(PKG_CONFIG) --libs symphony > $(addlibsdir)/sym_addlibs.txt
 @COIN_CXX_IS_CL_TRUE@@COIN_HAS_PKGCONFIG_FALSE@	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@" > $(addlibsdir)/sym_addlibs.txt
 @COIN_CXX_IS_CL_FALSE@@COIN_HAS_PKGCONFIG_FALSE@	echo -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@ > $(addlibsdir)/sym_addlibs.txt
@@ -1064,12 +1070,96 @@ install-data-hook:
 uninstall-hook:
 	rm -f $(addlibsdir)/sym_addlibs.txt
 
-install-doc: $(DocFiles)
+doxygen-docs: 
+	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
+	  if test -d "doxydoc/"; then \
+	    doxygen doxydoc/doxygen.conf;\
+	  fi;\
+	  if test -d "doxydoc/latex"; then \
+       	    if test "$(COIN_HAS_LATEX)" = TRUE; then \
+	      cd doxydoc/latex;\
+	      $(MAKE) pdf;\
+	      cd -;\
+	    fi;\
+	  fi;\
+	fi
+
+clean-doxygen-docs:
+	if test -d "doxydoc/"; then \
+	  cd doxydoc ;\
+	  rm -rf html latex *.log *.tag;\
+	fi
+
+install-doxygen-docs: doxygen-docs
+	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
+	  if test -d "doxydoc/"; then \
+	    $(INSTALL_DATA) @coin_doxy_tagname@ "$(DESTDIR)$(DocInstallDir)/@coin_doxy_tagname@";\
+	    test -d "$(DocInstallDir)/doxydoc" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc"; \
+	    if test -f "doxydoc/latex/refman.pdf"; then \
+	      $(INSTALL_DATA) doxydoc/latex/refman.pdf "$(DESTDIR)$(DocInstallDir)";\
+	    fi;\
+	    if test -d "doxydoc/html"; then \
+	      test -d "$(DocInstallDir)/doxydoc/search/" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc/search/"; \
+	      $(INSTALL_DATA) doxydoc/html/*.* "$(DESTDIR)$(DocInstallDir)/doxydoc";\
+	      $(INSTALL_DATA) doxydoc/html/search/*.* "$(DESTDIR)$(DocInstallDir)/doxydoc/search";\
+            fi;\
+          fi;\
+        fi
+
+uninstall-doxygen-docs:
+	if test -d "$(DESTDIR)$(DocInstallDir)/doxydoc/"; then \
+	  rm -rf "$(DESTDIR)$(DocInstallDir)/doxydoc/"; \
+	fi
+	if test -f "$(DESTDIR)$(DocInstallDir)/refman.pdf"; then \
+	  rm -f "$(DESTDIR)$(DocInstallDir)/refman.pdf"; \
+	fi
+
+all-doxygen-docs:
+	for dir in $(subdirs) ; do \
+	  do_project=true;\
+	  for proj in $(COIN_SKIP_DOXYGEN); do\
+	    if test $$dir = $$proj; then\
+	      do_project=false;\
+	    fi;\
+	  done;\
+	  if test -r $$dir/doxydoc & $$do_project = true; then \
+	    (cd $$dir ; $(MAKE) doxygen-docs) \
+	  fi ; \
+	done ; 
+
+clean-all-doxygen-docs:
+	for dir in $(subdirs) ; do \
+	  if test -r $$dir/doxydoc ; then \
+	    (cd $$dir ; $(MAKE) clean-doxygen-docs) \
+	  fi ; \
+	done ; 
+
+install-all-doxygen-docs: all-doxygen-docs
+	for dir in $(subdirs) ; do \
+	  do_project=true;\
+	  for proj in $(COIN_SKIP_DOXYGEN); do\
+	    if test $$dir = $$proj; then\
+	      do_project=false;\
+	    fi;\
+	  done;\
+	  if test -r $$dir/doxydoc & $$do_project = true; then \
+	    (cd $$dir ; $(MAKE) install-doxygen-docs) \
+	  fi ; \
+	done ; 
+
+uninstall-all-doxygen-docs:
+	for dir in $(subdirs) ; do \
+	  if test -r $$dir/doxydoc ; then \
+	    (cd $$dir ; $(MAKE) uninstall-doxygen-docs) \
+	  fi ; \
+	done ; 
+
+install-doc: $(DocFiles) 
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"
 	for file in $(DocFiles); do \
 	  if test -f "$$file"; then dir=; else dir="$(srcdir)/"; fi; \
 	  if test -f "$$dir$$file"; then $(INSTALL_DATA) "$$dir$$file" "$(DESTDIR)$(DocInstallDir)/$$file"; fi; \
-	done
+	done 
 
 uninstall-doc:
 	for file in $(DocFiles); do \
