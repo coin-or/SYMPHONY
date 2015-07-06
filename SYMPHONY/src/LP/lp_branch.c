@@ -2561,9 +2561,6 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue)
 {
-   //Modified
-   *should_continue = TRUE;
-   return(TRUE);
    double allowed_time = 0;
    *should_continue = TRUE;
    int min_cands;
