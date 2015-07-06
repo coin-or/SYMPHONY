@@ -2329,8 +2329,11 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }else if (strcmp(key, "tighten_root_bounds") == 0 ||
 	    strcmp(key, "TM_tighten_root_bounds") == 0){
-      READ_INT_PAR(tm_par->find_first_feasible);
-      lp_par->find_first_feasible = tm_par->find_first_feasible;
+      READ_INT_PAR(tm_par->tighten_root_bounds);
+      return(0);
+   }else if (strcmp(key, "max_sp_size") == 0 ||
+	    strcmp(key, "TM_max_sp_size") == 0){
+      READ_INT_PAR(tm_par->max_sp_size);
       return(0);
    }
 
@@ -3891,7 +3894,7 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 			    int MAX_ALLOWABLE_NUM_PIECES))
 {
 #ifdef SENSITIVITY_ANALYSIS
-   int i, j, retval;
+   int i, j;
    bc_node * child;
 
    if(root){   
@@ -4513,6 +4516,141 @@ double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip,
    printf("Please rebuild SYMPHONY with these features enabled\n");
    return(0);
 #endif
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
+{
+   int i, j, nz = 0,*matBeg, *matInd;
+   double value, *rowAct = NULL, *matVal; 
+   char feasible;
+   double lpetol =  9.9999999999999995e-07;
+   double *tmp_sol;
+   double *obj = env->mip->obj;
+   
+   if (colsol){
+      tmp_sol = colsol;
+   }else{
+      tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+      for (i = 0; i < sol->xlength; i++){
+	 if (sol->xind[i] >= env->mip->n){
+	    break;
+	 }
+	 tmp_sol[sol->xind[i]] = sol->xval[i];
+      }
+   }
+
+   if (i < sol->xlength){
+      printf("Error: Index out of range in solution\n");
+      return(-1);
+   }
+
+   sol->objval = 0;
+   /* step 1. check for bounds and integrality */   
+   for (i = env->mip->n - 1; i >= 0; i--){
+      if (tmp_sol[i] < env->mip->lb[i] - lpetol || 
+	  tmp_sol[i] > env->mip->ub[i] + lpetol)
+	 break;
+      if (!env->mip->is_int[i])
+	 continue; /* Not an integer variable */
+      value = tmp_sol[i];
+      if (tmp_sol[i] > env->mip->lb[i] && tmp_sol[i] < env->mip->ub[i]
+	  && tmp_sol[i]-floor(tmp_sol[i]) > lpetol &&
+	  ceil(tmp_sol[i])-tmp_sol[i] > lpetol){
+	 break;  
+      }
+      sol->objval += tmp_sol[i]*obj[i];
+   }
+
+   feasible = i < 0 ? true : false;
+   
+   /* step 2. check for the constraint matrix */
+   
+   if (feasible){      
+      rowAct = (double*) calloc(env->mip->m, DSIZE);
+      matBeg = env->mip->matbeg;
+      matVal = env->mip->matval;
+      matInd = env->mip->matind;
+	 
+      for(i = 0; i < env->mip->n; i++){
+	 for(j = matBeg[i]; j<matBeg[i+1]; j++){
+	    rowAct[matInd[j]] += matVal[j] * tmp_sol[i];
+	 }
+      }	 
+ 
+      for(i = 0; i < env->mip->m; i++){
+	 switch(env->mip->sense[i]){
+	  case 'L': 
+	     if (rowAct[i] > env->mip->rhs[i] + lpetol)
+		feasible = FALSE;
+	     break;
+	  case 'G':
+	     if (rowAct[i] < env->mip->rhs[i] - lpetol)
+		feasible = FALSE;
+	     break;
+	  case 'E':
+	     if (!((rowAct[i] > env->mip->rhs[i] - lpetol) && 
+		   (rowAct[i] < env->mip->rhs[i] + lpetol)))
+		feasible = FALSE;
+	     break;
+	  case 'R':
+	     if (rowAct[i] > env->mip->rhs[i] + lpetol || 
+		 rowAct[i] < env->mip->rhs[i] - env->mip->rngval[i] - lpetol)
+		feasible = FALSE;
+	     break;
+	  case 'N':
+	  default:
+	     break;
+	 }
+	 
+	 if (!feasible) 
+	    break;
+      }
+   }
+   if (rowAct){
+      FREE(rowAct);
+   }
+
+   if (colsol){
+
+      if (sol->xlength){
+	 FREE(sol->xind);
+	 FREE(sol->xval);
+      }
+   
+      int *tmp_ind = (int *) malloc(ISIZE*env->mip->n);
+
+      for (i = 0; i < env->mip->n; i++){
+	 if (tmp_sol[i] > lpetol || tmp_sol[i] < - lpetol){
+	    tmp_ind[nz] = i;
+	    nz++;
+	 }
+      }
+      
+      sol->xlength = nz;
+      
+      if(nz){
+	 sol->xval = (double *) calloc(nz, DSIZE);
+	 sol->xind = (int *) malloc(ISIZE*nz);
+	 memcpy(sol->xind, tmp_ind, ISIZE*nz);
+	 for (i = 0; i < nz; i++){
+	    sol->xval[i] = tmp_sol[tmp_ind[i]];
+	 }
+      }
+
+      FREE(tmp_ind);
+      
+   }else{
+      
+      FREE(tmp_sol);
+      
+   }
+
+   sol->has_sol = feasible;
+      
+   return(feasible);
 }
 
 /*===========================================================================*/

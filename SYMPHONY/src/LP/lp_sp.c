@@ -96,7 +96,7 @@ int sp_initialize(tm_prob *tm)
    int i;
    tm->sp = (sp_desc*)malloc(sizeof(sp_desc));
    sp_desc *sp = tm->sp;
-   sp->max_solutions = 10;
+   sp->max_solutions = tm->par.max_sp_size;
    sp->num_solutions = 0;
    sp->total_num_sols_found = 0;
    sp->solutions = (sp_solution **) malloc(sp->max_solutions*sizeof(sp_solution*));

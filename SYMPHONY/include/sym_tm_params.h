@@ -89,6 +89,8 @@ typedef struct TM_PARAMS{
    int         keep_cut_pools;
 
    int         tighten_root_bounds;
+
+   int         max_sp_size;
 }tm_params;
 
 #endif

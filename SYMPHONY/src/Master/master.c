@@ -259,6 +259,8 @@ int sym_set_defaults(sym_environment *env)
    tm_par->output_mode = 1;
 
    tm_par->tighten_root_bounds = TRUE;
+
+   tm_par->max_sp_size = 10;
    /************************** lp defaults ***********************************/
    lp_par->cuts_strong_branch = 0; //Anahita
    lp_par->is_recourse_prob = 0; //Anahita
@@ -349,6 +351,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.generate_cgl_rounding_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_landp_cuts = DO_NOT_GENERATE;
+
+   lp_par->cgl.gomory_globally_valid = FALSE;
 
    lp_par->cgl.probing_is_expensive = FALSE;
    lp_par->cgl.probing_root_max_look = 100;
@@ -831,7 +835,6 @@ int sym_solve(sym_environment *env)
 
    start_time = wall_clock(NULL);
 
-   double *tmp_sol;
    lp_sol *best_sol = &(env->best_sol);
 
    if(best_sol->has_sol && env->mip->is_modified){
@@ -847,6 +850,18 @@ int sym_solve(sym_environment *env)
 
    termcode = sym_presolve(env);
 
+   //Gomory cuts are globally valid for binary problems
+   int prob_type;
+   if (env->prep_mip){
+      prob_type = env->prep_mip->mip_inf->prob_type;
+   }else{
+      prob_type = env->mip->mip_inf->prob_type;
+   }
+   if (prob_type == BINARY_TYPE || prob_type != BIN_CONT_TYPE ||
+      prob_type == BIN_INT_TYPE){
+      env->par.lp_par.cgl.gomory_globally_valid = TRUE;
+   }
+   
    if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
       termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
       termcode == PREP_OTHER_ERROR){
@@ -1116,29 +1131,41 @@ int sym_solve(sym_environment *env)
    
    if (env->warm_start && env->par.tm_par.warm_start){
       //check stored solution for feasibility
-      if (env->warm_start->best_sol.has_sol){
-	 tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-	 for (i = 0; i < best_sol->xlength; i++){
-	    if (env->warm_start->best_sol.xind[i] >= env->mip->n){
-	       //The stored solution has the wrong dimension
-	       //This seems to happen in the Osi unit test
-	       break;
+      if (env->sp){
+	 double min = SYM_INFINITY;
+	 lp_sol sol;
+	 int min_ind = -1;
+	 for (i = 0; i < env->sp->num_solutions; i++){
+	    sol.xlength = env->sp->solutions[i]->xlength;
+	    sol.xind = env->sp->solutions[i]->xind;
+	    sol.xval = env->sp->solutions[i]->xval;
+	    if (check_solution(env, &sol) > 0){
+	       if ((env->sp->solutions[i]->objval = sol.objval) < min){
+		  min = env->sp->solutions[i]->objval;
+		  min_ind = i;
+	       }
 	    }
-	    tmp_sol[env->warm_start->best_sol.xind[i]] =
-	       env->warm_start->best_sol.xval[i];
+	    if (min < SYM_INFINITY){
+	       double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+	       for (i = 0; i < env->sp->solutions[min_ind]->xlength; i++){
+		  tmp_sol[env->sp->solutions[min_ind]->xind[i]] =
+		     env->sp->solutions[min_ind]->xval[i];
+	       }
+	       sym_set_col_solution(env, tmp_sol);
+	       FREE(tmp_sol);
+	    }
 	 }
-	 if (i == env->warm_start->best_sol.xlength){
-	    sym_set_col_solution(env, tmp_sol);
-	 }else{
-	    env->warm_start->best_sol.has_sol = FALSE;
-	    FREE(env->warm_start->best_sol.xind);
-	    FREE(env->warm_start->best_sol.xval);
-	    env->warm_start->best_sol.xlength = 0;
+	 //Transfer ownership to the Tree Manager
+	 tm->sp = env->sp;
+	 env->sp = NULL;
+      }else{
+	 if (best_sol->objval > env->warm_start->best_sol.objval){
+	    FREE(best_sol->xind);
+	    FREE(best_sol->xval);
+	    env->best_sol = env->warm_start->best_sol;
+	    memset(&(env->warm_start->best_sol), 0, sizeof(lp_sol));
 	 }
-	 FREE(tmp_sol);
       }
-      //   memset(&(env->best_sol), 0, sizeof(lp_sol));
-
       /* Load warm start info */
       tm->rootnode = env->warm_start->rootnode;
       tm->cuts = env->warm_start->cuts;
@@ -1152,11 +1179,6 @@ int sym_solve(sym_environment *env)
 	    tm->ub = env->ub;
 	 }
 	 tm->has_ub = TRUE;
-      }
-      if (best_sol->objval > env->warm_start->best_sol.objval){
-	 FREE(best_sol->xind);
-	 FREE(best_sol->xval);
-	 env->best_sol = env->warm_start->best_sol;
       }
       tm->phase = env->warm_start->phase;
    }else{
@@ -1177,23 +1199,11 @@ int sym_solve(sym_environment *env)
 	 }
       }
       if (best_sol->has_sol){
-	 tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+	 double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
 	 for (i = 0; i < best_sol->xlength; i++){
-	    if (best_sol->xind[i] >= env->mip->n){
-	       //The stored solution has the wrong dimension
-	       //This seems to happen in the Osi unit test
-	       break;
-	    }
 	    tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
 	 }
-	 if (i == best_sol->xlength){
-	    sym_set_col_solution(env, tmp_sol);
-	 }else{
-	    best_sol->has_sol = FALSE;
-	    FREE(best_sol->xind);
-	    FREE(best_sol->xval);
-	    best_sol->xlength = 0;
-	 }
+	 sym_set_col_solution(env, tmp_sol);
 	 FREE(tmp_sol);
       }
    }
@@ -1378,7 +1388,9 @@ int sym_solve(sym_environment *env)
     * Solve the problem and receive solutions                         
    \*------------------------------------------------------------------------*/
 #ifdef COMPILE_IN_LP
-   sp_initialize(tm);
+   if (!tm->sp){
+      sp_initialize(tm);
+   }
 #endif
 
    tm->start_time += start_time;
@@ -1459,6 +1471,22 @@ int sym_solve(sym_environment *env)
 		best_sol->xval, DSIZE * best_sol->xlength);	
       }
    }
+
+#ifdef COMPILE_IN_LP
+   if (env->sp){
+      sp_free_sp(env->sp);
+      FREE(env->sp);
+   }
+   env->sp = tm->sp;
+   if(env->orig_mip){
+      for (i = 0; i < env->sp->num_solutions; i++){
+	 prep_merge_solution(env->orig_mip, env->mip,
+			     &(env->sp->solutions[i]->xlength), 
+			     &(env->sp->solutions[i]->xind),
+			     &(env->sp->solutions[i]->xval));
+	 }
+   }
+#endif
 
    tm->rootnode = NULL;
    tm->cuts = NULL;
@@ -1580,21 +1608,6 @@ int sym_solve(sym_environment *env)
 		       tm->has_ub, tm->sp, tm->par.output_mode);
    }
    temp = termcode;
-#ifdef COMPILE_IN_LP
-   if (env->sp){
-      sp_free_sp(env->sp);
-      FREE(env->sp);
-   }
-   env->sp = tm->sp;
-   if(env->orig_mip){
-      for (i = 0; i < env->sp->num_solutions; i++){
-	 prep_merge_solution(env->orig_mip, env->mip,
-			     &(env->sp->solutions[i]->xlength), 
-			     &(env->sp->solutions[i]->xind),
-			     &(env->sp->solutions[i]->xval));
-	 }
-   }
-#endif
    
    if(env->par.verbosity >=-1 ) {
 #ifdef COMPILE_IN_LP
@@ -3995,12 +4008,8 @@ int sym_set_obj_sense(sym_environment *env, int sense)
 
 int sym_set_col_solution(sym_environment *env, double * colsol)
 {
-   int i, j, nz = 0,*matBeg, *matInd;
-   double value, *rowAct = NULL, *matVal; 
-   char feasible;
-   double lpetol =  9.9999999999999995e-07;
    lp_sol * sol;
-   int * tmp_ind;
+   char feasible;
 
    if (!env->mip || !env->mip->n){
       if(env->par.verbosity >= 1){
@@ -4009,101 +4018,11 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   /* Feasibility Check*/
-
-   /* step 1. check for bounds and integrality */   
-   for (i = env->mip->n - 1; i >= 0; i--){
-      if (colsol[i] < env->mip->lb[i] - lpetol || 
-	  colsol[i] > env->mip->ub[i] + lpetol)
-	 break;
-      if (!env->mip->is_int[i])
-	 continue; /* Not an integer variable */
-      value = colsol[i];
-      if (colsol[i] > env->mip->lb[i] && colsol[i] < env->mip->ub[i]
-	  && colsol[i]-floor(colsol[i]) > lpetol &&
-	  ceil(colsol[i])-colsol[i] > lpetol){
-	 break;  
-      }
-   }
-
-   feasible = i < 0 ? true : false;
-   
-   /* step 2. check for the constraint matrix */
-   
-   if (feasible){      
-      rowAct = (double*) calloc(env->mip->m, DSIZE);
-      matBeg = env->mip->matbeg;
-      matVal = env->mip->matval;
-      matInd = env->mip->matind;
-
-      for(i = 0; i < env->mip->n; i++){
-	 for(j = matBeg[i]; j<matBeg[i+1]; j++){
-	    rowAct[matInd[j]] += matVal[j] * colsol[i];
-	 }
-      }	 
- 
-      for(i = 0; i < env->mip->m; i++){
-	 switch(env->mip->sense[i]){
-	  case 'L': 
-	     if (rowAct[i] > env->mip->rhs[i] + lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'G':
-	     if (rowAct[i] < env->mip->rhs[i] - lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'E':
-	     if (!((rowAct[i] > env->mip->rhs[i] - lpetol) && 
-		   (rowAct[i] < env->mip->rhs[i] + lpetol)))
-		feasible = FALSE;
-	     break;
-	  case 'R':
-	     if (rowAct[i] > env->mip->rhs[i] + lpetol || 
-		 rowAct[i] < env->mip->rhs[i] - env->mip->rngval[i] - lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'N':
-	  default:
-	     break;
-	 }
-	 
-	 if (!feasible) 
-	    break;
-      }
-   }
-
-   tmp_ind = (int*)malloc(ISIZE*env->mip->n);
-
-   for (i = 0; i < env->mip->n; i++){
-      if (colsol[i] > lpetol || colsol[i] < - lpetol){
-	 tmp_ind[nz] = i;
-	 nz++;
-      }
-   }
-
    sol = &(env->best_sol);
-   if(sol->xlength){
-      FREE(sol->xind);
-      FREE(sol->xval);
-   }
    
-   sol->xlength = nz;
-   sol->objval = 0.0;
-   sol->has_sol = FALSE;
-   
-   if(nz){
-      sol->xval = (double*)calloc(nz,DSIZE);
-      sol->xind = (int*)malloc(ISIZE*nz);
-      memcpy(sol->xind, tmp_ind, ISIZE*nz);
-      for (i = 0; i < nz; i++){
-	 sol->xval[i] = colsol[tmp_ind[i]];
-	 sol->objval += sol->xval[i] * env->mip->obj[tmp_ind[i]]; 
-      }
-   }
+   feasible = check_solution(env, sol, colsol);
 
-   FREE(tmp_ind);
-   
-   if (feasible){
+   if (feasible == TRUE){
       /* now, it is feasible, set the best_sol to colsol */
       //FIXME
       
@@ -4130,13 +4049,9 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       env->best_sol.objval = 0.0;
    }  
 
-   if (rowAct){
-      FREE(rowAct);
-   }
-
    //env->mip->is_modified = FALSE; 
    
-   return(feasible ? FUNCTION_TERMINATED_NORMALLY:
+   return((feasible == TRUE) ? FUNCTION_TERMINATED_NORMALLY:
 	  FUNCTION_TERMINATED_ABNORMALLY);      
 }
 
@@ -5537,6 +5452,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }else if (strcmp(key, "tighten_root_bounds") == 0 ||
 	    strcmp(key, "TM_tighten_root_bounds") == 0){
       *value = tm_par->tighten_root_bounds;
+      return(0);
+   }else if (strcmp(key, "max_sp_size") == 0 ||
+	    strcmp(key, "TM_max_sp_size") == 0){
+      *value = tm_par->max_sp_size;
       return(0);
    }
      

@@ -58,6 +58,8 @@ typedef struct CGL_PARAMS{
    int               generate_cgl_lift_and_project_cuts_freq;
    int               generate_cgl_landp_cuts_freq;
 
+   int               gomory_globally_valid;
+
    int               gomory_generated_in_root;
    int               redsplit_generated_in_root;
    int               knapsack_generated_in_root;
