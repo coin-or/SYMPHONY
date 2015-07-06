@@ -35,13 +35,8 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
    
    if (sp->num_solutions == sp->max_solutions && 
          sp->solutions[0]->objval>=obj_value+p->lp_data->lpetol) {
-      /* delete first solution and move everything up by 1 */
+      /* delete first solution */
       sp_delete_solution(sp,0);
-      /*
-      for (i=0;i<(sp->max_solutions-1);i++) {
-         sp->solutions[i] = sp->solutions[i+1];
-      }
-      */
    } else if (sp->num_solutions == sp->max_solutions) {
       /* pool is full and the new solution is worse than any stored solution
        */
