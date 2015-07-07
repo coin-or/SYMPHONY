@@ -2652,7 +2652,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 
       lp_data->intcpt = intercept;
 
-#ifdef CHECK_DUAL_SOLUTION
+#ifndef NDEBUG
       //This code checks the dual solution values
       double lb = 0;
       for (int i = 0; i <lp_data->m; i++){
@@ -2773,7 +2773,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 
       lp_data->intcpt = intercept;
       
-#ifdef CHECK_DUAL_SOLUTION
+#ifndef NDEBUG
       //This code checks the dual solution values
       double lb = 0;
       for (int i = 0; i <lp_data->m; i++){
@@ -2785,7 +2785,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       }
       
       assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
-#ifdef
+#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2877,7 +2877,7 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 
       lp_data->intcpt = intercept;
 
-#ifdef CHECK_DUAL_SOLUTION
+#ifndef NDEBUG
       //This code checks the dual solution values
       double lb = 0;
       for (int i = 0; i <lp_data->m; i++){
