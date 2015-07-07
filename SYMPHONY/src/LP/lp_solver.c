@@ -2663,9 +2663,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 	 }
       }
       
-      if (fabs(intercept + lb - lp_data->objval) >= 0.1){
-	 printf("Dual solution appears to be incorrect!\n");
-      }
+      assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
 #endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -2786,10 +2784,8 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 	 }
       }
       
-      if (fabs(intercept + lb - lp_data->objval) >= 0.1){
-	 printf("Dual solution appears to be incorrect!\n");
-      }
-#endif
+      assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+#ifdef
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2892,9 +2888,7 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 	 }
       }
       
-      if (fabs(intercept + lb - lp_data->objval) >= 0.1){
-	 printf("Dual solution appears to be incorrect!\n");
-      }
+      assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
 #endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -4119,6 +4113,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       if ((bc_level<6 && comp_times->gomory_cuts<comp_times->lp) || 
           (bc_level>6 && comp_times->gomory_cuts<comp_times->lp/10)) {
          CglGomory *gomory = new CglGomory;
+	 CglTreeInfo *treeInfo = new CglTreeInfo;
          // TODO: change this to something based on number of cols, sparsity
          // etc.
          if (bc_level<1) {
@@ -4128,7 +4123,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             gomory->setLimitAtRoot(100);
             gomory->setLimit(100);
          }
-         gomory->generateCuts(*(lp_data->si), cutlist);
+	 if (par->cgl.gomory_globally_valid){
+	    treeInfo.options &= 16;
+	 }
+         gomory->generateCuts(*(lp_data->si), cutlist, treeInfo);
          if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
             if (is_top_iter){
                par->gomory_generated_in_root = TRUE;
