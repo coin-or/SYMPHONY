@@ -2877,7 +2877,7 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 
       lp_data->intcpt = intercept;
 
-#ifndef NDEBUG
+#ifdef CHECK_DUAL_SOLUTION_HOTSTART
       //This code checks the dual solution values
       double lb = 0;
       for (int i = 0; i <lp_data->m; i++){
