@@ -4011,7 +4011,7 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 
 /*===========================================================================*/
 /*===========================================================================*/
-double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
+double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip, branch_desc *bpath,
 			  int rhs_cnt, int *new_rhs_ind, double *new_rhs_val,
 			  int lb_cnt, int *new_lb_ind, double *new_lb_val,
 			  int ub_cnt, int *new_ub_ind, double *new_ub_val)
@@ -4022,14 +4022,16 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
    bc_node * child;
    double lb = 0, objval = -SYM_INFINITY;
    int level = node->bc_level;
-   bc_node **path, *n;
-   branch_desc *bpath ;
    branch_obj * bobj;
    
    if(!node){
       printf("Warning: NULL pointer in get_lb_for_new_rhs()\n");
       return(-SYM_INFINITY);
    }
+
+#if 0
+   bc_node **path, *n;
+   branch_desc *bpath ;
 
    path = (bc_node **) malloc((2*(level+1)+BB_BUNCH)*sizeof(bc_node *));
    bpath = (branch_desc *) malloc 
@@ -4050,7 +4052,22 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
       bpath[i].range = bobj->range[j];
       bpath[i].branch = bobj->branch[j];
    }
-
+#else
+   if (level > 0){
+      for (j = node->parent->bobj.child_num - 1; j >= 0; j--)
+	 if (node->parent->children[j] == node)
+	    break;
+      
+      bobj = &(node->parent->bobj);
+      bpath[level-1].type = bobj->type;
+      bpath[level-1].name = bobj->name;
+      bpath[level-1].sense = bobj->sense[j];
+      bpath[level-1].rhs = bobj->rhs[j];
+      bpath[level-1].range = bobj->range[j];
+      bpath[level-1].branch = bobj->branch[j];
+   }
+#endif
+      
    //Start with the previous bound
    if(node->feasibility_status == FEASIBLE_PRUNED ||
       node->feasibility_status == OVER_UB_PRUNED ||
@@ -4068,24 +4085,24 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
 	 }
       }
       //This is just to check the lower bound value
-      for (i = 0; i < level; i++, bpath++){
-	 if (bpath->type == BRANCHING_VARIABLE){
-	    switch (bpath->sense){
+      for (i = 0; i < level; i++){
+	 if (bpath[i]->type == BRANCHING_VARIABLE){
+	    switch (bpath[i]->sense){
 	     case 'E':
-	       if (bpath->rhs < mip->ub[j]){
-		  lb += node->dj[j] * (bpath->rhs - mip->ub[j]);
+	       if (bpath[i]->rhs < mip->ub[j]){
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->ub[j]);
 	       }else{
-		  lb += node->dj[j] * (bpath->rhs - mip->lb[j]);
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->lb[j]);
 	       }
 	       break;
 	     case 'L':
 	       if (node->dj[j] <= 0){
-		  lb += node->dj[j] * (bpath->rhs - mip->ub[j]);
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->ub[j]);
 	       }
 	       break;
 	     case 'G':
 	       if (node->dj[j] >= 0){
-		  lb += node->dj[j] * (bpath->rhs - mip->lb[j]);
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->lb[j]);
 	       }
 	       break;
 	     case 'R':
@@ -4173,7 +4190,7 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
    }else if (node->feasibility_status == INFEASIBLE_PRUNED){
       
       node->B_IP = SYM_INFINITY;
-      retval = check_feasibility_new_rhs(node, mip, path, bpath,
+      retval = check_feasibility_new_rhs(node, mip, bpath,
 					 rhs_cnt,
 					 new_rhs_ind, new_rhs_val,
 					 lb_cnt,
@@ -4199,7 +4216,7 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
       
       child = node->children[i];
       
-      child->B_IP = get_lb_for_new_rhs(child, mip,
+      child->B_IP = get_lb_for_new_rhs(child, mip, bpath,
 				       rhs_cnt, new_rhs_ind, new_rhs_val,
 				       lb_cnt, new_lb_ind, new_lb_val,
 				       ub_cnt, new_ub_ind, new_ub_val); 
@@ -4417,8 +4434,7 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip,
-				 bc_node **path, branch_desc *bpath,
+double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip, branch_desc *bpath,
 				 int rhs_cnt,
 				 int *new_rhs_ind, double *new_rhs_val,
 				 int lb_cnt,
@@ -4510,6 +4526,8 @@ double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip,
 
    lp_data->mip = NULL;
    FREE(lp_data);
+
+#if 0
    FREE(bpath);
 
    for(i=0; i<(level+1); i++){
@@ -4518,6 +4536,7 @@ double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip,
    }
 
    FREE(path);
+#endif
 
    return (retval);
 #else

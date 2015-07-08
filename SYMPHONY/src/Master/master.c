@@ -1147,9 +1147,9 @@ int sym_solve(sym_environment *env)
 	    }
 	    if (min < SYM_INFINITY){
 	       double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-	       for (i = 0; i < env->sp->solutions[min_ind]->xlength; i++){
-		  tmp_sol[env->sp->solutions[min_ind]->xind[i]] =
-		     env->sp->solutions[min_ind]->xval[i];
+	       for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
+		  tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
+		     env->sp->solutions[min_ind]->xval[j];
 	       }
 	       sym_set_col_solution(env, tmp_sol);
 	       FREE(tmp_sol);
@@ -1393,6 +1393,8 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
+   //To allow printing of columns header for solution status info
+   tm->stat.print_stats_cnt = 0;
    tm->start_time += start_time;
 
    termcode = solve(tm);
@@ -1727,6 +1729,7 @@ int sym_warm_solve(sym_environment *env)
 	 change_type = env->mip->change_type[i];
 	 if(change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED || 
 	    change_type == OBJ_COEFF_CHANGED || change_type == COLS_ADDED){
+#if 0
 	    if(change_type == OBJ_COEFF_CHANGED){
 	       if(env->par.lp_par.do_reduced_cost_fixing && !env->par.multi_criteria){		 
 		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
@@ -1757,6 +1760,7 @@ int sym_warm_solve(sym_environment *env)
 		  return(FUNCTION_TERMINATED_ABNORMALLY);
 	       } 
 	    }
+#endif
 	    if(!env->mip->cru_vars_num){
 	       analyzed = env->warm_start->stat.analyzed;
 	       depth = env->warm_start->stat.max_depth;
@@ -6437,7 +6441,10 @@ int sym_get_lb_for_new_rhs(sym_environment *env,
       printf("Bounds analysis parameter not set, cannot change bounds.\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }else{
+      branch_desc *bpath = (branch_desc *) malloc (env->warm_start->stat.max_depth*
+				      sizeof(branch_desc));
       *lb_for_new_rhs = get_lb_for_new_rhs(env->warm_start->rootnode, env->mip,
+					   bpath,
 					   rhs_cnt, new_rhs_ind, new_rhs_val,
 					   lb_cnt, new_lb_ind, new_lb_val,
 					   ub_cnt, new_ub_ind, new_ub_val);
