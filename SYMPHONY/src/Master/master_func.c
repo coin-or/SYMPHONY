@@ -4113,19 +4113,26 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
 	    if (bpath[j].type == BRANCHING_VARIABLE){
 	       k = bpath[j].name;   //assuming no extra vars!
 	       sense = bpath[j].sense;
-	       if ((new_lb_ind[i] == k) && ((sense == 'G') ||
-					    (sense == 'E'))){
+	       if (new_lb_ind[i] == k){
 		  if (new_lb_val[i] > bpath[j].rhs){
-		     node->C_LP +=
-			node->dj[k]*(new_lb_val[i] - bpath[j].rhs);
-		     break;
+		     if (sense == 'G'){
+			node->C_LP +=
+			   node->dj[k]*(new_lb_val[i] - bpath[j].rhs);
+			break;
+		     }else{ 
+			//New lower bound makes this node infeasible
+			return(node->C_LP = node->B_IP = SYM_INFINITY);
+		     }
 		  }
+		  //At this point, we don't need to continue the loop 
+		  break;
 	       }
 	    }
-	    if (j < level){
-	       node->C_LP += node->dj[new_lb_ind[i]] *
-		  (new_lb_val[i]- mip->lb[new_lb_ind[i]]);
-	    }
+	 }
+	 //This means we did not branch on new_ub_ind[i], so we adjust as usual
+	 if (j == level){
+	    node->C_LP += node->dj[new_lb_ind[i]] *
+	       (new_lb_val[i]- mip->lb[new_lb_ind[i]]);
 	 }
       }
       for (i = 0; i < ub_cnt; i++){
@@ -4136,19 +4143,26 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
 	    if (bpath[j].type == BRANCHING_VARIABLE){
 	       k = bpath[j].name;   //assuming no extra vars!
 	       sense = bpath[j].sense;
-	       if ((new_ub_ind[i] == k) && ((sense == 'L') ||
-					    (sense == 'E'))){
+	       if (new_ub_ind[i] == k){
 		  if (new_ub_val[i] < bpath[j].rhs){
-		     node->C_LP +=
-			node->dj[k]*(new_ub_val[i] - bpath[j].rhs);
-		     break;
+		     if (sense == 'L'){
+			node->C_LP +=
+			   node->dj[k]*(new_ub_val[i] - bpath[j].rhs);
+			break;
+		     }else{ 
+			//New lower bound makes this node infeasible
+			return(node->C_LP = node->B_IP = SYM_INFINITY);
+		     }
 		  }
+		  //At this point, we don't need to continue the loop 
+		  break;
 	       }
 	    }
-	    if (j < level){
-	       node->C_LP += node->dj[new_ub_ind[i]] *
-		  (new_ub_val[i]- mip->ub[new_ub_ind[i]]);
-	    }
+	 }
+	 if (j == level){
+	    //This means we did not branch on new_ub_ind[i], so we adjust as usual
+	    node->C_LP += node->dj[new_ub_ind[i]] *
+	       (new_ub_val[i]- mip->ub[new_ub_ind[i]]);
 	 }
       }
       for (i = 0; i < rhs_cnt; i++){ 
@@ -4166,11 +4180,7 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip,
 					 new_lb_ind, new_lb_val,
 					 ub_cnt,
 					 new_ub_ind, new_ub_val,
-					 &objval); 
-      /* if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
-	 retval == LP_D_INFEASIBLE){
-	 node->B_IP = SYM_INFINITY;
-	 } */
+					 &objval);
       if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM ||
 	 retval == LP_D_ITLIM){
 	 node->B_IP = objval;
