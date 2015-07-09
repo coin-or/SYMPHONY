@@ -6434,11 +6434,11 @@ int sym_get_lb_for_new_rhs(sym_environment *env,
    }else if (!env->par.tm_par.sensitivity_bounds &&
 	     (lb_cnt != 0 || ub_cnt != 0)){
       printf("sym_get_lb_for_new_rhs():\n");
-      printf("RHS analysis parameter not set, cannot change RHS.\n");
+      printf("Bounds analysis parameter not set, cannot change RHS.\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }else if (!env->warm_start){
       printf("sym_get_lb_for_new_rhs():\n");
-      printf("Bounds analysis parameter not set, cannot change bounds.\n");
+      printf("No warm start, cannot do sensitivity analysis.\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }else{
       branch_desc *bpath = (branch_desc *) malloc (env->warm_start->stat.max_depth*
@@ -6448,6 +6448,7 @@ int sym_get_lb_for_new_rhs(sym_environment *env,
 					   rhs_cnt, new_rhs_ind, new_rhs_val,
 					   lb_cnt, new_lb_ind, new_lb_val,
 					   ub_cnt, new_ub_ind, new_ub_val);
+      FREE(bpath);
       return(FUNCTION_TERMINATED_NORMALLY);
    }
 #else
