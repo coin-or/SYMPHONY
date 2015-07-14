@@ -2616,7 +2616,28 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
+      
       get_x(lp_data);
+      
+#ifndef NDEBUG
+      //This code checks the dual solution values
+      int t;
+      double intercept = 0;
+      double lb = 0;
+      
+      for (t=0; t < lp_data->n; t++){
+	 intercept += lp_data->x[t]* lp_data->dj[t];
+      }
+      for (int i = 0; i <lp_data->m; i++){
+	 if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	 }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	 }
+      }
+      
+      assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }
@@ -2701,6 +2722,26 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       
       get_x(lp_data);
       
+#ifndef NDEBUG
+      //This code checks the dual solution values
+      int t;
+      double intercept = 0;
+      double lb = 0;
+      
+      for (t=0; t < lp_data->n; t++){
+	 intercept += lp_data->x[t]* lp_data->dj[t];
+      }
+      for (int i = 0; i <lp_data->m; i++){
+	 if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	 }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	 }
+      }
+      
+      assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+#endif
+      
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
    else{
@@ -2768,6 +2809,26 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
       }
       
       get_x(lp_data);
+      
+#ifndef NDEBUG
+      //This code checks the dual solution values
+      int t;
+      double intercept = 0;
+      double lb = 0;
+      
+      for (t=0; t < lp_data->n; t++){
+	 intercept += lp_data->x[t]* lp_data->dj[t];
+      }
+      for (int i = 0; i <lp_data->m; i++){
+	 if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	 }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	 }
+      }
+      
+      assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
