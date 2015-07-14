@@ -2898,9 +2898,13 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
     case CGL_GOMORY_GENERATOR:
       {
          CglGomory *gomory = new CglGomory;
+	 CglTreeInfo treeInfo;
+	 if (p->par.cgl.gomory_globally_valid){
+	    treeInfo.options |= 16;
+	 }
          should_use_cgl_generator(p, &should_generate, i, (void *)gomory);
          if (should_generate == TRUE) {
-	    gomory->generateCuts(*(p->lp_data->si), cutlist);
+	    gomory->generateCuts(*(p->lp_data->si), cutlist, treeInfo);
 	    *was_tried = TRUE;	    
          }
          delete gomory;
