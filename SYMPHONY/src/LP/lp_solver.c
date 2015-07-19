@@ -2636,6 +2636,10 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 	 }
       }
       
+      if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	 write_mps(lp_data, "lp.assert");
+      }
+
       assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
 #endif
       
@@ -2739,6 +2743,10 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 	 }
       }
       
+      if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	 write_mps(lp_data, "lp.assert");
+      }
+
       assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
 #endif
       
@@ -2827,6 +2835,10 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 	 }
       }
       
+      if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	 write_mps(lp_data, "lp.assert");
+      }
+
       assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
 #endif
       
