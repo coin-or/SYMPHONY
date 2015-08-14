@@ -4552,7 +4552,7 @@ double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip, branch_desc *bpath
 
 char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
 {
-   int i, j, nz = 0,*matBeg, *matInd;
+   int i, j, nz = 0, *matBeg, *matInd;
    double value, *rowAct = NULL, *matVal; 
    char feasible;
    double lpetol =  9.9999999999999995e-07;
@@ -4561,19 +4561,15 @@ char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
    
    if (colsol){
       tmp_sol = colsol;
+      for (i = 0; i < env->mip->n; i++){
+	 assert(colsol[i] < env->mip->n);
+      }
    }else{
       tmp_sol = (double *) calloc(env->mip->n, DSIZE);
       for (i = 0; i < sol->xlength; i++){
-	 if (sol->xind[i] >= env->mip->n){
-	    break;
-	 }
+	 assert(sol->xind[i] < env->mip->n);
 	 tmp_sol[sol->xind[i]] = sol->xval[i];
       }
-   }
-
-   if (i < sol->xlength){
-      printf("Error: Index out of range in solution\n");
-      return(-1);
    }
 
    sol->objval = 0;
@@ -4637,48 +4633,13 @@ char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
 	 if (!feasible) 
 	    break;
       }
-   }
-   if (rowAct){
       FREE(rowAct);
    }
 
-   if (colsol){
-
-      if (sol->xlength){
-	 FREE(sol->xind);
-	 FREE(sol->xval);
-      }
-   
-      int *tmp_ind = (int *) malloc(ISIZE*env->mip->n);
-
-      for (i = 0; i < env->mip->n; i++){
-	 if (tmp_sol[i] > lpetol || tmp_sol[i] < - lpetol){
-	    tmp_ind[nz] = i;
-	    nz++;
-	 }
-      }
-      
-      sol->xlength = nz;
-      
-      if(nz){
-	 sol->xval = (double *) calloc(nz, DSIZE);
-	 sol->xind = (int *) malloc(ISIZE*nz);
-	 memcpy(sol->xind, tmp_ind, ISIZE*nz);
-	 for (i = 0; i < nz; i++){
-	    sol->xval[i] = tmp_sol[tmp_ind[i]];
-	 }
-      }
-
-      FREE(tmp_ind);
-      
-   }else{
-      
+   if (!colsol) {
       FREE(tmp_sol);
-      
    }
 
-   sol->has_sol = feasible;
-      
    return(feasible);
 }
 

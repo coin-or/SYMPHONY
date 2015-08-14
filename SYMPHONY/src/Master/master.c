@@ -153,6 +153,51 @@ sym_environment *sym_open_environment()
 /*===========================================================================*/
 /*===========================================================================*/
 
+int sym_close_environment(sym_environment *env)
+{
+   int termcode = 0;
+   
+   CALL_WRAPPER_FUNCTION( free_master_u(env) );
+
+   FREE(env);
+
+#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
+    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
+   pvm_catchout(0);
+   comm_exit();
+#endif
+
+   return(termcode);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_reset_environment(sym_environment *env)
+{
+   int termcode = 0, my_tid = env->my_tid;
+   params par = env->par;
+   
+   CALL_WRAPPER_FUNCTION( free_master_u(env) );
+
+#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
+    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
+   pvm_catchout(0);
+#endif
+   
+   memset(env, 0, sizeof(sym_environment));
+
+   env->my_tid = my_tid;
+   env->par = par;
+
+   env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+
+   return(FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 int sym_set_defaults(sym_environment *env)
 {
    int termcode = 0;
@@ -715,6 +760,8 @@ int sym_load_problem(sym_environment *env)
 
    (void) used_time(&t);
 
+   sym_reset_environment(env);
+
    /* Get the problem data */
    CALL_WRAPPER_FUNCTION( io_u(env) );
 
@@ -1131,7 +1178,7 @@ int sym_solve(sym_environment *env)
    
    if (env->warm_start && env->par.tm_par.warm_start){
       //check stored solution for feasibility
-      if (env->sp){
+      if (env->sp && env->par.prep_par.level <= 2){
 	 double min = SYM_INFINITY;
 	 lp_sol sol;
 	 int min_ind = -1;
@@ -1148,6 +1195,7 @@ int sym_solve(sym_environment *env)
 	    if (min < SYM_INFINITY){
 	       double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
 	       for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
+		  assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
 		  tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
 		     env->sp->solutions[min_ind]->xval[j];
 	       }
@@ -1199,12 +1247,26 @@ int sym_solve(sym_environment *env)
 	 }
       }
       if (best_sol->has_sol){
-	 double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-	 for (i = 0; i < best_sol->xlength; i++){
-	    tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
+	 if (env->par.prep_par.level <= 2){
+	    double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+	    for (i = 0; i < best_sol->xlength; i++){
+	       assert(best_sol->xind[i] < env->mip->n);
+	       tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
+	    }
+	    if (i == best_sol->xlength){
+	       sym_set_col_solution(env, tmp_sol);
+	    }else{
+	       best_sol->has_sol = FALSE;
+	    }
+	    FREE(tmp_sol);
 	 }
-	 sym_set_col_solution(env, tmp_sol);
-	 FREE(tmp_sol);
+      }else{
+	 best_sol->has_sol = FALSE;
+      }
+      if (best_sol->has_sol == FALSE){
+	 best_sol->xlength = 0;
+	 FREE(best_sol->xind);
+	 FREE(best_sol->xval);
       }
    }
  
@@ -2680,26 +2742,6 @@ cut_pool **sym_get_permanent_cut_pools(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_close_environment(sym_environment *env)
-{
-   int termcode = 0;
-   
-   CALL_WRAPPER_FUNCTION( free_master_u(env) );
-
-   FREE(env);
-
-#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
-    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
-   pvm_catchout(0);
-   comm_exit();
-#endif
-
-   return(termcode);
-}
-
-/*===========================================================================*/
-/*===========================================================================*/
-
 int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 			      int *start, int *index, double *value,         
 			      double *collb, double *colub, char *is_int,    
@@ -2711,13 +2753,15 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    int i = 0;
 
    if ((!numcols && !numrows) || numcols < 0 || numrows <0){
-      printf("sym_explicit_load_problem():The given problem is empty or incorrect ");
-      printf("problem description!\n");
+      printf("sym_explicit_load_problem(): The given problem is empty or the");
+      printf("problem description is incorrect!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    (void)used_time(&t);
    
+   sym_reset_environment(env);
+
    env->mip->m  = numrows;
    env->mip->n  = numcols;
 
@@ -4012,8 +4056,11 @@ int sym_set_obj_sense(sym_environment *env, int sense)
 
 int sym_set_col_solution(sym_environment *env, double * colsol)
 {
+   int i, nz = 0;
    lp_sol * sol;
    char feasible;
+   double lpetol =  9.9999999999999995e-07;
+   double *tmp_sol;
 
    if (!env->mip || !env->mip->n){
       if(env->par.verbosity >= 1){
@@ -4029,6 +4076,35 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    if (feasible == TRUE){
       /* now, it is feasible, set the best_sol to colsol */
       //FIXME
+      
+      if (colsol){
+	 if (sol->xlength){
+	    FREE(sol->xind);
+	    FREE(sol->xval);
+	 }
+   
+	 int *tmp_ind = (int *) malloc(ISIZE*env->mip->n);
+
+	 for (i = 0; i < env->mip->n; i++){
+	    if (colsol[i] > lpetol || colsol[i] < - lpetol){
+	       tmp_ind[nz] = i;
+	       nz++;
+	    }
+	 }
+      
+	 sol->xlength = nz;
+	 
+	 if(nz){
+	    sol->xval = (double *) malloc(DSIZE*nz);
+	    sol->xind = (int *) malloc(ISIZE*nz);
+	    memcpy(sol->xind, tmp_ind, ISIZE*nz);
+	    for (i = 0; i < nz; i++){
+	       sol->xval[i] = colsol[tmp_ind[i]];
+	    }
+	 }
+	 
+	 FREE(tmp_ind);
+      }
       
       if (env->has_ub_estimate){
 	 if (env->ub_estimate > sol->objval)
@@ -4049,8 +4125,10 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       }
       sol->has_sol = TRUE; 
    }else{
-      //      env->best_sol.objval = SYM_INFINITY;
-      env->best_sol.objval = 0.0;
+      sol->has_sol = FALSE;
+      sol->xlength = 0;
+      FREE(sol->xind);
+      FREE(sol->xval);
    }  
 
    //env->mip->is_modified = FALSE; 
@@ -6683,20 +6761,21 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
   int termcode = 0, verbosity;
   int i, file_num = 45;
   char mps_files[45][MAX_FILE_NAME_LENGTH +1] = {
-     "air03", "air04", "air05", "bell3a", "blend2", "cap6000", "dcmulti", "dsbmip",
-     "egout", "enigma", "fiber", "fixnet6", "flugpl", "gen", "gesa2", "gesa2_o",
-     "gesa3", "gesa3_o", "gt2", "khb05250", "l152lav", "lseu", "misc03", "misc06",
-     "misc07", "mitre", "mod008", "mod010", "mod011", "nw04", "p0033", "p0201",
-     "p0282", "p0548", "p2756", "pp08a", "pp08aCUTS", "qnet1", "qnet1_o", "rentacar",
-     "rgn", "stein27", "stein45", "vpm1", "vpm2" };
+     "air03", "air04", "air05", "bell3a", "blend2", "cap6000", "dcmulti",
+     "dsbmip", "egout", "enigma", "fiber", "fixnet6", "flugpl", "gen",
+     "gesa2", "gesa2_o", "gesa3", "gesa3_o", "gt2", "khb05250", "l152lav",
+     "lseu", "misc03", "misc06", "misc07", "mitre", "mod008", "mod010",
+     "mod011", "nw04", "p0033", "p0201", "p0282", "p0548", "p2756", "pp08a",
+     "pp08aCUTS", "qnet1", "qnet1_o", "rentacar", "rgn", "stein27",
+     "stein45", "vpm1", "vpm2" };
   
   double sol[45] = {340160, 56137, 26374, 878430.316, 7.599, -2451377, 188182,
 		    -305.198, 568.10, 0, 405935.18, 3983, 1201500, 112313.363,
-		    25779856.371, 25779856.371, 27991042.647, 27991042.647, 21166,
-		    106940226, 4722, 1120, 3360, 12850.86, 2810, 115155, 307,
-		    6548, -54558535, 16862, 3089, 7615, 258411, 8691, 3124, 7350,
-		    7350, 16029.693, 16029.693, 30356760.98, 82.20, 18, 30, 20,
-		    13.75};
+		    25779856.371, 25779856.371, 27991042.647, 27991042.647,
+		    21166, 106940226, 4722, 1120, 3360, 12850.86, 2810, 115155,
+		    307, 6548, -54558535, 16862, 3089, 7615, 258411, 8691,
+		    3124, 7350, 7350, 16029.693, 16029.693, 30356760.98, 82.20,
+		    18, 30, 20, 13.75};
 
   char *mps_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
@@ -6709,7 +6788,7 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
   *test_status = 0;
 
   sym_parse_command_line(env, argc, argv);
-  
+    
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   while (true) {
@@ -6732,7 +6811,7 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
     strcpy(mps_dir, env->par.test_dir);
   }
 
-  for(i = 0; i<file_num; i++){
+  for(i = 0; i < file_num; i++){
 
 #if 0
     if(env->mip->n){
@@ -6745,7 +6824,7 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
     sym_close_environment(env);
     env = sym_open_environment();
     sym_parse_command_line(env, argc, argv);
-    
+
     strcpy(infile, "");
     if (dirsep == '/')
        sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
