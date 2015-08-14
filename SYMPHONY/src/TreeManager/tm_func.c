@@ -1563,9 +1563,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       desc->desc = node->desc.desc;
       desc->nf_status = node->desc.nf_status;
 
+#ifdef SENSITIVITY_ANALYSIS
       //Anahita
       child->intcpt = bobj->intcpt[i];
-#ifdef SENSITIVITY_ANALYSIS
       if (tm->par.sensitivity_rhs){ //&& //Anahita 
 	  //action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
 	 child->duals = bobj->duals[i];
@@ -1580,8 +1580,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 //Ted
 	 child->dj = bobj->dj[i];
 	 bobj->dj[i] = 0;
-      }
-      
+      }      
 #endif
 
       if (child->node_status != NODE_STATUS__PRUNED && feasible[i]){

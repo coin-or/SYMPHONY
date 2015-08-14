@@ -587,9 +587,11 @@ void send_node_desc(lp_prob *p, int node_type)
 	 p->dj = NULL;
       }
    }
-#endif	 
+
    //Anahita
    n->intcpt = lp_data->intcpt;
+#endif
+
    n->lower_bound = p->objval; /*lp_data->objval gets over-written
 				 in branching */
       
