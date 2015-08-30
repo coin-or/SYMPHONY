@@ -193,6 +193,8 @@ typedef struct SYM_ENVIRONMENT sym_environment;
 
 void sym_version PROTO((void));
 sym_environment *sym_open_environment PROTO((void));
+int sym_close_environment PROTO((sym_environment *env));
+int sym_reset_environment PROTO((sym_environment *env));
 int sym_set_defaults PROTO((sym_environment *env));
 int sym_parse_command_line PROTO((sym_environment *env, int argc, 
 				  char **argv));
@@ -213,7 +215,6 @@ int sym_warm_solve PROTO((sym_environment *env));
 int sym_mc_solve PROTO((sym_environment *env));
 
 int sym_create_permanent_cut_pools PROTO((sym_environment *env, int *cp_num));
-int sym_close_environment PROTO((sym_environment *env));
 int sym_explicit_load_problem PROTO((sym_environment *env, int numcols, 
 				     int numrows, int *start, int *index, 
 				     double *value, double *collb,
