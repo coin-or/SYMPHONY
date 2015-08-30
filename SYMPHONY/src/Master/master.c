@@ -153,6 +153,52 @@ sym_environment *sym_open_environment()
 /*===========================================================================*/
 /*===========================================================================*/
 
+int sym_close_environment(sym_environment *env)
+{
+   int termcode = 0;
+   
+   CALL_WRAPPER_FUNCTION( free_master_u(env) );
+
+   FREE(env);
+
+#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
+    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
+   pvm_catchout(0);
+   comm_exit();
+#endif
+
+   return(termcode);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_reset_environment(sym_environment *env)
+{
+   int termcode = 0, my_tid = env->my_tid;
+   params par = env->par;
+   
+   CALL_WRAPPER_FUNCTION( free_master_u(env) );
+
+#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
+    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
+   pvm_catchout(0);
+#endif
+   
+   memset(env, 0, sizeof(sym_environment));
+
+   env->my_tid = my_tid;
+   env->par = par;
+   env->par.tm_par.granularity = env->par.lp_par.granularity = 1e-7;
+
+   env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+
+   return(FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 int sym_set_defaults(sym_environment *env)
 {
    int termcode = 0;
@@ -703,6 +749,8 @@ int sym_load_problem(sym_environment *env)
    \*------------------------------------------------------------------------*/
 
    (void) used_time(&t);
+
+   sym_reset_environment(env);
 
    /* Get the problem data */
    CALL_WRAPPER_FUNCTION( io_u(env) );
@@ -2585,26 +2633,6 @@ int sym_create_permanent_cut_pools(sym_environment *env, int * cp_num)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_close_environment(sym_environment *env)
-{
-   int termcode = 0;
-   
-   CALL_WRAPPER_FUNCTION( free_master_u(env) );
-
-   FREE(env);
-
-#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
-    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
-   pvm_catchout(0);
-   comm_exit();
-#endif
-
-   return(termcode);
-}
-
-/*===========================================================================*/
-/*===========================================================================*/
-
 int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 			      int *start, int *index, double *value,         
 			      double *collb, double *colub, char *is_int,    
@@ -2623,6 +2651,8 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 
    (void)used_time(&t);
    
+   sym_reset_environment(env);
+
    env->mip->m  = numrows;
    env->mip->n  = numcols;
 
@@ -6595,18 +6625,6 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
 
   for(i = 0; i<file_num; i++){
 
-#if 0
-    if(env->mip->n){
-       free_master_u(env);
-       strcpy(env->par.infile, "");
-       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-    }
-#endif
-    
-    sym_close_environment(env);
-    env = sym_open_environment();
-    sym_parse_command_line(env, argc, argv);
-    
     strcpy(infile, "");
     if (dirsep == '/')
        sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
