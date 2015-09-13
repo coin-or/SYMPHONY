@@ -176,7 +176,9 @@ int sym_close_environment(sym_environment *env)
 int sym_reset_environment(sym_environment *env)
 {
    int termcode = 0, my_tid = env->my_tid;
-   params par = env->par;
+   //params par = env->par;
+   
+   int obj_sense = env->mip->obj_sense;
    
    CALL_WRAPPER_FUNCTION( free_master_u(env) );
 
@@ -185,13 +187,15 @@ int sym_reset_environment(sym_environment *env)
    pvm_catchout(0);
 #endif
    
-   memset(env, 0, sizeof(sym_environment));
+   //memset(env, 0, sizeof(sym_environment));
 
-   env->my_tid = my_tid;
-   env->par = par;
+   //env->my_tid = my_tid;
+   //env->par = par;
    env->par.tm_par.granularity = env->par.lp_par.granularity = 1e-7;
 
    env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+
+   env->mip->obj_sense = obj_sense;
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
