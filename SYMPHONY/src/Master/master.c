@@ -309,6 +309,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->tighten_root_bounds = TRUE;
    /************************** lp defaults ***********************************/
    lp_par->verbosity = 0;
+   lp_par->debug_lp = FALSE;
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
    lp_par->set_obj_upper_lim = TRUE;
@@ -5492,6 +5493,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
     ***********************************************************************/
    if (strcmp(key, "LP_verbosity") == 0){
       *value = lp_par->verbosity;
+   }
+   else if (strcmp(key, "debug_lp") == 0 ||
+       strcmp(key, "LP_debug_lp") == 0){
+      *value = lp_par->debug_lp;
    }
    else if (strcmp(key, "set_obj_upper_lim") == 0 ||
 	    strcmp(key, "LP_set_obj_upper_lim") == 0){
