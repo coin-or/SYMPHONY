@@ -3628,6 +3628,22 @@ void write_mps(LPdata *lp_data, char *fname)
 
 /*===========================================================================*/
 
+void write_lp(LPdata *lp_data, char *fname)
+{
+   const char * extension = "LP";
+   OsiXSolverInterface  *si = lp_data->si;
+   double ObjSense = si->getObjSense();
+   int i;
+   
+   for (i = 0; i < lp_data->n; i++) {
+      si->setContinuous(i);
+   }
+
+   si->writeLp(fname, extension);
+}
+
+/*===========================================================================*/
+
 void write_mip_desc_mps(MIPdesc *mip, char *fname)
 {
    int i;
