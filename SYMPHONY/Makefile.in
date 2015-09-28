@@ -71,6 +71,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/symphony-app.pc.in \
 	$(srcdir)/symphony-uninstalled.pc.in $(srcdir)/symphony.pc.in \
+	$(top_srcdir)/Applications/BILEVEL/Makefile.in \
 	$(top_srcdir)/Applications/CNRP/Makefile.in \
 	$(top_srcdir)/Applications/MATCH/Makefile.in \
 	$(top_srcdir)/Applications/MCKP/Makefile.in \
@@ -101,7 +102,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config.h \
 	$(top_builddir)/include/config_sym.h
 CONFIG_CLEAN_FILES = Examples/Makefile \
-	Applications/Makefile.Applications Applications/CNRP/Makefile \
+	Applications/Makefile.Applications \
+	Applications/BILEVEL/Makefile Applications/CNRP/Makefile \
 	Applications/MATCH/Makefile Applications/MCKP/Makefile \
 	Applications/MISOCO/Makefile Applications/MPP/Makefile \
 	Applications/SPP/Makefile Applications/SPP+CUTS/Makefile \
@@ -588,6 +590,8 @@ Examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/Examples/Makefile
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/Makefile.Applications: $(top_builddir)/config.status $(top_srcdir)/Applications/Makefile.Applications.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/BILEVEL/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/BILEVEL/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/CNRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/CNRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/MATCH/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MATCH/Makefile.in
@@ -779,7 +783,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/Applications $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MISOCO $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
+	$(mkdir_p) $(distdir)/. $(distdir)/Applications $(distdir)/Applications/BILEVEL $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MISOCO $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

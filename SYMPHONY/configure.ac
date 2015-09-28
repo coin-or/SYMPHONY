@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[trunk],[symphony@list.coin-or.org])
+AC_INIT([SYMPHONY],[WS],[symphony@list.coin-or.org])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -920,6 +920,7 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
 		 Examples/Makefile
 		 Applications/Makefile.Applications
+		 Applications/BILEVEL/Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile
