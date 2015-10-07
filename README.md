@@ -228,6 +228,18 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
 
+### Release 5.6.12
+  * Fixed function for determining duals and reduced costs.
+  * Making it possible to build with cut validity checking enabled.
+  * Fixed bug with re-using of environment for new instances.
+  * Added parameter that allows saving of LP relaxations for debugging.
+  * Added function for writing LP files.
+  * Fixed bug that arose when we fixed a variable in strong branching (now, we keep going with LP loop when this happens).
+  * Fixed long-standing bug that arose when child 0 could be pruned while generating children.
+
+### Release 5.6.11
+  * Updated externals
+
 ### Release 5.6.10
   * Fixed bug with using more the 1 process in PVM
   * Print to stderr on ctrl-c
