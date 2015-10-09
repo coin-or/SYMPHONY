@@ -228,6 +228,9 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
 
+### Release 5.6.13
+  * Updating externals to get relevant bug fixes
+
 ### Release 5.6.12
   * Fixed function for determining duals and reduced costs.
   * Making it possible to build with cut validity checking enabled.
