@@ -3547,8 +3547,9 @@ int update_pcost(lp_prob *p)
 {
 #ifdef COMPILE_IN_LP
    bc_node *parent = p->tm->active_nodes[p->proc_index]->parent;
-   char sense = parent->bobj.sense[0];
-   int branch_var = parent->bobj.position;
+   char sense = parent->bobj.cdesc[0].sense;
+   // TODO: confirm how to set this position?
+   int branch_var = parent->bobj.cdesc[0].position;
    double *pcost_down = p->pcost_down;
    double *pcost_up = p->pcost_up;
    int *br_rel_down = p->br_rel_down;
@@ -3557,11 +3558,14 @@ int update_pcost(lp_prob *p)
    double oldobjval = p->tm->active_nodes[p->proc_index]->lower_bound;
    double oldx =  parent->bobj.value;
    double *x;
+   int i;
 
-   if(parent->bobj.type == SOS1_IMPLICIT){
-      return 0;
+   for (i = 0; i < parent->bobj.child_num; i++) {
+      if(parent->bobj.cdesc[i].type == SOS1_IMPLICIT){
+         return 0;
+      }
    }
-   
+
    //get_x(p->lp_data);
    x = p->lp_data->x;
    if (parent->children[0]->bc_index != p->bc_index) {

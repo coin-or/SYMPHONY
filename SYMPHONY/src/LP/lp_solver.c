@@ -2351,6 +2351,7 @@ void open_lp_solver(LPdata *lp_data)
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   
+   lp_data->si->setDblParam(OsiPrimalTolerance, 1e-10);
    lp_data->si->getDblParam(OsiPrimalTolerance, lp_data->lpetol);
 #endif
 }
@@ -2579,15 +2580,15 @@ void change_col(LPdata *lp_data, int col_ind,
 
 int initial_lp_solve (LPdata *lp_data, int *iterd)
 {
-   
+
    //int term = LP_ABANDONED;
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 
    si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
-    
+
    si->initialSolve();
-   
+
    if (si->isProvenDualInfeasible()){
       term = LP_D_INFEASIBLE;
    }else if (si->isProvenPrimalInfeasible()){
@@ -2601,7 +2602,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 #ifdef __OSI_CLP__
       /* If max iterations and had switched to primal, bound is no good */
       if (si->getModelPtr()->secondaryStatus() == 10){
-	 term = LP_ABANDONED;
+         term = LP_ABANDONED;
       }
 #endif
    }else if (si->isAbandoned()){
@@ -2611,68 +2612,68 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       // This is the only posibility left.
       term = LP_TIME_LIMIT;
    }
-   
+
    lp_data->termcode = term;
-   
+
    if (term != LP_ABANDONED && term != LP_D_INFEASIBLE){
-      
+
       *iterd = si->getIterationCount();
-      
+
       lp_data->objval = si->getObjValue();
 
       /* Get relevant data */
       if (!lp_data->dualsol){
-      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+         lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
       }
       if (!lp_data->dj){
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+         lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
       }
       get_dj_pi(lp_data);
-      
+
       if (lp_data->slacks && term == LP_OPTIMAL) {
-	 get_slacks(lp_data);
+         get_slacks(lp_data);
       }
-      
+
       //Anahita
       if (term == LP_D_UNBOUNDED) {
-	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	    lp_data->maxm * DSIZE);
-	 get_dual_farkas_ray(lp_data);
+         lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+               lp_data->maxm * DSIZE);
+         get_dual_farkas_ray(lp_data);
       }
-      
+
       get_x(lp_data);
 
       //Anahita
       int t;
       double intercept = 0;
-      
+
       for (t=0; t < lp_data->n; t++){
-	 intercept += lp_data->x[t]* lp_data->dj[t];
+         intercept += lp_data->x[t]* lp_data->dj[t];
       }
 
       lp_data->intcpt = intercept;
 
 #ifndef CHECK_DUAL_SOLUTION
       if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
-	//This code checks the dual solution values
-	double lb = 0;
-	
-	for (int i = 0; i <lp_data->m; i++){
-	  if (si->getRowUpper()[i] < 1000000){
-	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
-	  }else{
-	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
-	  }
-	}
-	
-	if (fabs(intercept + lb - lp_data->objval) > 0.1){
-	  write_mps(lp_data, "lp.assert");
-	}
-	
-	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+         //This code checks the dual solution values
+         double lb = 0;
+
+         for (int i = 0; i <lp_data->m; i++){
+            if (si->getRowUpper()[i] < 1000000){
+               lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+            }else{
+               lb += si->getRowLower()[i]*lp_data->dualsol[i];
+            }
+         }
+
+         if (fabs(intercept + lb - lp_data->objval) > 0.1){
+            write_mps(lp_data, "lp.assert");
+         }
+
+         assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
       }
 #endif
-      
+
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }
    else{
@@ -2680,12 +2681,12 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 #ifdef __OSI_CLP__
       if (si->getModelPtr()->secondaryStatus() != 10)
 #endif
-      printf("OSI Abandoned calculation: Code %i \n\n", term);
+         printf("OSI Abandoned calculation: Code %i \n\n", term);
    }
-   
+
    /*
-   si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
-   */
+      si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
+    */
    return(term);
 }
 
@@ -3211,11 +3212,14 @@ void get_dual_ray(LPdata *lp_data)
 
 void get_dual_farkas_ray(LPdata *lp_data)
 {
+   // Commented out by Suresh
+   /*
    std::vector<double*> vRays;
    vRays = lp_data->si->getDualFarkasRays(1);
 
    //check that there is at least one ray
    int raysReturned = static_cast<unsigned int>(vRays.size()) ;
+   int raysReturned = 1;
    assert (raysReturned == 1);
    
    //   double* ray = (double*) malloc (lp_data->m * DSIZE *
@@ -3236,6 +3240,7 @@ void get_dual_farkas_ray(LPdata *lp_data)
    }else{
       double* ray = NULL;
    }
+   */
 }
 
 /*===========================================================================*/
@@ -3637,12 +3642,12 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    row_data *rows = lp_data->rows;
    cut_data *cut;
    int i;
-   
+
    for (i = length - 1; i >= 0; i--){
       cut = rows[index[i]].cut;
       rhs[i] = cut->rhs;  
       if ((sense[i] = cut->sense) == 'R'){
-	 range[i] = cut->range;
+         range[i] = cut->range;
       }
    }
 

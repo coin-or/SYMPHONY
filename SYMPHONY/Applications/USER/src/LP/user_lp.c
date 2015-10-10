@@ -53,8 +53,6 @@ int user_receive_lp_data(void **user)
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
 			   int *maxn, int *maxm, int *maxnz)
 {
-   user_problem *prob = (user_problem *) user;
-
    return(USER_DEFAULT);
 }      
 
@@ -71,7 +69,52 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 		     double *values, int *feasible, double *objval,
 		     char branching, double *heur_solution)
 {
-   return(USER_DEFAULT);
+   user_problem * prob = (user_problem *)user;
+   double *rowact, *rhs, *matval;
+   int *matbeg, *matind;
+
+   rowact = (double *) calloc(prob->rownum, DSIZE);
+
+   rhs = prob->mip->rhs;
+   matbeg = prob->mip->matbeg;
+   matval = prob->mip->matval;
+   matind = prob->mip->matind;
+
+   int i, j, violcount = 0, *violind;
+   violind = (int *) malloc(varnum * ISIZE);
+
+   for(i = 0; i < varnum; i++){
+      for(j = matbeg[indices[i]]; j<matbeg[indices[i]+1]; j++){
+         rowact[matind[j]] += matval[j] * values[i];
+      }
+   }
+
+   for (i = 0; i < varnum; i++) {
+      if (values[i] * (rowact[prob->ccind[indices[i]]] - rhs[prob->ccind[indices[i]]]) > lpetol ||
+              values[i] * (rowact[prob->ccind[indices[i]]] - rhs[prob->ccind[indices[i]]]) < -1.0 * lpetol) {
+         violind[violcount] = indices[i];
+         violcount++;
+      }
+   }
+
+   if (violcount > 0) {
+      *feasible = IP_INFEASIBLE;
+
+      /* Update appropriate values for prob data structure */
+      prob->feasible = *feasible;
+      prob->vvind = (int *) realloc(prob->vvind, violcount * ISIZE);
+      memcpy(prob->vvind, violind, violcount * ISIZE);
+      prob->vvnum = violcount;
+   } else {
+      *feasible = IP_FEASIBLE;
+
+      /* Update appropriate values for prob data structure */
+      prob->feasible = *feasible;
+   }
+
+   FREE(violind);
+   FREE(rowact);
+   return (USER_SUCCESS);
 }
 
 /*===========================================================================*/

@@ -27,7 +27,7 @@ void free_cut(cut_data **cut)
 {
    if (*cut){
       if ((*cut)->coef){
-	 FREE((*cut)->coef);
+         FREE((*cut)->coef);
       }
       FREE(*cut);
    }
@@ -76,15 +76,18 @@ void free_candidate(branch_obj **cand)
       branch_obj *can = *cand;
 #ifdef COMPILE_FRAC_BRANCHING
       for (i = can->child_num-1; i >= 0; i--){
-	 if (can->frac_num[i]){
-	    FREE(can->frac_ind[i]);
-	    FREE(can->frac_val[i]);
-	 }
+         if (can->frac_num[i]){
+            FREE(can->frac_ind[i]);
+            FREE(can->frac_val[i]);
+         }
       }
 #endif
-      free_waiting_row(&(can->row));
+      for (i = can->child_num-1; i >= 0; i--) {
+         free_waiting_row(&(can->cdesc[i].row));
+         FREE(can->cdesc[i].sos_ind);
+      }
 #ifndef MAX_CHILDREN_NUM
-      FREE(can->sense); FREE(can->rhs); FREE(can->range); FREE(can->branch);
+      FREE(cdesc);
 
       if (can->solutions){
 	 for (i = can->child_num-1; i >= 0; i--){

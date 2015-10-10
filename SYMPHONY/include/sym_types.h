@@ -131,13 +131,21 @@ typedef struct BOUNDS_CHANGE_DESC{
 }bounds_change_desc; 
 
 
+/* Suresh: extended in the process of adding disjunction based branching */
 typedef struct BRANCH_DESC{
    int            name;        /* the userind/cut name depending on the type */
    char           type;        /* description of the child. All of them are
-				  natural for branching cuts. For branching
-				  variables they should be interpreted as if
-				  we were adding a cut with a single variable
-				  on the left hand side */
+				                      natural for branching cuts. For branching
+				                      variables they should be interpreted as if
+				                      we were adding a cut with a single variable
+				                      on the left hand side */
+#if defined(COMPILING_FOR_LP) || defined(COMPILE_IN_LP)
+   int            position;     /* Position of the child candidate: col num for
+                                   CANDIDATE_VARIABLE, row num for 
+                                   CANDIDATE_CUT_IN_MATRIX, and so on. */
+   waiting_row    *row;         /* Description of left hand side; makes sense
+                                   only for branching cuts */
+#endif
    char           sense;
    double         rhs;
    double         range;
@@ -207,46 +215,20 @@ typedef struct NODE_DESC{
    int          *frac_vars;
 }node_desc;
 
+
 typedef struct BRANCH_OBJ{
-   char          type;         /* Type of the candidate */
-#if defined(COMPILING_FOR_LP) || defined(COMPILE_IN_LP) 
-   int           position;     /* The position of the candidate */
-   waiting_row  *row;          /* Description of the left hand side; makes
-				  sense only for branching cuts */
-#endif
    int           child_num;    /* Number of kids */
-#if defined(COMPILING_FOR_TM) || defined(COMPILING_FOR_MASTER) || defined(COMPILE_IN_LP) 
-   int           name;         /* userind for VAR, the index for CUT */
-#endif
    double        value;        /* for evaluating pcost */
 
-   /*========================================================================* \
-    * Description of the children.
-    * All of them are natural for branching cuts.
-    * For branching variables they should be interpreted as if we were adding
-    * a cut with a single variable on the left hand side
-   \*========================================================================*/
-   /* regarding implicit sos1 branching */
-
 #ifdef MAX_CHILDREN_NUM
-   char          sense[MAX_CHILDREN_NUM];
-   double        rhs[MAX_CHILDREN_NUM];
-   double        range[MAX_CHILDREN_NUM];
-   int           branch[MAX_CHILDREN_NUM];
-   int           sos_cnt[MAX_CHILDREN_NUM];
-   int          *sos_ind[MAX_CHILDREN_NUM];
+   branch_desc   cdesc[MAX_CHILDREN_NUM];
 #ifdef COMPILE_FRAC_BRANCHING
    int           frac_num[MAX_CHILDREN_NUM];
    int          *frac_ind[MAX_CHILDREN_NUM];
    double       *frac_val[MAX_CHILDREN_NUM];
 #endif
 #else
-   char         *sense;
-   double       *rhs;
-   double       *range;
-   int          *branch;
-   int          *sos_cnt;
-   int          **sos_ind;
+   branch_desc  *cdesc;
 #ifdef COMPILE_FRAC_BRANCHING
    int          *frac_num;
    int         **frac_ind;
@@ -256,7 +238,6 @@ typedef struct BRANCH_OBJ{
 
 #if defined(COMPILING_FOR_LP) || defined(COMPILE_IN_LP) 
    double        lhs;          /* purely for the user */
-
 #ifdef MAX_CHILDREN_NUM
    double        objval[MAX_CHILDREN_NUM];   /* arrays of size 'number' */
    //Anahita
@@ -266,7 +247,6 @@ typedef struct BRANCH_OBJ{
    int           iterd[MAX_CHILDREN_NUM];
    int           feasible[MAX_CHILDREN_NUM];
    int           is_est[MAX_CHILDREN_NUM];
-
 #else
    double       *objval;   /* arrays of size 'number' */
   //Anahita
@@ -275,10 +255,9 @@ typedef struct BRANCH_OBJ{
    int          *termcode;
    int          *iterd;
    int          *feasible;
-
+#endif
 #endif
 
-#endif
    int          *sol_sizes;
    int         **sol_inds;
    double      **solutions;

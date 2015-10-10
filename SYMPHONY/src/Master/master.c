@@ -177,6 +177,7 @@ int sym_reset_environment(sym_environment *env)
 {
    int termcode = 0, my_tid = env->my_tid;
    params par = env->par;
+   void *user = env->user;
    
    CALL_WRAPPER_FUNCTION( free_master_u(env) );
 
@@ -189,6 +190,7 @@ int sym_reset_environment(sym_environment *env)
 
    env->my_tid = my_tid;
    env->par = par;
+   env->user = user;
 
    env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
 
@@ -760,7 +762,8 @@ int sym_load_problem(sym_environment *env)
 
    (void) used_time(&t);
 
-   sym_reset_environment(env);
+   // Disabled by Suresh //
+   //sym_reset_environment(env);
 
    /* Get the problem data */
    CALL_WRAPPER_FUNCTION( io_u(env) );
@@ -2760,7 +2763,8 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 
    (void)used_time(&t);
    
-   sym_reset_environment(env);
+   // Disabled by Suresh //
+   //sym_reset_environment(env);
 
    env->mip->m  = numrows;
    env->mip->n  = numcols;

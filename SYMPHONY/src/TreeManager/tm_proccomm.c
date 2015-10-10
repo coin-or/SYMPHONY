@@ -407,33 +407,36 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
    bounds_change_desc *bnd_change = NULL;
    for (bpath = branch_path, i = 0; i < level; i++, bpath++){
       for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
-	 if (path[i]->children[j] == path[i+1])
-	    break;
+         if (path[i]->children[j] == path[i+1])
+            break;
       bobj = &path[i]->bobj;
-      bpath->type = bobj->type;
-      bpath->name = bobj->name;
-      bpath->sense = bobj->sense[j];
-      bpath->rhs = bobj->rhs[j];
-      bpath->range = bobj->range[j];
-      bpath->branch = bobj->branch[j];
-      bpath->sos_cnt = bobj->sos_cnt[j];
-      bpath->sos_ind = bobj->sos_ind[j];
-      
+      bpath->type = bobj->cdesc[j].type;
+      bpath->name = bobj->cdesc[j].name;
+      bpath->position = bobj->cdesc[j].position;
+      // TODO: is this row assignment correct? If not, correct it later.
+      bpath->row = bobj->cdesc[j].row;
+      bpath->sense = bobj->cdesc[j].sense;
+      bpath->rhs = bobj->cdesc[j].rhs;
+      bpath->range = bobj->cdesc[j].range;
+      bpath->branch = bobj->cdesc[j].branch;
+      bpath->sos_cnt = bobj->cdesc[j].sos_cnt;
+      bpath->sos_ind = bobj->cdesc[j].sos_ind;
+
       /* copy changes in variable bounds from each node above this node */
       merge_bound_changes(&bnd_change, path[i]->desc.bnd_change);
       /*
-      if (path[i]->desc.bnd_change) {
+         if (path[i]->desc.bnd_change) {
          printf("size = %d\n",path[i]->desc.bnd_change->num_changes);
-      } else {
+         } else {
          printf("parent %d is null\n",path[i]->bc_index);
-      }
-      */
+         }
+       */
       //if(path[i]->desc.frac_vars){
       //	for(int k = 0; k < path[i]->desc.frac_cnt; k++){
       //	  frac_var_cnt[path[i]->desc.frac_vars[k]]++;
       //	}
       //}
-      
+
       if(path[i]->cuts_forced) cuts_trial_num++;
    }
    /*
@@ -931,15 +934,20 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    int olddive, dive;
    int new_branching_cut = FALSE, lp, i;
 
-   receive_char_array(&bobj->type, 1);
-   receive_int_array(&bobj->name, 1);
-   if (bobj->type == CANDIDATE_CUT_IN_MATRIX){
-      receive_int_array(&new_branching_cut, 1);
-      if ( (old_cut_name = bobj->name) == -tm->bcutnum-1){
-	 bobj->name = add_cut_to_list(tm, unpack_cut(NULL));
+   // Suresh: relocated following line from line before REMALLOC
+   receive_int_array(&bobj->child_num, 1);
+
+   for (i = 0; i < bobj->child_num; i++) {
+      receive_char_array(&bobj->cdesc[i].type, 1);
+      receive_int_array(&bobj->cdesc[i].name, 1);
+      if (bobj->cdesc[i].type == CANDIDATE_CUT_IN_MATRIX){
+         receive_int_array(&new_branching_cut, 1);
+         if ( (old_cut_name = bobj->cdesc[i].name) == -tm->bcutnum-1){
+            bobj->cdesc[i].name = add_cut_to_list(tm, unpack_cut(NULL));
+         }
       }
    }
-   receive_int_array(&bobj->child_num, 1);
+
    REMALLOC(tm->tmp.c, char, tm->tmp.c_size, bobj->child_num, BB_BUNCH);
    REMALLOC(tm->tmp.i, int, tm->tmp.i_size, bobj->child_num, BB_BUNCH);
    REMALLOC(tm->tmp.d, double, tm->tmp.d_size, bobj->child_num, BB_BUNCH);
@@ -947,18 +955,21 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    feasible = tm->tmp.i;
    objval = tm->tmp.d;
 
-#ifndef MAX_CHILDREN_NUM
-   bobj->sense = malloc(bobj->child_num * CSIZE);
-   bobj->rhs = (double *) malloc(bobj->child_num * DSIZE);
-   bobj->range = (double *) malloc(bobj->child_num * DSIZE);
-   bobj->branch = (int *) malloc(bobj->child_num * ISIZE);
-   bobj->sos_cnt = (int *) malloc(bobj->child_num * ISIZE);
-   bobj->sos_ind = (int **) malloc(bobj->child_num * sizeof(int*));
-#endif
-   receive_char_array(bobj->sense, bobj->child_num);
-   receive_dbl_array(bobj->rhs, bobj->child_num);
-   receive_dbl_array(bobj->range, bobj->child_num);
-   receive_int_array(bobj->branch, bobj->child_num);
+//#ifndef MAX_CHILDREN_NUM
+//   bobj->sense = malloc(bobj->child_num * CSIZE);
+//   bobj->rhs = (double *) malloc(bobj->child_num * DSIZE);
+//   bobj->range = (double *) malloc(bobj->child_num * DSIZE);
+//   bobj->branch = (int *) malloc(bobj->child_num * ISIZE);
+//   bobj->sos_cnt = (int *) malloc(bobj->child_num * ISIZE);
+//   bobj->sos_ind = (int **) malloc(bobj->child_num * sizeof(int*));
+//#endif
+
+   for (i = 0; i < bobj->child_num; i++) {
+      receive_char_array(&bobj->cdesc[i].sense, 1);
+      receive_dbl_array(&bobj->cdesc[i].rhs, 1);
+      receive_dbl_array(&bobj->cdesc[i].range, 1);
+      receive_int_array(&bobj->cdesc[i].branch, 1);
+   }
 
    receive_dbl_array(objval, bobj->child_num);
    receive_int_array(feasible, bobj->child_num);
@@ -966,9 +977,9 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    for (i = 0; i < bobj->child_num; i++){
       if (feasible[i]){
 #if 0
-	 bobj->solutions[i] = (double *)
-	    malloc(DSIZE*tm->rootnode->desc.uind.size); 
-	 receive_dbl_array(bobj->solutions[i], tm->rootnode->desc.uind.size);
+         bobj->solutions[i] = (double *)
+            malloc(DSIZE*tm->rootnode->desc.uind.size); 
+         receive_dbl_array(bobj->solutions[i], tm->rootnode->desc.uind.size);
 #endif
       }
    }
@@ -979,9 +990,9 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    receive_int_array(&keep, 1);
    oldkeep = keep;
    lp = node->lp;
-   
+
    dive = generate_children(tm, node, bobj, objval, feasible, action, olddive,
-			    &keep, new_branching_cut); 
+         &keep, new_branching_cut); 
 
    if (oldkeep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE)){
       /* We have to reply */
@@ -989,17 +1000,17 @@ void process_branching_info(tm_prob *tm, bc_node *node)
       ch = (char) dive;
       send_char_array(&ch, 1);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
-	 /* Give the index of the node kept and also the index of the
-	  * branching cut if necessary */
-	 send_int_array(&node->children[keep]->bc_index, 1);
-	 if (bobj->type == CANDIDATE_CUT_IN_MATRIX &&
-	     old_cut_name == -tm->bcutnum-1)
-	    send_int_array(&bobj->name, 1);
-	 node->children[keep]->lp = node->lp;
-	 node->children[keep]->cg = node->cg;
-	 /* update the info which node is processed by that lp process */
-	 tm->active_nodes[find_process_index(&tm->lp, node->lp)] =
-	    node->children[keep];
+         /* Give the index of the node kept and also the index of the
+          * branching cut if necessary */
+         send_int_array(&node->children[keep]->bc_index, 1);
+         if (bobj->cdesc[keep].type == CANDIDATE_CUT_IN_MATRIX &&
+               old_cut_name == -tm->bcutnum-1)
+            send_int_array(&bobj->cdesc[keep].name, 1);
+         node->children[keep]->lp = node->lp;
+         node->children[keep]->cg = node->cg;
+         /* update the info which node is processed by that lp process */
+         tm->active_nodes[find_process_index(&tm->lp, node->lp)] =
+            node->children[keep];
       }
       send_msg(lp, LP__DIVING_INFO);
    }

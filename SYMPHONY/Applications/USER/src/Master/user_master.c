@@ -86,8 +86,6 @@ int user_initialize(void **user)
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
-   /* This code is just a template for customization. Uncomment to use.*/
-#if 0
    FILE *f;
    char line[50], key[50], value[50], c, tmp;
    int i;
@@ -95,6 +93,8 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
 
+   /* This code is just a template for customization. Uncomment to use.*/
+#if 0
    if (strcmp(filename, "")){
       if ((f = fopen(filename, "r")) == NULL){
 	 printf("SYMPHONY: file %s can't be opened\n", filename);
@@ -115,6 +115,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       
       fclose(f);
    }
+#endif
 
    /* Here you can parse the command line for options. By convention, the
       users options should be capital letters */
@@ -133,9 +134,8 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 	 break;
       };
    }
-#endif
    
-   return(USER_DEFAULT);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/

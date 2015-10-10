@@ -22,6 +22,8 @@
 typedef struct USER_PARAMETERS{
    /* Name of file containingthe instance data */
    char             infile[MAX_FILE_NAME_LENGTH + 1];
+   int              test;
+   char             test_dir[MAX_FILE_NAME_LENGTH +1]; /* Test files directory */
 }user_parameters;
 
 /*---------------------------------------------------------------------------*\
@@ -29,9 +31,44 @@ typedef struct USER_PARAMETERS{
 \*---------------------------------------------------------------------------*/
 
 typedef struct USER_PROBLEM{
-   int              colnum; /* Number of rows in base matrix */
-   int              rownum; /* Number of columns in base matrix */
    user_parameters  par;    /* Parameters */
+   int              colnum; /* Number of columns in base matrix */
+   int              rownum; /* Number of rows in base matrix */
+
+   /* Various parameters to store data read from mps file.
+    * Note that data read from mps file is not the final problem that
+    * is loaded into SYMPHONY.
+    * These parameters are used in creating final problem data */
+   int             *matbeg_row; /* */
+   int             *matind_row; /* */
+   double          *matval_row; /* */
+   int              con_sense_e;/* */
+   int              con_sense_g;/* */
+   int              con_sense_l;/* */
+   int              ubinfty;    /* number of infinity UBs */
+   int              lbinfty;    /* number of -infinity LBs */
+   double          *tempub;     /* condensed finite UBs */
+   double          *templb;     /* condensed finite LBs */
+   int             *infubsofar; /* number of infinite UBs so far */
+   int             *inflbsofar; /* number of infinite LBs so far */
+   int             *infubind;   /* indicator of a infinite UB */
+   int             *inflbind;   /* indicator of a -infinite LB */
+   double           infty;      /* */
+   int             *ccind;      /* Index of complementarity constraint */
+   MIPdesc         *mip;        /* MIP data structure to store problem data */
+
+   int             *nzcount;    /* Non-zero coeff count of each constraint */
+   int              feasible;   /* Feasibility status of current LP relaxation */
+   int             *vvind;      /* Var indices of violated complementarity constraints */
+   int              vvnum;      /* Number of violated complementarity cons. Size of vvind */
+
+   // Added by Suresh for debugging
+   double         *origobj_coeffs;
+   int            origvar_num;
+
 }user_problem;
+
+int user_read_data PROTO((user_problem *prob, char *infile));
+int user_load_problem PROTO((sym_environment *env, user_problem *prob));
 
 #endif

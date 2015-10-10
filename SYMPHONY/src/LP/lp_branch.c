@@ -1,4 +1,3 @@
-
 /*===========================================================================*/
 /*                                                                           */
 /* This file is part of the SYMPHONY MILP Solver Framework.                  */
@@ -38,14 +37,17 @@ void add_slacks_to_matrix(lp_prob *p, int cand_num, branch_obj **candidates)
    LPdata *lp_data = p->lp_data;
    int *index;
    int m = p->lp_data->m;
-   int j, k;
+   int j, k, i;
    branch_obj *can;
    row_data *newrows;
    waiting_row **wrows;
 
-   for (j=cand_num-1; j >= 0; j--)
-      if (candidates[j]->type == CANDIDATE_CUT_NOT_IN_MATRIX)
-	 break;
+   for (j=cand_num-1; j >= 0; j--) {
+      for (i = 0; i < candidates[j]->child_num; i++) {
+         if (candidates[j]->cdesc[i].type == CANDIDATE_CUT_NOT_IN_MATRIX)
+            break;
+      }
+   }
 
    if (j < 0) /* there is nothing to add */
       return;
@@ -56,12 +58,14 @@ void add_slacks_to_matrix(lp_prob *p, int cand_num, branch_obj **candidates)
    /* can't use tmp.p, because that might get resized in add_row_set */
    for (k=0; j >= 0; j--){
       can = candidates[j];
-      if (can->type == CANDIDATE_CUT_NOT_IN_MATRIX){
-	 wrows[k] = can->row;
-	 can->row = NULL;
-	 can->position = m + k;
-	 can->type = CANDIDATE_CUT_IN_MATRIX;
-	 k++;
+      for (i = 0; i < can->child_num; i++) {
+         if (can->cdesc[i].type == CANDIDATE_CUT_NOT_IN_MATRIX){
+            wrows[k] = can->cdesc[i].row;
+            can->cdesc[i].row = NULL;
+            can->cdesc[i].position = m + k;
+            can->cdesc[i].type = CANDIDATE_CUT_IN_MATRIX;
+            k++;
+         }
       }
    }
    add_row_set(p, wrows, k);
@@ -92,17 +96,19 @@ int add_violated_slacks(lp_prob *p, int cand_num, branch_obj **candidates)
 {
    LPdata *lp_data = p->lp_data;
    waiting_row **new_rows;
-   int i, new_row_num = 0;
+   int i, j, new_row_num = 0;
 
    /* If there are any violated (former) slack, unpack them and add them
     * to the set of waiting rows. */
    if (cand_num > 0){
       new_rows = (waiting_row **) lp_data->tmp.p1; /* m (actually, candnum<m */
       for (i=0; i<cand_num; i++){
-	 if (candidates[i]->type == VIOLATED_SLACK){
-	    new_rows[new_row_num++] = candidates[i]->row;
-	    candidates[i]->row = NULL;
-	 }
+         for (j= 0; j < candidates[i]->child_num; j++) {
+            if (candidates[i]->cdesc[j].type == VIOLATED_SLACK){
+               new_rows[new_row_num++] = candidates[i]->cdesc[j].row;
+               candidates[i]->cdesc[j].row = NULL;
+            }
+         }
       }
       if (new_row_num > 0)
 	 add_new_rows_to_waiting_rows(p, new_rows, new_row_num);
@@ -170,36 +176,36 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
     * -- return with DO_NOT_BRANCH along with a bunch of violated cuts
     *    in the matrix and/or among the slack_cuts, or
     * -- return with DO_NOT_BRANCH__FATHOMED, i.e., the node can be fathomed.
-   \*------------------------------------------------------------------------*/      
+    \*------------------------------------------------------------------------*/      
 
    j = select_candidates_u(p, cuts, &new_vars, &cand_num, &candidates);
 
    switch (j){
-    case DO_NOT_BRANCH__FATHOMED:
-      *candidate = NULL;
-      return(DO_NOT_BRANCH__FATHOMED);
-    case DO_NOT_BRANCH__FEAS_SOL:
-      *candidate = NULL;
-      return(DO_NOT_BRANCH__FEAS_SOL);
-    case DO_NOT_BRANCH:
-      if (cand_num)
-	 *cuts += add_violated_slacks(p, cand_num, candidates);
-      /* Free the candidates */
-      if (candidates){
-	 for (i=0; i<cand_num; i++){
-	    free_candidate(candidates + i);
-	 }
-	 FREE(candidates);
-      }
-      *candidate = NULL;
-      return(DO_NOT_BRANCH);
+      case DO_NOT_BRANCH__FATHOMED:
+         *candidate = NULL;
+         return(DO_NOT_BRANCH__FATHOMED);
+      case DO_NOT_BRANCH__FEAS_SOL:
+         *candidate = NULL;
+         return(DO_NOT_BRANCH__FEAS_SOL);
+      case DO_NOT_BRANCH:
+         if (cand_num)
+            *cuts += add_violated_slacks(p, cand_num, candidates);
+         /* Free the candidates */
+         if (candidates){
+            for (i=0; i<cand_num; i++){
+               free_candidate(candidates + i);
+            }
+            FREE(candidates);
+         }
+         *candidate = NULL;
+         return(DO_NOT_BRANCH);
 
-    case DO_BRANCH:
-      break;
+      case DO_BRANCH:
+         break;
 
-   case ERROR__NO_BRANCHING_CANDIDATE:
-      *candidate = NULL;
-      return(ERROR__NO_BRANCHING_CANDIDATE);
+      case ERROR__NO_BRANCHING_CANDIDATE:
+         *candidate = NULL;
+         return(ERROR__NO_BRANCHING_CANDIDATE);
    }
 
    /* OK, now we have to branch. */
@@ -215,7 +221,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    if (p->par.branch_on_cuts)
       add_slacks_to_matrix(p, cand_num, candidates);
    m = lp_data->m;
-   rows = lp_data->rows;   
+   rows = lp_data->rows;
 
 
 #ifndef MAX_CHILDREN_NUM   
@@ -224,7 +230,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       and allocate space for it */
    for (maxnum = candidates[0]->child_num, j=0, i=1; i<cand_num; i++){
       if (maxnum < candidates[i]->child_num)
-	 maxnum = candidates[i]->child_num;
+         maxnum = candidates[i]->child_num;
    }
 
    objval   = (double *) malloc(maxnum * DSIZE);
@@ -244,7 +250,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    pfeas = (int *) malloc(maxnum * ISIZE);
    piter = (int *) malloc(maxnum * ISIZE);
 #endif
-   
+
    /* Look at the candidates one-by-one and presolve them. */
    vars = lp_data->vars;
    oldobjval   = lp_data->objval;
@@ -254,21 +260,22 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    int *cstat = lp_data->tmp.i1;
    int *rstat = lp_data->tmp.i2;
 
+   /* TODO: Look into this function */
    get_basis(lp_data, cstat, rstat);
-      
+
    if (should_use_rel_br==TRUE) {
 
       const double lpetol100 = lp_data->lpetol*100;
       double lpetol = lp_data->lpetol;
 
       if(!(lp_data->tmp2_size) || lp_data->tmp2_size < 2*lp_data->n){
-	 FREE(lp_data->tmp2.i1);
-	 FREE(lp_data->tmp2.d);
-	 FREE(lp_data->tmp2.c);
-	 int tmp_size = 2*lp_data->n;
-	 lp_data->tmp2.i1 = (int *)malloc (tmp_size*ISIZE);
-	 lp_data->tmp2.d = (double *)malloc ((tmp_size + lp_data->n)*DSIZE);
-	 lp_data->tmp2.c = (char *)malloc (tmp_size*CSIZE);
+         FREE(lp_data->tmp2.i1);
+         FREE(lp_data->tmp2.d);
+         FREE(lp_data->tmp2.c);
+         int tmp_size = 2*lp_data->n;
+         lp_data->tmp2.i1 = (int *)malloc (tmp_size*ISIZE);
+         lp_data->tmp2.d = (double *)malloc ((tmp_size + lp_data->n)*DSIZE);
+         lp_data->tmp2.c = (char *)malloc (tmp_size*CSIZE);
       }
       double *bnd_val = lp_data->tmp2.d; //(double *)malloc (2*lp_data->n*DSIZE);
       int *bnd_ind = lp_data->tmp2.i1; //(int *)malloc (2*lp_data->n*ISIZE);
@@ -279,7 +286,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       int full_solves = 0, down_is_est, up_is_est, best_down_is_est, best_up_is_est, 
           max_solves_since_impr = p->par.rel_br_cand_threshold, 
           stop_solving = FALSE, both_children_inf = FALSE, rel_up, 
-	 rel_down, solves_since_impr = 0, best_one_child_inf = FALSE;
+          rel_down, solves_since_impr = 0, best_one_child_inf = FALSE;
       int max_solves = p->par.rel_br_max_solves;
       double alpha = p->par.strong_branching_high_low_weight;
       double one_m_alpha = 1.0 - alpha;
@@ -287,7 +294,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       int check_level = 0;
       int num_up_iters = 0, num_down_iters = 0;
       int up_status = -1, down_status = -1;
-      
+
       int check_off = TRUE;
 
       double *row_lb = lp_data->tmp.d;
@@ -297,398 +304,399 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
       // experimental - node-presolve 
       if(p->par.use_branching_prep && cand_num > 1){
-	 //prep_tighten_bounds(lp_data, &num_bnd_changes, bnd_val, bnd_ind, bnd_sense,
-	 //	    row_ub, row_lb, &cand_fixed);
+         //prep_tighten_bounds(lp_data, &num_bnd_changes, bnd_val, bnd_ind, bnd_sense,
+         //	    row_ub, row_lb, &cand_fixed);
 
-	 if(prep_tighten_bounds(lp_data, &num_bnd_changes, bnd_val, bnd_ind, bnd_sense,
-			       row_ub, row_lb, &cand_fixed) == PREP_INFEAS){
- 	    cand_num = 1;
-	    FREE(bnd_val);
-	    FREE(bnd_ind);
-	    FREE(bnd_sense);
-	    FREE(best_can);
-	    FREE(candidates);
-	    *candidate = NULL;
-	    p->lp_stat.prep_nodes_pruned++;
-	    set_itlim(lp_data, -1); //both limits should be set for hotstarts
-	    return (DO_NOT_BRANCH__FATHOMED);
-	 }else if(num_bnd_changes > 0){
-	    p->lp_stat.prep_bnd_changes += num_bnd_changes; 
-	    if(cand_fixed){
-	       int c_ind, new_cand_num = 0;
-	       int *new_cand_list = lp_data->tmp.i1; 
-	       for(i = 0; i< cand_num; i++){
-		  c_ind = p->br_rel_cand_list[i];
-		  xval = lp_data->x[c_ind];
-		  if(vars[c_ind]->lb < xval && 
-		     vars[c_ind]->ub > xval){
-		     new_cand_list[new_cand_num] = c_ind;
-		     new_cand_num++;
-		  }
-	       }
-	       cand_num = new_cand_num;
-	       memcpy(p->br_rel_cand_list, new_cand_list, ISIZE*cand_num);
-	    }
-	 }
+         if(prep_tighten_bounds(lp_data, &num_bnd_changes, bnd_val, bnd_ind, 
+                  bnd_sense, row_ub, row_lb, &cand_fixed) == PREP_INFEAS){
+            cand_num = 1;
+            FREE(bnd_val);
+            FREE(bnd_ind);
+            FREE(bnd_sense);
+            FREE(best_can);
+            FREE(candidates);
+            *candidate = NULL;
+            p->lp_stat.prep_nodes_pruned++;
+            set_itlim(lp_data, -1); //both limits should be set for hotstarts
+            return (DO_NOT_BRANCH__FATHOMED);
+         }else if(num_bnd_changes > 0){
+            p->lp_stat.prep_bnd_changes += num_bnd_changes; 
+            if(cand_fixed){
+               int c_ind, new_cand_num = 0;
+               int *new_cand_list = lp_data->tmp.i1; 
+               for(i = 0; i< cand_num; i++){
+                  c_ind = p->br_rel_cand_list[i];
+                  xval = lp_data->x[c_ind];
+                  if(vars[c_ind]->lb < xval && 
+                        vars[c_ind]->ub > xval){
+                     new_cand_list[new_cand_num] = c_ind;
+                     new_cand_num++;
+                  }
+               }
+               cand_num = new_cand_num;
+               memcpy(p->br_rel_cand_list, new_cand_list, ISIZE*cand_num);
+            }
+         }
 
-	
-	 if(p->par.use_branching_prep){//use_violation){ //}
-	    up_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
-	    down_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
-	    violation_col_size = (int *)calloc(lp_data->n, ISIZE);
-	    
-	    
-	    const double *si_ub = lp_data->si->getColUpper();
-	    const double *si_lb = lp_data->si->getColLower();
-	    
-	    const CoinPackedMatrix * matrix = lp_data->si->getMatrixByCol();
-	    const double *matval = matrix->getElements();  
-	    const int *matind = matrix->getIndices(); 
-	    const int *matbeg = matrix->getVectorStarts();
-	    const int *len = matrix->getVectorLengths();
 
-	    
-	    int c_ind, r_ind, col_start, col_end;
-	    double coeff;
-	    
-	    const double *r_ub = lp_data->si->getRowUpper();
-	    const double *r_lb = lp_data->si->getRowLower();
-	    const double inf = lp_data->si->getInfinity();
-	    //double new_objval = 0;
-	    //double *violation_max_cnt = lp_data->tmp.d + 2*lp_data->m; 
-	    
-	    const double *r_act = lp_data->si->getRowActivity();	    
-	    double up_max, down_max, new_act, new_row_lb, new_row_ub; 
-	    double violation, si_row_ub, si_row_lb;  
-	    for(i = 0; i < cand_num; i++){
-	       up_max = -DBL_MAX;
-	       down_max = -DBL_MAX;
-	       c_ind = p->br_rel_cand_list[i];
-	       col_start = matbeg[c_ind];
-	       col_end = col_start + len[c_ind];	    
-	       xval = lp_data->x[c_ind];
-	       floorx = floor(xval);
-	       ceilx = ceil(xval);
+         if(p->par.use_branching_prep){//use_violation){ //}
+            up_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
+            down_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
+            violation_col_size = (int *)calloc(lp_data->n, ISIZE);
 
-	       for(j = col_start; j < col_end; j++){
-		  char get_cols_dir = 'R';
-		  r_ind = matind[j];
-		  coeff = matval[j];
-		  if(row_ub[r_ind] < row_lb[r_ind] + 100*lp_data->lpetol)
-		     printf("error in row bounds...%i %i %f %f\n", p->bc_index, r_ind, row_lb[r_ind], row_ub[r_ind]);
-		  if(row_ub[r_ind] < row_lb[r_ind] + lp_data->lpetol) continue; 
-		  si_row_ub = r_ub[r_ind];
-		  si_row_lb = r_lb[r_ind];
-		  violation_col_size[c_ind]++;
-		  if(si_row_ub < si_row_lb + lp_data->lpetol){ // 'E' 
-		     get_cols_dir = 'E';
-		     //up_violation_cnt[c_ind]++;
-		     //down_violation_cnt[c_ind]++;
-		     if(coeff >= 0.0){
-			/* fixing to upper */
-			new_row_lb = row_lb[r_ind] + coeff*(ceilx - si_lb[c_ind]);
-			/* fixing to lower */
-			new_row_ub = row_ub[r_ind] + coeff*(floorx - si_ub[c_ind]);
-			if(new_row_lb > si_row_ub - lp_data->lpetol){
-			   get_cols_dir = 'U';
-			   up_violation_cnt[c_ind]++;
-			}else if(new_row_ub < si_row_lb + lp_data->lpetol){
-			   get_cols_dir = 'D';
-			   down_violation_cnt[c_ind]++;
-			}else{
-			   up_violation_cnt[c_ind]++;
-			   down_violation_cnt[c_ind]++;
-			}
-		     }else{
-			/* fixing to upper */
-			new_row_ub = row_ub[r_ind] + coeff*(ceilx - si_lb[c_ind]);
-			/* fixing to lower */
-			new_row_lb = row_lb[r_ind] + coeff*(floorx - si_ub[c_ind]);
-			
-			if(new_row_ub < si_row_lb + lp_data->lpetol){
-			   get_cols_dir = 'U';
-			   up_violation_cnt[c_ind]++;
-			}else if (new_row_lb > si_row_ub - lp_data->lpetol){
-			   get_cols_dir = 'D';			   
-			   down_violation_cnt[c_ind]++;
-			}
-		     }
-		  }else{		     
-		     si_row_ub = MIN(r_ub[r_ind], inf/2);
-		     si_row_lb = MAX(r_lb[r_ind], -inf/2);
 
-		     new_act = r_act[r_ind] + coeff*(ceilx - xval);	       
-		     violation = MAX(new_act - si_row_ub, si_row_lb - new_act);		    
-		     //if(violation > up_max) up_max = violation;
-		     if(violation > lp_data->lpetol) { 
-			get_cols_dir = 'U';
-			up_violation_cnt[c_ind]++; 
-		     }
+            const double *si_ub = lp_data->si->getColUpper();
+            const double *si_lb = lp_data->si->getColLower();
 
-		     new_act = r_act[r_ind] + coeff*(floorx - xval);
-		     violation = MAX(new_act - si_row_ub, si_row_lb - new_act);		     
-		     //if(violation > down_max) down_max = violation;
-		     if(violation > lp_data->lpetol) { 
-			get_cols_dir = 'D';
-			down_violation_cnt[c_ind]++; 
-		     }
-		  }
-	       }
-	    }
-	 }
+            const CoinPackedMatrix * matrix = lp_data->si->getMatrixByCol();
+            const double *matval = matrix->getElements();  
+            const int *matind = matrix->getIndices(); 
+            const int *matbeg = matrix->getVectorStarts();
+            const int *len = matrix->getVectorLengths();
+
+
+            int c_ind, r_ind, col_start, col_end;
+            double coeff;
+
+            const double *r_ub = lp_data->si->getRowUpper();
+            const double *r_lb = lp_data->si->getRowLower();
+            const double inf = lp_data->si->getInfinity();
+            //double new_objval = 0;
+            //double *violation_max_cnt = lp_data->tmp.d + 2*lp_data->m; 
+
+            const double *r_act = lp_data->si->getRowActivity();	    
+            double up_max, down_max, new_act, new_row_lb, new_row_ub; 
+            double violation, si_row_ub, si_row_lb;  
+            for(i = 0; i < cand_num; i++){
+               up_max = -DBL_MAX;
+               down_max = -DBL_MAX;
+               c_ind = p->br_rel_cand_list[i];
+               col_start = matbeg[c_ind];
+               col_end = col_start + len[c_ind];	    
+               xval = lp_data->x[c_ind];
+               floorx = floor(xval);
+               ceilx = ceil(xval);
+
+               for(j = col_start; j < col_end; j++){
+                  char get_cols_dir = 'R';
+                  r_ind = matind[j];
+                  coeff = matval[j];
+                  if(row_ub[r_ind] < row_lb[r_ind] + 100*lp_data->lpetol)
+                     printf("error in row bounds...%i %i %f %f\n", p->bc_index,
+                           r_ind, row_lb[r_ind], row_ub[r_ind]);
+                  if(row_ub[r_ind] < row_lb[r_ind] + lp_data->lpetol) continue; 
+                  si_row_ub = r_ub[r_ind];
+                  si_row_lb = r_lb[r_ind];
+                  violation_col_size[c_ind]++;
+                  if(si_row_ub < si_row_lb + lp_data->lpetol){ // 'E' 
+                     get_cols_dir = 'E';
+                     //up_violation_cnt[c_ind]++;
+                     //down_violation_cnt[c_ind]++;
+                     if(coeff >= 0.0){
+                        /* fixing to upper */
+                        new_row_lb = row_lb[r_ind] + coeff*(ceilx - si_lb[c_ind]);
+                        /* fixing to lower */
+                        new_row_ub = row_ub[r_ind] + coeff*(floorx - si_ub[c_ind]);
+                        if(new_row_lb > si_row_ub - lp_data->lpetol){
+                           get_cols_dir = 'U';
+                           up_violation_cnt[c_ind]++;
+                        }else if(new_row_ub < si_row_lb + lp_data->lpetol){
+                           get_cols_dir = 'D';
+                           down_violation_cnt[c_ind]++;
+                        }else{
+                           up_violation_cnt[c_ind]++;
+                           down_violation_cnt[c_ind]++;
+                        }
+                     }else{
+                        /* fixing to upper */
+                        new_row_ub = row_ub[r_ind] + coeff*(ceilx - si_lb[c_ind]);
+                        /* fixing to lower */
+                        new_row_lb = row_lb[r_ind] + coeff*(floorx - si_ub[c_ind]);
+
+                        if(new_row_ub < si_row_lb + lp_data->lpetol){
+                           get_cols_dir = 'U';
+                           up_violation_cnt[c_ind]++;
+                        }else if (new_row_lb > si_row_ub - lp_data->lpetol){
+                           get_cols_dir = 'D';			   
+                           down_violation_cnt[c_ind]++;
+                        }
+                     }
+                  }else{
+                     si_row_ub = MIN(r_ub[r_ind], inf/2);
+                     si_row_lb = MAX(r_lb[r_ind], -inf/2);
+
+                     new_act = r_act[r_ind] + coeff*(ceilx - xval);	       
+                     violation = MAX(new_act - si_row_ub, si_row_lb - new_act);		    
+                     //if(violation > up_max) up_max = violation;
+                     if(violation > lp_data->lpetol) { 
+                        get_cols_dir = 'U';
+                        up_violation_cnt[c_ind]++; 
+                     }
+
+                     new_act = r_act[r_ind] + coeff*(floorx - xval);
+                     violation = MAX(new_act - si_row_ub, si_row_lb - new_act);		     
+                     //if(violation > down_max) down_max = violation;
+                     if(violation > lp_data->lpetol) { 
+                        get_cols_dir = 'D';
+                        down_violation_cnt[c_ind]++; 
+                     }
+                  }
+               }
+            }
+         }
       }
 
       double *x = lp_data->tmp2.d + 2*(lp_data->n); //(double *)malloc (lp_data->n*DSIZE);
-      
+
       best_var = -1;
       best_var_score = -SYM_INFINITY;
       memcpy(x, lp_data->x, lp_data->n*DSIZE);
-      
-      
+
+
 #ifdef COMPILE_IN_LP
-      
+
       if(p->par.rel_br_override_default && p->mip->mip_inf && cand_num > 1){
 
 
-	 int weighted_iter =
-	    p->lp_stat.lp_total_iter_num/(p->lp_stat.lp_calls -
-					  p->lp_stat.str_br_lp_calls -
-					  p->lp_stat.fp_lp_calls + 1);	 
-	 if(p->mip->nz > 5e3){
-	    weighted_iter = (int)
-	       ((1.0*weighted_iter * p->mip->nz) / 5e3);
-	 }
-	 
-	 if(p->mip->nz > 5e4){
-	    rel_threshold = MAX(2, (int)(1.0 * rel_threshold * 5e4/p->mip->nz));
-	 }
-	 
-	 if(p->bc_level < 1){
-	    if(p->iter_num > 2 && weighted_iter <= 1000){
-	       if(p->mip->mip_inf){
-		  if(p->mip->mip_inf->prob_type == BINARY_TYPE){
-		     strong_br_min_level = 
-			MIN(p->par.strong_br_min_level,
-			    (int)((p->mip->mip_inf->binary_var_num)/10.0) + 1);
-		  }
-		  if(p->mip->mip_inf->prob_type == BIN_CONT_TYPE){
-		     if(p->mip->mip_inf->bin_var_ratio < 0.1){
-			strong_br_min_level = 
-			   MIN(MAX(p->par.strong_br_min_level,
-				   (int)((p->mip->mip_inf->binary_var_num)/10.0)
-				   + 1), 10);
-			if(p->mip->nz < 5e4){
-			   strong_br_min_level = MAX(p->par.strong_br_min_level, 8);
-			}
-		     }
-		  }
-	       }
-	    }
-	 }
-	 
-	 if(weighted_iter * p->bc_index < 5e7){
-	    //check_off = FALSE;
-	 }
-	 
-	 
-	 if(p->mip->mip_inf && p->mip->mip_inf->bin_cont_row_num > 0 && 
-	    (p->mip->mip_inf->bin_cont_row_num >= p->mip->m ||
-	     (p->mip->mip_inf->bin_var_ratio < 0.2) ||
-	     p->mip->n - p->mip->mip_inf->cont_var_num <= 100 ||
-	     (p->mip->mip_inf->sos_bin_row_ratio < 0.00 &&
-	      p->mip->mip_inf->bin_var_ratio < 0.6) ||
-	     (p->mip->mip_inf->max_row_ratio < 0.01 &&
-	      p->mip->mip_inf->prob_type != BIN_CONT_TYPE))){
-	    /* -either we have all continuos rows
-	       -less number of bin vars
-	       -small number of int vars
-	       -large bin but less sos rows
-	       -small max_row_size - if rest are all binary, skip to latter 
-	    */
-	    
-	    if(p->mip->mip_inf->bin_cont_row_num >= p->mip->m){ 
-	       max_solves = MIN(max_solves, 2*cand_num);
-	       
-	    }else if(p->mip->mip_inf->bin_var_ratio < 0.2){
-	       max_solves = MIN(max_solves, 2*cand_num);
-	       if(p->mip->mip_inf->bin_var_ratio > 0.05){
-		  strong_br_min_level = (int)strong_br_min_level/2;
-	       }
-	    }else{// if(p->mip->mip_inf->max_row_ratio < 0.01){ //}	       
-	       max_solves = MIN(2*max_solves, 2*cand_num);
-	       if(p->mip->mip_inf->sos_bin_row_ratio > 0.05){
-		  //  max_solves = MIN(2*max_solves, 2*cand_num);
-		  strong_br_min_level = (int)(2.0*strong_br_min_level);
-		  rel_threshold = 2*rel_threshold;
-	       }
-	    }
-	 }else{	 
-	    double imp_avg = 0.0;
-	    int backtrack = 0;
+         int weighted_iter =
+            p->lp_stat.lp_total_iter_num/(p->lp_stat.lp_calls -
+                  p->lp_stat.str_br_lp_calls -
+                  p->lp_stat.fp_lp_calls + 1);	 
+         if(p->mip->nz > 5e3){
+            weighted_iter = (int)
+               ((1.0*weighted_iter * p->mip->nz) / 5e3);
+         }
 
-	    bc_node *node = p->tm->active_nodes[p->proc_index];	    
-	    if(p->bc_level >= 1){   
-	       while(node->parent){
-		  if(node->start_objval > node->parent->end_objval){
-		     imp_avg +=
-			fabs(node->start_objval/(node->parent->end_objval +0.0001) - 1.0);
-		  }
-		  node = node->parent;
-		  if(backtrack++ > p->par.rel_br_chain_backtrack) break;
-	       }	       
-	    }
+         if(p->mip->nz > 5e4){
+            rel_threshold = MAX(2, (int)(1.0 * rel_threshold * 5e4/p->mip->nz));
+         }
 
-	    if(backtrack > 0){
-	       imp_avg /= backtrack;
-	    }
+         if(p->bc_level < 1){
+            if(p->iter_num > 2 && weighted_iter <= 1000){
+               if(p->mip->mip_inf){
+                  if(p->mip->mip_inf->prob_type == BINARY_TYPE){
+                     strong_br_min_level = 
+                        MIN(p->par.strong_br_min_level,
+                              (int)((p->mip->mip_inf->binary_var_num)/10.0) + 1);
+                  }
+                  if(p->mip->mip_inf->prob_type == BIN_CONT_TYPE){
+                     if(p->mip->mip_inf->bin_var_ratio < 0.1){
+                        strong_br_min_level = 
+                           MIN(MAX(p->par.strong_br_min_level,
+                                    (int)((p->mip->mip_inf->binary_var_num)/10.0)
+                                    + 1), 10);
+                        if(p->mip->nz < 5e4){
+                           strong_br_min_level = MAX(p->par.strong_br_min_level, 8);
+                        }
+                     }
+                  }
+               }
+            }
+         }
 
-	    if(imp_avg > p->par.rel_br_min_imp &&
-	       imp_avg < p->par.rel_br_max_imp){
-	       if(bc_level <= strong_br_min_level ){
-		  max_solves = MIN(3*max_solves, 2*cand_num);
-	       }else{
-		  max_solves = MIN(2*max_solves, 2*cand_num);
-	       }
-	    }else{
-	       
-	       int c_cnt = 0;
-	       double d_avg = 0.0;
+         if(weighted_iter * p->bc_index < 5e7){
+            //check_off = FALSE;
+         }
 
-	       for (i=0; i<cand_num; i++) {
-		  branch_var = p->br_rel_cand_list[i];
-		  xval = x[branch_var];
-		  floorx = floor(xval);
-		  ceilx = ceil(xval);
-		  rel_down = br_rel_down[branch_var];
-		  rel_up = br_rel_up[branch_var];
-		  if(xval - floorx > 0.5){
-		     d_avg += ceilx - xval;
-		  }else{
-		     d_avg += xval - floorx;
-		  }
-	       }
-	       
-	       d_avg /= cand_num;	 
 
-	       for (i=0; i<cand_num; i++) {
-		  branch_var = p->br_rel_cand_list[i];
-		  xval = x[branch_var];
-		  if(xval - floor(xval) > d_avg && ceil(xval) - xval > d_avg) c_cnt++;
-		  else break;
-	       }
+         if(p->mip->mip_inf && p->mip->mip_inf->bin_cont_row_num > 0 && 
+               (p->mip->mip_inf->bin_cont_row_num >= p->mip->m ||
+                (p->mip->mip_inf->bin_var_ratio < 0.2) ||
+                p->mip->n - p->mip->mip_inf->cont_var_num <= 100 ||
+                (p->mip->mip_inf->sos_bin_row_ratio < 0.00 &&
+                 p->mip->mip_inf->bin_var_ratio < 0.6) ||
+                (p->mip->mip_inf->max_row_ratio < 0.01 &&
+                 p->mip->mip_inf->prob_type != BIN_CONT_TYPE))){
+            /* -either we have all continuos rows
+               -less number of bin vars
+               -small number of int vars
+               -large bin but less sos rows
+               -small max_row_size - if rest are all binary, skip to latter 
+             */
 
-	       if(bc_level < 1){
-		 max_solves = (cand_num < p->par.rel_br_override_max_solves ?
-			       MIN(p->par.rel_br_override_max_solves/2, cand_num) :
-			       p->par.rel_br_override_max_solves);
-	       }else if(bc_level < 4){
-		  max_solves = MIN((int)(0.75*c_cnt), (int)(0.3 * cand_num) + 1);
-	       }else if(bc_level < 20){
-		  max_solves = MIN(c_cnt/2, (int)(0.25 * cand_num) + 1);
-	       }else if(bc_level < 40){
-		  max_solves = MIN(c_cnt/3, (int)(0.20 * cand_num) + 1);
-	       }else{
-		  max_solves = MAX(c_cnt/4, (int)(0.15 * cand_num) + 1);
-	       }
-	    }
+            if(p->mip->mip_inf->bin_cont_row_num >= p->mip->m){ 
+               max_solves = MIN(max_solves, 2*cand_num);
 
-	    max_solves_since_impr  = 5;
-	    
-	    //printf("level - set to : %i %i\n", p->bc_level, max_solves);	    
-	    //printf("c_cnt - cand num - max_solves : %i %i %i\n\n",
-	    //c_cnt,cand_num, max_solves);
+            }else if(p->mip->mip_inf->bin_var_ratio < 0.2){
+               max_solves = MIN(max_solves, 2*cand_num);
+               if(p->mip->mip_inf->bin_var_ratio > 0.05){
+                  strong_br_min_level = (int)strong_br_min_level/2;
+               }
+            }else{// if(p->mip->mip_inf->max_row_ratio < 0.01){ //}	       
+               max_solves = MIN(2*max_solves, 2*cand_num);
+               if(p->mip->mip_inf->sos_bin_row_ratio > 0.05){
+                  //  max_solves = MIN(2*max_solves, 2*cand_num);
+                  strong_br_min_level = (int)(2.0*strong_br_min_level);
+                  rel_threshold = 2*rel_threshold;
+               }
+            }
+         }else{
+            double imp_avg = 0.0;
+            int backtrack = 0;
 
-	    int int_num = p->mip->n - p->mip->mip_inf->cont_var_num;
-	    int max_level = ((p->mip->mip_inf == 0) ? 500 : 
-			     (int_num)/2);
-	    max_level = MIN(500, MAX(100, max_level));
+            bc_node *node = p->tm->active_nodes[p->proc_index];	    
+            if(p->bc_level >= 1){   
+               while(node->parent){
+                  if(node->start_objval > node->parent->end_objval){
+                     imp_avg +=
+                        fabs(node->start_objval/(node->parent->end_objval +0.0001) - 1.0);
+                  }
+                  node = node->parent;
+                  if(backtrack++ > p->par.rel_br_chain_backtrack) break;
+               }	       
+            }
 
-	    if(cand_num > 100 && int_num > 500){
-	       max_level = MIN(100, max_level);
-	       if((p->mip->mip_inf->prob_type == BINARY_TYPE ||
-		   p->mip->mip_inf->prob_type == BIN_CONT_TYPE) &&
-		  cand_num > 0.05*int_num){
-		  max_level /= 2;
-	       }
-	    }
-	    
-	    if(bc_level > max_level){
-	       rel_threshold = max_solves = 0;
-	       strong_br_min_level = 1;
-	       //cand_num = 1;
-	    }
-	    //printf("max_level: %i\n", max_level);
-	 }
-	 
-	 max_solves = MIN(p->par.rel_br_override_max_solves, max_solves);
-	 
-	 double rel_limit = 0.05;
-	 if((p->mip->mip_inf && ((p->mip->mip_inf->mat_density < rel_limit &&
-				 p->mip->mip_inf->int_var_ratio > rel_limit &&
-				 (p->mip->mip_inf->max_col_ratio > rel_limit ||
-				  p->mip->mip_inf->max_row_ratio > rel_limit))||
-	     (p->mip->nz > 1e5 && p->mip->mip_inf->mat_density > rel_limit/50) ||
-	     (p->mip->mip_inf->max_row_ratio < rel_limit/5 &&
-	      p->mip->mip_inf->prob_type != BIN_CONT_TYPE)))){
+            if(backtrack > 0){
+               imp_avg /= backtrack;
+            }
+
+            if(imp_avg > p->par.rel_br_min_imp &&
+                  imp_avg < p->par.rel_br_max_imp){
+               if(bc_level <= strong_br_min_level ){
+                  max_solves = MIN(3*max_solves, 2*cand_num);
+               }else{
+                  max_solves = MIN(2*max_solves, 2*cand_num);
+               }
+            }else{
+
+               int c_cnt = 0;
+               double d_avg = 0.0;
+
+               for (i=0; i<cand_num; i++) {
+                  branch_var = p->br_rel_cand_list[i];
+                  xval = x[branch_var];
+                  floorx = floor(xval);
+                  ceilx = ceil(xval);
+                  rel_down = br_rel_down[branch_var];
+                  rel_up = br_rel_up[branch_var];
+                  if(xval - floorx > 0.5){
+                     d_avg += ceilx - xval;
+                  }else{
+                     d_avg += xval - floorx;
+                  }
+               }
+
+               d_avg /= cand_num;	 
+
+               for (i=0; i<cand_num; i++) {
+                  branch_var = p->br_rel_cand_list[i];
+                  xval = x[branch_var];
+                  if(xval - floor(xval) > d_avg && ceil(xval) - xval > d_avg) c_cnt++;
+                  else break;
+               }
+
+               if(bc_level < 1){
+                  max_solves = (cand_num < p->par.rel_br_override_max_solves ?
+                        MIN(p->par.rel_br_override_max_solves/2, cand_num) :
+                        p->par.rel_br_override_max_solves);
+               }else if(bc_level < 4){
+                  max_solves = MIN((int)(0.75*c_cnt), (int)(0.3 * cand_num) + 1);
+               }else if(bc_level < 20){
+                  max_solves = MIN(c_cnt/2, (int)(0.25 * cand_num) + 1);
+               }else if(bc_level < 40){
+                  max_solves = MIN(c_cnt/3, (int)(0.20 * cand_num) + 1);
+               }else{
+                  max_solves = MAX(c_cnt/4, (int)(0.15 * cand_num) + 1);
+               }
+            }
+
+            max_solves_since_impr  = 5;
+
+            //printf("level - set to : %i %i\n", p->bc_level, max_solves);	    
+            //printf("c_cnt - cand num - max_solves : %i %i %i\n\n",
+            //c_cnt,cand_num, max_solves);
+
+            int int_num = p->mip->n - p->mip->mip_inf->cont_var_num;
+            int max_level = ((p->mip->mip_inf == 0) ? 500 : 
+                  (int_num)/2);
+            max_level = MIN(500, MAX(100, max_level));
+
+            if(cand_num > 100 && int_num > 500){
+               max_level = MIN(100, max_level);
+               if((p->mip->mip_inf->prob_type == BINARY_TYPE ||
+                        p->mip->mip_inf->prob_type == BIN_CONT_TYPE) &&
+                     cand_num > 0.05*int_num){
+                  max_level /= 2;
+               }
+            }
+
+            if(bc_level > max_level){
+               rel_threshold = max_solves = 0;
+               strong_br_min_level = 1;
+               //cand_num = 1;
+            }
+            //printf("max_level: %i\n", max_level);
+         }
+
+         max_solves = MIN(p->par.rel_br_override_max_solves, max_solves);
+
+         double rel_limit = 0.05;
+         if((p->mip->mip_inf && ((p->mip->mip_inf->mat_density < rel_limit &&
+                        p->mip->mip_inf->int_var_ratio > rel_limit &&
+                        (p->mip->mip_inf->max_col_ratio > rel_limit ||
+                         p->mip->mip_inf->max_row_ratio > rel_limit))||
+                     (p->mip->nz > 1e5 && p->mip->mip_inf->mat_density > rel_limit/50) ||
+                     (p->mip->mip_inf->max_row_ratio < rel_limit/5 &&
+                      p->mip->mip_inf->prob_type != BIN_CONT_TYPE)))){
 #ifdef __OSI_CLP__
-	    lp_data->si->setupForRepeatedUse(2,0);
+            lp_data->si->setupForRepeatedUse(2,0);
 #endif
-	 }
+         }
 
-	 if(p->mip->mip_inf && !check_off &&
-	    (p->mip->mip_inf->prob_type == BINARY_TYPE ||
-	     p->mip->mip_inf->prob_type == BIN_CONT_TYPE) && 
-	    (p->mip->n - p->mip->mip_inf->cont_var_num < 100 ||
-	     (p->mip->mip_inf->int_var_ratio > rel_limit &&
-	      p->mip->mip_inf->row_density/(p->mip->n + 1) > rel_limit/5))){//
-	 }
-      
-         
-	 if(p->mip->mip_inf->binary_sos_row_num > 0){
-	    double bin_den = (1.0*p->mip->mip_inf->binary_sos_row_num)/
-	       (p->mip->m + 1);
-	    if( bin_den > rel_limit && ((bin_den < 10*rel_limit && 
-					 p->mip->mip_inf->prob_type != BINARY_TYPE &&
-					 p->mip->mip_inf->bin_var_ratio > 10*rel_limit) ||
-					(bin_den < 2*rel_limit &&
-					 p->mip->mip_inf->prob_type == BINARY_TYPE))){
-	       /* give priority to vars appear in sos rows */
-	       int *sos_ind = lp_data->tmp.i1;//(int *)(malloc)(ISIZE*cand_num);
-	       int *sos_tot_var = lp_data->tmp.i1+cand_num;//(int *)(malloc)(ISIZE*cand_num);
-	       int sos_cnt = 0;
-	       for (i=0; i<cand_num; i++) {
-		  branch_var = p->br_rel_cand_list[i];
-		  //printf("%i %i\n", branch_var, p->mip->mip_inf->cols[branch_var].sos_num);
-		  //if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){ //}
-		  if(p->mip->mip_inf->cols[branch_var].sos_num >= (1.0*p->mip->nz)/(p->mip->m + 1)){
-		     sos_tot_var[sos_cnt] = -p->mip->mip_inf->cols[branch_var].sos_num;
-		     sos_ind[sos_cnt] = i;
-		     sos_cnt++;
-		  }
-	       }
-	       //printf("sos_cnt %i\n", sos_cnt);
-	       if(sos_cnt > 0){
-		  qsort_ii(sos_tot_var, sos_ind, sos_cnt);
-		  int *sos_chosen = lp_data->tmp.i1+cand_num;//(int *)(calloc)(ISIZE,cand_num);
-		  int *new_ord = lp_data->tmp.i1+2*cand_num;//(int *)(malloc)(ISIZE*cand_num);
-		  memset(sos_chosen, 0, ISIZE*cand_num);
-		  for (i=0; i<MIN(max_solves/2 + 1, sos_cnt); i++) {	       
-		     new_ord[i] = p->br_rel_cand_list[sos_ind[i]];
-		     sos_chosen[sos_ind[i]] = TRUE;
-		  }
-		  
-		  if(i < cand_num){
-		     int rest_cnt = 0;
-		     for(j = 0; j < cand_num; j++){
-			if(sos_chosen[j]) continue;
-			else new_ord[i+rest_cnt++] = p->br_rel_cand_list[j];
-		     }
-		  }	       
-		  
-		  memcpy(p->br_rel_cand_list, new_ord, ISIZE*cand_num);
-	       }	       
-	    }
-	 }
+         if(p->mip->mip_inf && !check_off &&
+               (p->mip->mip_inf->prob_type == BINARY_TYPE ||
+                p->mip->mip_inf->prob_type == BIN_CONT_TYPE) && 
+               (p->mip->n - p->mip->mip_inf->cont_var_num < 100 ||
+                (p->mip->mip_inf->int_var_ratio > rel_limit &&
+                 p->mip->mip_inf->row_density/(p->mip->n + 1) > rel_limit/5))){//
+         }
+
+
+         if(p->mip->mip_inf->binary_sos_row_num > 0){
+            double bin_den = (1.0*p->mip->mip_inf->binary_sos_row_num)/
+               (p->mip->m + 1);
+            if( bin_den > rel_limit && ((bin_den < 10*rel_limit && 
+                        p->mip->mip_inf->prob_type != BINARY_TYPE &&
+                        p->mip->mip_inf->bin_var_ratio > 10*rel_limit) ||
+                     (bin_den < 2*rel_limit &&
+                      p->mip->mip_inf->prob_type == BINARY_TYPE))){
+               /* give priority to vars appear in sos rows */
+               int *sos_ind = lp_data->tmp.i1;//(int *)(malloc)(ISIZE*cand_num);
+               int *sos_tot_var = lp_data->tmp.i1+cand_num;//(int *)(malloc)(ISIZE*cand_num);
+               int sos_cnt = 0;
+               for (i=0; i<cand_num; i++) {
+                  branch_var = p->br_rel_cand_list[i];
+                  //printf("%i %i\n", branch_var, p->mip->mip_inf->cols[branch_var].sos_num);
+                  //if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){ //}
+                  if(p->mip->mip_inf->cols[branch_var].sos_num >= (1.0*p->mip->nz)/(p->mip->m + 1)){
+                     sos_tot_var[sos_cnt] = -p->mip->mip_inf->cols[branch_var].sos_num;
+                     sos_ind[sos_cnt] = i;
+                     sos_cnt++;
+                  }
+               }
+               //printf("sos_cnt %i\n", sos_cnt);
+               if(sos_cnt > 0){
+                  qsort_ii(sos_tot_var, sos_ind, sos_cnt);
+                  int *sos_chosen = lp_data->tmp.i1+cand_num;//(int *)(calloc)(ISIZE,cand_num);
+                  int *new_ord = lp_data->tmp.i1+2*cand_num;//(int *)(malloc)(ISIZE*cand_num);
+                  memset(sos_chosen, 0, ISIZE*cand_num);
+                  for (i=0; i<MIN(max_solves/2 + 1, sos_cnt); i++) {	       
+                     new_ord[i] = p->br_rel_cand_list[sos_ind[i]];
+                     sos_chosen[sos_ind[i]] = TRUE;
+                  }
+
+                  if(i < cand_num){
+                     int rest_cnt = 0;
+                     for(j = 0; j < cand_num; j++){
+                        if(sos_chosen[j]) continue;
+                        else new_ord[i+rest_cnt++] = p->br_rel_cand_list[j];
+                     }
+                  }	       
+
+                  memcpy(p->br_rel_cand_list, new_ord, ISIZE*cand_num);
+               }	       
+            }
+         }
       }
 
       /* order by inf status */	 
@@ -696,52 +704,52 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       update_solve_parameters(p);
 
       if (p->mip->mip_inf){
-	 if(1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) < 0.2 || 
-	    1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) > 0.8){
-	    if(p->bc_level <= 10){
-	       max_solves *= 3;
-	       max_solves_since_impr *= 2;
-	       rel_threshold *=2;
-	    }
-	 }
+         if(1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) < 0.2 || 
+               1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) > 0.8){
+            if(p->bc_level <= 10){
+               max_solves *= 3;
+               max_solves_since_impr *= 2;
+               rel_threshold *=2;
+            }
+         }
       }
-      
+
 #endif
 
       if(cand_num > 1 && !p->par.disable_obj && !p->par.rs_mode_enabled){
-	if(p->par.use_hot_starts && !p->par.branch_on_cuts){ 
-	  should_use_hot_starts = TRUE;	    
-	}else{
-	  should_use_hot_starts = FALSE;
-	}
-	
-	if (should_use_hot_starts) {
-	  mark_hotstart(lp_data);
-	}
+         if(p->par.use_hot_starts && !p->par.branch_on_cuts){ 
+            should_use_hot_starts = TRUE;	    
+         }else{
+            should_use_hot_starts = FALSE;
+         }
+
+         if (should_use_hot_starts) {
+            mark_hotstart(lp_data);
+         }
       }
 
       if (p->par.max_presolve_iter > 0) {
-	 max_presolve_iter = p->par.max_presolve_iter - bc_level;
+         max_presolve_iter = p->par.max_presolve_iter - bc_level;
 
 #ifdef COMPILE_IN_LP	 
-	 if(p->mip->nz > 5e4){
-	    max_presolve_iter = (int)(1.0 * max_presolve_iter * 5e4/p->mip->nz);
-	 }
+         if(p->mip->nz > 5e4){
+            max_presolve_iter = (int)(1.0 * max_presolve_iter * 5e4/p->mip->nz);
+         }
 #endif
-	 //max_presolve_iter = MAX(max_presolve_iter, 25);
-	 max_presolve_iter = 40;
-	 if(p->par.rs_mode_enabled) max_presolve_iter = 5; 
+         //max_presolve_iter = MAX(max_presolve_iter, 25);
+         max_presolve_iter = 40;
+         if(p->par.rs_mode_enabled) max_presolve_iter = 5; 
 
-	 if (max_presolve_iter < 5) {
-	    max_presolve_iter = 5;
-	 }
-	 
-	 if(should_use_hot_starts){
-	   set_itlim_hotstart(lp_data, max_presolve_iter);
-	 }
-	 set_itlim(lp_data, max_presolve_iter);
+         if (max_presolve_iter < 5) {
+            max_presolve_iter = 5;
+         }
+
+         if(should_use_hot_starts){
+            set_itlim_hotstart(lp_data, max_presolve_iter);
+         }
+         set_itlim(lp_data, max_presolve_iter);
       }
-      
+
       char best_is_est = FALSE; 
       char better_cand_found = FALSE;
       double prog_ratio = fabs(oldobjval)*0.0001;
@@ -755,7 +763,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       double str_br_factor = MAX(10.0, 3.2e6/(1.0*lp_data->m));
       int str_br_cnt_limit = (int)(lp_data->n*str_br_factor);
 
-      if (1.0*p->lp_stat.str_br_total_iter_num > str_br_cnt_limit) str_br_iter_limit = TRUE; 
+      if (1.0*p->lp_stat.str_br_total_iter_num > str_br_cnt_limit)
+         str_br_iter_limit = TRUE; 
 
 #ifdef COMPILE_IN_LP
       int node_factor = (int)(p->tm->stat.analyzed/50.0);
@@ -764,90 +773,90 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
       double int_factor = 0.5; 
       if (p->mip->mip_inf){
-	 int int_var_num = p->mip->n - p->mip->mip_inf->binary_var_num - p->mip->mip_inf->cont_var_num;
-	 if (int_var_num < 1 && p->mip->mip_inf->binary_var_num < 500) {
-	    int_factor = 0.1; 
-	 }
+         int int_var_num = p->mip->n - p->mip->mip_inf->binary_var_num - p->mip->mip_inf->cont_var_num;
+         if (int_var_num < 1 && p->mip->mip_inf->binary_var_num < 500) {
+            int_factor = 0.1; 
+         }
       }
-      
-      double init_ratio = MIN(int_factor*((int)((1.0*lp_data->nz)/1e4) + 1), 2.0);      
-      
+
+      double init_ratio = MIN(int_factor*((int)((1.0*lp_data->nz)/1e4) + 1), 2.0);
+
       if (p->bc_index > 0 && p->lp_stat.str_br_lp_calls > 0) {
-	 double str_lp_factor = MAX(0.1, init_ratio - node_factor*0.1);
-	 int str_iter = p->lp_stat.str_br_total_iter_num;
-	 int lp_iter = p->lp_stat.lp_total_iter_num + str_iter;  
-	 //printf("str_ratio: %.2f\n", (1.0*str_iter)/lp_iter);
-	 //printf("str_iter: %i - lp_iter: %i - node_factor: %i - str_ratio: %.2f\n",
-	 //	str_iter, lp_iter, node_factor, ((1.0*str_iter)/lp_iter));
-	 if (((1.0*str_iter)/lp_iter) > str_lp_factor) {
-	    str_br_iter_limit = TRUE;
-	 }
+         double str_lp_factor = MAX(0.1, init_ratio - node_factor*0.1);
+         int str_iter = p->lp_stat.str_br_total_iter_num;
+         int lp_iter = p->lp_stat.lp_total_iter_num + str_iter;  
+         //printf("str_ratio: %.2f\n", (1.0*str_iter)/lp_iter);
+         //printf("str_iter: %i - lp_iter: %i - node_factor: %i - str_ratio: %.2f\n",
+         //	str_iter, lp_iter, node_factor, ((1.0*str_iter)/lp_iter));
+         if (((1.0*str_iter)/lp_iter) > str_lp_factor) {
+            str_br_iter_limit = TRUE;
+         }
       }
 
       if (
 #ifdef COMPILE_IN_LP
-	  p->tm->stat.analyzed > 5e5 ||
+            p->tm->stat.analyzed > 5e5 ||
 #endif
-	  p->lp_stat.str_br_total_iter_num > 5e5) {
-	 str_br_iter_limit = TRUE;      
+            p->lp_stat.str_br_total_iter_num > 5e5) {
+         str_br_iter_limit = TRUE;      
       }
 
       double frac_avg = 0.0;
       double frac_tol = 1e-5; 
       for (i=0; i<cand_num; i++) {
-	 xval = x[p->br_rel_cand_list[i]];
-	 frac_avg += MIN(xval - floor(xval), ceil(xval) - xval);
+         xval = x[p->br_rel_cand_list[i]];
+         frac_avg += MIN(xval - floor(xval), ceil(xval) - xval);
       }
       frac_avg = frac_avg/cand_num;
       if (frac_avg < 1e-2) {
-	 frac_tol = 1e-2; 
+         frac_tol = 1e-2; 
       }
       //printf("frac_avg - %f \n", frac_avg);
 
       for (i=0; i<cand_num; i++) {
-	//printf("cand - %i \n", i);
-	 branch_var = p->br_rel_cand_list[i];
+         //printf("cand - %i \n", i);
+         branch_var = p->br_rel_cand_list[i];
          lb = vars[branch_var]->new_lb;
          ub = vars[branch_var]->new_ub;
          xval = x[branch_var];
-	 floorx = floor(xval);
-	 ceilx = ceil(xval);	 
-	 rel_down = br_rel_down[branch_var];
+         floorx = floor(xval);
+         ceilx = ceil(xval);	 
+         rel_down = br_rel_down[branch_var];
          rel_up = br_rel_up[branch_var];
 
-	 // ignore the small violations
-	 if (best_can != NULL){
-	    if (xval - floorx < frac_tol ||
-		ceilx - xval < frac_tol){
-	       //printf("xval: %f\n", xval);
-	       continue;
-	    }
-	 }
-	 
-	 if (cand_num < 2 || str_br_iter_limit || 
-	     ((rel_down > rel_threshold && 
-	       bc_level > strong_br_min_level) &&
-	      (i > check_level || (i < check_level + 1 && !check_first ))) || 
-	     (p->par.disable_obj) || (stop_solving == TRUE && rel_down > 1)){
-	    down_obj = oldobjval + pcost_down[branch_var] * (xval - floorx);
+         // ignore the small violations
+         if (best_can != NULL){
+            if (xval - floorx < frac_tol ||
+                  ceilx - xval < frac_tol){
+               //printf("xval: %f\n", xval);
+               continue;
+            }
+         }
+
+         if (cand_num < 2 || str_br_iter_limit || 
+               ((rel_down > rel_threshold && 
+                 bc_level > strong_br_min_level) &&
+                (i > check_level || (i < check_level + 1 && !check_first ))) || 
+               (p->par.disable_obj) || (stop_solving == TRUE && rel_down > 1)){
+            down_obj = oldobjval + pcost_down[branch_var] * (xval - floorx);
             down_is_est = TRUE; 
-	    p->lp_stat.rel_br_pc_down_num++;
+            p->lp_stat.rel_br_pc_down_num++;
          } else {
             if (stop_solving == TRUE){ 
                continue;
             }
-	    //down_obj = oldobjval; 
+            //down_obj = oldobjval; 
             if (strong_branch(p, branch_var, lb, ub, lb, floorx, &down_obj,
-			      should_use_hot_starts, &down_status, &num_down_iters, 0, NULL)) {
+                     should_use_hot_starts, &down_status, &num_down_iters, 0, NULL)) {
                // lp was abandoned
                continue;
             }	    
             down_is_est = FALSE;
-	    if(p->bc_level < p->br_rel_down_min_level[branch_var]){ 
-	       p->br_rel_down_min_level[branch_var] =  p->bc_level;
-	    }
+            if(p->bc_level < p->br_rel_down_min_level[branch_var]){ 
+               p->br_rel_down_min_level[branch_var] =  p->bc_level;
+            }
             if (down_status == LP_D_INFEASIBLE || down_status == LP_D_OBJLIM || 
-                down_status == LP_D_UNBOUNDED) {
+                  down_status == LP_D_UNBOUNDED) {
                // update bounds
                bnd_val[num_bnd_changes] = ceilx;
                bnd_sense[num_bnd_changes] = 'G';
@@ -857,44 +866,44 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                vars[branch_var]->new_lb = ceilx;
                vars[branch_var]->lb = ceilx;
                lb = ceilx;
-	       p->br_inf_down[branch_var]++;
-	    } else {
-              // update pcost
-	       pcost_down[branch_var] = (pcost_down[branch_var]*
-		  rel_down + (down_obj - oldobjval)/(xval-floorx))/
-		  (rel_down + 1);
+               p->br_inf_down[branch_var]++;
+            } else {
+               // update pcost
+               pcost_down[branch_var] = (pcost_down[branch_var]*
+                     rel_down + (down_obj - oldobjval)/(xval-floorx))/
+                  (rel_down + 1);
                br_rel_down[branch_var]++;
-	       p->lp_stat.rel_br_down_update++;
+               p->lp_stat.rel_br_down_update++;
             }
-	    full_solves++;
-	    solves_since_impr++;
-	    p->lp_stat.rel_br_full_solve_num++;
+            full_solves++;
+            solves_since_impr++;
+            p->lp_stat.rel_br_full_solve_num++;
          }
 
-	 if (cand_num < 2 || str_br_iter_limit ||
-	     ((rel_up > rel_threshold &&
-	       bc_level > strong_br_min_level) &&
-	      (i > check_level || (i < check_level + 1 && !check_first ))) ||
-	     (p->par.disable_obj) || (stop_solving == TRUE && rel_up > 1)){
-	    up_obj   = oldobjval + pcost_up[branch_var] * (ceilx - xval);
+         if (cand_num < 2 || str_br_iter_limit ||
+               ((rel_up > rel_threshold &&
+                 bc_level > strong_br_min_level) &&
+                (i > check_level || (i < check_level + 1 && !check_first ))) ||
+               (p->par.disable_obj) || (stop_solving == TRUE && rel_up > 1)){
+            up_obj   = oldobjval + pcost_up[branch_var] * (ceilx - xval);
             up_is_est = TRUE;
-	    p->lp_stat.rel_br_pc_up_num++;
+            p->lp_stat.rel_br_pc_up_num++;
          } else {
             if (stop_solving == TRUE){
                continue;
             }
-	    //up_obj = oldobjval; 
+            //up_obj = oldobjval; 
             if (strong_branch(p, branch_var, lb, ub, ceilx, ub, &up_obj,
-			      should_use_hot_starts, &up_status, &num_up_iters, 0, NULL)) {
+                     should_use_hot_starts, &up_status, &num_up_iters, 0, NULL)) {
                // lp was abandoned
                continue;
             }
-	    if(p->bc_level < p->br_rel_up_min_level[branch_var]){ 
-	       p->br_rel_up_min_level[branch_var] =  p->bc_level;
-	    }
+            if(p->bc_level < p->br_rel_up_min_level[branch_var]){ 
+               p->br_rel_up_min_level[branch_var] =  p->bc_level;
+            }
             up_is_est = FALSE;
             if (up_status == LP_D_INFEASIBLE || up_status == LP_D_OBJLIM || 
-                up_status == LP_D_UNBOUNDED) {
+                  up_status == LP_D_UNBOUNDED) {
                // update bounds
                bnd_val[num_bnd_changes] = floorx;
                bnd_sense[num_bnd_changes] = 'L';
@@ -904,555 +913,557 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                vars[branch_var]->new_ub = floorx;
                vars[branch_var]->ub = floorx;
                ub = floorx;
-	       p->br_inf_up[branch_var]++;
+               p->br_inf_up[branch_var]++;
             } else {
-              // update pcost
-	       pcost_up[branch_var] = (pcost_up[branch_var]*
-	         rel_up + (up_obj - oldobjval)/(ceilx-xval))/ 
-	         (rel_up + 1);
+               // update pcost
+               pcost_up[branch_var] = (pcost_up[branch_var]*
+                     rel_up + (up_obj - oldobjval)/(ceilx-xval))/ 
+                  (rel_up + 1);
                br_rel_up[branch_var]++;
-	       p->lp_stat.rel_br_up_update++;
-	    }
-	    full_solves++;
-	    solves_since_impr++;
-	    p->lp_stat.rel_br_full_solve_num++;
-	 }
+               p->lp_stat.rel_br_up_update++;
+            }
+            full_solves++;
+            solves_since_impr++;
+            p->lp_stat.rel_br_full_solve_num++;
+         }
 
          if (down_obj > SYM_INFINITY/10 && up_obj > SYM_INFINITY/10) {
-	    //printf("d u %f %f\n", down_obj, up_obj);
-	   both_children_inf = TRUE;
-	   best_can = candidates[0];
-	   break;
+            //printf("d u %f %f\n", down_obj, up_obj);
+            both_children_inf = TRUE;
+            best_can = candidates[0];
+            break;
          }
 
          if ((down_obj > SYM_INFINITY/10 || up_obj > SYM_INFINITY/10)) {
-	    var_score = MIN(down_obj, up_obj);
-	    if(best_can != NULL) {	   
-	       continue; 
-	    }else{
-	       best_one_child_inf = TRUE; 
-	    }
-	 } else {
-	    if (down_obj < up_obj) {
-	       low = down_obj;
-	       high = up_obj;
-	    } else {
-	       low = up_obj;
-	       high = down_obj;
-	    }
-	    var_score = alpha * low + one_m_alpha * high;
-	 }
-	 
-	 double violation_cnt_diff = 0;
-	 int inf_cnt_diff = 0;
-	 int sos_diff = 0;
-	 int frac_cnt_diff = 0, nz_diff = 0;
+            var_score = MIN(down_obj, up_obj);
+            if(best_can != NULL) {	   
+               continue; 
+            }else{
+               best_one_child_inf = TRUE; 
+            }
+         } else {
+            if (down_obj < up_obj) {
+               low = down_obj;
+               high = up_obj;
+            } else {
+               low = up_obj;
+               high = down_obj;
+            }
+            var_score = alpha * low + one_m_alpha * high;
+         }
 
-	 if(best_can){
-	   inf_cnt_diff = MAX(p->br_inf_up[branch_var], p->br_inf_down[branch_var]) - 
-	     MAX(p->br_inf_up[best_var], p->br_inf_down[best_var]);
-	 }
-	   
-	 if(best_can){
-	   if(down_violation_cnt){
-	      double cand_v = 0.0, best_v = 0.0;
-	      if(violation_col_size[branch_var]){
-		 cand_v = 1.0*MAX(down_violation_cnt[branch_var],
-				  up_violation_cnt[branch_var])/violation_col_size[branch_var];
-	      }
-	      if(violation_col_size[best_var]){
-		 best_v = 1.0*MAX(down_violation_cnt[best_var],
-				  up_violation_cnt[best_var])/violation_col_size[best_var];
-	      }
-	      violation_cnt_diff = cand_v - best_v;	      
-	   }
+         double violation_cnt_diff = 0;
+         int inf_cnt_diff = 0;
+         int sos_diff = 0;
+         int frac_cnt_diff = 0, nz_diff = 0;
 
-	   if(p->mip->mip_inf){
-	      sos_diff = p->mip->mip_inf->cols[branch_var].sos_num - 
-		 p->mip->mip_inf->cols[best_var].sos_num;
+         if(best_can){
+            inf_cnt_diff = MAX(p->br_inf_up[branch_var], p->br_inf_down[branch_var])
+               - MAX(p->br_inf_up[best_var], p->br_inf_down[best_var]);
+         }
 
-	      //frac_cnt_diff = frac_cnt[branch_var] - frac_cnt[best_var];
-	      frac_cnt_diff = (int)(p->var_rank[branch_var] -
-				    p->var_rank[best_var]);
-	      nz_diff = p->mip->mip_inf->cols[branch_var].nz -
-		 p->mip->mip_inf->cols[best_var].nz;
-	   }
-	 }
-	 
-	 int tot_var_score = 0; 
-	 if(best_can){
-	   better_cand_found = FALSE; 
+         if(best_can){
+            if(down_violation_cnt){
+               double cand_v = 0.0, best_v = 0.0;
+               if(violation_col_size[branch_var]){
+                  cand_v = 1.0*MAX(down_violation_cnt[branch_var],
+                        up_violation_cnt[branch_var])/violation_col_size[branch_var];
+               }
+               if(violation_col_size[best_var]){
+                  best_v = 1.0*MAX(down_violation_cnt[best_var],
+                        up_violation_cnt[best_var])/violation_col_size[best_var];
+               }
+               violation_cnt_diff = cand_v - best_v;	      
+            }
 
-	   int s_score = 1, v_score = 32, i_score = 16, f_score = 8, b_score = 4, z_score = 2; 	   
-	   
-	   double branch_var_frac =  fabs(0.5 -(x[best_var] - floorx)) - fabs(0.5 -(x[branch_var] - floorx));	   
-	   tot_var_score = (sos_diff > 0 ? s_score: (sos_diff < 0 ? -s_score:0)) +  
-	      (violation_cnt_diff > 0.0 ? v_score: (violation_cnt_diff < 0.0 ? -v_score:0)) + 
-	      (inf_cnt_diff > 0 ? i_score: (inf_cnt_diff < 0 ? - i_score:0)) + 
-	      (frac_cnt_diff > 0 ? f_score: (frac_cnt_diff < 0 ? -f_score:0)) + 
-	      (branch_var_frac > 0.0 ? b_score: (branch_var_frac < 0.0 ? -b_score:0)) + 
-	      (nz_diff > 0 ? z_score : (nz_diff < 0 ? -z_score:0));
-	   
-	   //printf("s : v : i : f : b : n : %i %i %i %i %f %i", sos_diff, 
-	   //  violation_cnt_diff, inf_cnt_diff, frac_cnt_diff, branch_var_frac, nz_diff);	   
+            if(p->mip->mip_inf){
+               sos_diff = p->mip->mip_inf->cols[branch_var].sos_num - 
+                  p->mip->mip_inf->cols[best_var].sos_num;
 
-	   int c_score = 0; 
-	   if(!p->par.disable_obj){
-	      char cand_is_est = ((down_is_est && up_is_est) ? TRUE : FALSE); 
-	      double score_diff = var_score - best_var_score; 
-	      if(score_diff > lpetol100) c_score = 100;
-	      else if(score_diff < -lpetol100) c_score = -100; 
-	      
-	      if(cand_is_est || best_is_est){
-		 c_score = 0; 
-		 if(cand_is_est && best_is_est) {
-		    if(score_diff > lpetol100) c_score = 100; 
-		    else if(score_diff < -lpetol100) c_score = -100; 		 
-		 }else{
-		    if(best_is_est){
-		       if(score_diff > lpetol100) c_score = 100; 
-		       else if(score_diff < -lpetol100) c_score = -32; 
-		    }else{
-		       if(score_diff > lpetol100) c_score = 32; 
-		       else if(score_diff < -lpetol100) c_score = -100; 
-		    }
-		 }
-	      }
-	      
-	      tot_var_score += c_score; 
-	   }
-	   
-	   if(tot_var_score > 0){
-	      better_cand_found = TRUE; 
-	   }
-	 }
+               //frac_cnt_diff = frac_cnt[branch_var] - frac_cnt[best_var];
+               frac_cnt_diff = (int)(p->var_rank[branch_var] -
+                     p->var_rank[best_var]);
+               nz_diff = p->mip->mip_inf->cols[branch_var].nz -
+                  p->mip->mip_inf->cols[best_var].nz;
+            }
+         }
 
-	 if(best_can == NULL || better_cand_found || best_one_child_inf){
-	    //printf("here - %i\n", p->bc_index);
-	    if ( var_score > best_var_score + prog_ratio &&(down_is_est != TRUE ||
-							   up_is_est != TRUE)) {
-	      solves_since_impr = 0;
-		if(best_can!= NULL){
-		   p->lp_stat.rel_br_impr_num++;
-		}
-	   }
+         int tot_var_score = 0; 
+         if(best_can){
+            better_cand_found = FALSE; 
 
-	    if(best_can != NULL && best_one_child_inf) {
-	       best_one_child_inf = FALSE; 
-	    }
-	   
-	    if(down_is_est && up_is_est) best_is_est = TRUE; 
-	    else best_is_est = FALSE; 
+            int s_score = 1, v_score = 32, i_score = 16, f_score = 8, b_score = 4, z_score = 2;
 
-	    //printf("%f %f\n", var_score, best_var_score);
-	     best_var_score = var_score;
-	     best_var = branch_var;
-	     best_can = candidates[0];
-	     best_can->position = branch_var;
-	     best_can->solutions = NULL;
-	     best_can->sol_inds = NULL;
-	     best_can->sol_sizes = NULL;
-	     best_can->sense[1] = 'L';
-	     best_can->sense[0] = 'G';
-	     if (down_is_est==TRUE) {
-		best_can->objval[1] = oldobjval;
-		best_can->iterd[1] = 0;
-		best_can->termcode[1] = LP_D_ITLIM;
-	     } else {
-		best_can->objval[1] = down_obj;
-		best_can->iterd[1] = num_down_iters;
-		best_can->termcode[1] = down_status;
-		// added by asm4 because  hot starts dont generate a reliable 
-		// bound.
-		//if (should_use_hot_starts && down_status==LP_D_ITLIM) {
-		//  down_is_est = TRUE;
-		//  best_can->objval[0] = oldobjval;
-		//}
-	     }
-	     if (up_is_est==TRUE) {
-	        best_can->objval[0] = oldobjval;
-		best_can->iterd[0] = 0;
-		best_can->termcode[0] = LP_D_ITLIM;
-	     } else {
-		best_can->objval[0] = up_obj;
-		best_can->iterd[0] = num_up_iters;
-		best_can->termcode[0] = up_status;
-		// added by asm4 because  hot starts dont generate a reliable 
-		// bound.
-		//if (should_use_hot_starts && up_status==LP_D_ITLIM) { 
-		//  up_is_est = TRUE;
-		//  best_can->objval[1] = oldobjval;
-		//}
-	     }
-	     best_can->is_est[1] = down_is_est;
-	     best_can->is_est[0] = up_is_est;
-	     best_can->rhs[1] = floorx;
-	     best_can->rhs[0] = ceilx;
-	     best_can->value = xval;
-	     best_down_is_est = down_is_est;
-	     best_up_is_est = up_is_est;
-	     
-	     if(best_can->objval[0] < best_can->objval[1] + lpetol100 &&
-		best_can->objval[0] > best_can->objval[1] - lpetol100){
-	       char swap = TRUE;
-	       double objcoef; 
-	       get_objcoef(lp_data, branch_var, &objcoef);
+            double branch_var_frac =  fabs(0.5 -(x[best_var] - floorx)) - fabs(0.5 -(x[branch_var] - floorx));
+            tot_var_score = (sos_diff > 0 ? s_score: (sos_diff < 0 ? -s_score:0)) + 
+               (violation_cnt_diff > 0.0 ? v_score: (violation_cnt_diff < 0.0 ? -v_score:0)) + 
+               (inf_cnt_diff > 0 ? i_score: (inf_cnt_diff < 0 ? - i_score:0)) + 
+               (frac_cnt_diff > 0 ? f_score: (frac_cnt_diff < 0 ? -f_score:0)) + 
+               (branch_var_frac > 0.0 ? b_score: (branch_var_frac < 0.0 ? -b_score:0)) + 
+               (nz_diff > 0 ? z_score : (nz_diff < 0 ? -z_score:0));
 
-	       if(objcoef > -lpetol) swap = FALSE; 
-	       else if(objcoef > -lpetol){		  
-		  double var_frac_diff =  fabs(0.5 -(x[best_var] - floorx)) - fabs(0.5 -(x[branch_var] - floorx));	   
-		  int var_inf_cnt_diff = p->br_inf_up[branch_var] - p->br_inf_down[branch_var];
-		  int var_violation_cnt_diff = 0;
-		  if(up_violation_cnt){
-		     var_violation_cnt_diff = up_violation_cnt[branch_var] - down_violation_cnt[branch_var];
-		  }
-		  int v_score = 4, i_score = 2, b_score = 1;
+            //printf("s : v : i : f : b : n : %i %i %i %i %f %i", sos_diff, 
+            //  violation_cnt_diff, inf_cnt_diff, frac_cnt_diff, branch_var_frac, nz_diff);	   
 
-		  int tot_var_score = 
-		     (var_violation_cnt_diff > 0.0 ? v_score: (violation_cnt_diff < 0.0 ? -v_score:0)) + 
-		     (var_inf_cnt_diff > 0 ? i_score: (inf_cnt_diff < 0 ? - i_score:0)) + 
-		     (var_frac_diff > 0.0 ? b_score: (var_frac_diff < 0.0 ? -b_score:0));
-		  if(tot_var_score > 0) swap = FALSE; 
-	       }
+            int c_score = 0; 
+            if(!p->par.disable_obj){
+               char cand_is_est = ((down_is_est && up_is_est) ? TRUE : FALSE); 
+               double score_diff = var_score - best_var_score; 
+               if(score_diff > lpetol100) c_score = 100;
+               else if(score_diff < -lpetol100) c_score = -100; 
 
-	       if(swap){
-		 best_can->sense[0] = 'L';
-		 best_can->sense[1] = 'G';
-		 if (down_is_est==TRUE) {
-		   best_can->objval[0] = oldobjval;
-		   best_can->iterd[0] = 0;
-		   best_can->termcode[0] = LP_D_ITLIM;
-		 } else {
-		   best_can->objval[0] = down_obj;
-		   best_can->iterd[0] = num_down_iters;
-		   best_can->termcode[0] = down_status;
-		 }
-		 if (up_is_est==TRUE) {
-		   best_can->objval[1] = oldobjval;
-		   best_can->iterd[1] = 0;
-		   best_can->termcode[1] = LP_D_ITLIM;
-		 } else {
-		   best_can->objval[1] = up_obj;
-		   best_can->iterd[1] = num_up_iters;
-		   best_can->termcode[1] = up_status;
-		 }
-		 best_can->is_est[0] = down_is_est;
-		 best_can->is_est[1] = up_is_est;
-		 best_can->rhs[0] = floorx;
-		 best_can->rhs[1] = ceilx;
-	       }
-	     }
-	 }
+               if(cand_is_est || best_is_est){
+                  c_score = 0; 
+                  if(cand_is_est && best_is_est) {
+                     if(score_diff > lpetol100) c_score = 100; 
+                     else if(score_diff < -lpetol100) c_score = -100; 		 
+                  }else{
+                     if(best_is_est){
+                        if(score_diff > lpetol100) c_score = 100; 
+                        else if(score_diff < -lpetol100) c_score = -32; 
+                     }else{
+                        if(score_diff > lpetol100) c_score = 32; 
+                        else if(score_diff < -lpetol100) c_score = -100; 
+                     }
+                  }
+               }
 
-	 //printf("solves_no_imp %i\n", solves_since_impr);
-	 if ((solves_since_impr > max_solves_since_impr ||   
-	      full_solves >= max_solves) || p->par.rs_mode_enabled) {
-	    //printf("breaking because of no gain at iter %d\n", i);
-	    //printf("%i %i %i %i\n", p->bc_level, cand_num, solves_since_impr, full_solves);
-	    stop_solving = TRUE;
-	  }
+               tot_var_score += c_score; 
+            }
+
+            if(tot_var_score > 0){
+               better_cand_found = TRUE; 
+            }
+         }
+
+         if(best_can == NULL || better_cand_found || best_one_child_inf){
+            //printf("here - %i\n", p->bc_index);
+            if ( var_score > best_var_score + prog_ratio &&(down_is_est != TRUE ||
+                     up_is_est != TRUE)) {
+               solves_since_impr = 0;
+               if(best_can!= NULL){
+                  p->lp_stat.rel_br_impr_num++;
+               }
+            }
+
+            if(best_can != NULL && best_one_child_inf) {
+               best_one_child_inf = FALSE; 
+            }
+
+            if(down_is_est && up_is_est) best_is_est = TRUE; 
+            else best_is_est = FALSE; 
+
+            //printf("%f %f\n", var_score, best_var_score);
+            best_var_score = var_score;
+            best_var = branch_var;
+            best_can = candidates[0];
+            best_can->cdesc[0].position = branch_var;
+            best_can->cdesc[1].position = branch_var;
+            best_can->solutions = NULL;
+            best_can->sol_inds = NULL;
+            best_can->sol_sizes = NULL;
+            best_can->cdesc[1].sense = 'L';
+            best_can->cdesc[0].sense = 'G';
+            if (down_is_est==TRUE) {
+               best_can->objval[1] = oldobjval;
+               best_can->iterd[1] = 0;
+               best_can->termcode[1] = LP_D_ITLIM;
+            } else {
+               best_can->objval[1] = down_obj;
+               best_can->iterd[1] = num_down_iters;
+               best_can->termcode[1] = down_status;
+               // added by asm4 because  hot starts dont generate a reliable 
+               // bound.
+               //if (should_use_hot_starts && down_status==LP_D_ITLIM) {
+               //  down_is_est = TRUE;
+               //  best_can->objval[0] = oldobjval;
+               //}
+            }
+            if (up_is_est==TRUE) {
+               best_can->objval[0] = oldobjval;
+               best_can->iterd[0] = 0;
+               best_can->termcode[0] = LP_D_ITLIM;
+            } else {
+               best_can->objval[0] = up_obj;
+               best_can->iterd[0] = num_up_iters;
+               best_can->termcode[0] = up_status;
+               // added by asm4 because  hot starts dont generate a reliable 
+               // bound.
+               //if (should_use_hot_starts && up_status==LP_D_ITLIM) { 
+               //  up_is_est = TRUE;
+               //  best_can->objval[1] = oldobjval;
+               //}
+            }
+            best_can->is_est[1] = down_is_est;
+            best_can->is_est[0] = up_is_est;
+            best_can->cdesc[1].rhs = floorx;
+            best_can->cdesc[0].rhs = ceilx;
+            best_can->value = xval;
+            best_down_is_est = down_is_est;
+            best_up_is_est = up_is_est;
+
+            if(best_can->objval[0] < best_can->objval[1] + lpetol100 &&
+                  best_can->objval[0] > best_can->objval[1] - lpetol100){
+               char swap = TRUE;
+               double objcoef; 
+               get_objcoef(lp_data, branch_var, &objcoef);
+
+               if(objcoef > -lpetol) swap = FALSE; 
+               else if(objcoef > -lpetol){
+                  double var_frac_diff =  fabs(0.5 -(x[best_var] - floorx)) - fabs(0.5 -(x[branch_var] - floorx));	   
+                  int var_inf_cnt_diff = p->br_inf_up[branch_var] - p->br_inf_down[branch_var];
+                  int var_violation_cnt_diff = 0;
+                  if(up_violation_cnt){
+                     var_violation_cnt_diff = up_violation_cnt[branch_var] - down_violation_cnt[branch_var];
+                  }
+                  int v_score = 4, i_score = 2, b_score = 1;
+
+                  int tot_var_score = 
+                     (var_violation_cnt_diff > 0.0 ? v_score: (violation_cnt_diff < 0.0 ? -v_score:0)) + 
+                     (var_inf_cnt_diff > 0 ? i_score: (inf_cnt_diff < 0 ? - i_score:0)) + 
+                     (var_frac_diff > 0.0 ? b_score: (var_frac_diff < 0.0 ? -b_score:0));
+                  if(tot_var_score > 0) swap = FALSE; 
+               }
+
+               if(swap){
+                  best_can->cdesc[0].sense = 'L';
+                  best_can->cdesc[1].sense = 'G';
+                  if (down_is_est==TRUE) {
+                     best_can->objval[0] = oldobjval;
+                     best_can->iterd[0] = 0;
+                     best_can->termcode[0] = LP_D_ITLIM;
+                  } else {
+                     best_can->objval[0] = down_obj;
+                     best_can->iterd[0] = num_down_iters;
+                     best_can->termcode[0] = down_status;
+                  }
+                  if (up_is_est==TRUE) {
+                     best_can->objval[1] = oldobjval;
+                     best_can->iterd[1] = 0;
+                     best_can->termcode[1] = LP_D_ITLIM;
+                  } else {
+                     best_can->objval[1] = up_obj;
+                     best_can->iterd[1] = num_up_iters;
+                     best_can->termcode[1] = up_status;
+                  }
+                  best_can->is_est[0] = down_is_est;
+                  best_can->is_est[1] = up_is_est;
+                  best_can->cdesc[0].rhs = floorx;
+                  best_can->cdesc[1].rhs = ceilx;
+               }
+            }
+         }
+
+         //printf("solves_no_imp %i\n", solves_since_impr);
+         if ((solves_since_impr > max_solves_since_impr ||   
+                  full_solves >= max_solves) || p->par.rs_mode_enabled) {
+            //printf("breaking because of no gain at iter %d\n", i);
+            //printf("%i %i %i %i\n", p->bc_level, cand_num, solves_since_impr, full_solves);
+            stop_solving = TRUE;
+         }
       }
       //printf("reliability branching: selected var %d with score %f\n", best_var, best_var_score);
-      
+
 #ifdef COMPILE_IN_LP
       if (num_bnd_changes > 0) {
-	 str_br_bound_changes(p, num_bnd_changes, bnd_val, bnd_ind, bnd_sense);
+         str_br_bound_changes(p, num_bnd_changes, bnd_val, bnd_ind, bnd_sense);
       }
 #endif
 
 
       // experimental - sos branching - not tested
       if(p->par.use_sos_branching && !both_children_inf && p->mip->mip_inf && 
-	 1.0*p->mip->mip_inf->binary_var_num/(p->mip->n + 1) > 0.5 && 
-	 p->bc_level <= p->par.sos_branching_max_level && p->mip->mip_inf->binary_sos_row_num){
-	
-	 //printf("\nsos row cnt %i", p->mip->mip_inf->binary_sos_row_num);
-	 if (should_use_hot_starts) {
-	    unmark_hs = FALSE;
-	    unmark_hotstart(lp_data);
-	    set_itlim_hotstart(lp_data, -1);
-	 }
-	 double sos_best_var_score = -SYM_INFINITY;
-	 int sos_best_f_cnt = 0;
+            1.0*p->mip->mip_inf->binary_var_num/(p->mip->n + 1) > 0.5 && 
+            p->bc_level <= p->par.sos_branching_max_level && p->mip->mip_inf->binary_sos_row_num){
 
-	 if (max_presolve_iter < 5) {
-	    max_presolve_iter = 5;
-	 }
-	 set_itlim(lp_data, max_presolve_iter);
+         //printf("\nsos row cnt %i", p->mip->mip_inf->binary_sos_row_num);
+         if (should_use_hot_starts) {
+            unmark_hs = FALSE;
+            unmark_hotstart(lp_data);
+            set_itlim_hotstart(lp_data, -1);
+         }
+         double sos_best_var_score = -SYM_INFINITY;
+         int sos_best_f_cnt = 0;
 
-	 //p->mip->mip_inf->cols[best_var].sos_num > 0){ //}
-	 int *l_ind = NULL, *r_ind = NULL;
-	 
-	 int col_num = lp_data->n;
-	 int row_num = p->mip->m; // p->base.cutnum ? 
-	 int col_ind, row_ind;
-	 int maxmn = MAX(row_num, col_num);
-	 int row_size,row_frac_cnt; 
+         if (max_presolve_iter < 5) {
+            max_presolve_iter = 5;
+         }
+         set_itlim(lp_data, max_presolve_iter);
 
-	 //int *max_frac_ind = lp_data->tmp.i1;
-	 //int *frac_ind = lp_data->tmp.i1 + col_num;
-	 char *col_stat = lp_data->tmp.c + 2*maxmn;
-	 
-	 //double *max_frac_val = lp_data->tmp.d + col_num;
-	 //double *frac_val = lp_data->tmp.d + 2*col_num;
-	 int *row_z_cnt = lp_data->tmp.i1;	 
-	 int *sos_row_size = lp_data->tmp.i1+maxmn;
-	 int *sos_row = NULL;
-	 int sos_row_cnt = 0;
-	 int *row_frac_freq = lp_data->tmp.i1+2*maxmn;
-	    
-	 ROWinfo *rows = p->mip->mip_inf->rows;
-	 //COLinfo *cols = p->mip->mip_inf->cols;     
-	 
-	 int *row_matbeg = p->mip->row_matbeg;
-	 int *row_matind = p->mip->row_matind;
-	 //double *row_matval = p->mip->row_matval;
-	 
-	 int *matbeg = p->mip->matbeg;
-	 int *matind = p->mip->matind;
-	 //double *matval = p->mip->matval;	 
-	 double ub, lb; 
-	 memset(row_frac_freq, 0, ISIZE*row_num);
-	 memset(sos_row_size, 0, ISIZE*row_num);
-	 memset(row_z_cnt, 0, ISIZE*row_num);
-	 for(i = 0; i < col_num; i++){
-	    //col_stat[i] = 'N'; // not required 
-	    if(vars[i]->is_int){
-	       col_stat[i] = 'I'; //integer
-	       get_ub(lp_data, i, &ub);
-	       get_lb(lp_data, i, &lb);
-	       int col_size =  matbeg[i+1] - matbeg[i];
-	       if(ub > lb + lpetol){
-		  col_stat[i] = 'U'; // integer but unfixed yet
-		  if(x[i] - floor(x[i]) > lpetol && ceil(x[i]) - x[i] > lpetol){
-		     col_stat[i] = 'F'; // fractional 
-		     for(j = matbeg[i]; j < matbeg[i + 1]; j++){
-			row_frac_freq[matind[j]]++;
-			row_z_cnt[matind[j]] -= col_size;
-		     }
-		  }else{
-		     for(j = matbeg[i]; j < matbeg[i + 1]; j++){
-			row_z_cnt[matind[j]] -= col_size;
-		     }
-		  }
-	       }else{
-		  for(j = matbeg[i]; j < matbeg[i + 1]; j++){
-		     sos_row_size[matind[j]]++;
-		  }
-	       }
-	    }else{
-	       col_stat[i] = 'C'; //continuous
-	    }
-	 }
+         //p->mip->mip_inf->cols[best_var].sos_num > 0){ //}
+         int *l_ind = NULL, *r_ind = NULL;
 
-	 for(row_ind = 0; row_ind < row_num; row_ind++){
-	    sos_row_size[row_ind] = rows[row_ind].size - sos_row_size[row_ind];
-	    if(rows[row_ind].is_sos_row && row_frac_freq[row_ind] > 1 && sos_row_size[row_ind] > 4){
-	       if(!sos_row){
-		  sos_row = (int*)malloc(ISIZE*row_num);
-	       }
-	       sos_row_size[sos_row_cnt] = -sos_row_size[row_ind] - row_frac_freq[row_ind];
-	       sos_row[sos_row_cnt++] = row_ind;
-	    }
-	 }
-	 //printf("...cnt %i\n", sos_row_cnt);
-	 if(sos_row_cnt > 0){
-	    //qsort_ii(sos_row_size, sos_row, sos_row_cnt);
-	    qsort_ii(row_z_cnt, sos_row, sos_row_cnt);
-	 }
-	 int final_cnt = MIN(5, sos_row_cnt);
-	 double *frac_val = lp_data->tmp.d + maxmn;
-	 int *frac_ind = lp_data->tmp.i1;
-	 char *l_assigned = lp_data->tmp.c;
-	 char *r_assigned = lp_data->tmp.c + maxmn;
+         int col_num = lp_data->n;
+         int row_num = p->mip->m; // p->base.cutnum ? 
+         int col_ind, row_ind;
+         int maxmn = MAX(row_num, col_num);
+         int row_size,row_frac_cnt; 
 
-	 for(int k = 0; k < final_cnt; k++){
-	    row_ind = sos_row[k];
-	    int total_f_cnt = 0;
-	    if(rows[row_ind].is_sos_row){
-	       row_frac_cnt = 0;
-	       row_size = 0;
-	       for(i = row_matbeg[row_ind]; i < row_matbeg[row_ind+1]; i++){
-		  col_ind = row_matind[i];		  
-		  if(col_stat[col_ind] == 'C') {
-		     printf("ERROR in sos branching... - row %i col %i\n",
-			    row_ind, col_ind);
-		     continue;
-		     //exit(0);
-		  }
-		  if(col_stat[col_ind] != 'I') row_size++;
-		  if(col_stat[col_ind] == 'F'){
-		     total_f_cnt += matbeg[col_ind + 1] - matbeg[col_ind];
-		     frac_ind[row_frac_cnt] = col_ind;
-		     frac_val[row_frac_cnt] = floor(x[col_ind]) - x[col_ind];
-		     row_frac_cnt++;
-		  }
-		  //if(col_stat[i] == 'U') bin_cnt[sos_num]--;
-		  //else frac_cnt[sos_num]--;
-	       }
-	       
-	       int l_cnt = 0, r_cnt = 0;
-	       if(!l_ind)
-		  l_ind = (int*)malloc(ISIZE*col_num);
-	       if(!r_ind)
-		  r_ind = (int*)malloc(ISIZE*col_num);
-	       qsort_di(frac_val, frac_ind, row_frac_cnt);
-	       l_cnt = row_frac_cnt/2;
-	       r_cnt = row_frac_cnt - l_cnt;
-	       l_ind[0] = frac_ind[0];
-	       r_ind[0] = frac_ind[1];
-	       if(r_cnt > 1){
-		  memcpy(r_ind + 1, frac_ind + 2, ISIZE*(r_cnt - 1));
-	       }
-	       if(l_cnt > 1){
-		  memcpy(l_ind + 1, frac_ind + r_cnt + 1, ISIZE*(l_cnt - 1));
-	       }
-	       
-	       int l_assigned_cnt = 0, r_assigned_cnt = 0;
+         //int *max_frac_ind = lp_data->tmp.i1;
+         //int *frac_ind = lp_data->tmp.i1 + col_num;
+         char *col_stat = lp_data->tmp.c + 2*maxmn;
 
-	       if(row_size > row_frac_cnt){
-		  memset(l_assigned, 0, CSIZE*row_num);
-		  memset(r_assigned, 0, CSIZE*row_num);
-		  
-		  for(i = 0; i < l_cnt; i++){
-		     col_ind = l_ind[i];
-		     for(j = matbeg[col_ind]; j < matbeg[col_ind + 1]; j++){
-			if(!l_assigned[matind[j]]){
-			   l_assigned[matind[j]] = TRUE;
-			   l_assigned_cnt++;
-			}
-		     }
-		  }
-		  for(i = 0; i < r_cnt; i++){
-		     col_ind = r_ind[i];
-		     for(j = matbeg[col_ind]; j < matbeg[col_ind + 1]; j++){
-			if(!r_assigned[matind[j]]){
-			   r_assigned[matind[j]] = TRUE;
-			   r_assigned_cnt++;
-			}
-		     }
-		  }
-	    
-		  int bin_l_cnt = 0, bin_r_cnt = 0;
-		  for(i = row_matbeg[row_ind];
-		      i < row_matbeg[row_ind + 1]; i++){
-		     col_ind = row_matind[i];
-		     if(col_stat[col_ind] == 'U'){
-			bin_l_cnt = bin_r_cnt = 0;
-			for(j = matbeg[col_ind]; j < matbeg[col_ind + 1]; j++){
-			   if(l_assigned[matind[j]]) bin_l_cnt++;
-			   if(r_assigned[matind[j]]) bin_r_cnt++;
-			}
+         //double *max_frac_val = lp_data->tmp.d + col_num;
+         //double *frac_val = lp_data->tmp.d + 2*col_num;
+         int *row_z_cnt = lp_data->tmp.i1;	 
+         int *sos_row_size = lp_data->tmp.i1+maxmn;
+         int *sos_row = NULL;
+         int sos_row_cnt = 0;
+         int *row_frac_freq = lp_data->tmp.i1+2*maxmn;
 
-			if(bin_l_cnt > bin_r_cnt) {
-			   l_ind[l_cnt++] = col_ind;
-			}else if(bin_l_cnt < bin_r_cnt){
-			   r_ind[r_cnt++] = col_ind;
-			}else{
-			   if(l_cnt < r_cnt) l_ind[l_cnt++] = col_ind;
-			   else r_ind[r_cnt++] = col_ind;
-			}
-		     }
-		  }
+         ROWinfo *rows = p->mip->mip_inf->rows;
+         //COLinfo *cols = p->mip->mip_inf->cols;     
 
-	       }
+         int *row_matbeg = p->mip->row_matbeg;
+         int *row_matind = p->mip->row_matind;
+         //double *row_matval = p->mip->row_matval;
 
-	       strong_branch(p, 0, 0.0, 0.0, 0.0, 0.0, &down_obj,
-			     FALSE,
-			     &down_status, &num_down_iters, l_cnt,
-			     l_ind);
-	       strong_branch(p, 0, 0.0, 0.0, 0.0, 0.0, &up_obj,
-			     FALSE,
-			     &up_status, &num_up_iters, r_cnt,
-			     r_ind);
+         int *matbeg = p->mip->matbeg;
+         int *matind = p->mip->matind;
+         //double *matval = p->mip->matval;	 
+         double ub, lb; 
+         memset(row_frac_freq, 0, ISIZE*row_num);
+         memset(sos_row_size, 0, ISIZE*row_num);
+         memset(row_z_cnt, 0, ISIZE*row_num);
+         for(i = 0; i < col_num; i++){
+            //col_stat[i] = 'N'; // not required 
+            if(vars[i]->is_int){
+               col_stat[i] = 'I'; //integer
+               get_ub(lp_data, i, &ub);
+               get_lb(lp_data, i, &lb);
+               int col_size =  matbeg[i+1] - matbeg[i];
+               if(ub > lb + lpetol){
+                  col_stat[i] = 'U'; // integer but unfixed yet
+                  if(x[i] - floor(x[i]) > lpetol && ceil(x[i]) - x[i] > lpetol){
+                     col_stat[i] = 'F'; // fractional 
+                     for(j = matbeg[i]; j < matbeg[i + 1]; j++){
+                        row_frac_freq[matind[j]]++;
+                        row_z_cnt[matind[j]] -= col_size;
+                     }
+                  }else{
+                     for(j = matbeg[i]; j < matbeg[i + 1]; j++){
+                        row_z_cnt[matind[j]] -= col_size;
+                     }
+                  }
+               }else{
+                  for(j = matbeg[i]; j < matbeg[i + 1]; j++){
+                     sos_row_size[matind[j]]++;
+                  }
+               }
+            }else{
+               col_stat[i] = 'C'; //continuous
+            }
+         }
 
-	       if (down_obj > SYM_INFINITY/10 && up_obj > SYM_INFINITY/10) {
-		  both_children_inf = TRUE;
-		  FREE(best_can->sos_ind[0]);
-		  FREE(best_can->sos_ind[1]);
-		  best_can = candidates[0];
-		  break;
-	       }
+         for(row_ind = 0; row_ind < row_num; row_ind++){
+            sos_row_size[row_ind] = rows[row_ind].size - sos_row_size[row_ind];
+            if(rows[row_ind].is_sos_row && row_frac_freq[row_ind] > 1 && sos_row_size[row_ind] > 4){
+               if(!sos_row){
+                  sos_row = (int*)malloc(ISIZE*row_num);
+               }
+               sos_row_size[sos_row_cnt] = -sos_row_size[row_ind] - row_frac_freq[row_ind];
+               sos_row[sos_row_cnt++] = row_ind;
+            }
+         }
+         //printf("...cnt %i\n", sos_row_cnt);
+         if(sos_row_cnt > 0){
+            //qsort_ii(sos_row_size, sos_row, sos_row_cnt);
+            qsort_ii(row_z_cnt, sos_row, sos_row_cnt);
+         }
+         int final_cnt = MIN(5, sos_row_cnt);
+         double *frac_val = lp_data->tmp.d + maxmn;
+         int *frac_ind = lp_data->tmp.i1;
+         char *l_assigned = lp_data->tmp.c;
+         char *r_assigned = lp_data->tmp.c + maxmn;
 
-	       if (down_obj < up_obj) {
-		  low = down_obj;
-		  high = up_obj;
-	       } else {
-		  low = up_obj;
-		  high = down_obj;
-	       }
-	       
-	       double sos_score = 
-	       	  alpha * low + one_m_alpha * high;
-	       int can_iterate = FALSE;
-	       if((best_down_is_est && best_up_is_est) ||
-		  sos_score > SYM_INFINITY/10 || best_var_score < SYM_INFINITY/10) {
-		  can_iterate = TRUE;
-		  //printf("...can iterate \n");
-	       }
-	       if(can_iterate && sos_score > best_var_score - lpetol100 && 
-		  (sos_score > sos_best_var_score + lpetol100 || !(best_can->sos_ind[0]) ||
-		  (sos_score > sos_best_var_score - lpetol100 &&
-		   total_f_cnt > sos_best_f_cnt))){ 
+         for(int k = 0; k < final_cnt; k++){
+            row_ind = sos_row[k];
+            int total_f_cnt = 0;
+            if(rows[row_ind].is_sos_row){
+               row_frac_cnt = 0;
+               row_size = 0;
+               for(i = row_matbeg[row_ind]; i < row_matbeg[row_ind+1]; i++){
+                  col_ind = row_matind[i];		  
+                  if(col_stat[col_ind] == 'C') {
+                     printf("ERROR in sos branching... - row %i col %i\n",
+                           row_ind, col_ind);
+                     continue;
+                     //exit(0);
+                  }
+                  if(col_stat[col_ind] != 'I') row_size++;
+                  if(col_stat[col_ind] == 'F'){
+                     total_f_cnt += matbeg[col_ind + 1] - matbeg[col_ind];
+                     frac_ind[row_frac_cnt] = col_ind;
+                     frac_val[row_frac_cnt] = floor(x[col_ind]) - x[col_ind];
+                     row_frac_cnt++;
+                  }
+                  //if(col_stat[i] == 'U') bin_cnt[sos_num]--;
+                  //else frac_cnt[sos_num]--;
+               }
 
-		  sos_best_var_score = sos_score;
-		  sos_best_f_cnt = total_f_cnt; 
-		     
-		  int li = 0;
-		  int ri = 1;
-	    
-		  if(l_assigned_cnt < r_assigned_cnt) {
-		     li = 1;
-		     ri = 0;
-		  }
+               int l_cnt = 0, r_cnt = 0;
+               if(!l_ind)
+                  l_ind = (int*)malloc(ISIZE*col_num);
+               if(!r_ind)
+                  r_ind = (int*)malloc(ISIZE*col_num);
+               qsort_di(frac_val, frac_ind, row_frac_cnt);
+               l_cnt = row_frac_cnt/2;
+               r_cnt = row_frac_cnt - l_cnt;
+               l_ind[0] = frac_ind[0];
+               r_ind[0] = frac_ind[1];
+               if(r_cnt > 1){
+                  memcpy(r_ind + 1, frac_ind + 2, ISIZE*(r_cnt - 1));
+               }
+               if(l_cnt > 1){
+                  memcpy(l_ind + 1, frac_ind + r_cnt + 1, ISIZE*(l_cnt - 1));
+               }
 
-		  if(!best_can->sos_ind[li]){
-		     best_can->sos_ind[li] = (int*)malloc(ISIZE*l_cnt);
-		  }else if(l_cnt > best_can->sos_cnt[li]){
-		     best_can->sos_ind[li] = (int*)realloc((char *)best_can->sos_ind[li],
-							   ISIZE*l_cnt);
-		  }
-		  if(!best_can->sos_ind[ri]){
-		     //printf("...accepted\n");
-		     best_can->sos_ind[ri] = (int*)malloc(ISIZE*r_cnt);
-		  }else if (r_cnt > best_can->sos_cnt[ri]){
-		     best_can->sos_ind[ri] = (int*)realloc((char*)best_can->sos_ind[ri],
-							   ISIZE*r_cnt);
-		  }
+               int l_assigned_cnt = 0, r_assigned_cnt = 0;
 
-		  memcpy(best_can->sos_ind[li], l_ind, ISIZE*l_cnt);
-		  memcpy(best_can->sos_ind[ri], r_ind, ISIZE*r_cnt);
+               if(row_size > row_frac_cnt){
+                  memset(l_assigned, 0, CSIZE*row_num);
+                  memset(r_assigned, 0, CSIZE*row_num);
 
-		  best_can->type = SOS1_IMPLICIT;
-		  best_can->sense[li] = 'L';
-		  best_can->sense[ri] = 'G';
-		  
-		  best_can->objval[li] = down_obj;
-		  best_can->iterd[li] = num_down_iters;
-		  best_can->termcode[li] = down_status;
-		  
-		  best_can->objval[ri] = up_obj;
-		  best_can->iterd[ri] = num_up_iters;
-		  best_can->termcode[ri] = up_status;
-		  
-		  best_can->rhs[li] = 0.0;
-		  best_can->rhs[ri] = 0.0;
-		  
-		  best_can->sos_cnt[li] = l_cnt;
-		  best_can->sos_cnt[ri] = r_cnt;
-	       }
-	    }
-	 }
-	 FREE(l_ind);
-	 FREE(r_ind);
-	 FREE(sos_row);
+                  for(i = 0; i < l_cnt; i++){
+                     col_ind = l_ind[i];
+                     for(j = matbeg[col_ind]; j < matbeg[col_ind + 1]; j++){
+                        if(!l_assigned[matind[j]]){
+                           l_assigned[matind[j]] = TRUE;
+                           l_assigned_cnt++;
+                        }
+                     }
+                  }
+                  for(i = 0; i < r_cnt; i++){
+                     col_ind = r_ind[i];
+                     for(j = matbeg[col_ind]; j < matbeg[col_ind + 1]; j++){
+                        if(!r_assigned[matind[j]]){
+                           r_assigned[matind[j]] = TRUE;
+                           r_assigned_cnt++;
+                        }
+                     }
+                  }
+
+                  int bin_l_cnt = 0, bin_r_cnt = 0;
+                  for(i = row_matbeg[row_ind];
+                        i < row_matbeg[row_ind + 1]; i++){
+                     col_ind = row_matind[i];
+                     if(col_stat[col_ind] == 'U'){
+                        bin_l_cnt = bin_r_cnt = 0;
+                        for(j = matbeg[col_ind]; j < matbeg[col_ind + 1]; j++){
+                           if(l_assigned[matind[j]]) bin_l_cnt++;
+                           if(r_assigned[matind[j]]) bin_r_cnt++;
+                        }
+
+                        if(bin_l_cnt > bin_r_cnt) {
+                           l_ind[l_cnt++] = col_ind;
+                        }else if(bin_l_cnt < bin_r_cnt){
+                           r_ind[r_cnt++] = col_ind;
+                        }else{
+                           if(l_cnt < r_cnt) l_ind[l_cnt++] = col_ind;
+                           else r_ind[r_cnt++] = col_ind;
+                        }
+                     }
+                  }
+
+               }
+
+               strong_branch(p, 0, 0.0, 0.0, 0.0, 0.0, &down_obj,
+                     FALSE,
+                     &down_status, &num_down_iters, l_cnt,
+                     l_ind);
+               strong_branch(p, 0, 0.0, 0.0, 0.0, 0.0, &up_obj,
+                     FALSE,
+                     &up_status, &num_up_iters, r_cnt,
+                     r_ind);
+
+               if (down_obj > SYM_INFINITY/10 && up_obj > SYM_INFINITY/10) {
+                  both_children_inf = TRUE;
+                  FREE(best_can->cdesc[0].sos_ind);
+                  FREE(best_can->cdesc[1].sos_ind);
+                  best_can = candidates[0];
+                  break;
+               }
+
+               if (down_obj < up_obj) {
+                  low = down_obj;
+                  high = up_obj;
+               } else {
+                  low = up_obj;
+                  high = down_obj;
+               }
+
+               double sos_score = 
+                  alpha * low + one_m_alpha * high;
+               int can_iterate = FALSE;
+               if((best_down_is_est && best_up_is_est) ||
+                     sos_score > SYM_INFINITY/10 || best_var_score < SYM_INFINITY/10) {
+                  can_iterate = TRUE;
+                  //printf("...can iterate \n");
+               }
+               if(can_iterate && sos_score > best_var_score - lpetol100 && 
+                     (sos_score > sos_best_var_score + lpetol100 || !(best_can->cdesc[0].sos_ind) ||
+                      (sos_score > sos_best_var_score - lpetol100 &&
+                       total_f_cnt > sos_best_f_cnt))){ 
+
+                  sos_best_var_score = sos_score;
+                  sos_best_f_cnt = total_f_cnt; 
+
+                  int li = 0;
+                  int ri = 1;
+
+                  if(l_assigned_cnt < r_assigned_cnt) {
+                     li = 1;
+                     ri = 0;
+                  }
+
+                  if(!best_can->cdesc[li].sos_ind){
+                     best_can->cdesc[li].sos_ind = (int*)malloc(ISIZE*l_cnt);
+                  }else if(l_cnt > best_can->cdesc[li].sos_cnt){
+                     best_can->cdesc[li].sos_ind = (int*)realloc((char *)best_can->cdesc[li].sos_ind,
+                           ISIZE*l_cnt);
+                  }
+                  if(!best_can->cdesc[ri].sos_ind){
+                     //printf("...accepted\n");
+                     best_can->cdesc[ri].sos_ind = (int*)malloc(ISIZE*r_cnt);
+                  }else if (r_cnt > best_can->cdesc[ri].sos_cnt){
+                     best_can->cdesc[ri].sos_ind = (int*)realloc((char*)best_can->cdesc[ri].sos_ind,
+                           ISIZE*r_cnt);
+                  }
+
+                  memcpy(best_can->cdesc[li].sos_ind, l_ind, ISIZE*l_cnt);
+                  memcpy(best_can->cdesc[ri].sos_ind, r_ind, ISIZE*r_cnt);
+
+                  best_can->cdesc[li].type = SOS1_IMPLICIT;
+                  best_can->cdesc[ri].type = SOS1_IMPLICIT;
+                  best_can->cdesc[li].sense = 'L';
+                  best_can->cdesc[ri].sense = 'G';
+
+                  best_can->objval[li] = down_obj;
+                  best_can->iterd[li] = num_down_iters;
+                  best_can->termcode[li] = down_status;
+
+                  best_can->objval[ri] = up_obj;
+                  best_can->iterd[ri] = num_up_iters;
+                  best_can->termcode[ri] = up_status;
+
+                  best_can->cdesc[li].rhs = 0.0;
+                  best_can->cdesc[ri].rhs = 0.0;
+
+                  best_can->cdesc[li].sos_cnt = l_cnt;
+                  best_can->cdesc[ri].sos_cnt = r_cnt;
+               }
+            }
+         }
+         FREE(l_ind);
+         FREE(r_ind);
+         FREE(sos_row);
       }
-      
+
       cand_num = 1;
       FREE(up_violation_cnt);
       FREE(down_violation_cnt);
       FREE(violation_col_size);
-      
+
       if (both_children_inf == TRUE) {
          FREE(best_can);
          FREE(candidates);
@@ -1462,46 +1473,48 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             unmark_hotstart(lp_data);
             set_itlim_hotstart(lp_data, -1);
          }else{
-	    load_basis(lp_data, rstat, cstat);
-	 }
+            load_basis(lp_data, rstat, cstat);
+         }
          set_itlim(lp_data, -1); //both limits should be set for hotstarts
          return (DO_NOT_BRANCH__FATHOMED);
       }
 
       //printf("Branching on %i %c\n", best_can->position, best_can->sense[0]);
 
-   } else {      
+   } else {
       /* do the default symphony branching */
 
       /* 
        * see if hot-starts should be used. in theory if strong branching is used
        * and only variable bounds are changed then, hot-starts should be faster
        */
-      
+
 #ifdef __OSI_CLP__
       lp_data->si->setupForRepeatedUse(2,0);
 #endif
+      /* NOTE: Assuming branch_on_cuts ON even in case of branching on disjunctions.
+         Otherwise this if condition may become true even in case of disjunction branching. */
       if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
-	 should_use_hot_starts = TRUE;
+         should_use_hot_starts = TRUE;
       } else {
-	 should_use_hot_starts = FALSE;
+         should_use_hot_starts = FALSE;
       }
 
       /* Set the iteration limit */
       if (should_use_hot_starts) {
-	 mark_hotstart(lp_data);
+         mark_hotstart(lp_data);
       }
-      
+
       if (p->par.max_presolve_iter > 0) {
-	 max_presolve_iter = p->par.max_presolve_iter - bc_level;
-	 
-	 if (max_presolve_iter < 5) {
-	    max_presolve_iter = 5;
-	 }
-	 if(should_use_hot_starts){
-	    set_itlim_hotstart(lp_data, max_presolve_iter);
-	 }
-	 set_itlim(lp_data, max_presolve_iter);
+         max_presolve_iter = p->par.max_presolve_iter - bc_level;
+
+         if (max_presolve_iter < 5) {
+            max_presolve_iter = 5;
+         }
+         if(should_use_hot_starts){
+            set_itlim_hotstart(lp_data, max_presolve_iter);
+         }
+         set_itlim(lp_data, max_presolve_iter);
       }
 
       for (i=0; i<cand_num; i++){
@@ -1519,21 +1532,21 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          }
 
 #ifdef SENSITIVITY_ANALYSIS
-	 if (p->par.sensitivity_rhs){
-	    can->duals = (double **) calloc(maxnum, sizeof(double *));
-	    //Anahita
-	    can->rays = (double **) calloc(maxnum, sizeof(double *));
-	 }else{
-	    can->duals = NULL;
-	    //Anahita
-	    can->rays = NULL;
-	 }
-	 if (p->par.sensitivity_bounds){
-	    //Ted
-	    can->dj = (double **) calloc(maxnum, sizeof(double *));
-	 }else{
-	    //Ted
-	    can->dj = NULL; 
+         if (p->par.sensitivity_rhs){
+            can->duals = (double **) calloc(maxnum, sizeof(double *));
+            //Anahita
+            can->rays = (double **) calloc(maxnum, sizeof(double *));
+         }else{
+            can->duals = NULL;
+            //Anahita
+            can->rays = NULL;
+         }
+         if (p->par.sensitivity_bounds){
+            //Ted
+            can->dj = (double **) calloc(maxnum, sizeof(double *));
+         }else{
+            //Ted
+            can->dj = NULL; 
          }
 #endif
 #ifdef COMPILE_FRAC_BRANCHING
@@ -1543,7 +1556,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
 
 #else
-         if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){	 	 
+         if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
             can->solutions = (double **) calloc (MAX_CHILDREN_NUM, 
                   sizeof(double *));
             can->sol_inds = (int **) calloc(MAX_CHILDREN_NUM, 
@@ -1554,19 +1567,19 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef SENSITIVITY_ANALYSIS
          if (p->par.sensitivity_rhs){      
             can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
-	    //Anahita
-	    can->rays = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
-	 }else{
+            //Anahita
+            can->rays = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+         }else{
             can->duals = NULL;
-	    //Anahita
-	    can->rays = NULL;
-	 }
+            //Anahita
+            can->rays = NULL;
+         }
          if (p->par.sensitivity_bounds){      
             //Ted
-	    can->dj = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+            can->dj = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
          }else{
-	    //Ted
-	    can->dj = NULL;
+            //Ted
+            can->dj = NULL;
          }
 #endif
 #endif
@@ -1575,335 +1588,337 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          cnum += can->child_num;
 #endif
 
-         /* Now depending on the type, adjust ub/lb or rhs/range/sense */
-         switch (can->type){
-          case CANDIDATE_VARIABLE:
-            branch_var = can->position;
+         for (j = 0; j < can->child_num; j++) {
+            /* Now depending on the type, adjust ub/lb or rhs/range/sense */
+            switch (can->cdesc[j].type){
+               case CANDIDATE_VARIABLE:
+                  branch_var = can->cdesc[j].position;
 #if 0
-            if (lp_data->status[branch_var] & PERM_FIXED_TO_LB ||
-                  lp_data->status[branch_var] & PERM_FIXED_TO_UB){
-               if (vars[branch_var]->lb == vars[branch_var]->ub){
-                  printf("Warning -- branching candidate is already fixed. \n");
-                  printf("SYMPHONY has encountered numerical difficulties \n");
-                  printf("With the LP solver. Exiting...\n\n");
-               }
-               /* } to unconfuse vi*/
+                  if (lp_data->status[branch_var] & PERM_FIXED_TO_LB ||
+                        lp_data->status[branch_var] & PERM_FIXED_TO_UB){
+                     if (vars[branch_var]->lb == vars[branch_var]->ub){
+                        printf("Warning -- branching candidate is already fixed. \n");
+                        printf("SYMPHONY has encountered numerical difficulties \n");
+                        printf("With the LP solver. Exiting...\n\n");
+                     }
+                     /* } to unconfuse vi*/
 #endif
-            lb = vars[branch_var]->new_lb;
-            ub = vars[branch_var]->new_ub;
-            for (j = 0; j < can->child_num; j++){
-               switch (can->sense[j]){
-                case 'E':
-                  change_lbub(lp_data, branch_var, can->rhs[j], can->rhs[j]);
-                  break;
-                case 'R':
-                  change_lbub(lp_data, branch_var, can->rhs[j],
-                        can->rhs[j] + can->range[j]);
-                  break;
-                case 'L':
-                  change_lbub(lp_data, branch_var, lb, can->rhs[j]);
-                  break;
-                case 'G':
-                  change_lbub(lp_data, branch_var, can->rhs[j], ub);
-                  break;
-               }
-               check_ub(p);
-               /* The original basis is in lp_data->lpbas */
-	       if (!p->par.cuts_strong_branch){
-		  if (should_use_hot_starts) {
-		     can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
-		     total_iters+=*(can->iterd+j);
-		     
-		  } else {
-		     load_basis(lp_data, cstat, rstat);
-		     can->termcode[j] = initial_lp_solve(lp_data, can->iterd+j);
-		     total_iters+=*(can->iterd+j);
-		     
-		  }
-		  p->lp_stat.lp_calls++; 
-	       }
-	       else{
-		     
-		  bool keep_going = TRUE;
-		  int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
-		  int real_nzcnt, matbeg = 0, ind = 0;
-		  double quality, *tmp_matval, *matval;
-		  cut_pool *cp = p->tm->cpp[p->cut_pool];
-		  cp_cut_data **cp_cut;
-		  while (keep_going){
-		     if (should_use_hot_starts) {
-			can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
-			total_iters+=*(can->iterd+j);
-		     } else {
-			load_basis(lp_data, cstat, rstat);
-			can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
-			total_iters+=*(can->iterd+j);
-		     }
-		     iter_num++;
-		     keep_going = FALSE;
-		     for (ind = 0, cp_cut = cp->cuts; ind < cp->cut_num;
-			  ind++, cp_cut++){
-			check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
-				    &quality, lp_data->x);
-			if (violated){
-			   keep_going = TRUE;
-			   real_nzcnt = 0;
-			   nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
-			   tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
-			   tmp_matind =
-			      (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
-			   matval = (double *) malloc(nzcnt * DSIZE);
-			   matind = (int *) malloc(nzcnt * ISIZE);
-			   if (p->par.is_userind_in_order) {
-			      memcpy(matind, tmp_matind, nzcnt*ISIZE);
-			      memcpy(matval, tmp_matval, nzcnt*DSIZE);
-			      real_nzcnt = nzcnt;
-			   } else {
-			      for (j = 0; j < lp_data->n; j++){
-				 for (k = 0; k < nzcnt; k++){
-				    if (tmp_matind[k] == lp_data->vars[j]->userind){
-				       matind[real_nzcnt]   = j;
-				       matval[real_nzcnt++] = tmp_matval[k];
-				    }
-				 }
-			      }
-			   }
-			   add_rows(lp_data, 1, real_nzcnt,
-				    &(&(*cp_cut)->cut)->rhs,
-				    &(&(*cp_cut)->cut)->sense,
-				    &matbeg, matind, matval);
-			}
-		     }
-		  }
-		  p->lp_stat.lp_calls++;
-	       }
-               p->lp_stat.str_br_lp_calls++;
-	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
-               can->objval[j] = lp_data->objval;
-               //get_x(lp_data);
-	       //Anahita
-	       can->intcpt[j] = lp_data->intcpt;
-	       
+                  lb = vars[branch_var]->new_lb;
+                  ub = vars[branch_var]->new_ub;
+                  switch (can->cdesc[j].sense){
+                     case 'E':
+                        change_lbub(lp_data, branch_var, can->cdesc[j].rhs, can->cdesc[j].rhs);
+                        break;
+                     case 'R':
+                        change_lbub(lp_data, branch_var, can->cdesc[j].rhs,
+                              can->cdesc[j].rhs + can->cdesc[j].range);
+                        break;
+                     case 'L':
+                        change_lbub(lp_data, branch_var, lb, can->cdesc[j].rhs);
+                        break;
+                     case 'G':
+                        change_lbub(lp_data, branch_var, can->cdesc[j].rhs, ub);
+                        break;
+                  }
+                  check_ub(p);
+                  /* The original basis is in lp_data->lpbas */
+                  if (!p->par.cuts_strong_branch){
+                     if (should_use_hot_starts) {
+                        can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+                        total_iters+=*(can->iterd+j);
+                     } else {
+                        load_basis(lp_data, cstat, rstat);
+                        can->termcode[j] = initial_lp_solve(lp_data, can->iterd+j);
+                        total_iters+=*(can->iterd+j);
+                     }
+                     p->lp_stat.lp_calls++; 
+                  }
+                  else{
+                     bool keep_going = TRUE;
+                     int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
+                     int real_nzcnt, matbeg = 0, ind = 0;
+                     double quality, *tmp_matval, *matval;
+                     cut_pool *cp = p->tm->cpp[p->cut_pool];
+                     cp_cut_data **cp_cut;
+                     while (keep_going){
+                        if (should_use_hot_starts) {
+                           can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+                           total_iters+=*(can->iterd+j);
+                        } else {
+                           load_basis(lp_data, cstat, rstat);
+                           can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+                           total_iters+=*(can->iterd+j);
+                        }
+                        iter_num++;
+                        keep_going = FALSE;
+                        for (ind = 0, cp_cut = cp->cuts; ind < cp->cut_num;
+                              ind++, cp_cut++){
+                           check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
+                                 &quality, lp_data->x);
+                           if (violated){
+                              keep_going = TRUE;
+                              real_nzcnt = 0;
+                              nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
+                              tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
+                              tmp_matind =
+                                 (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
+                              matval = (double *) malloc(nzcnt * DSIZE);
+                              matind = (int *) malloc(nzcnt * ISIZE);
+                              if (p->par.is_userind_in_order) {
+                                 memcpy(matind, tmp_matind, nzcnt*ISIZE);
+                                 memcpy(matval, tmp_matval, nzcnt*DSIZE);
+                                 real_nzcnt = nzcnt;
+                              } else {
+                                 for (j = 0; j < lp_data->n; j++){
+                                    for (k = 0; k < nzcnt; k++){
+                                       if (tmp_matind[k] == lp_data->vars[j]->userind){
+                                          matind[real_nzcnt]   = j;
+                                          matval[real_nzcnt++] = tmp_matval[k];
+                                       }
+                                    }
+                                 }
+                              }
+                              add_rows(lp_data, 1, real_nzcnt,
+                                    &(&(*cp_cut)->cut)->rhs,
+                                    &(&(*cp_cut)->cut)->sense,
+                                    &matbeg, matind, matval);
+                           }
+                        }
+                     }
+                     p->lp_stat.lp_calls++;
+                  }
+                  p->lp_stat.str_br_lp_calls++;
+                  p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
+                  can->objval[j] = lp_data->objval;
+                  //get_x(lp_data);
+                  //Anahita
+                  can->intcpt[j] = lp_data->intcpt;
+
 #ifdef SENSITIVITY_ANALYSIS
-               if (p->par.sensitivity_analysis){      
-                  get_dj_pi(lp_data);
-		  if (p->par.sensitivity_rhs){
-		     can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
-		     memcpy(can->duals[j], lp_data->dualsol,
-			    DSIZE*p->base.cutnum);
-		     //Anahita
-		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
-			get_dual_farkas_ray(lp_data);
-			if (lp_data->raysol){
-			   can->rays[j] =
-			      (double *) malloc(DSIZE*p->base.cutnum);
-			   memcpy(can->rays[j], lp_data->raysol,
-				  DSIZE*p->base.cutnum);
-			}
-		     }
-		  }
-		  if (p->par.sensitivity_bounds){
-		     //Ted
-		     can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
-		     memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
-		  }
-	       }
+                  if (p->par.sensitivity_analysis){      
+                     get_dj_pi(lp_data);
+                     if (p->par.sensitivity_rhs){
+                        can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
+                        memcpy(can->duals[j], lp_data->dualsol,
+                              DSIZE*p->base.cutnum);
+                        //Anahita
+                        if (can->termcode[j] == LP_D_UNBOUNDED){ 
+                           get_dual_farkas_ray(lp_data);
+                           if (lp_data->raysol){
+                              can->rays[j] =
+                                 (double *) malloc(DSIZE*p->base.cutnum);
+                              memcpy(can->rays[j], lp_data->raysol,
+                                    DSIZE*p->base.cutnum);
+                           }
+                        }
+                     }
+                     if (p->par.sensitivity_bounds){
+                        //Ted
+                        can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
+                        memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
+                     }
+                  }
 #endif
 
-               if (can->termcode[j] == LP_OPTIMAL){
-                  /* is_feasible_u() fills up lp_data->x, too!! */
-                  switch (is_feasible_u(p, TRUE, FALSE)){
+                  if (can->termcode[j] == LP_OPTIMAL){
+                     /* is_feasible_u() fills up lp_data->x, too!! */
+                     switch (is_feasible_u(p, TRUE, FALSE)){
 
-                     /*NOTE: This is confusing but not all that citical...*/
-                     /*The "feasible" field is only filled out for the
-                       purposes of display (in vbctool) to keep track of
-                       where in the tree the feasible solutions were
-                       found. Since this may not be the actual candidate
-                       branched on, we need to pass this info on to whatever
-                       candidate does get branched on so the that the fact that
-                       a feasible solution was found in presolve can be recorded*/
+                        /*NOTE: This is confusing but not all that citical...*/
+                        /*The "feasible" field is only filled out for the
+                          purposes of display (in vbctool) to keep track of
+                          where in the tree the feasible solutions were
+                          found. Since this may not be the actual candidate
+                          branched on, we need to pass this info on to whatever
+                          candidate does get branched on so the that the fact that
+                          a feasible solution was found in presolve can be recorded*/
 
-                   case IP_FEASIBLE:
-                     can->termcode[j] = LP_OPT_FEASIBLE;
-                     can->feasible[j] = TRUE;
-                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-                        can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
-                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                        case IP_FEASIBLE:
+                           can->termcode[j] = LP_OPT_FEASIBLE;
+                           can->feasible[j] = TRUE;
+                           if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                              can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+                              memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                           }
+                           break;
+
+                        case IP_FEASIBLE_BUT_CONTINUE:
+                           can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
+                           can->feasible[j] = TRUE;
+                           if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                              can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+                              memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                           }
+                           break;
+
+                        default:
+                           break;
                      }
-                     break;
-
-                   case IP_FEASIBLE_BUT_CONTINUE:
-                     can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
-                     can->feasible[j] = TRUE;
-                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-                        can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
-                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                  } else if (can->termcode[j] == LP_D_OBJLIM || 
+                        can->termcode[j] == LP_D_UNBOUNDED ||
+                        can->termcode[j] == LP_D_INFEASIBLE){
+                     //p->bound_changes_in_iter++;
+                     switch (can->cdesc[j].sense){
+                        case 'L':
+                           /* decreasing the ub made the problem inf, so change lb */
+                           //lb = can->cdesc[j].rhs + 1;
+                           //vars[can->cdesc[j].position]->new_lb = lb;
+                           break;
+                        case 'G':
+                           //ub = can->cdesc[j].rhs - 1;
+                           //vars[can->cdesc[j].position]->new_ub = ub;
+                           break;
+                        case 'E':
+                           /* problem becomes infeasible */
+                           /* dont know what to do */
+                           break;
                      }
-                     break;
-
-                   default:
-                     break;
                   }
-               } else if (can->termcode[j] == LP_D_OBJLIM || 
-                     can->termcode[j] == LP_D_UNBOUNDED ||
-                     can->termcode[j] == LP_D_INFEASIBLE){
-                  //p->bound_changes_in_iter++;
-                  switch (can->sense[j]){
-                   case 'L':
-                     /* decreasing the ub made the problem inf, so change lb */
-                     //lb = can->rhs[j] + 1;
-                     //vars[can->position]->new_lb = lb;
-                     break;
-                   case 'G':
-                     //ub = can->rhs[j] - 1;
-                     //vars[can->position]->new_ub = ub;
-                     break;
-                   case 'E':
-                     /* problem becomes infeasible */
-                     /* dont know what to do */
-                     break;
-                  }
-               }
 #ifdef COMPILE_FRAC_BRANCHING
-               else{
+                  else{
+                     if (can->termcode[j] != LP_ABANDONED){
+                        //get_x(lp_data);
+                     }
+                  }
                   if (can->termcode[j] != LP_ABANDONED){
-                     //get_x(lp_data);
+                     xind = lp_data->tmp.i1; /* n */
+                     xval = lp_data->tmp.d; /* n */
+                     can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
+                     if (can->frac_num[j] > 0){
+                        can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
+                        can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
+                        memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
+                        memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
+                     }
+                  }else{
+                     can->frac_num[j] = 0;
                   }
-               }
-               if (can->termcode[j] != LP_ABANDONED){
-                  xind = lp_data->tmp.i1; /* n */
-                  xval = lp_data->tmp.d; /* n */
-                  can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
-                  if (can->frac_num[j] > 0){
-                     can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
-                     can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
-                     memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
-                     memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
-                  }
-               }else{
-                  can->frac_num[j] = 0;
-               }
 #endif
 #ifdef STATISTICS
-               if (can->termcode[j] == LP_D_ITLIM)
-                  itlim++;
+                  if (can->termcode[j] == LP_D_ITLIM)
+                     itlim++;
 #endif
-            }
-            change_lbub(lp_data, branch_var, lb, ub);
-            break;
+                  //                  }
+                  /* Changing back the bounds after presolving */
+                  change_lbub(lp_data, branch_var, lb, ub);
+                  break;
 
-          case CANDIDATE_CUT_IN_MATRIX:
-            branch_row = can->position;
-            for (j = 0; j < can->child_num; j++){
-               change_row(lp_data, branch_row,
-                     can->sense[j], can->rhs[j], can->range[j]);
-               check_ub(p);
-               /* The original basis is in lp_data->lpbas */
-               can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
-               p->lp_stat.lp_calls++;
-               p->lp_stat.str_br_lp_calls++;
-	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
-               can->objval[j] = lp_data->objval;
+            case CANDIDATE_CUT_IN_MATRIX:
+                  branch_row = can->cdesc[j].position;
+                  //                  for (j = 0; j < can->child_num; j++){
+                  change_row(lp_data, branch_row,
+                        can->cdesc[j].sense, can->cdesc[j].rhs, can->cdesc[j].range);
+                  check_ub(p);
+                  /* The original basis is in lp_data->lpbas */
+                  can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+                  p->lp_stat.lp_calls++;
+                  p->lp_stat.str_br_lp_calls++;
+                  p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
+                  can->objval[j] = lp_data->objval;
 
-	       //Anahita
-	       can->intcpt[j] = lp_data->intcpt;
+                  //get_x(lp_data);
+                  //Anahita
+                  can->intcpt[j] = lp_data->intcpt;
 
 #ifdef SENSITIVITY_ANALYSIS
-               if (p->par.sensitivity_analysis){      
-                  get_dj_pi(lp_data);
-		  if (p->par.sensitivity_rhs){
-		     can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
-		     memcpy(can->duals[j], lp_data->dualsol,
-			    DSIZE*p->base.cutnum);
-		     //Anahita
-		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
-			get_dual_farkas_ray(lp_data);
-			if (lp_data->raysol){
-			   can->rays[j] =
-			      (double *) malloc(DSIZE*p->base.cutnum);
-			   memcpy(can->rays[j], lp_data->raysol,
-				  DSIZE*p->base.cutnum);
-			}
-		     }
-		  }
-		  if (p->par.sensitivity_bounds){
-		     //Ted
-		     can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
-		     memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
-		  }
-	       }
+                  if (p->par.sensitivity_analysis){      
+                     get_dj_pi(lp_data);
+                     if (p->par.sensitivity_rhs){
+                        can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
+                        memcpy(can->duals[j], lp_data->dualsol,
+                              DSIZE*p->base.cutnum);
+                        //Anahita
+                        if (can->termcode[j] == LP_D_UNBOUNDED){ 
+                           get_dual_farkas_ray(lp_data);
+                           if (lp_data->raysol){
+                              can->rays[j] =
+                                 (double *) malloc(DSIZE*p->base.cutnum);
+                              memcpy(can->rays[j], lp_data->raysol,
+                                    DSIZE*p->base.cutnum);
+                           }
+                        }
+                     }
+                     if (p->par.sensitivity_bounds){
+                        //Ted
+                        can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
+                        memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
+                     }
+                  }
 #endif
 
-               if (can->termcode[j] == LP_OPTIMAL){
-                  /* is_feasible_u() fills up lp_data->x, too!! */
-                  switch (is_feasible_u(p, TRUE, FALSE)){
+                  if (can->termcode[j] == LP_OPTIMAL){
+                     /* is_feasible_u() fills up lp_data->x, too!! */
+                     switch (is_feasible_u(p, TRUE, FALSE)){
 
-                     /*NOTE: This is confusing but not all that citical...*/
-                     /*The "feasible" field is only filled out for the
-                       purposes of display (in vbctool) to keep track of
-                       where in the tree the feasible solutions were
-                       found. Since this may not be the actual candidate
-                       branched on, we need to pass this info on to whatever
-                       candidate does get branched on so the that the fact that
-                       a feasible solution was found in presolve can be recorded*/
+                        /*NOTE: This is confusing but not all that citical...*/
+                        /*The "feasible" field is only filled out for the
+                          purposes of display (in vbctool) to keep track of
+                          where in the tree the feasible solutions were
+                          found. Since this may not be the actual candidate
+                          branched on, we need to pass this info on to whatever
+                          candidate does get branched on so the that the fact that
+                          a feasible solution was found in presolve can be recorded*/
 
-                   case IP_FEASIBLE:
-                     can->termcode[j] = LP_OPT_FEASIBLE;
-                     can->feasible[j] = TRUE;
-                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-                        can->solutions[j] = (double *) malloc (DSIZE*
-                              lp_data->n);
-                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                        case IP_FEASIBLE:
+                           can->termcode[j] = LP_OPT_FEASIBLE;
+                           can->feasible[j] = TRUE;
+                           if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                              can->solutions[j] = (double *) malloc (DSIZE*
+                                    lp_data->n);
+                              memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                           }
+                           break;
+
+                        case IP_FEASIBLE_BUT_CONTINUE:
+                           can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
+                           can->feasible[j] = TRUE;
+                           if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                              can->solutions[j] = (double *) malloc (DSIZE*
+                                    lp_data->n);
+                              memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                           }
+                           break;
+
+                        default:
+                           break;
                      }
-                     break;
-
-                   case IP_FEASIBLE_BUT_CONTINUE:
-                     can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
-                     can->feasible[j] = TRUE;
-                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-                        can->solutions[j] = (double *) malloc (DSIZE*
-                              lp_data->n);
-                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-                     }
-                     break;
-
-                   default:
-                     break;
                   }
-               }
 #ifdef COMPILE_FRAC_BRANCHING
-               else{
-                  if (can->termcode[j] != LP_ABANDONED)
-                     //get_x(lp_data);
-               }
-               if (can->termcode[j] != LP_ABANDONED){
-                  xind = lp_data->tmp.i1; /* n */
-                  xval = lp_data->tmp.d; /* n */
-                  can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
-                  if (can->frac_num[j] > 0){
-                     can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
-                     can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
-                     memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
-                     memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
+                  else{
+                     if (can->termcode[j] != LP_ABANDONED)
+                        //get_x(lp_data);
                   }
-               }else{
-                  can->frac_num[j] = 0;
-               }
+                  if (can->termcode[j] != LP_ABANDONED){
+                     xind = lp_data->tmp.i1; /* n */
+                     xval = lp_data->tmp.d; /* n */
+                     can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
+                     if (can->frac_num[j] > 0){
+                        can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
+                        can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
+                        memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
+                        memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
+                     }
+                  }else{
+                     can->frac_num[j] = 0;
+                  }
 #endif
 #ifdef STATISTICS
-               if (can->termcode[j] == LP_D_ITLIM)
-                  itlim++;
+                  if (can->termcode[j] == LP_D_ITLIM)
+                     itlim++;
 #endif
-            }
-            cut = rows[branch_row].cut;
-            change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
-            free_row_set(lp_data, 1, &branch_row);
-            break;
-         }
+                  //                  }
+                  cut = rows[branch_row].cut;
+                  /* Changing back after presolving */
+                  change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
+                  free_row_set(lp_data, 1, &branch_row);
+                  break;
 
-         switch ((j = compare_candidates_u(p, oldobjval, best_can, can))){
-          case FIRST_CANDIDATE_BETTER:
-          case FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
+         } /* end of switch(can->cdesc[j].type) */
+      } /* end of for loop over child_num */
+
+      switch ((j = compare_candidates_u(p, oldobjval, best_can, can))){
+         case FIRST_CANDIDATE_BETTER:
+         case FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
             if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
                min_ind = -1;
                for (k = can->child_num - 1; k >= 0; k--){
@@ -1939,8 +1954,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             }
             free_candidate(candidates + i);
             break;
-          case SECOND_CANDIDATE_BETTER:
-          case SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
+         case SECOND_CANDIDATE_BETTER:
+         case SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
 #ifndef MAX_CHILDREN_NUM
             if (best_can == NULL){
                pobj  = objval;
@@ -2004,23 +2019,25 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             best_can = can;
             candidates[i] = NULL;
             break;
-         }
-         if ((j & BRANCH_ON_IT)){
+      } /* end of switch(j = compare_candidates_u(.)) */
+
+      if ((j & BRANCH_ON_IT)){
+         break;
+      }
+      st_time += used_time(&total_time);
+
+      if (p->par.limit_strong_branching_time){
+         should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
+               &should_continue);
+         if (should_continue==FALSE) {
+            PRINT(p->par.verbosity, 2, 
+                  ("too much time in strong branching, breaking\n"));
             break;
          }
-         st_time += used_time(&total_time);
-
-         if (p->par.limit_strong_branching_time){
-	    should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
-					     &should_continue);
-	    if (should_continue==FALSE) {
-	       PRINT(p->par.verbosity, 2, 
-		     ("too much time in strong branching, breaking\n"));
-	       break;
-	    }
-         }
       }
-   }
+   } /* end of for loop on i for cand_num */
+   } /* end of default symphony branching rule */
+
    //printf ("total_iters = %d \n",total_iters);
    //printf ("candidates evaluated = %d \n",i);
 
@@ -2031,24 +2048,25 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       load_basis(lp_data, cstat, rstat);
    }
    set_itlim(lp_data, -1);
-	    
+
 #if 0
+   // TODO: did not convert this block of code into new structure for best_can 
    if (best_can->type == CANDIDATE_VARIABLE &&
-       vars[best_can->position]->lb == vars[best_can->position]->ub){
+         vars[best_can->position]->lb == vars[best_can->position]->ub){
       printf("Error -- branching variable is already fixed. \n");
       printf("SYMPHONY has encountered numerical difficulties \n");
       printf("with the LP solver. Exiting...\n\n");
    }
-   
+
    if (best_can->type == CANDIDATE_VARIABLE &&
-       best_can->rhs[0] < vars[best_can->position]->lb ||
-       best_can->rhs[1] > vars[best_can->position]->ub){
+         best_can->rhs[0] < vars[best_can->position]->lb ||
+         best_can->rhs[1] > vars[best_can->position]->ub){
       printf("Warning -- possible illegal branching. \n");
       printf("SYMPHONY has encountered possible numerical difficulties \n");
       printf("with the LP solver. Exiting...\n\n");
    }
 #endif
-   
+
 #ifndef MAX_CHILDREN_NUM
    FREE(pobj); FREE(pterm); FREE(pfeas); FREE(piter);
 #  ifdef COMPILE_FRAC_BRANCHING
@@ -2065,7 +2083,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 #ifdef STATISTICS
    PRINT(p->par.verbosity, 5,
-	 ("Itlim reached %i times out of %i .\n\n", itlim, cnum));
+         ("Itlim reached %i times out of %i .\n\n", itlim, cnum));
 #endif
 
    if (should_use_rel_br != TRUE) {
@@ -2080,26 +2098,26 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       indices = lp_data->tmp.i1;
       values = lp_data->tmp.d;
       for (k = best_can->child_num - 1; k >= 0; k--){
-	 if (best_can->feasible[k]){
-	    best_can->sol_sizes[k] = collect_nonzeros(p, 
-						      best_can->solutions[k],
-						     indices, values);
-	    FREE(best_can->solutions[k]);
-	    best_can->sol_inds[k] = (int *) malloc(best_can->sol_sizes[k]* 
-						   ISIZE);
-	    best_can->solutions[k] = (double *) malloc(best_can->sol_sizes[k]* 
-						       DSIZE);
-	    memcpy(best_can->sol_inds[k], indices, best_can->sol_sizes[k] * 
-		   ISIZE);
-	    memcpy(best_can->solutions[k], values, best_can->sol_sizes[k]* 
-		   DSIZE);
-	    break;
-	 }
+         if (best_can->feasible[k]){
+            best_can->sol_sizes[k] = collect_nonzeros(p, 
+                  best_can->solutions[k],
+                  indices, values);
+            FREE(best_can->solutions[k]);
+            best_can->sol_inds[k] = (int *) malloc(best_can->sol_sizes[k]* 
+                  ISIZE);
+            best_can->solutions[k] = (double *) malloc(best_can->sol_sizes[k]* 
+                  DSIZE);
+            memcpy(best_can->sol_inds[k], indices, best_can->sol_sizes[k] * 
+                  ISIZE);
+            memcpy(best_can->solutions[k], values, best_can->sol_sizes[k]* 
+                  DSIZE);
+            break;
+         }
       }
    }
 
    *candidate = best_can;
-   
+
    p->comp_times.strong_branching += used_time(&p->tt);
    send_node_desc(p, NODE_BRANCHED_ON);
    p->comp_times.communication += used_time(&p->tt);
@@ -2144,6 +2162,7 @@ int branch(lp_prob *p, int cuts)
    /*------------------------------------------------------------------------*\
     * Now we evaluate can, the best of the candidates.
    \*------------------------------------------------------------------------*/
+   // TODO: Would size of action be an issue in future?
    action = lp_data->tmp.c; /* n (good estimate... can->child_num) */
    if ((termcode = select_child_u(p, can, action)) < 0)
       return(termcode);
@@ -2166,114 +2185,125 @@ int branch(lp_prob *p, int cuts)
    }
 
    desc = p->desc;
-   switch (can->type){
-    case CANDIDATE_VARIABLE:
-      p->branch_var = can->position;
-      p->branch_dir = can->sense[keep];
-      var = lp_data->vars[branch_var = can->position];
-      switch (can->sense[keep]){
-       case 'E':
-	 var->new_lb = var->new_ub = can->rhs[keep];
-	 var->lb = var->ub = can->rhs[keep];                             break;
-       case 'R':
-	 var->new_lb = can->rhs[keep]; 
-         var->new_ub = var->lb + can->range[keep];
-	 var->lb = can->rhs[keep]; var->ub = var->lb + can->range[keep]; break;
-       case 'L':
-	 var->new_ub = can->rhs[keep];
-	 var->ub = can->rhs[keep];                                       break;
-       case 'G':
-	 var->new_lb = can->rhs[keep];
-	 var->lb = can->rhs[keep];                                       break;
-      }
-      //printf("branching on %i %c %f %f\n", branch_var, can->sense[keep], var->lb, var->ub);
-      change_col(lp_data, branch_var, can->sense[keep], var->lb, var->ub);
-      lp_data->status[branch_var] |= VARIABLE_BRANCHED_ON;
-      break;
-    case SOS1_IMPLICIT:
-      for(int j = 0; j < can->sos_cnt[keep]; j++){
-	 branch_var = can->sos_ind[keep][j];
-	 change_ub(lp_data, branch_var, 0.0);
-	 lp_data->vars[branch_var]->new_ub = 0.0;
-	 lp_data->vars[branch_var]->ub = 0.0;
-	 //printf("%i ", branch_var);
-	 lp_data->status[branch_var] |= VARIABLE_BRANCHED_ON;
-      }
-      //printf("\n");
-      break;
-    case CANDIDATE_CUT_IN_MATRIX:
-      branch_row = can->position;
-      cut = lp_data->rows[branch_row].cut;
-      /* To maintain consistency with TM we have to fix a few more things if
-	 we had a non-base, new branching cut */
-      if (branch_row >= p->base.cutnum && !(cut->branch & CUT_BRANCHED_ON)){
-	 /* insert cut->name into p->desc.cutind.list, and insert SLACK_BASIC
-	    to the same position in p->desc.basis.extrarows.stat */
+   // TODO: Suresh: added following line since send_branching_info:
+   // generate_children: purge_pruned_nodes is partially modifying bobj of
+   // parent of current node, partially modifying action[], and partially
+   // modifying can. Due to such partial modifications, instance solving is 
+   // erratic, I think.
+   // Source: test run on sample7.mps in USER application.
+   *can = p->tm->active_nodes[p->proc_index]->parent->bobj;
+   switch (can->cdesc[keep].type){
+      case CANDIDATE_VARIABLE:
+         p->branch_var = can->cdesc[keep].position;
+         p->branch_dir = can->cdesc[keep].sense;
+         var = lp_data->vars[branch_var = can->cdesc[keep].position];
+         switch (can->cdesc[keep].sense){
+            case 'E':
+               var->new_lb = var->new_ub = can->cdesc[keep].rhs;
+               var->lb = var->ub = can->cdesc[keep].rhs;
+               break;
+            case 'R':
+               var->new_lb = can->cdesc[keep].rhs; 
+               var->new_ub = var->lb + can->cdesc[keep].range;
+               var->lb = can->cdesc[keep].rhs; var->ub = var->lb + can->cdesc[keep].range;
+               break;
+            case 'L':
+               var->new_ub = can->cdesc[keep].rhs;
+               var->ub = can->cdesc[keep].rhs;
+               break;
+            case 'G':
+               var->new_lb = can->cdesc[keep].rhs;
+               var->lb = can->cdesc[keep].rhs;
+               break;
+         }
+         //printf("branching on %i %c %f %f\n", branch_var, can->sense[keep], var->lb, var->ub);
+         change_col(lp_data, branch_var, can->cdesc[keep].sense, var->lb, var->ub);
+         lp_data->status[branch_var] |= VARIABLE_BRANCHED_ON;
+         break;
+      case SOS1_IMPLICIT:
+         for(int j = 0; j < can->cdesc[keep].sos_cnt; j++){
+            branch_var = can->cdesc[keep].sos_ind[j];
+            change_ub(lp_data, branch_var, 0.0);
+            lp_data->vars[branch_var]->new_ub = 0.0;
+            lp_data->vars[branch_var]->ub = 0.0;
+            //printf("%i ", branch_var);
+            lp_data->status[branch_var] |= VARIABLE_BRANCHED_ON;
+         }
+         //printf("\n");
+         break;
+      case CANDIDATE_CUT_IN_MATRIX:
+         branch_row = can->cdesc[keep].position;
+         cut = lp_data->rows[branch_row].cut;
+         /* To maintain consistency with TM we have to fix a few more things if
+            we had a non-base, new branching cut */
+         if (branch_row >= p->base.cutnum && !(cut->branch & CUT_BRANCHED_ON)){
+            /* insert cut->name into p->desc.cutind.list, and insert SLACK_BASIC
+               to the same position in p->desc.basis.extrarows.stat */
 #ifdef DO_TESTS
-	 if (desc->cutind.size != desc->basis.extrarows.size){
-	    printf("Oops! desc.cutind.size != desc.basis.extrarows.size! \n");
-	    exit(-123);
-	 }
+            if (desc->cutind.size != desc->basis.extrarows.size){
+               printf("Oops! desc.cutind.size != desc.basis.extrarows.size! \n");
+               exit(-123);
+            }
 #endif
 #ifdef COMPILE_IN_LP
-	 /* Because these cuts are shared with the treemanager, we have to
-	    make a copy before changing them if the LP is compiled in */
-	 cut = (cut_data *) malloc(sizeof(cut_data));
-	 memcpy((char *)cut, (char *)lp_data->rows[branch_row].cut,
-		sizeof(cut_data));
-	 if (cut->size){
-	    cut->coef = (char *) malloc(cut->size);
-	    memcpy((char *)cut->coef,
-		   (char *)lp_data->rows[branch_row].cut->coef, cut->size);
-	 }
-	 lp_data->rows[branch_row].cut = cut;
+            /* Because these cuts are shared with the treemanager, we have to
+               make a copy before changing them if the LP is compiled in */
+            cut = (cut_data *) malloc(sizeof(cut_data));
+            memcpy((char *)cut, (char *)lp_data->rows[branch_row].cut,
+                  sizeof(cut_data));
+            if (cut->size){
+               cut->coef = (char *) malloc(cut->size);
+               memcpy((char *)cut->coef,
+                     (char *)lp_data->rows[branch_row].cut->coef, cut->size);
+            }
+            lp_data->rows[branch_row].cut = cut;
 #endif
-	 if (desc->cutind.size == 0){
-	    desc->cutind.size = 1;
-	    desc->cutind.list = (int *) malloc(ISIZE);
-	    desc->cutind.list[0] = cut->name;
-	    desc->basis.extrarows.size = 1; /* this must have been 0, too */
-	    desc->basis.extrarows.stat = (int *) malloc(ISIZE);
-	    desc->basis.extrarows.stat[0] = SLACK_BASIC;
-	 }else{
-	    int i, name = cut->name;
-	    int *list;
-	    int *stat;
-	    /* most of the time the one extra element will fit into the
-	       already allocated memory chunk, so it's worth to realloc */
-	    desc->cutind.size++;
-	    list = desc->cutind.list =
-	       (int *) realloc(desc->cutind.list, desc->cutind.size * ISIZE);
-	    desc->basis.extrarows.size++;
-	    stat = desc->basis.extrarows.stat =
-	       (int *) realloc(desc->basis.extrarows.stat,
-			       desc->cutind.size * ISIZE);
-	    for (i = desc->cutind.size - 1; i > 0; i--){
+            if (desc->cutind.size == 0){
+               desc->cutind.size = 1;
+               desc->cutind.list = (int *) malloc(ISIZE);
+               desc->cutind.list[0] = cut->name;
+               desc->basis.extrarows.size = 1; /* this must have been 0, too */
+               desc->basis.extrarows.stat = (int *) malloc(ISIZE);
+               desc->basis.extrarows.stat[0] = SLACK_BASIC;
+            }else{
+               int i, name = cut->name;
+               int *list;
+               int *stat;
+               /* most of the time the one extra element will fit into the
+                  already allocated memory chunk, so it's worth to realloc */
+               desc->cutind.size++;
+               list = desc->cutind.list =
+                  (int *) realloc(desc->cutind.list, desc->cutind.size * ISIZE);
+               desc->basis.extrarows.size++;
+               stat = desc->basis.extrarows.stat =
+                  (int *) realloc(desc->basis.extrarows.stat,
+                        desc->cutind.size * ISIZE);
+               for (i = desc->cutind.size - 1; i > 0; i--){
 #ifdef DO_TESTS
-	       if (name == list[i-1]){
-		  printf("Oops! name == desc.cutind.list[i] !\n");
-		  exit(-124);
-	       }
+                  if (name == list[i-1]){
+                     printf("Oops! name == desc.cutind.list[i] !\n");
+                     exit(-124);
+                  }
 #endif
-	       if (name < list[i-1]){
-		  list[i] = list[i-1];
-		  stat[i] = stat[i-1];
-	       }else{
-		  break;
-	       }
-	    }
-	    list[i] = name;
-	    stat[i] = SLACK_BASIC;
-	 }
-      }
-      cut->rhs = can->rhs[keep];
-      if ((cut->sense = can->sense[keep]) == 'R')
-	 cut->range = can->range[keep];
-      cut->branch = CUT_BRANCHED_ON | can->branch[keep];
-      constrain_row_set(lp_data, 1, &branch_row);
-      lp_data->rows[branch_row].free = FALSE;
-      break;
-   }
+                  if (name < list[i-1]){
+                     list[i] = list[i-1];
+                     stat[i] = stat[i-1];
+                  }else{
+                     break;
+                  }
+               }
+               list[i] = name;
+               stat[i] = SLACK_BASIC;
+            }
+         }
+         cut->rhs = can->cdesc[keep].rhs;
+         if ((cut->sense = can->cdesc[keep].sense) == 'R')
+            cut->range = can->cdesc[keep].range;
+         cut->branch = CUT_BRANCHED_ON | can->cdesc[keep].branch;
+         constrain_row_set(lp_data, 1, &branch_row);
+         lp_data->rows[branch_row].free = FALSE;
+         break;
+   } // End of can->type switch statement
 
    /* Since this is a child we dived into, we know that TM stores the stati of
       extra vars/rows wrt the parent */
@@ -2362,16 +2392,16 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
    
    for (i = lp_data->n-1; i >= 0; i--){
       if (vars[i]->is_int){
-	 if (x[i] > vars[i]->new_lb && x[i] < vars[i]->new_ub){
-	    fracx = x[i] - floor(x[i]);
-	    if (fracx > lpetol100 && fracx < lpetol1){
-	       xind[cnt] = i;
-	       int collen = matrixByCol->getVectorSize(i);
-	       //xval[cnt++] = fabs(fracx - .5);
-	       xval[cnt++] = -collen*(0.5 - fabs(fracx - .5));
-	       frac_avg += 0.5 - fabs(fracx - .5); 
-	    }
-	 }
+         if (x[i] > vars[i]->new_lb && x[i] < vars[i]->new_ub){
+            fracx = x[i] - floor(x[i]);
+            if (fracx > lpetol100 && fracx < lpetol1){
+               xind[cnt] = i;
+               int collen = matrixByCol->getVectorSize(i);
+               //xval[cnt++] = fabs(fracx - .5);
+               xval[cnt++] = -collen*(0.5 - fabs(fracx - .5));
+               frac_avg += 0.5 - fabs(fracx - .5); 
+            }
+         }
       }
       *cand_num = cnt;
    }
@@ -2384,11 +2414,13 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
    if (should_use_rel_br == TRUE) {
       *candidates = (branch_obj **) malloc(1 * sizeof(branch_obj *));
       cand = (*candidates)[0] = (branch_obj *) calloc(1, sizeof(branch_obj) );
-      cand->type = CANDIDATE_VARIABLE;
       cand->child_num = 2;
-      cand->sense[0] = 'L';
-      cand->sense[1] = 'G';
-      cand->range[0] = cand->range[1] = 0;
+      for (j = 0; j < cand->child_num; j++) {
+         cand->cdesc[j].type = CANDIDATE_VARIABLE;
+      }
+      cand->cdesc[0].sense = 'L';
+      cand->cdesc[1].sense = 'G';
+      cand->cdesc[0].range = cand->cdesc[1].range = 0;
       qsort_di(xval, xind, cnt);
    } else {
       qsort_di(xval, xind, cnt);
@@ -2415,14 +2447,16 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
          *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
       for (i=*cand_num-1; i>=0; i--){
          cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
-         cand->type = CANDIDATE_VARIABLE;
          cand->child_num = 2;
-         cand->position = xind[i];
-         cand->sense[0] = 'L';
-         cand->sense[1] = 'G';
-         cand->rhs[0] = floor(x[xind[i]]);
-         cand->rhs[1] = cand->rhs[0] + 1;
-         cand->range[0] = cand->range[1] = 0;
+         for (j = 0; j < cand->child_num; j++) {
+            cand->cdesc[j].type = CANDIDATE_VARIABLE;
+            cand->cdesc[j].position = xind[i];
+         }
+         cand->cdesc[0].sense = 'L';
+         cand->cdesc[1].sense = 'G';
+         cand->cdesc[0].rhs = floor(x[xind[i]]);
+         cand->cdesc[1].rhs = cand->cdesc[0].rhs + 1;
+         cand->cdesc[0].range = cand->cdesc[1].range = 0;
       }
    }
 }
@@ -2449,20 +2483,20 @@ void branch_close_to_half_and_expensive(lp_prob *p, int max_cand_num,
    for (i = lp_data->n-1; i >= 0; i--){
       fracx = x[i] - floor(x[i]);
       if (fracx > lpetol && fracx < lpetol1){
-	 xind[cnt] = i;
-	 xval[cnt++] = fabs(fracx - .5);
-       }
+         xind[cnt] = i;
+         xval[cnt++] = fabs(fracx - .5);
+      }
    }
    
    qsort_di(xval, xind, cnt);
 
    for (j=0, i=0; i<cnt; i++){
       if (xval[i] > lim[j]){
-	 if (i == 0){
-	    j++; continue;
-	 }else{
-	    break;
-	 }
+         if (i == 0){
+            j++; continue;
+         }else{
+            break;
+         }
       }
    }
    cnt = i;
@@ -2471,8 +2505,8 @@ void branch_close_to_half_and_expensive(lp_prob *p, int max_cand_num,
       *cand_num = cnt;
    }else{
       for (i=cnt-1; i>=0; i--){
-	 get_objcoef(p->lp_data, xind[i], xval+i);
-	 xval[i] *= -1;
+         get_objcoef(p->lp_data, xind[i], xval+i);
+         xval[i] *= -1;
       }
       qsort_di(xval, xind, cnt);
       *cand_num = max_cand_num;
@@ -2482,14 +2516,16 @@ void branch_close_to_half_and_expensive(lp_prob *p, int max_cand_num,
       *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
    for (i=*cand_num-1; i>=0; i--){
       cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
-      cand->type = CANDIDATE_VARIABLE;
       cand->child_num = 2;
-      cand->position = xind[i];
-      cand->sense[0] = 'L';
-      cand->sense[1] = 'G';
-      cand->rhs[0] = floor(x[xind[i]]);
-      cand->rhs[1] = cand->rhs[0] + 1;
-      cand->range[0] = cand->range[1] = 0;
+      for (j = 0; j < cand->child_num; j++) {
+         cand->cdesc[j].type = CANDIDATE_VARIABLE;
+         cand->cdesc[j].position = xind[i];
+      }
+      cand->cdesc[0].sense = 'L';
+      cand->cdesc[1].sense = 'G';
+      cand->cdesc[0].rhs = floor(x[xind[i]]);
+      cand->cdesc[1].rhs = cand->cdesc[0].rhs + 1;
+      cand->cdesc[0].range = cand->cdesc[1].range = 0;
    }
 }
 
@@ -2514,19 +2550,19 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
    /* first get the fractional values */
    for (i = lp_data->n-1; i >= 0; i--){
       if (x[i] > lpetol && x[i] < lpetol1){
-	 xind[cnt] = i;
-	 xval[cnt++] = 1 - x[i];
+         xind[cnt] = i;
+         xval[cnt++] = 1 - x[i];
       }
    }
    qsort_di(xval, xind, cnt);
 
    for (j=0, i=0; i<cnt; i++){
       if (xval[i] > lim[j]){
-	 if (i == 0){
-	    j++; continue;
-	 }else{
-	    break;
-	 }
+         if (i == 0){
+            j++; continue;
+         }else{
+            break;
+         }
       }
    }
    cnt = i;
@@ -2535,7 +2571,7 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
       *cand_num = cnt;
    }else{
       for (i=cnt-1; i>=0; i--){
-	 get_objcoef(p->lp_data, xind[i], xval+i);
+         get_objcoef(p->lp_data, xind[i], xval+i);
       }
       qsort_di(xval, xind, cnt);
       *cand_num = max_cand_num;
@@ -2545,14 +2581,16 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
       *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
    for (i=*cand_num-1; i>=0; i--){
       cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
-      cand->type = CANDIDATE_VARIABLE;
       cand->child_num = 2;
-      cand->position = xind[i];
-      cand->sense[0] = 'L';
-      cand->sense[1] = 'G';
-      cand->rhs[0] = floor(x[xind[i]]);
-      cand->rhs[1] = cand->rhs[0] + 1;
-      cand->range[0] = cand->range[1] = 0;
+      for (j = 0; j < cand->child_num; j++) {
+         cand->cdesc[j].type = CANDIDATE_VARIABLE;
+         cand->cdesc[j].position = xind[i];
+      }
+      cand->cdesc[0].sense = 'L';
+      cand->cdesc[1].sense = 'G';
+      cand->cdesc[0].rhs = floor(x[xind[i]]);
+      cand->cdesc[1].rhs = cand->cdesc[0].rhs + 1;
+      cand->cdesc[0].range = cand->cdesc[1].range = 0;
    }
 }
 
@@ -2561,6 +2599,9 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue)
 {
+   // Suresh: added temporarily to eliminate any randomness
+   return TRUE;
+
    double allowed_time = 0;
    *should_continue = TRUE;
    int min_cands;
@@ -3036,8 +3077,3 @@ int prep_tighten_bounds(LPdata *lp_data, //int cand_num, int *cand_ind,
    
    return PREP_MODIFIED;
 }
-      
-   
-
-   
-   

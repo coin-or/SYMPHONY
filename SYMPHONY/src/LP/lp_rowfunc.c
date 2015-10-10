@@ -433,22 +433,22 @@ int compute_violations(lp_prob *p, int new_row_num, waiting_row **new_rows)
       matind = wrow->matind;
       matval = wrow->matval;
       for (lhs=0, j = wrow->nzcnt-1; j>=0; j--)
-	 lhs += matval[j] * x[matind[j]];
+         lhs += matval[j] * x[matind[j]];
       cut = wrow->cut;
       switch (cut->sense){
-       case 'L': wrow->violation = lhs - cut->rhs;       break;
-       case 'G': wrow->violation = cut->rhs - lhs;       break;
-       case 'E': wrow->violation = fabs(lhs - cut->rhs); break;
-       case 'R':
-	 wrow->violation =
-	    lhs < cut->rhs ? cut->rhs - lhs : lhs - cut->rhs - cut->range;
-	 break;
+         case 'L': wrow->violation = lhs - cut->rhs;       break;
+         case 'G': wrow->violation = cut->rhs - lhs;       break;
+         case 'E': wrow->violation = fabs(lhs - cut->rhs); break;
+         case 'R':
+                   wrow->violation =
+                      lhs < cut->rhs ? cut->rhs - lhs : lhs - cut->rhs - cut->range;
+                   break;
       }
       if  (wrow->violation < lpetol){
-	 free_waiting_row(new_rows+i);
-	 new_rows[i] = new_rows[--new_row_num];
+         free_waiting_row(new_rows+i);
+         new_rows[i] = new_rows[--new_row_num];
       }else{
-	 i++;
+         i++;
       }
    }
    return(new_row_num);
@@ -460,12 +460,12 @@ void compress_slack_cuts(lp_prob *p)
 {
    int i, snum = p->slack_cut_num;
    cut_data **slack_cuts = p->slack_cuts;
-   
+
    for (i=0; i<snum; ){
       if (slack_cuts[i] == NULL){
-	 slack_cuts[i] = slack_cuts[--snum];
+         slack_cuts[i] = slack_cuts[--snum];
       }else{
-	 i++;
+         i++;
       }
    }
    p->slack_cut_num = snum;

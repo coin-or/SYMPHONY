@@ -854,9 +854,9 @@ void send_node_desc(lp_prob *p, int node_type)
 	       char branch_dir='M';
 	       if (n->bc_index>0) {
 		  if (n->parent->children[0]==n) {
-		     branch_dir = n->parent->bobj.sense[0];
+		     branch_dir = n->parent->bobj.cdesc[0].sense;
 		  } else {
-		     branch_dir = n->parent->bobj.sense[1];
+		     branch_dir = n->parent->bobj.cdesc[1].sense;
 		  }
 		  if (branch_dir == 'G') {
 		     branch_dir = 'R';
@@ -1474,10 +1474,15 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 #ifndef COMPILE_IN_LP
    int s_bufid, r_bufid, name;
 #endif
-   int i = 0, pos = can->position;
+   int i = 0, j;
    cut_data *brcut;
    char dive = p->dive, olddive = p->dive;
    char fractional_dive = FALSE;
+   int *position;
+   position = (int *) malloc(can->child_num * ISIZE);
+   for (j = 0; j < can->child_num; j++) {
+      position[j] = can->cdesc[j].position;
+   }
 
 #ifdef COMPILE_IN_LP
    tm_prob *tm = p->tm;
@@ -1491,60 +1496,67 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    //to transfer ownership and avoid a double free
    can->solutions = NULL;
 
-   switch (can->type){
-    case CANDIDATE_VARIABLE:
-      bobj->name = pos < p->base.varnum ?
-         - pos - 1 : lp_data->vars[pos]->userind;
-      break;
-    case CANDIDATE_CUT_IN_MATRIX:
-      brcut = lp_data->rows[pos].cut;
-      bobj->name = pos < p->base.cutnum ?
-	 - pos - 1 : (brcut->name < 0 ? - p->base.cutnum - 1 : brcut->name);
-      i = (brcut->branch & CUT_BRANCHED_ON) ? FALSE : TRUE;
-      if ( (old_cut_name = bobj->name) == -tm->bcutnum-1){
-	 bobj->name = add_cut_to_list(tm, lp_data->rows[pos].cut);
+   for (j = 0; j < can->child_num; j++) {
+      switch (can->cdesc[j].type){
+         case CANDIDATE_VARIABLE:
+            bobj->cdesc[j].name = position[j] < p->base.varnum ?
+               - position[j] - 1 : lp_data->vars[position[j]]->userind;
+            break;
+         case CANDIDATE_CUT_IN_MATRIX:
+            brcut = lp_data->rows[position[j]].cut;
+            bobj->cdesc[j].name = position[j] < p->base.cutnum ?
+               - position[j] - 1 : (brcut->name < 0 ? - p->base.cutnum - 1 : 
+                     brcut->name);
+            // TODO: confirm the effect of redundant addition here
+            i = (brcut->branch & CUT_BRANCHED_ON) ? FALSE : TRUE;
+            if ( (old_cut_name = bobj->cdesc[j].name) == -tm->bcutnum-1){
+               bobj->cdesc[j].name = add_cut_to_list(tm, 
+                     lp_data->rows[position[j]].cut);
+            }
+            break;
       }
-      break;
    }
+
 
 #ifdef COMPILE_FRAC_BRANCHING
    if (can->frac_num[*keep]<((double)lp_data->n)*p->par.fractional_diving_ratio
-       || can->frac_num[*keep] < p->par.fractional_diving_num){
+         || can->frac_num[*keep] < p->par.fractional_diving_num){
       dive = DO_DIVE;
       fractional_dive = TRUE;
    }
 #endif
-      
+
    dive = generate_children(tm, node, bobj, can->objval, can->feasible,
-			    action, dive, keep, i);
+         action, dive, keep, i);
 
    if (*keep >= 0 && (p->dive == CHECK_BEFORE_DIVE || p->dive == DO_DIVE)){
-#ifndef MAX_CHILDREN_NUM
-      node->bobj.sense = malloc(node->bobj.child_num);
-      node->bobj.rhs = (double *) malloc(node->bobj.child_num * DSIZE);
-      node->bobj.range = (double *) malloc(node->bobj.child_num * DSIZE);
-      node->bobj.branch = (int *) malloc(node->bobj.child_num * ISIZE);
-      memcpy(node->bobj.sense, bobj->sense, bobj->child_num);
-      memcpy((char *)node->bobj.rhs, (char *)bobj->rhs, bobj->child_num*DSIZE);
-      memcpy((char *)node->bobj.range, (char *)bobj->range, bobj->child_num*DSIZE);
-      memcpy((char *)node->bobj.branch, (char *)bobj->branch, bobj->child_num*ISIZE);
-#endif   
+//#ifndef MAX_CHILDREN_NUM
+//      node->bobj.sense = malloc(node->bobj.child_num);
+//      node->bobj.rhs = (double *) malloc(node->bobj.child_num * DSIZE);
+//      node->bobj.range = (double *) malloc(node->bobj.child_num * DSIZE);
+//      node->bobj.branch = (int *) malloc(node->bobj.child_num * ISIZE);
+//      memcpy(node->bobj.sense, bobj->sense, bobj->child_num);
+//      memcpy((char *)node->bobj.rhs, (char *)bobj->rhs, bobj->child_num*DSIZE);
+//      memcpy((char *)node->bobj.range, (char *)bobj->range, bobj->child_num*DSIZE);
+//      memcpy((char *)node->bobj.branch, (char *)bobj->branch, bobj->child_num*ISIZE);
+//#endif   
       p->dive = fractional_dive ? olddive : dive;
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE /*next time*/){
-	 /* get the new node index */
-	 p->bc_index = node->children[*keep]->bc_index;
-	 if (node->bobj.type == CANDIDATE_CUT_IN_MATRIX &&
-	     bobj->name == -p->base.cutnum-1){
-	    /* in this case we must have a branching cut */
-	    lp_data->rows[pos].cut->name = bobj->name;
-	    PRINT(p->par.verbosity, 4,
-		  ("The real cut name is %i \n",lp_data->rows[pos].cut->name));
-	 }
-	 node->children[*keep]->cg = node->cg;	 
-	 tm->active_nodes[p->proc_index] = node->children[*keep];
-	 PRINT(p->par.verbosity, 1, ("Decided to dive...\n"));
+         /* get the new node index */
+         p->bc_index = node->children[*keep]->bc_index;
+         // TODO: Is a for loop required on child_num instead of *keep below?
+         if (node->bobj.cdesc[*keep].type == CANDIDATE_CUT_IN_MATRIX &&
+               bobj->cdesc[*keep].name == -p->base.cutnum-1){
+            /* in this case we must have a branching cut */
+            lp_data->rows[position[*keep]].cut->name = bobj->cdesc[*keep].name;
+            PRINT(p->par.verbosity, 4,
+                  ("The real cut name is %i \n",lp_data->rows[position[*keep]].cut->name));
+         }
+         node->children[*keep]->cg = node->cg;
+         tm->active_nodes[p->proc_index] = node->children[*keep];
+         PRINT(p->par.verbosity, 1, ("Decided to dive...\n"));
       }else{
-	 PRINT(p->par.verbosity, 1, ("Decided not to dive...\n"));
+         PRINT(p->par.verbosity, 1, ("Decided not to dive...\n"));
       }
    }
    if (*keep < 0){
@@ -1554,51 +1566,60 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 #else
 
    s_bufid = init_send(DataInPlace);
+
+   // Suresh: relocated following 2 lines from just after #endif below.
+   /* Number of descendants */
+   send_int_array(&can->child_num, 1);
+
    /* Type of the object */
-   send_char_array(&can->type, 1);
-   switch (can->type){
-    case CANDIDATE_VARIABLE:
-      /* For branching variable pack only the name */
-      name = pos < p->base.varnum ? - pos - 1 : lp_data->vars[pos]->userind;
-      send_int_array(&name, 1);
-      break;
-    case CANDIDATE_CUT_IN_MATRIX:
-      /* For branching cut pack the name, whether it is a new branching cut
-	 and if necessary the cut itself. */
-      brcut = lp_data->rows[pos].cut;
-      name = pos < p->base.cutnum ?
-	 - pos - 1 : (brcut->name < 0 ? - p->base.cutnum - 1 : brcut->name);
-      send_int_array(&name, 1);
-      i = (brcut->branch & CUT_BRANCHED_ON) ? FALSE : TRUE;
-      send_int_array(&i, 1);
-      if (name == - p->base.cutnum - 1)
-	 /* a branching cut without name. Pack the cut, too.*/
-	 pack_cut(lp_data->rows[pos].cut);
-      break;
+   for (j = 0; j < can->child_num; j++) {
+      send_char_array(&can->cdesc[j].type, 1);
+      switch (can->cdesc[j].type){
+         case CANDIDATE_VARIABLE:
+            /* For branching variable pack only the name */
+            name = position[j] < p->base.varnum ? - position[j] - 1 :
+               lp_data->vars[position[j]]->userind;
+            send_int_array(&name, 1);
+            break;
+         case CANDIDATE_CUT_IN_MATRIX:
+            /* For branching cut pack the name, whether it is a new branching cut
+               and if necessary the cut itself. */
+            brcut = lp_data->rows[position[j]].cut;
+            name = position[j] < p->base.cutnum ?
+               - position[j] - 1 : (brcut->name < 0 ? - p->base.cutnum - 1 : 
+                     brcut->name);
+            send_int_array(&name, 1);
+            // TODO: Confirm the affect in case of disjunction branching
+            i = (brcut->branch & CUT_BRANCHED_ON) ? FALSE : TRUE;
+            send_int_array(&i, 1);
+            if (name == - p->base.cutnum - 1)
+               /* a branching cut without name. Pack the cut, too.*/
+               pack_cut(lp_data->rows[position[j]].cut);
+            break;
+      }
    }
 
 #ifdef COMPILE_FRAC_BRANCHING
    if (can->frac_num[*keep]<((double)lp_data->n)*p->par.fractional_diving_ratio
-       || can->frac_num[*keep] < p->par.fractional_diving_num){
+         || can->frac_num[*keep] < p->par.fractional_diving_num){
       dive = DO_DIVE;
       fractional_dive = TRUE;
    }
 #endif
-   
-   /* Number of descendants */
-   send_int_array(&can->child_num, 1);
 
-   /* The describing arrays */
-   send_char_array(can->sense, can->child_num);
-   send_dbl_array(can->rhs, can->child_num);
-   send_dbl_array(can->range, can->child_num);
-   send_int_array(can->branch, can->child_num);
+   /* The describing data */
+   for (j = 0; j < can->child_num; j++) {
+      send_char_array(can->cdesc[j].sense, 1);
+      send_dbl_array(can->cdesc[j].rhs, 1);
+      send_dbl_array(can->cdesc[j].range, 1);
+      send_int_array(can->cdesc[j].branch, 1);
+   }
    send_dbl_array(can->objval, can->child_num);
    send_int_array(can->feasible, can->child_num);
    for (i = 0; i < can->child_num; i++){
       if (can->feasible[i]){
 #if 0
-	 send_dbl_array(can->solutions[i], lp_data->n);
+         send_dbl_array(can->solutions[i], lp_data->n);
 #endif
       }
    }
@@ -1608,7 +1629,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    /* Our diving status and what we would keep */
    send_char_array(&dive, 1);
    send_int_array(keep, 1);
-   
+
    send_msg(p->tree_manager, LP__BRANCHING_INFO);
    freebuf(s_bufid);
 
@@ -1618,50 +1639,58 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
       struct timeval timeout = {15, 0};
       start = wall_clock(NULL);
       do{
-	 r_bufid = treceive_msg(p->tree_manager, LP__DIVING_INFO, &timeout);
-	 if (! r_bufid){
-	    if (pstat(p->tree_manager) != PROCESS_OK){
-	       printf("TM has died -- LP exiting\n\n");
-	       exit(-301);
-	    }
-	 }
+         r_bufid = treceive_msg(p->tree_manager, LP__DIVING_INFO, &timeout);
+         if (! r_bufid){
+            if (pstat(p->tree_manager) != PROCESS_OK){
+               printf("TM has died -- LP exiting\n\n");
+               exit(-301);
+            }
+         }
       }while (! r_bufid);
       receive_char_array(&dive, 1);
       /* get the new nodenum (and the index of the branching cut if unknown)
        * if we dive */
       p->comp_times.idle_diving += wall_clock(NULL) - start;
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE /*next time*/){
-	 /* get the new node index */
-	 receive_int_array(&p->bc_index, 1);
-	 if (can->type == CANDIDATE_CUT_IN_MATRIX &&
-	     name == -p->base.cutnum-1){
-	    /* in this case we must have a branching cut */
-	    receive_int_array(&lp_data->rows[pos].cut->name, 1);
-	    PRINT(p->par.verbosity, 4,
-		  ("The real cut name is %i \n",lp_data->rows[pos].cut->name));
-	 }
-	 PRINT(p->par.verbosity, 1, ("Decided to dive...\n"));
+         /* get the new node index */
+         receive_int_array(&p->bc_index, 1);
+         // TODO: Is a for loop on child_num required below instead of *keep?
+         if (can->cdesc[*keep].type == CANDIDATE_CUT_IN_MATRIX &&
+               name == -p->base.cutnum-1){
+            /* in this case we must have a branching cut */
+            receive_int_array(&lp_data->rows[position[*keep]].cut->name, 1);
+            PRINT(p->par.verbosity, 4,
+                  ("The real cut name is %i \n",lp_data->rows[position[*keep]].cut->name));
+         }
+         PRINT(p->par.verbosity, 1, ("Decided to dive...\n"));
       }else{
-	 PRINT(p->par.verbosity, 1, ("Decided not to dive...\n"));
+         PRINT(p->par.verbosity, 1, ("Decided not to dive...\n"));
       }
       freebuf(r_bufid);
       p->dive = fractional_dive ? olddive : dive;
    }
 #endif
-   
+
    /* Print some statistics */
+   // TODO: when a child node is infeasible and discarded, generate_children 
+   // function discards the node and alters node->bobj partially, can->*
+   // partially, and action[]. But here we are using unaltered can->child_num
+   // in conjunction with altered action[], which is leading to wrong prints.
+   // Source: test run on sample7.mps in USER application.
    for (i = can->child_num-1; i >= 0; i--){
       switch (action[i]){
-       case KEEP_THIS_CHILD: break;
-       case RETURN_THIS_CHILD: break;
-       case PRUNE_THIS_CHILD:
-	 PRINT(p->par.verbosity, 2, ("child %i is pruned by rule\n", i));
-	 break;
-       case PRUNE_THIS_CHILD_FATHOMABLE:
-       case PRUNE_THIS_CHILD_INFEASIBLE: 
-	  PRINT(p->par.verbosity, 2, ("child %i is fathomed [%i, %i]\n",
-				     i, can->termcode[i], can->iterd[i]));
-	 break;
+         case KEEP_THIS_CHILD:
+            break;
+         case RETURN_THIS_CHILD:
+            break;
+         case PRUNE_THIS_CHILD:
+            PRINT(p->par.verbosity, 2, ("child %i is pruned by rule\n", i));
+            break;
+         case PRUNE_THIS_CHILD_FATHOMABLE:
+         case PRUNE_THIS_CHILD_INFEASIBLE: 
+            PRINT(p->par.verbosity, 2, ("child %i is fathomed [%i, %i]\n",
+                                          i, can->termcode[i], can->iterd[i]));
+            break;
       }
    }
 }
@@ -1711,23 +1740,23 @@ void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
 
    if (cnt > 0){
       REALLOC(cp->cuts_to_add, cut_data *, cp->cuts_to_add_size,
-	      cnt, BB_BUNCH);
+            cnt, BB_BUNCH);
       for (i = p->lp_data->m - p->base.cutnum - 1; i >= 0; i--){
-	 if (! (extrarows[i].cut->name != CUT__SEND_TO_CP ||
-		extrarows[i].free || extrarows[i].eff_cnt < eff_cnt_limit)){
-	    cp->cuts_to_add[cp->cuts_to_add_num] =
-	       (cut_data *) malloc (sizeof(cut_data));
-	    memcpy((char *)cp->cuts_to_add[cp->cuts_to_add_num],
-		   (char *)extrarows[i].cut, sizeof(cut_data));
-	    if (extrarows[i].cut->size > 0){
-	       cp->cuts_to_add[cp->cuts_to_add_num]->coef =
-		  (char *) malloc (extrarows[i].cut->size * sizeof(char));
-	       memcpy((char *)cp->cuts_to_add[cp->cuts_to_add_num++]->coef,
-		      extrarows[i].cut->coef,
-		      extrarows[i].cut->size*sizeof(char));
-	    }
-	    extrarows[i].cut->name = CUT__DO_NOT_SEND_TO_CP;
-	 }
+         if (! (extrarows[i].cut->name != CUT__SEND_TO_CP ||
+                  extrarows[i].free || extrarows[i].eff_cnt < eff_cnt_limit)){
+            cp->cuts_to_add[cp->cuts_to_add_num] =
+               (cut_data *) malloc (sizeof(cut_data));
+            memcpy((char *)cp->cuts_to_add[cp->cuts_to_add_num],
+                  (char *)extrarows[i].cut, sizeof(cut_data));
+            if (extrarows[i].cut->size > 0){
+               cp->cuts_to_add[cp->cuts_to_add_num]->coef =
+                  (char *) malloc (extrarows[i].cut->size * sizeof(char));
+               memcpy((char *)cp->cuts_to_add[cp->cuts_to_add_num++]->coef,
+                     extrarows[i].cut->coef,
+                     extrarows[i].cut->size*sizeof(char));
+            }
+            extrarows[i].cut->name = CUT__DO_NOT_SEND_TO_CP;
+         }
       }
       cut_pool_receive_cuts(cp, p->bc_level);
       cp->cuts_to_add_num = 0;
@@ -1740,11 +1769,11 @@ void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
       /* whatever is sent to the CP must have been generated at this level */
       send_int_array(&p->bc_level, 1);
       for (i = p->lp_data->m - p->base.cutnum - 1; i >= 0; i--){
-	 if (! (extrarows[i].cut->name != CUT__SEND_TO_CP ||
-		extrarows[i].free || extrarows[i].eff_cnt < eff_cnt_limit)){
-	    pack_cut(extrarows[i].cut);
-	    extrarows[i].cut->name = CUT__DO_NOT_SEND_TO_CP;
-	 }
+         if (! (extrarows[i].cut->name != CUT__SEND_TO_CP ||
+                  extrarows[i].free || extrarows[i].eff_cnt < eff_cnt_limit)){
+            pack_cut(extrarows[i].cut);
+            extrarows[i].cut->name = CUT__DO_NOT_SEND_TO_CP;
+         }
       }
       send_msg(p->cut_pool, PACKED_CUTS_TO_CP);
       freebuf(s_bufid);

@@ -4852,14 +4852,14 @@ int prep_integerize_var(PREPdesc *P, int col_ind) {
 /*===========================================================================*/
 /*===========================================================================*/
 int prep_fill_row_ordered(PREPdesc *P)
-{ 
+{
    /*
-     recreates 'A' matrix using three matrices just like the standard
-     notation. However, matrices contain row representations rather than
-     column representation.
+      recreates 'A' matrix using three matrices just like the standard
+      notation. However, matrices contain row representations rather than
+      column representation.
 
-     Also replace any >= constraints by <=.
-   */ 
+      Also replace any >= constraints by <=.
+    */ 
 
    int i, j, *o_ind, *c_lengths;
    int row_ind, elem_ind, *matind, *matbeg, *r_matind, *r_matbeg, *r_lengths; 
@@ -4885,7 +4885,7 @@ int prep_fill_row_ordered(PREPdesc *P)
    if (mip->orig_sense) FREE(mip->orig_sense);
    if (mip->orig_ind) FREE(mip->orig_ind);
    if (mip->col_lengths) FREE(mip->col_lengths);
-   
+
    r_matval = (mip->row_matval = (double *)malloc(nz*DSIZE)); 
    r_matind = (mip->row_matind = (int *)malloc(nz*ISIZE)); 
    r_matbeg = (mip->row_matbeg = (int *)malloc((m+1)*ISIZE));
@@ -4896,13 +4896,13 @@ int prep_fill_row_ordered(PREPdesc *P)
    u_row_ind = (P->user_row_ind) = (int *)malloc(m*ISIZE);
    c_lengths = (mip->col_lengths = (int *)calloc(n,ISIZE));
    /* these are initialized here, we have to visit this function anyway */
-   
+
    /* first get row legths */   
    for (i = 0; i < n; i++){
       /* set orig indices here */
       o_ind[i] = u_col_ind[i] = i;
       for (j = matbeg[i]; j < matbeg[i+1]; j++){
-	 r_lengths[matind[j]]++;
+         r_lengths[matind[j]]++;
       }
       c_lengths[i] = matbeg[i+1] - matbeg[i]; 
    }
@@ -4919,24 +4919,24 @@ int prep_fill_row_ordered(PREPdesc *P)
    for (i = 0; i < n; i++){
       qsort_id(&(matind[matbeg[i]]), &(matval[matbeg[i]]), matbeg[i+1] - matbeg[i]);
       for (j = matbeg[i]; j < matbeg[i+1]; j++){
-	 row_ind = matind[j];
-	 elem_ind = r_matbeg[row_ind];
-	 r_matind[elem_ind] = i;
-	 if (sense[row_ind] == 'G'){
-	    matval[j] = -matval[j];
-	 }
-	 r_matval[elem_ind] = matval[j];
-	 r_matbeg[row_ind] = elem_ind + 1;
+         row_ind = matind[j];
+         elem_ind = r_matbeg[row_ind];
+         r_matind[elem_ind] = i;
+         if (sense[row_ind] == 'G'){
+            matval[j] = -matval[j];
+         }
+         r_matval[elem_ind] = matval[j];
+         r_matbeg[row_ind] = elem_ind + 1;
       }
    }
    /* and update matbegs, rhs, and rows with 'G' to 'L'*/
    memcpy(o_sense, sense, CSIZE*m);   
-   
+
    for (i = 0; i < m; i++){
       r_matbeg[i] -= r_lengths[i];
       if (sense[i] == 'G'){
-	 sense[i] = 'L';
-	 rhs[i] = -rhs[i];
+         sense[i] = 'L';
+         rhs[i] = -rhs[i];
       }
    }   
 
