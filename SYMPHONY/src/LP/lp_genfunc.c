@@ -320,9 +320,11 @@ int fathom_branch(lp_prob *p)
 
       p->bound_changes_in_iter = 0;
 
-      //char name[50] = "";
-      //sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
-      //write_mps(lp_data, name);
+      if (!rs_mode_enabled && p->par.debug_lp) {
+      char name[50] = "";
+      sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
+      write_lp(lp_data, name);
+      }
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
 			       p->bc_level < 1)) ||
 	  p->par.should_warmstart_node == FALSE) {

@@ -313,6 +313,7 @@ void constrain_row_set PROTO((LPdata *lp_data, int length, int *index));
 int read_mps PROTO((MIPdesc *mip, char *infile, char *probname, int verbosity));
 int read_lp PROTO((MIPdesc *mip, char *infile, char *probname, int verbosity));
 void write_mps PROTO((LPdata *lp_data, char *fname));
+void write_lp PROTO((LPdata *lp_data, char *fname));
 void write_mip_desc_mps PROTO((MIPdesc *mip, char *fname));
 void write_mip_desc_lp PROTO((MIPdesc *mip, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));

@@ -476,6 +476,9 @@ int user_free_master(void **user)
 {
    user_problem *prob = (user_problem *) (*user);
 
+   FREE(prob->vvind);
+   FREE(prob->ccind);
+   FREE(prob->mip);
    FREE(prob);
 
    return(USER_SUCCESS);

@@ -1345,15 +1345,15 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #ifdef TRACE_PATH
    if (node->optimal_path && tm->feas_sol_size){
       for (i = 0; i < tm->feas_sol_size; i++)
-    // TODO: Confirm how to deal with bobj->name now? 
-	 if (tm->feas_sol[i] == bobj->name)
-	    break;
+         // TODO: Confirm how to deal with bobj->name now? 
+         if (tm->feas_sol[i] == bobj->name)
+            break;
       if (i < tm->feas_sol_size)
-	 optimal_path = 1;
+         optimal_path = 1;
       else
-	 optimal_path = 0;
+         optimal_path = 0;
       printf("\n\nNode %i is on the optimal path\n\n",
-	     tm->stat.tree_size + optimal_path);
+            tm->stat.tree_size + optimal_path);
    }
 #endif
    for (i = 0; i < child_num; i++){

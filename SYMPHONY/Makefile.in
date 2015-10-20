@@ -101,7 +101,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config.h \
 	$(top_builddir)/include/config_sym.h
 CONFIG_CLEAN_FILES = Examples/Makefile \
-	Applications/Makefile.Applications Applications/CNRP/Makefile \
+	Applications/Makefile.Applications \
+	Applications/CNRP/Makefile \
 	Applications/MATCH/Makefile Applications/MCKP/Makefile \
 	Applications/MISOCO/Makefile Applications/MPP/Makefile \
 	Applications/SPP/Makefile Applications/SPP+CUTS/Makefile \

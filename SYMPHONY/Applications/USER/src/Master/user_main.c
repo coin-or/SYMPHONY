@@ -441,9 +441,10 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    prob->mip->ub     = (double *) realloc(prob->mip->ub, DSIZE * prob->mip->n);
    prob->mip->lb     = (double *) realloc(prob->mip->lb, DSIZE * prob->mip->n);
    prob->mip->is_int = (char *)   malloc(CSIZE * prob->mip->n);
-   /* Default values for vvind and feasible */
+   /* Default values for vvind, vvnum and feasible */
    prob->feasible    = USER__DO_NOT_BRANCH;
-   prob->vvind       = (int *)    calloc(0, ISIZE);
+   prob->vvind       = (int *)    calloc(prob->mip->n, ISIZE);
+   prob->vvnum       = 0;
    
    memcpy(prob->mip->obj, obj, DSIZE * prob->mip->n);
    memcpy(prob->mip->rhs, rhs, DSIZE * prob->mip->m);
@@ -480,6 +481,9 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    FREE(prob->infubsofar);
    FREE(prob->inflbind);
    FREE(prob->infubind);
+   FREE(prob->matval_row);
+   FREE(prob->matind_row);
+   FREE(prob->matbeg_row);
 
    return (FUNCTION_TERMINATED_NORMALLY);
 }

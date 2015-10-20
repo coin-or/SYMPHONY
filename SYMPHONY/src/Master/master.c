@@ -312,6 +312,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cuts_strong_branch = 0; //Anahita
    lp_par->is_recourse_prob = 0; //Anahita
    lp_par->verbosity = 0;
+   lp_par->debug_lp = FALSE;
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
    lp_par->set_obj_upper_lim = TRUE;
@@ -1016,10 +1017,10 @@ int sym_solve(sym_environment *env)
 
 #ifdef USE_SYM_APPLICATION
       if (user_send_feas_sol(env->user, &feas_sol_size, &feas_sol)==USER_NO_PP){
-	 send_int_array(&feas_sol_size, 1);
-	 if (feas_sol_size){
-	    send_int_array(feas_sol, feas_sol_size);
-	 }
+         send_int_array(&feas_sol_size, 1);
+         if (feas_sol_size){
+            send_int_array(feas_sol, feas_sol_size);
+         }
       }
 #endif
    }
@@ -1309,9 +1310,9 @@ int sym_solve(sym_environment *env)
       int *feas_sol;
 #ifdef USE_SYM_APPLICATION      
       if (user_send_feas_sol(env->user,&feas_sol_size,&feas_sol)==USER_NO_PP){
-	 tm->feas_sol_size = feas_sol_size;
-	 tm->feas_sol = (int *) calloc (tm->feas_sol_size, sizeof(int));
-	 memcpy((char *)tm->feas_sol, (char *)feas_sol, feas_sol_size * ISIZE);
+         tm->feas_sol_size = feas_sol_size;
+         tm->feas_sol = (int *) calloc (tm->feas_sol_size, sizeof(int));
+         memcpy((char *)tm->feas_sol, (char *)feas_sol, feas_sol_size * ISIZE);
       }
 #endif
    }
@@ -5550,6 +5551,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
     ***********************************************************************/
    if (strcmp(key, "LP_verbosity") == 0){
       *value = lp_par->verbosity;
+   }
+   else if (strcmp(key, "debug_lp") == 0 ||
+         strcmp(key, "LP_debug_lp") == 0) {
+      *value = lp_par->debug_lp;
    }
    else if (strcmp(key, "set_obj_upper_lim") == 0 ||
 	    strcmp(key, "LP_set_obj_upper_lim") == 0){

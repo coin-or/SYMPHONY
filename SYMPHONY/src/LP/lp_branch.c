@@ -1910,7 +1910,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   cut = rows[branch_row].cut;
                   /* Changing back after presolving */
                   change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
-                  free_row_set(lp_data, 1, &branch_row);
+                  // TODO: following line is commented by Suresh, as a doubt. Check it.
+                  //free_row_set(lp_data, 1, &branch_row);
                   break;
 
          } /* end of switch(can->cdesc[j].type) */
@@ -2600,7 +2601,8 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
                                      int *should_continue)
 {
    // Suresh: added temporarily to eliminate any randomness
-   return TRUE;
+   *should_continue = TRUE;
+   return 0;
 
    double allowed_time = 0;
    *should_continue = TRUE;

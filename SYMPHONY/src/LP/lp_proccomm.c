@@ -605,15 +605,15 @@ void send_node_desc(lp_prob *p, int node_type)
 
 #ifdef TRACE_PATH
       if (n->optimal_path){
-	 printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
-	 sleep(600);
-	 if (tm->par.logging){
-	    write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
-	    write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
-			  TRUE, tm->par.logging);
-	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
-	 }
-	 exit(-10);
+         printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
+         sleep(600);
+         if (tm->par.logging){
+            write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
+            write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
+                  TRUE, tm->par.logging);
+            write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
+         }
+         exit(-10);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
@@ -996,15 +996,15 @@ void send_node_desc(lp_prob *p, int node_type)
    if (n->node_status == NODE_STATUS__PRUNED){
 #ifdef TRACE_PATH
       if (n->optimal_path){
-	 printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
-	 sleep(600);
-	 if (tm->par.logging){
-	    write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
-	    write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
-			  TRUE, tm->par.logging);
-	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
-	 }
-	 exit(-10);
+         printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
+         sleep(600);
+         if (tm->par.logging){
+            write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
+            write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
+                  TRUE, tm->par.logging);
+            write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
+         }
+         exit(-10);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
@@ -1693,6 +1693,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
             break;
       }
    }
+   FREE(position);
 }
 
 /*===========================================================================*/

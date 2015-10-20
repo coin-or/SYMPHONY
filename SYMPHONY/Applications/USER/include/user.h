@@ -57,7 +57,6 @@ typedef struct USER_PROBLEM{
    int             *ccind;      /* Index of complementarity constraint */
    MIPdesc         *mip;        /* MIP data structure to store problem data */
 
-   int             *nzcount;    /* Non-zero coeff count of each constraint */
    int              feasible;   /* Feasibility status of current LP relaxation */
    int             *vvind;      /* Var indices of violated complementarity constraints */
    int              vvnum;      /* Number of violated complementarity cons. Size of vvind */

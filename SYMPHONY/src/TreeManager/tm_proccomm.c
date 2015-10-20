@@ -673,15 +673,15 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       }
 #ifdef TRACE_PATH
       if (n->optimal_path){
-	 printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
-	 sleep(600);
-	 if (tm->par.logging){
-	    write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
-	    write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
-			  TRUE, tm->par.logging);
-	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
-	 }
-	 exit(1);
+         printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
+         sleep(600);
+         if (tm->par.logging){
+            write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
+            write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
+                  TRUE, tm->par.logging);
+            write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
+         }
+         exit(1);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
@@ -877,15 +877,15 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    if (n->node_status == NODE_STATUS__PRUNED){
 #ifdef TRACE_PATH
       if (n->optimal_path){
-	 printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
-	 sleep(600);
-	 if (tm->par.logging){
-	    write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
-	    write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
-			  TRUE, tm->par.logging);
-	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
-	 }
-	 exit(1);
+         printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
+         sleep(600);
+         if (tm->par.logging){
+            write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
+            write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
+                  TRUE, tm->par.logging);
+            write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
+         }
+         exit(1);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
