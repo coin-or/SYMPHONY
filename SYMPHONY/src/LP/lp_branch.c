@@ -1810,7 +1810,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                         can->cdesc[j].sense, can->cdesc[j].rhs, can->cdesc[j].range);
                   check_ub(p);
                   /* The original basis is in lp_data->lpbas */
-                  can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+                  can->termcode[j] = initial_lp_solve(lp_data, can->iterd+j);
                   p->lp_stat.lp_calls++;
                   p->lp_stat.str_br_lp_calls++;
                   p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
