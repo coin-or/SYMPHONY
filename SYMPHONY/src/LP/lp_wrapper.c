@@ -2112,8 +2112,13 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
       }else{ /* must be CANDIDATE_CUT_IN_MATRIX */
          if (p->lp_data->rows[can->cdesc[i].position].cut->name ==
 	     BASE_CONSTRAINT){
-	    printf("base cut #%i ",
-		   can->cdesc[i].position);
+	    if (p->mip && p->mip->rowname){
+	       printf("base cut %s ",
+		      p->mip->rowname[can->cdesc[i].position]);
+	    }else{
+	       printf("base cut #%i ",
+		      can->cdesc[i].position);
+	    }
 	 }else{
 	    printf("the cut named %i ",
 		   p->lp_data->rows[can->cdesc[i].position].cut->name);
