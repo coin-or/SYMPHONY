@@ -14,6 +14,7 @@
 
 /* system include files */
 #include <stdio.h>
+#include <math.h>
 
 /* SYMPHONY include files */
 #include "sym_constants.h"
@@ -90,8 +91,9 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    }
 
    for (i = 0; i < varnum; i++) {
-      if (values[i] * (rowact[prob->ccind[indices[i]]] - rhs[prob->ccind[indices[i]]]) > lpetol ||
-              values[i] * (rowact[prob->ccind[indices[i]]] - rhs[prob->ccind[indices[i]]]) < -1.0 * lpetol) {
+      if (fabs(values[i]) > lpetol &&
+	  fabs(rowact[prob->ccind[indices[i]]] -
+	       rhs[prob->ccind[indices[i]]]) > lpetol){
          violind[violcount] = indices[i];
          violcount++;
       }
@@ -111,6 +113,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 
       /* Update appropriate values for prob data structure */
       prob->feasible = *feasible;
+      prob->vvnum = 0;
    }
 
    FREE(violind);

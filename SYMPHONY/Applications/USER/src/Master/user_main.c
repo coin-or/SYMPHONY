@@ -143,6 +143,8 @@ int user_read_data(user_problem *prob, char *infile)
    prob->mip->rngval = (double *) malloc(DSIZE * prob->mip->m);
    prob->mip->ub     = (double *) malloc(DSIZE * prob->mip->n);
    prob->mip->lb     = (double *) malloc(DSIZE * prob->mip->n);
+   prob->mip->colname = (char **) malloc(sizeof(char *) * prob->mip->n);  
+   prob->mip->rowname = (char **) malloc(sizeof(char *) * prob->mip->m);  
    
    memcpy(prob->mip->obj, const_cast <double *> (mps.getObjCoefficients()),
 	  DSIZE * prob->mip->n);
@@ -156,6 +158,19 @@ int user_read_data(user_problem *prob, char *infile)
 	  DSIZE * prob->mip->n);
    memcpy(prob->mip->lb, const_cast <double *> (mps.getColLower()),
 	  DSIZE * prob->mip->n);
+
+   // Save names
+   for (j = 0; j < prob->mip->n; j++){
+      prob->mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(prob->mip->colname[j], mps.columnName(j), MAX_NAME_SIZE);
+      prob->mip->colname[j][MAX_NAME_SIZE-1] = 0;
+   }
+
+   for (j = 0; j < prob->mip->m; j++){
+      prob->mip->rowname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(prob->mip->rowname[j], mps.rowName(j), MAX_NAME_SIZE);
+      prob->mip->rowname[j][MAX_NAME_SIZE-1] = 0;
+   }
 
    // Added by Suresh for debugging
    prob->origvar_num = prob->mip->n;
@@ -246,7 +261,7 @@ int user_read_data(user_problem *prob, char *infile)
    // Fill temporary LB arrays
    counter = 0;
    for (j = 0; j < prob->mip->n; j++) {
-      if (prob->mip->lb[j] <= -1.0 * prob->infty) {
+      if (prob->mip->lb[j] <= -prob->infty) {
          continue;
       } else {
          prob->templb[counter] = prob->mip->lb[j];
@@ -292,11 +307,11 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          if (i < prob->mip->n) {
             obj[i] = prob->mip->obj[i];
          } else if (i < prob->mip->n + prob->mip->m) {
-            obj[i] = -1.0 * prob->mip->rhs[i - prob->mip->n];
+            obj[i] = -prob->mip->rhs[i - prob->mip->n];
          } else if (i < 2 * prob->mip->n + prob->mip->m - prob->ubinfty) {
-            obj[i] = -1.0 * prob->tempub[i - prob->mip->n - prob->mip->m];
+            obj[i] = -prob->tempub[i - prob->mip->n - prob->mip->m];
          } else {
-            obj[i] = -1.0 * prob->templb[i - 2 * prob->mip->n - prob->mip->m + prob->ubinfty];
+            obj[i] = -prob->templb[i - 2 * prob->mip->n - prob->mip->m + prob->ubinfty];
          }
          */
          obj[i] = 0.0;
@@ -305,7 +320,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       for (i = 0; i < n; i++) {
          /*
          if (i < prob->mip->n) {
-            obj[i] = -1.0 * prob->mip->obj[i];
+            obj[i] = -prob->mip->obj[i];
          } else if (i < prob->mip->n + prob->mip->m) {
             obj[i] = prob->mip->rhs[i - prob->mip->n];
          } else if (i < 2 * prob->mip->n + prob->mip->m - prob->ubinfty) {
@@ -317,44 +332,127 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          obj[i] = 0.0;
       }
    }
-   for (i = 0; i < n; i++) {
+   env->mip->colname = (char **) malloc(sizeof(char *) * n);  
+   env->mip->rowname = (char **) malloc(sizeof(char *) * m);  
+
+   /* The original primal variables */
+   for (i = 0; i < prob->mip->n; i++) {
       is_int[i] = FALSE;
-      if (i < prob->mip->n) {
-         ub[i] = prob->infty;
-         lb[i] = -1.0 * prob->infty;
-      } else if (i < prob->mip->n + prob->mip->m) {
-         if (prob->mip->sense[i - prob->mip->n] == 'L') {
-            ub[i] = 0;
-            lb[i] = -1.0 * prob->infty;
-         } else if (prob->mip->sense[i - prob->mip->n] == 'G') {
-            ub[i] = prob->infty;
-            lb[i] = 0;
-         } else {
-            ub[i] = prob->infty;
-            lb[i] = -1.0 * prob->infty;
-         }
-      } else if (i < 2 * prob->mip->n + prob->mip->m - prob->ubinfty) {
-         ub[i] = 0;
-         lb[i] = -1.0 * prob->infty;
-      } else {
-         ub[i] = prob->infty;
-         lb[i] = 0;
-      }
+      ub[i] = prob->infty;
+      lb[i] = -prob->infty;
+      env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(env->mip->colname[i], prob->mip->colname[i], MAX_NAME_SIZE);
+      env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
    }
-   for (i = 0; i < m; i++) {
-      if (i < prob->mip->m) {
-         sense[i] = prob->mip->sense[i];
-         rhs[i] = prob->mip->rhs[i];
-      } else if (i < (prob->mip->m + prob->mip->n - prob->ubinfty)) {
-         sense[i] = 'L';
-         rhs[i] = prob->tempub[i - prob->mip->m];
-      } else if (i < (prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty)) {
-         sense[i] = 'G';
-         rhs[i] = prob->templb[i - (prob->mip->m + prob->mip->n - prob->ubinfty)];
+   /* The duals on original constraints */
+   for (;i < prob->mip->n + prob->mip->m; i++){
+      index = i - prob->mip->n; 
+      is_int[i] = FALSE;
+      if (prob->mip->sense[i - prob->mip->n] == 'L') {
+	 ub[i] = 0;
+	 lb[i] = -prob->infty;
+      } else if (prob->mip->sense[index] == 'G') {
+	 ub[i] = prob->infty;
+	 lb[i] = 0;
       } else {
-         sense[i] = 'E';
-         rhs[i] = prob->mip->obj[i - (prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty)];
+	 ub[i] = prob->infty;
+	 lb[i] = -prob->infty;
       }
+      env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->colname[i][0] = 'D';
+      env->mip->colname[i][1] = '_';
+      strncpy(env->mip->colname[i]+2, prob->mip->rowname[i - prob->mip->n],
+	      MAX_NAME_SIZE-2);
+      env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
+   }
+   /* The duals on variable upper bound constraints */
+   int infty_count = 0;
+   while (i < 2 * prob->mip->n + prob->mip->m - prob->ubinfty) {
+      index = i + infty_count - prob->mip->n - prob->mip->m; 
+      if (prob->mip->ub[index] >= prob->infty) {
+	 infty_count++;
+	 continue;
+      } 
+      ub[i] = 0;
+      lb[i] = -prob->infty;
+      env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->colname[i][0] = 'U';
+      env->mip->colname[i][1] = '_';
+      strncpy(env->mip->colname[i]+2, prob->mip->colname[index],
+	      MAX_NAME_SIZE-2);
+      env->mip->colname[i++][MAX_NAME_SIZE-1] = 0;
+   }
+   infty_count = prob->ubinfty;
+   /* The duals on variable lower bound constraints */
+   while (i < n){
+      index = i + infty_count - 2*prob->mip->n - prob->mip->m;
+      if (prob->mip->lb[index] <= -prob->infty) {
+	 infty_count++;
+	 continue;
+      } 
+      ub[i] = prob->infty;
+      lb[i] = 0;
+      env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->colname[i][0] = 'L';
+      env->mip->colname[i][1] = '_';
+      strncpy(env->mip->colname[i]+2, prob->mip->colname[index],
+	      MAX_NAME_SIZE-2);
+      env->mip->colname[i++][MAX_NAME_SIZE-1] = 0;
+   }
+
+   /* The original constraints */
+   for (i = 0; i < prob->mip->m; i++) {
+      sense[i] = prob->mip->sense[i];
+      rhs[i] = prob->mip->rhs[i];
+      env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(env->mip->rowname[i], prob->mip->rowname[i], MAX_NAME_SIZE);
+      env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
+   }
+   /* The upper bound constraints on variables */
+   infty_count = 0;
+   while (i < prob->mip->m + prob->mip->n - prob->ubinfty) {
+      index = i + infty_count - prob->mip->m; 
+      if (prob->mip->ub[index] >= prob->infty) {
+	 infty_count++;
+	 continue;
+      } 
+      sense[i] = 'L';
+      rhs[i] = prob->mip->ub[index];
+      env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->rowname[i][0] = 'U';
+      env->mip->rowname[i][1] = '_';
+      strncpy(env->mip->rowname[i]+2, prob->mip->colname[index],
+	      MAX_NAME_SIZE-2);
+      env->mip->rowname[i++][MAX_NAME_SIZE-1] = 0;
+   }
+   infty_count = prob->ubinfty;
+   /* The lower bound constraints on variables */
+   while(i < prob->mip->m + 2*prob->mip->n - prob->ubinfty - prob->lbinfty){
+      index = i + infty_count - prob->mip->m - prob->mip->n; 
+      if (prob->mip->lb[index] <= -prob->infty) {
+	 infty_count++;
+	 continue;
+      } 
+      sense[i] = 'G';
+      rhs[i] = prob->mip->lb[index];
+      env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->rowname[i][0] = 'L';
+      env->mip->rowname[i][1] = '_';
+      strncpy(env->mip->rowname[i]+2, prob->mip->colname[index],
+	      MAX_NAME_SIZE-2);
+      env->mip->rowname[i++][MAX_NAME_SIZE-1] = 0;
+   }
+   /* Note sure what these are */
+   while (i < m) {
+      sense[i] = 'E';
+      index = i + infty_count - prob->mip->m - 2 * prob->mip->n;
+      rhs[i] = prob->mip->obj[index];
+      env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->rowname[i][0] = 'E';
+      env->mip->rowname[i][1] = '_';
+      strncpy(env->mip->rowname[i]+2, prob->mip->colname[index],
+	      MAX_NAME_SIZE-2);
+      env->mip->rowname[i++][MAX_NAME_SIZE-1] = 0;
    }
    column_starts[0] = 0;
    for (i = 0; i < prob->mip->n; i++) {
