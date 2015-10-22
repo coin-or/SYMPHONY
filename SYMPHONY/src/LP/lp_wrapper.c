@@ -2099,22 +2099,31 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
 {
    int i;
 
+   printf("Branching on ");
    for (i = 0; i < can->child_num; i++) {
       if (can->cdesc[i].type == CANDIDATE_VARIABLE){
-         if (p->mip){
-            if (p->mip->colname){
-               printf("Branching on variable %s \n   children: ",
+         if (p->mip && p->mip->colname){
+               printf("variable %s",
                      p->mip->colname[p->lp_data->vars[can->cdesc[i].position]->userind]);
-            }
          }else{
-            printf("Branching on variable %i ( %i )\n   children: ",
+            printf("variable %i ( %i ) ",
                   can->cdesc[i].position, p->lp_data->vars[can->cdesc[i].position]->userind);
          }
       }else{ /* must be CANDIDATE_CUT_IN_MATRIX */
-         printf("Branching on a cut %i\n   children: ",
-               p->lp_data->rows[can->cdesc[i].position].cut->name);
+         if (p->lp_data->rows[can->cdesc[i].position].cut->name ==
+	     BASE_CONSTRAINT){
+	    printf("base cut #%i ",
+		   can->cdesc[i].position);
+	 }else{
+	    printf("the cut named %i ",
+		   p->lp_data->rows[can->cdesc[i].position].cut->name);
+	 }
+      }
+      if (i != can->child_num - 1){
+	 printf("and ");
       }
    }
+   printf("\nChildren: ");
    for (i=0; i<can->child_num; i++){
       if (can->objval[i] != MAXDOUBLE / 2){
          if (p->mip->obj_sense == SYM_MAXIMIZE){
