@@ -432,7 +432,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       }
       index = j + prob->mip->m + prob->mip->n - prob->ubinfty - prob->inflbsofar[j];
       sense[index] = 'G';
-      rhs[index] = prob->mip->lb[index];
+      rhs[index] = prob->mip->lb[j];
       env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
       env->mip->rowname[index][0] = 'L';
       env->mip->rowname[index][1] = '_';
