@@ -260,7 +260,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    int *cstat = lp_data->tmp.i1;
    int *rstat = lp_data->tmp.i2;
 
-   /* TODO: Look into this function */
    get_basis(lp_data, cstat, rstat);
 
    if (should_use_rel_br==TRUE) {
@@ -1910,7 +1909,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   cut = rows[branch_row].cut;
                   /* Changing back after presolving */
                   change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
-                  // TODO: following line is commented by Suresh, as a doubt. Check it.
+                  // TODO: Suresh: commented this line since it is a bug for the use case of branching on complementarity conditions.
                   //free_row_set(lp_data, 1, &branch_row);
                   break;
 
@@ -2051,7 +2050,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    set_itlim(lp_data, -1);
 
 #if 0
-   // TODO: did not convert this block of code into new structure for best_can 
+   // TODO: Suresh: did not convert this block of code into new structure for best_can 
    if (best_can->type == CANDIDATE_VARIABLE &&
          vars[best_can->position]->lb == vars[best_can->position]->ub){
       printf("Error -- branching variable is already fixed. \n");
@@ -2191,7 +2190,7 @@ int branch(lp_prob *p, int cuts)
    // parent of current node, partially modifying action[], and partially
    // modifying can. Due to such partial modifications, instance solving is 
    // erratic, I think.
-   // Source: test run on sample7.mps in USER application.
+   // Source: test run on one of the sample instances in USER application.
    *can = p->tm->active_nodes[p->proc_index]->parent->bobj;
    switch (can->cdesc[keep].type){
       case CANDIDATE_VARIABLE:

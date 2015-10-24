@@ -346,58 +346,58 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    }
    /* The duals on original constraints */
    for (;i < prob->mip->n + prob->mip->m; i++){
-      index = i - prob->mip->n; 
       is_int[i] = FALSE;
       if (prob->mip->sense[i - prob->mip->n] == 'L') {
-	 ub[i] = 0;
-	 lb[i] = -prob->infty;
-      } else if (prob->mip->sense[index] == 'G') {
-	 ub[i] = prob->infty;
-	 lb[i] = 0;
+         ub[i] = 0;
+         lb[i] = -prob->infty;
+      } else if (prob->mip->sense[i - prob->mip->n] == 'G') {
+         ub[i] = prob->infty;
+         lb[i] = 0;
       } else {
-	 ub[i] = prob->infty;
-	 lb[i] = -prob->infty;
+         ub[i] = prob->infty;
+         lb[i] = -prob->infty;
       }
       env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
       env->mip->colname[i][0] = 'D';
       env->mip->colname[i][1] = '_';
       strncpy(env->mip->colname[i]+2, prob->mip->rowname[i - prob->mip->n],
-	      MAX_NAME_SIZE-2);
+            MAX_NAME_SIZE-2);
       env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
    }
    /* The duals on variable upper bound constraints */
-   int infty_count = 0;
-   while (i < 2 * prob->mip->n + prob->mip->m - prob->ubinfty) {
-      index = i + infty_count - prob->mip->n - prob->mip->m; 
-      if (prob->mip->ub[index] >= prob->infty) {
-	 infty_count++;
-	 continue;
-      } 
-      ub[i] = 0;
-      lb[i] = -prob->infty;
-      env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
-      env->mip->colname[i][0] = 'U';
-      env->mip->colname[i][1] = '_';
-      strncpy(env->mip->colname[i]+2, prob->mip->colname[index],
-	      MAX_NAME_SIZE-2);
-      env->mip->colname[i++][MAX_NAME_SIZE-1] = 0;
+   for (j = 0; j < prob->mip->n; j++) {
+      if (prob->mip->ub[j] >= prob->infty) {
+         continue;
+      }
+      index = j + prob->mip->m + prob->mip->n - prob->infubsofar[j];
+      is_int[index] = FALSE;
+      ub[index] = 0.0;
+      lb[index] = -prob->infty;
+      env->mip->colname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->colname[index][0] = 'U';
+      env->mip->colname[index][1] = '_';
+      strncpy(env->mip->colname[index]+2, prob->mip->colname[j],
+            MAX_NAME_SIZE-2);
+      env->mip->colname[index][MAX_NAME_SIZE-1] = 0;
+      i++;
    }
-   infty_count = prob->ubinfty;
+
    /* The duals on variable lower bound constraints */
-   while (i < n){
-      index = i + infty_count - 2*prob->mip->n - prob->mip->m;
-      if (prob->mip->lb[index] <= -prob->infty) {
-	 infty_count++;
-	 continue;
-      } 
-      ub[i] = prob->infty;
-      lb[i] = 0;
-      env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
-      env->mip->colname[i][0] = 'L';
-      env->mip->colname[i][1] = '_';
-      strncpy(env->mip->colname[i]+2, prob->mip->colname[index],
-	      MAX_NAME_SIZE-2);
-      env->mip->colname[i++][MAX_NAME_SIZE-1] = 0;
+   for (j = 0; j < prob->mip->n; j++) {
+      if (prob->mip->lb[j] <= -prob->infty) {
+         continue;
+      }
+      index = j + prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->inflbsofar[j];
+      is_int[index] = FALSE;
+      ub[index] = prob->infty;
+      lb[index] = 0.0;
+      env->mip->colname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->colname[index][0] = 'L';
+      env->mip->colname[index][1] = '_';
+      strncpy(env->mip->colname[index]+2, prob->mip->colname[j],
+            MAX_NAME_SIZE-2);
+      env->mip->colname[index][MAX_NAME_SIZE-1] = 0;
+      i++;
    }
 
    /* The original constraints */
@@ -409,43 +409,43 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
    }
    /* The upper bound constraints on variables */
-   infty_count = 0;
-   while (i < prob->mip->m + prob->mip->n - prob->ubinfty) {
-      index = i + infty_count - prob->mip->m; 
-      if (prob->mip->ub[index] >= prob->infty) {
-	 infty_count++;
-	 continue;
-      } 
-      sense[i] = 'L';
-      rhs[i] = prob->mip->ub[index];
-      env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
-      env->mip->rowname[i][0] = 'U';
-      env->mip->rowname[i][1] = '_';
-      strncpy(env->mip->rowname[i]+2, prob->mip->colname[index],
-	      MAX_NAME_SIZE-2);
-      env->mip->rowname[i++][MAX_NAME_SIZE-1] = 0;
+   for (j = 0; j < prob->mip->n; j++) {
+      if (prob->mip->ub[j] >= prob->infty) {
+         continue;
+      }
+      index = j + prob->mip->m - prob->infubsofar[j];
+      sense[index] = 'L';
+      rhs[index] = prob->mip->ub[j];
+      env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->rowname[index][0] = 'U';
+      env->mip->rowname[index][1] = '_';
+      strncpy(env->mip->rowname[index]+2, prob->mip->colname[j],
+            MAX_NAME_SIZE-2);
+      env->mip->rowname[index][MAX_NAME_SIZE-1] = 0;
+      i++;
    }
-   infty_count = prob->ubinfty;
+
    /* The lower bound constraints on variables */
-   while(i < prob->mip->m + 2*prob->mip->n - prob->ubinfty - prob->lbinfty){
-      index = i + infty_count - prob->mip->m - prob->mip->n; 
-      if (prob->mip->lb[index] <= -prob->infty) {
-	 infty_count++;
-	 continue;
-      } 
-      sense[i] = 'G';
-      rhs[i] = prob->mip->lb[index];
-      env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
-      env->mip->rowname[i][0] = 'L';
-      env->mip->rowname[i][1] = '_';
-      strncpy(env->mip->rowname[i]+2, prob->mip->colname[index],
-	      MAX_NAME_SIZE-2);
-      env->mip->rowname[i++][MAX_NAME_SIZE-1] = 0;
+   for (j = 0; j < prob->mip->n; j++) {
+      if (prob->mip->lb[j] <= -prob->infty) {
+         continue;
+      }
+      index = j + prob->mip->m + prob->mip->n - prob->ubinfty - prob->inflbsofar[j];
+      sense[index] = 'G';
+      rhs[index] = prob->mip->lb[index];
+      env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->rowname[index][0] = 'L';
+      env->mip->rowname[index][1] = '_';
+      strncpy(env->mip->rowname[index]+2, prob->mip->colname[j],
+            MAX_NAME_SIZE-2);
+      env->mip->rowname[index][MAX_NAME_SIZE-1] = 0;
+      i++;
    }
-   /* Note sure what these are */
+
+   /* The dual constraints */
    while (i < m) {
       sense[i] = 'E';
-      index = i + infty_count - prob->mip->m - 2 * prob->mip->n;
+      index = i + prob->ubinfty + prob->lbinfty - prob->mip->m - 2 * prob->mip->n;
       rhs[i] = prob->mip->obj[index];
       env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
       env->mip->rowname[i][0] = 'E';
@@ -454,9 +454,9 @@ int user_load_problem(sym_environment *env, user_problem *prob){
 	      MAX_NAME_SIZE-2);
       env->mip->rowname[i++][MAX_NAME_SIZE-1] = 0;
    }
+   /* column sparse format entries corresponding to original variables */
    column_starts[0] = 0;
    for (i = 0; i < prob->mip->n; i++) {
-//      column_starts[i] = prob->mip->matbeg[i] + (2 - prob->infubind[i] - prob->inflbind[i]) * i;
       column_starts[i+1] = column_starts[i] + prob->mip->matbeg[i+1] - prob->mip->matbeg[i] + 2 - prob->infubind[i] - prob->inflbind[i];
       if (prob->mip->matbeg[i + 1] - prob->mip->matbeg[i] > 0) {
          for (j = (prob->mip->matbeg[i]); j < (prob->mip->matbeg[i + 1]); j++) {
@@ -476,7 +476,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          nz_index++;
       }
    }
-//   column_starts[prob->mip->n] = prob->mip->matbeg[prob->mip->n] + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty;
+   /* column sparse format entries corresponding to dual variables on original constraints */
    index = 0;
    for (i = 0; i < prob->mip->m; i++) {
       column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + prob->matbeg_row[i + 1] - prob->matbeg_row[i];
@@ -487,6 +487,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          nz_index++;
       }
    }
+   /* column sparse format entries corresponding to dual variables on primal UB constraints */
    for (i = 0; i < prob->mip->n; i++) {
       if (!prob->infubind[i]) {
          column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + 1;
@@ -496,6 +497,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          nz_index++;
       }
    }
+   /* column sparse format entries corresponding to dual variables on primal LB constraints */
    for (i = 0; i < prob->mip->n; i++) {
       if (!prob->inflbind[i]) {
          column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + 1;

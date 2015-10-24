@@ -2350,8 +2350,9 @@ void open_lp_solver(LPdata *lp_data)
 #endif
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
-#else   
-   //lp_data->si->setDblParam(OsiPrimalTolerance, 1e-10);
+#else
+   // TODO: Suresh: added following line for testing with varying tolerances
+   // lp_data->si->setDblParam(OsiPrimalTolerance, 1e-10);
    lp_data->si->getDblParam(OsiPrimalTolerance, lp_data->lpetol);
 #endif
 }
