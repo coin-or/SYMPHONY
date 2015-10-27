@@ -1627,7 +1627,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                         total_iters+=*(can->iterd+j);
                      } else {
                         load_basis(lp_data, cstat, rstat);
-                        can->termcode[j] = initial_lp_solve(lp_data, can->iterd+j);
+                        // Suresh: testing this b/w dual_simplex and initial_lp_solve
+                        can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
                         total_iters+=*(can->iterd+j);
                      }
                      p->lp_stat.lp_calls++; 
@@ -2674,12 +2675,12 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       change_lbub(lp_data, branch_var, new_lb, new_ub);   
    }else{
       for(int i = 0; i < sos_cnt; i++){
-      	 change_lbub(lp_data, sos_ind[i], 0.0, 0.0);
+         change_lbub(lp_data, sos_ind[i], 0.0, 0.0);
       }
    }
 
    if (p->par.cuts_strong_branch) {
-   
+
       bool keep_going = TRUE;
       int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
       int orig_row_num = lp_data->m;
@@ -2688,54 +2689,54 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       cut_pool *cp = p->tm->cpp[p->cut_pool];
       cp_cut_data **cp_cut;
       while (keep_going && iter_num < 1 &&
-	     (!p->has_ub ||
-	      (p->has_ub &&
-	       lp_data->objval < p->ub - p->par.granularity + lp_data->lpetol))){
-	 if (should_use_hot_starts && iter_num == 0) {
-	    *termstatus = solve_hotstart(lp_data, iterd);
-	    //total_iters+=*iterd;
-	 } else {
-	    *termstatus = dual_simplex(lp_data, iterd);
-	    //total_iters+=*iterd;
-	 }
-	 iter_num++;
-	 keep_going = FALSE;
-	 for (ind_i = 0, cp_cut = cp->cuts; ind_i < cp->cut_num;
-	      ind_i++, cp_cut++){
-	    check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
-			&quality, lp_data->x);
-	    if (violated){
-	       keep_going = TRUE;
-	       real_nzcnt = 0;
-	       nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
-	       tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
-	       tmp_matind =
-		  (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
-	       matval = (double *) malloc(nzcnt * DSIZE);
-	       matind = (int *) malloc(nzcnt * ISIZE);
-	       if (p->par.is_userind_in_order) {
-		  memcpy(matind, tmp_matind, nzcnt*ISIZE);
-		  memcpy(matval, tmp_matval, nzcnt*DSIZE);
-		  real_nzcnt = nzcnt;
-	       } else {
-		  for (ind_j = 0; ind_j < lp_data->n; ind_j++){
-		     for (ind_k = 0; ind_k < nzcnt; ind_k++){
-			if (tmp_matind[ind_k] == lp_data->vars[ind_j]->userind){
-			   matind[real_nzcnt]   = ind_j;
-			   matval[real_nzcnt++] = tmp_matval[ind_k];
-			}
-		     }
-		  }
-	       }
-	       add_rows(lp_data, 1, real_nzcnt, &(&(*cp_cut)->cut)->rhs,
-			&(&(*cp_cut)->cut)->sense, &matbeg, matind, matval);
-	    }
-	 }
-	 size_lp_arrays(lp_data, TRUE, FALSE, 0, 0, 0);
+            (!p->has_ub ||
+             (p->has_ub &&
+              lp_data->objval < p->ub - p->par.granularity + lp_data->lpetol))){
+         if (should_use_hot_starts && iter_num == 0) {
+            *termstatus = solve_hotstart(lp_data, iterd);
+            //total_iters+=*iterd;
+         } else {
+            *termstatus = dual_simplex(lp_data, iterd);
+            //total_iters+=*iterd;
+         }
+         iter_num++;
+         keep_going = FALSE;
+         for (ind_i = 0, cp_cut = cp->cuts; ind_i < cp->cut_num;
+               ind_i++, cp_cut++){
+            check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
+                  &quality, lp_data->x);
+            if (violated){
+               keep_going = TRUE;
+               real_nzcnt = 0;
+               nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
+               tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
+               tmp_matind =
+                  (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
+               matval = (double *) malloc(nzcnt * DSIZE);
+               matind = (int *) malloc(nzcnt * ISIZE);
+               if (p->par.is_userind_in_order) {
+                  memcpy(matind, tmp_matind, nzcnt*ISIZE);
+                  memcpy(matval, tmp_matval, nzcnt*DSIZE);
+                  real_nzcnt = nzcnt;
+               } else {
+                  for (ind_j = 0; ind_j < lp_data->n; ind_j++){
+                     for (ind_k = 0; ind_k < nzcnt; ind_k++){
+                        if (tmp_matind[ind_k] == lp_data->vars[ind_j]->userind){
+                           matind[real_nzcnt]   = ind_j;
+                           matval[real_nzcnt++] = tmp_matval[ind_k];
+                        }
+                     }
+                  }
+               }
+               add_rows(lp_data, 1, real_nzcnt, &(&(*cp_cut)->cut)->rhs,
+                     &(&(*cp_cut)->cut)->sense, &matbeg, matind, matval);
+            }
+         }
+         size_lp_arrays(lp_data, TRUE, FALSE, 0, 0, 0);
       }
       int *which = lp_data->tmp.i1;
       for (ind_i = orig_row_num; ind_i < lp_data->m; ind_i++){
-	 which[ind_i - orig_row_num] = ind_i;
+         which[ind_i - orig_row_num] = ind_i;
       }
       lp_data->si->deleteRows(lp_data->m - orig_row_num, which);
       lp_data->nz = lp_data->si->getNumElements();
@@ -2743,37 +2744,37 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    }
    else{
       if (should_use_hot_starts) {
-	 *termstatus = solve_hotstart(lp_data, iterd);
+         *termstatus = solve_hotstart(lp_data, iterd);
       } else {
-	 load_basis(lp_data, cstat, rstat);
-	 *termstatus = dual_simplex(lp_data, iterd);
+         load_basis(lp_data, cstat, rstat);
+         *termstatus = dual_simplex(lp_data, iterd);
       }
    }
-   
+
    if (*termstatus == LP_D_INFEASIBLE || *termstatus == LP_D_OBJLIM || 
          *termstatus == LP_D_UNBOUNDED) {
       *obj = SYM_INFINITY;
       if(sos_cnt < 1){
-	 p->lp_stat.str_br_bnd_changes++;
+         p->lp_stat.str_br_bnd_changes++;
       }
    } else {
-     *obj = lp_data->objval;
-     // if(lp_data->objval < *obj - lp_data->lpetol){
-     //   printf("dual_simplex error: %i %i\n", p->bc_index, branch_var);       
-     // }else{
-     //  *obj = lp_data->objval;
-     // }
+      *obj = lp_data->objval;
+      // if(lp_data->objval < *obj - lp_data->lpetol){
+      //   printf("dual_simplex error: %i %i\n", p->bc_index, branch_var);       
+      // }else{
+      //  *obj = lp_data->objval;
+      // }
 
       if (*termstatus == LP_OPTIMAL) {
          if (!p->has_ub || *obj < p->ub - p->par.granularity + lp_data->lpetol) {
             is_feasible_u(p, TRUE, TRUE);
          } else {
-	    *obj = SYM_INFINITY;
+            *obj = SYM_INFINITY;
             *termstatus = LP_D_OBJLIM;
-	    if(sos_cnt < 1){
-	       p->lp_stat.str_br_bnd_changes++;
-	    }
-	 }
+            if(sos_cnt < 1){
+               p->lp_stat.str_br_bnd_changes++;
+            }
+         }
       } else if (*termstatus == LP_ABANDONED) {
          status = LP_ABANDONED;
       }
@@ -2782,12 +2783,12 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    p->lp_stat.str_br_lp_calls++;
    p->lp_stat.str_br_total_iter_num += *iterd;
    p->lp_stat.num_str_br_cands_in_path++;
-   
+
    if(sos_cnt < 1){
       change_lbub(lp_data, branch_var, lb, ub);
    }else{
       for(int i = 0; i < sos_cnt; i++){
-   	 change_lbub(lp_data, sos_ind[i], 0.0, 1.0);
+         change_lbub(lp_data, sos_ind[i], 0.0, 1.0);
       }
    }
    return status;

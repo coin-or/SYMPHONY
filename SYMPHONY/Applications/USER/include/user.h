@@ -62,8 +62,10 @@ typedef struct USER_PROBLEM{
    int              vvnum;      /* Number of violated complementarity cons. Size of vvind */
 
    // Added by Suresh for debugging
+   /*
    double         *origobj_coeffs;
    int            origvar_num;
+   */
 
 }user_problem;
 

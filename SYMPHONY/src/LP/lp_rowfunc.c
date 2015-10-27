@@ -55,54 +55,54 @@ int check_row_effectiveness(lp_prob *p)
     * violated, loose or tight */
 
    //int base_m = orig_eff ? bcutnum : 0;
-   
+
    for (i = m - 1; i >= 0; i--){
       slack = slacks[i];
       switch (rows[i].cut->sense){
-       case 'E':
-	 if (slack < -lpetol10 || slack > lpetol10) stat[i] = VIOLATED_ROW;
-	 else                                   stat[i] = TIGHT_ROW;
-	 break;
-       case 'L':
-	 if (slack > lpetol10)       stat[i] = SLACK_ROW;
-	 else if (slack > -lpetol10) stat[i] = TIGHT_ROW;
-	 else                        stat[i] = VIOLATED_ROW;
-	 break;
-       case 'G':
-	 if (slack < -lpetol10)     stat[i] = SLACK_ROW;
-	 else if (slack < lpetol10) stat[i] = TIGHT_ROW;
-	 else                       stat[i] = VIOLATED_ROW;
-	 break;
-       case 'R':
-	 if (rows[i].cut->range < 0){
-	    if (slack > rows[i].cut->range + lpetol10 || slack < -lpetol10)
-	       stat[i] = SLACK_ROW;
-	    else if (slack > rows[i].cut->range - lpetol10 || slack < lpetol10)
-	       stat[i] = TIGHT_ROW;
-	    else
-	       stat[i] = VIOLATED_ROW;
-	 }else{
-	    if (slack < rows[i].cut->range - lpetol10 || slack > lpetol10)
-	       stat[i] = SLACK_ROW;
-	    else if (slack < rows[i].cut->range + lpetol10 || slack > - lpetol10)
-	       stat[i] = TIGHT_ROW;
-	    else
-	       stat[i] = VIOLATED_ROW;
-	 }	    
-	 break;
+         case 'E':
+            if (slack < -lpetol10 || slack > lpetol10) stat[i] = VIOLATED_ROW;
+            else                                   stat[i] = TIGHT_ROW;
+            break;
+         case 'L':
+            if (slack > lpetol10)       stat[i] = SLACK_ROW;
+            else if (slack > -lpetol10) stat[i] = TIGHT_ROW;
+            else                        stat[i] = VIOLATED_ROW;
+            break;
+         case 'G':
+            if (slack < -lpetol10)     stat[i] = SLACK_ROW;
+            else if (slack < lpetol10) stat[i] = TIGHT_ROW;
+            else                       stat[i] = VIOLATED_ROW;
+            break;
+         case 'R':
+            if (rows[i].cut->range < 0){
+               if (slack > rows[i].cut->range + lpetol10 || slack < -lpetol10)
+                  stat[i] = SLACK_ROW;
+               else if (slack > rows[i].cut->range - lpetol10 || slack < lpetol10)
+                  stat[i] = TIGHT_ROW;
+               else
+                  stat[i] = VIOLATED_ROW;
+            }else{
+               if (slack < rows[i].cut->range - lpetol10 || slack > lpetol10)
+                  stat[i] = SLACK_ROW;
+               else if (slack < rows[i].cut->range + lpetol10 || slack > - lpetol10)
+                  stat[i] = TIGHT_ROW;
+               else
+                  stat[i] = VIOLATED_ROW;
+            }	    
+            break;
       }
    }
-   
+
    /* Now set the branch values appropriately */
    if (p->par.branch_on_cuts){
       for (i=m-1; i>=0; i--){
-	 if (stat[i] == SLACK_ROW){
-	    if ((rows[i].cut->branch & ALLOWED_TO_BRANCH_ON))
-	       rows[i].cut->branch ^= SWITCH_CANDIDATE_ALLOWED;
-	 }else{
-	    if ((rows[i].cut->branch & CANDIDATE_FOR_BRANCH))
-	       rows[i].cut->branch ^= SWITCH_CANDIDATE_ALLOWED;
-	 }
+         if (stat[i] == SLACK_ROW){
+            if ((rows[i].cut->branch & ALLOWED_TO_BRANCH_ON))
+               rows[i].cut->branch ^= SWITCH_CANDIDATE_ALLOWED;
+         }else{
+            if ((rows[i].cut->branch & CANDIDATE_FOR_BRANCH))
+               rows[i].cut->branch ^= SWITCH_CANDIDATE_ALLOWED;
+         }
       }
    }
 
@@ -119,8 +119,8 @@ int check_row_effectiveness(lp_prob *p)
     * Also, base constraints and branching cuts may be ineffective but they
     * are not deletable.
     *   So be careful!
-   \*========================================================================*/
-   
+    \*========================================================================*/
+
    violated = ineffective = 0;
 
    /* we'll first use slackstat then outrhsind. no conflict */
@@ -130,65 +130,65 @@ int check_row_effectiveness(lp_prob *p)
    if (p->par.ineffective_constraints != NO_CONSTRAINT_IS_INEFFECTIVE){
       /* Deal with the violated rows */
       for (i = orig_eff ? bcutnum : 0; i < m; i++){
-	 if (stat[i] == VIOLATED_ROW){ /* must have been free */
-	    rows[i].free = FALSE;
-	    rows[i].eff_cnt = 0;
-	    rows[i].ineff_cnt = 0;
-	    inrhsind[violated++] = i;
-	 } 
+         if (stat[i] == VIOLATED_ROW){ /* must have been free */
+            rows[i].free = FALSE;
+            rows[i].eff_cnt = 0;
+            rows[i].ineff_cnt = 0;
+            inrhsind[violated++] = i;
+         } 
       }
       /* Collect the rows that are deemed ineffective now */
       switch (p->par.ineffective_constraints){
-       case NONZERO_SLACKS_ARE_INEFFECTIVE:
-	 for (i = orig_eff ? bcutnum : 0; i < m; i++){
-	    if (stat[i] == SLACK_ROW ||
-		(stat[i] == TIGHT_ROW && rows[i].free == TRUE)){
-	       now_ineff[ineffective++] = i;
-	    }else{
-	       rows[i].eff_cnt++;
-	    }
-	 }
-	 break;
-       case BASIC_SLACKS_ARE_INEFFECTIVE:
-	 /* for violated free rows the slack is in basis! */
-	 get_basis(lp_data, NULL, slackstat);
-	 for (i = orig_eff ? bcutnum : 0; i < m; i++){
-	    if (slackstat[i] == SLACK_BASIC && stat[i] != VIOLATED_ROW){
-	       now_ineff[ineffective++] = i;
-	    }else{
-	       rows[i].eff_cnt++;
-	    }
-	 }
-	 break;
-       case ZERO_DUAL_VALUES_ARE_INEFFECTIVE:
-	 for (i = orig_eff ? bcutnum : 0; i < m; i++){
- 	    if (fabs(lp_data->dualsol[i]) < lpetol && stat[i] != VIOLATED_ROW){
- 	       now_ineff[ineffective++] = i;
- 	    }else{
- 	       rows[i].eff_cnt++;
-	    }
-	 }
-	 break;
+         case NONZERO_SLACKS_ARE_INEFFECTIVE:
+            for (i = orig_eff ? bcutnum : 0; i < m; i++){
+               if (stat[i] == SLACK_ROW ||
+                     (stat[i] == TIGHT_ROW && rows[i].free == TRUE)){
+                  now_ineff[ineffective++] = i;
+               }else{
+                  rows[i].eff_cnt++;
+               }
+            }
+            break;
+         case BASIC_SLACKS_ARE_INEFFECTIVE:
+            /* for violated free rows the slack is in basis! */
+            get_basis(lp_data, NULL, slackstat);
+            for (i = orig_eff ? bcutnum : 0; i < m; i++){
+               if (slackstat[i] == SLACK_BASIC && stat[i] != VIOLATED_ROW){
+                  now_ineff[ineffective++] = i;
+               }else{
+                  rows[i].eff_cnt++;
+               }
+            }
+            break;
+         case ZERO_DUAL_VALUES_ARE_INEFFECTIVE:
+            for (i = orig_eff ? bcutnum : 0; i < m; i++){
+               if (fabs(lp_data->dualsol[i]) < lpetol && stat[i] != VIOLATED_ROW){
+                  now_ineff[ineffective++] = i;
+               }else{
+                  rows[i].eff_cnt++;
+               }
+            }
+            break;
       }
       /* Now violated rows have eff_cnt = 1 (not that it matters...) */
    }
 
    deletable = k = 0;
    for (j = ineffective - 1; j >= 0; j--){
-      
+
       row = rows + (i = now_ineff[j]);
 
       //if(p->bc_level > 100 && !(row->deletable))row->deletable = TRUE;
 
       if (!row->free && row->deletable){
-	 row->free = TRUE;
-	 row->ineff_cnt = stat[i] == TIGHT_ROW ? 0 : ((MAXINT) >> 1);
-	 outrhsind[k++] = i;
+         row->free = TRUE;
+         row->ineff_cnt = stat[i] == TIGHT_ROW ? 0 : ((MAXINT) >> 1);
+         outrhsind[k++] = i;
       } 
       row->ineff_cnt++;
       if (i >= bcutnum && ! (row->cut->branch & CUT_BRANCHED_ON) &&
-	  row->deletable && row->ineff_cnt >= ineff_cnt_to_delete )
-        deletable++;
+            row->deletable && row->ineff_cnt >= ineff_cnt_to_delete )
+         deletable++;
    }
 
    /* stat is not used any more so its location can be used in
@@ -203,56 +203,56 @@ int check_row_effectiveness(lp_prob *p)
       free_row_set(lp_data, k, outrhsind);
 
    PRINT(p->par.verbosity, 3,
-	 ("Row effectiveness: rownum: %i ineff: %i deletable: %i\n",
-	  m, ineffective, deletable));
+         ("Row effectiveness: rownum: %i ineff: %i deletable: %i\n",
+          m, ineffective, deletable));
    if (p->par.verbosity > 6 && ineffective){
       printf("   Ineffective row(s):");
       for (i=0; i<m; i++){
-	 if (rows[i].free)
-	    printf(" %i", i);
+         if (rows[i].free)
+            printf(" %i", i);
       }
       printf("\n");
    }
-   
+
    /*------------------------------------------------------------------------*\
     * Finally, remove the deletable rows if there are enough to remove
-   \*------------------------------------------------------------------------*/
+    \*------------------------------------------------------------------------*/
 
    if (deletable > p->par.mat_row_compress_ratio * m &&
-       deletable > p->par.mat_row_compress_num){
+         deletable > p->par.mat_row_compress_num){
       PRINT(p->par.verbosity, 3, ("   Removing deletable rows ...\n"));
       if (p->par.branch_on_cuts)
-	 p->slack_cuts = (cut_data **) realloc(p->slack_cuts,
-			 (p->slack_cut_num + deletable) * sizeof(cut_data *));
+         p->slack_cuts = (cut_data **) realloc(p->slack_cuts,
+               (p->slack_cut_num + deletable) * sizeof(cut_data *));
 
       free_rows = lp_data->tmp.i1;
       if (bcutnum > 0)
-	 memset(free_rows, FALSE, bcutnum * ISIZE);
+         memset(free_rows, FALSE, bcutnum * ISIZE);
       /* remember, by now every ineffective row is free and ineff_cnt is
-	 positive only for free rows */
+         positive only for free rows */
       for (k = i = bcutnum; i < m; i++){
-	 row = rows + i;
-	 if (row->free && ! (row->cut->branch & CUT_BRANCHED_ON) &&
-	     row->ineff_cnt >= ineff_cnt_to_delete){
-	    free_rows[i] = TRUE;
-	    if (row->cut->branch & CANDIDATE_FOR_BRANCH){
+         row = rows + i;
+         if (row->free && ! (row->cut->branch & CUT_BRANCHED_ON) &&
+               row->ineff_cnt >= ineff_cnt_to_delete){
+            free_rows[i] = TRUE;
+            if (row->cut->branch & CANDIDATE_FOR_BRANCH){
 #ifdef DO_TESTS
-	       if (!p->par.branch_on_cuts)
-		  printf("No branch_on_cuts but a CANDIDATE_FOR_BRANCH!\n\n");
+               if (!p->par.branch_on_cuts)
+                  printf("No branch_on_cuts but a CANDIDATE_FOR_BRANCH!\n\n");
 #endif
-	       p->slack_cuts[p->slack_cut_num++] = row->cut;
-	       row->cut = NULL;
-	    }else{
+               p->slack_cuts[p->slack_cut_num++] = row->cut;
+               row->cut = NULL;
+            }else{
 #ifdef COMPILE_IN_LP /*we don't want to free rows that have a name if we are
-		       using shared memory because they are still being used*/
-	       if (row->cut->name < 0)
+                       using shared memory because they are still being used*/
+               if (row->cut->name < 0)
 #endif
-		  free_cut(&(row->cut));
-	    }
-	 }else{
-	    free_rows[i] = FALSE;
-	    rows[k++] = rows[i];
-	 }
+                  free_cut(&(row->cut));
+            }
+         }else{
+            free_rows[i] = FALSE;
+            rows[k++] = rows[i];
+         }
       }
       delete_rows(lp_data, deletable, free_rows);
       p->lp_stat.cuts_deleted_from_lps += deletable;

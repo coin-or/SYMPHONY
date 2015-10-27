@@ -96,6 +96,7 @@ int main(int argc, char **argv)
    CALL_FUNCTION( sym_solve(env) );
      
    // Added by Suresh for debugging
+   /*
    printf("\n\n");
    double obj_val = 0.0;
    int n = env->best_sol.xlength;
@@ -108,6 +109,7 @@ int main(int argc, char **argv)
       }
    }
    printf("\n\nORIGINAL OBJECTIVE FUNCTION VALUE = %06f\n\n", obj_val);
+   */
 
 
    CALL_FUNCTION( sym_close_environment(env) );
@@ -173,10 +175,12 @@ int user_read_data(user_problem *prob, char *infile)
    }
 
    // Added by Suresh for debugging
+   /*
    prob->origvar_num = prob->mip->n;
    prob->origobj_coeffs = (double *) malloc(DSIZE * prob->mip->n);
    memcpy(prob->origobj_coeffs, const_cast <double *> (mps.getObjCoefficients()),
 	  DSIZE * prob->mip->n);
+     */
 
    //user defined matind, matval, matbeg--fill as column ordered
    const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
@@ -269,6 +273,81 @@ int user_read_data(user_problem *prob, char *infile)
       }
    }
 
+   /* Suresh: debug code START */
+   /*
+   printf("\nORIGINAL MATBEG\n");
+   for (j = 0; j < prob->mip->n+1; j++) {
+      printf("%d\n", prob->mip->matbeg[j]);
+   }
+   printf("\nORIGINAL MATVAL\n");
+   for (j = 0; j < prob->mip->matbeg[prob->mip->n]; j ++) {
+      printf("%2.4e\n", prob->mip->matval[j]);
+   }
+   printf("\nORIGINAL MATIND\n");
+   for (j = 0; j < prob->mip->matbeg[prob->mip->n]; j ++) {
+      printf("%d\n", prob->mip->matind[j]);
+   }
+   printf("\nORIGINAL UB\n");
+   for (j = 0; j < prob->mip->n; j++) {
+      printf("%2.4e\n", prob->mip->ub[j]);
+   }
+   printf("\nORIGINAL LB\n");
+   for (j = 0; j < prob->mip->n; j++) {
+      printf("%2.4e\n", prob->mip->lb[j]);
+   }
+   printf("\nORIGINAL MATBEG_ROW\n");
+   for (j = 0; j < prob->mip->m+1; j++) {
+      printf("%d\n", prob->matbeg_row[j]);
+   }
+   printf("\nORIGINAL MATVAL_ROW\n");
+   for (j = 0; j < prob->matbeg_row[prob->mip->m]; j++) {
+      printf("%2.4e\n", prob->matval_row[j]);
+   }
+   printf("\nORIGINAL MATIND_ROW\n");
+   for (j = 0; j < prob->matbeg_row[prob->mip->m]; j++) {
+      printf("%d\n", prob->matind_row[j]);
+   }
+   */
+   /*
+   for (j = 0; j < prob->mip->n; j++) {
+      printf("%s\t%2.4e\t%2.4e\n", prob->mip->colname[j], prob->mip->lb[j], prob->mip->ub[j]);
+   }
+   */
+   /*
+   printf("\nORIG_OBJ\n");
+   for (j = 0; j < prob->mip->n; j++) {
+      printf("%s\tx%d\t%2.4e\n", prob->mip->colname[j], j, prob->mip->obj[j]);
+   }
+   printf("\nORIG_LB\n");
+   for (j = 0; j < prob->mip->n; j++) {
+      printf("%s\tx%d\t%2.4e\n", prob->mip->colname[j], j, prob->mip->lb[j]);
+   }
+   printf("\nORIG_UB\n");
+   for (j = 0; j < prob->mip->n; j++) {
+      printf("%s\tx%d\t%2.4e\n", prob->mip->colname[j], j, prob->mip->ub[j]);
+   }
+   printf("\nORIG_SENSE\n");
+   for (j = 0; j < prob->mip->m; j++) {
+      printf("%s\tc%d\t%c\n", prob->mip->rowname[j], j, prob->mip->sense[j]);
+   }
+   printf("\nORIG_RHS\n");
+   for (j = 0; j < prob->mip->m; j++) {
+      printf("%s\tc%d\t%2.4e\n", prob->mip->rowname[j], j, prob->mip->rhs[j]);
+   }
+   */
+   /*
+   int i;
+   printf("\nORIG_COEFF\n");
+   for (i = 0; i < prob->mip->n; i++) {
+      if ((prob->mip->matbeg[i+1] - prob->mip->matbeg[i]) > 0) {
+         for (j = prob->mip->matbeg[i]; j < prob->mip->matbeg[i+1]; j++) {
+            printf("x%d\tc%d\t%2.4e\n", i, prob->mip->matind[j], prob->mip->matval[j]);
+         }
+      }
+   }
+   */
+   /* Suresh: debug code END */
+
    return (FUNCTION_TERMINATED_NORMALLY);
 }
 
@@ -303,6 +382,11 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    /* Fill out the appropriate data structures */
    if (prob->mip->obj_sense > 0.0) {
       for (i = 0; i < n; i++) {
+         if (i < prob->mip->n) {
+            obj[i] = prob->mip->obj[i];
+         } else {
+            obj[i] = 0;
+         }
          /*
          if (i < prob->mip->n) {
             obj[i] = prob->mip->obj[i];
@@ -314,7 +398,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
             obj[i] = -prob->templb[i - 2 * prob->mip->n - prob->mip->m + prob->ubinfty];
          }
          */
-         obj[i] = 0.0;
+//         obj[i] = 0.0;
       }
    } else {
       for (i = 0; i < n; i++) {
@@ -443,17 +527,19 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    }
 
    /* The dual constraints */
-   while (i < m) {
-      sense[i] = 'E';
-      index = i + prob->ubinfty + prob->lbinfty - prob->mip->m - 2 * prob->mip->n;
-      rhs[i] = prob->mip->obj[index];
-      env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
-      env->mip->rowname[i][0] = 'E';
-      env->mip->rowname[i][1] = '_';
-      strncpy(env->mip->rowname[i]+2, prob->mip->colname[index],
+   for (j = 0; j < prob->mip->n; j++) {
+      index = j - prob->ubinfty - prob->lbinfty + prob->mip->m + 2 * prob->mip->n;
+      sense[index] = 'E';
+      rhs[index] = prob->mip->obj[j];
+      env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      env->mip->rowname[index][0] = 'E';
+      env->mip->rowname[index][1] = '_';
+      strncpy(env->mip->rowname[index]+2, prob->mip->colname[j],
 	      MAX_NAME_SIZE-2);
-      env->mip->rowname[i++][MAX_NAME_SIZE-1] = 0;
+      env->mip->rowname[index][MAX_NAME_SIZE-1] = 0;
+      i++;
    }
+
    /* column sparse format entries corresponding to original variables */
    column_starts[0] = 0;
    for (i = 0; i < prob->mip->n; i++) {
@@ -493,7 +579,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + 1;
          index++;
          matrix_values[nz_index] = 1.0;
-         matrix_indices[nz_index] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + (i - prob->infubsofar[i]);
+         matrix_indices[nz_index] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + i;
          nz_index++;
       }
    }
@@ -503,7 +589,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + 1;
          index++;
          matrix_values[nz_index] = 1.0;
-         matrix_indices[nz_index] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + (i - prob->inflbsofar[i]);
+         matrix_indices[nz_index] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + i;
          nz_index++;
       }
    }
@@ -514,8 +600,19 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    index1 = 0;
    for (i = 0; i < n;) {
       if (i < prob->mip->n) {
-         prob->ccind[i] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + i;
+         //         prob->ccind[i] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + i;
+         prob->ccind[i] = -1;
          i++;
+      } else if (i < prob->mip->n + prob->mip->m) {
+         if (sense[i - prob->mip->n] == 'E') {
+            prob->ccind[i] = -1;
+            i++;
+            index1++;
+         } else {
+            prob->ccind[i] = index1;
+            i++;
+            index1++;
+         }
       } else {
          prob->ccind[i] = index1;
          i++;
@@ -527,6 +624,89 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    sym_explicit_load_problem(env, n, m, column_starts, matrix_indices,
 			     matrix_values, lb, ub, is_int, obj, 0, sense, rhs,
 			     rngval, true);
+
+   /* Suresh: debug code START */
+   /*
+   printf("\nBIG MATBEG\n");
+   for (j = 0; j < n+1; j++) {
+      printf("%d\n", column_starts[j]);
+   }
+   printf("\nBIG MATVAL\n");
+   for (j = 0; j < nz; j ++) {
+      printf("%2.4e\n", matrix_values[j]);
+   }
+   printf("\nBIG MATIND\n");
+   for (j = 0; j < nz; j ++) {
+      printf("%d\n", matrix_indices[j]);
+   }
+   printf("\nORIG_UB\tINFUB_IND\n");
+   for(j = 0; j < prob->mip->n; j++) {
+   printf("%2.4e\t%d\n", prob->mip->ub[j], prob->infubind[j]);
+   }
+    */
+   /*
+   printf("\nMAT INDS\n");
+   for (j = 0; j < n; j++) {
+      if ((column_starts[j+1] - column_starts[j]) > 0) {
+         for (i = column_starts[j]; i < column_starts[j+1]; i++) {
+            printf("%d\t", matrix_indices[i]);
+         }
+         printf("\n");
+      }
+   }
+   printf("\nMAT VALS\n");
+   for (j = 0; j < n; j++) {
+      if ((column_starts[j+1] - column_starts[j]) > 0) {
+         for (i = column_starts[j]; i < column_starts[j+1]; i++) {
+            printf("%f\t", matrix_values[i]);
+         }
+         printf("\n");
+      }
+   }
+   */
+   /*
+   printf("\nNEW_OBJ\n");
+   for (j = 0; j < n; j++) {
+      printf("%s\tx%d\t%f\n", env->mip->colname[j], j, obj[j]);
+   }
+   */
+   /*
+   printf("\nNEW_LB\n");
+   for (j = 0; j < n; j++) {
+      printf("%s\tx%d\t%2.4e\n", env->mip->colname[j], j, lb[j]);
+   }
+   printf("\nNEW_UB\n");
+   for (j = 0; j < n; j++) {
+      printf("%s\tx%d\t%2.4e\n", env->mip->colname[j], j, ub[j]);
+   }
+   printf("\nNEW_SENSE\n");
+   for (j = 0; j < m; j++) {
+      printf("%s\tc%d\t%c\n", env->mip->rowname[j], j, sense[j]);
+   }
+   */
+   /*
+   printf("\nNEW_RHS\n");
+   for (j = 0; j < m; j++) {
+      printf("%s\tc%d\t%f\n", env->mip->rowname[j], j, rhs[j]);
+   }
+   */
+   /*
+   printf("\nNEW_COEFF\n");
+   for (i = 0; i < n; i++) {
+      if ((column_starts[i+1] - column_starts[i]) > 0) {
+         for (j = column_starts[i]; j < column_starts[i+1]; j++) {
+            printf("x%d\tc%d\t%f\n", i, matrix_indices[j], matrix_values[j]);
+         }
+      }
+   }
+   */
+   /*
+   printf("\nNEW_CCIND\n");
+   for (i = 0; i < n; i++) {
+      printf("%s\tx%d\t%d\n", env->mip->colname[i], i, prob->ccind[i]);
+   }
+   */
+   /* Suresh: debug code END */
 
    /* Change prob->mip values to final problem values */
    prob->mip->n = n;
