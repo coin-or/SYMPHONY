@@ -29025,7 +29025,7 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/BILEVEL/Makefile Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MISOCO/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MISOCO/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
 
 
 
@@ -30146,7 +30146,6 @@ do
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
   "Examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES Examples/Makefile" ;;
   "Applications/Makefile.Applications" ) CONFIG_FILES="$CONFIG_FILES Applications/Makefile.Applications" ;;
-  "Applications/BILEVEL/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/BILEVEL/Makefile" ;;
   "Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/CNRP/Makefile" ;;
   "Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MATCH/Makefile" ;;
   "Applications/MCKP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MCKP/Makefile" ;;

@@ -1,4 +1,3 @@
-
 /*===========================================================================*/
 /*                                                                           */
 /* This file is part of the SYMPHONY MILP Solver Framework.                  */
@@ -728,8 +727,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    max_presolve_iter = (int)(1.0 * max_presolve_iter * 5e4/p->mip->nz);
 	 }
 #endif
-	 //max_presolve_iter = MAX(max_presolve_iter, 25);
-	 max_presolve_iter = 40;
+	 max_presolve_iter = MAX(max_presolve_iter, 40);
+	 //max_presolve_iter = 40;
 	 if(p->par.rs_mode_enabled) max_presolve_iter = 5; 
 
 	 if (max_presolve_iter < 5) {
@@ -847,11 +846,17 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->br_rel_down_min_level[branch_var] =  p->bc_level;
 	    }
             if (down_status == LP_D_INFEASIBLE || down_status == LP_D_OBJLIM || 
-                down_status == LP_D_UNBOUNDED) {
+                down_status == LP_D_UNBOUNDED ||
+		(p->has_ub && down_obj > p->ub - p->par.granularity + p->lp_data->lpetol)) {
                // update bounds
                bnd_val[num_bnd_changes] = ceilx;
                bnd_sense[num_bnd_changes] = 'G';
                bnd_ind[num_bnd_changes] = branch_var;
+	       if (p->mip->colname){
+		  PRINT(p->par.verbosity, 5,
+			("Fixing variable index %i (%s) to 1 \n", branch_var,
+			 p->mip->colname[p->lp_data->vars[branch_var]->userind]));
+	       }
                num_bnd_changes++;
                change_lbub(lp_data, branch_var, ceilx, ub);
                vars[branch_var]->new_lb = ceilx;
@@ -894,11 +899,17 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    }
             up_is_est = FALSE;
             if (up_status == LP_D_INFEASIBLE || up_status == LP_D_OBJLIM || 
-                up_status == LP_D_UNBOUNDED) {
+                up_status == LP_D_UNBOUNDED ||
+		(p->has_ub && up_obj > p->ub - p->par.granularity + p->lp_data->lpetol)) {
                // update bounds
                bnd_val[num_bnd_changes] = floorx;
                bnd_sense[num_bnd_changes] = 'L';
                bnd_ind[num_bnd_changes] = branch_var;
+	       if (p->mip->colname){
+		  PRINT(p->par.verbosity, 5,
+			("Fixing variable index %i (%s) to 1 \n", branch_var,
+			 p->mip->colname[p->lp_data->vars[branch_var]->userind]));
+	       }
                num_bnd_changes++;
                change_lbub(lp_data, branch_var, lb, floorx);
                vars[branch_var]->new_ub = floorx;
@@ -1452,12 +1463,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       FREE(up_violation_cnt);
       FREE(down_violation_cnt);
       FREE(violation_col_size);
-      
-      if (both_children_inf == TRUE) {
+
+      if (both_children_inf || num_bnd_changes > 0) {
          FREE(best_can);
          FREE(candidates);
          *candidate = NULL;
-         p->lp_stat.str_br_nodes_pruned++;
          if (should_use_hot_starts && unmark_hs){
             unmark_hotstart(lp_data);
             set_itlim_hotstart(lp_data, -1);
@@ -1465,7 +1475,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    load_basis(lp_data, rstat, cstat);
 	 }
          set_itlim(lp_data, -1); //both limits should be set for hotstarts
-         return (DO_NOT_BRANCH__FATHOMED);
+	 if (both_children_inf){
+	    p->lp_stat.str_br_nodes_pruned++;
+	    return (DO_NOT_BRANCH__FATHOMED);
+	 }else{
+	    return (DO_NOT_BRANCH);
+	 }
       }
 
       //printf("Branching on %i %c\n", best_can->position, best_can->sense[0]);
@@ -1693,7 +1708,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 			    DSIZE*p->base.cutnum);
 		     //Anahita
 		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
-			get_dual_farkas_ray(lp_data);
+			get_dual_ray(lp_data);
 			if (lp_data->raysol){
 			   can->rays[j] =
 			      (double *) malloc(DSIZE*p->base.cutnum);
@@ -1817,7 +1832,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 			    DSIZE*p->base.cutnum);
 		     //Anahita
 		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
-			get_dual_farkas_ray(lp_data);
+			get_dual_ray(lp_data);
 			if (lp_data->raysol){
 			   can->rays[j] =
 			      (double *) malloc(DSIZE*p->base.cutnum);
@@ -2118,6 +2133,8 @@ int branch(lp_prob *p, int cuts)
    cut_data *cut;
    node_desc *desc;
    int termcode;
+   bc_node *node = p->tm->active_nodes[p->proc_index];
+   branch_obj *bobj = &node->bobj;
    
    termcode = select_branching_object(p, &cuts, &can);
    
@@ -2166,33 +2183,33 @@ int branch(lp_prob *p, int cuts)
    }
 
    desc = p->desc;
-   switch (can->type){
+   switch (bobj->type){
     case CANDIDATE_VARIABLE:
-      p->branch_var = can->position;
-      p->branch_dir = can->sense[keep];
-      var = lp_data->vars[branch_var = can->position];
-      switch (can->sense[keep]){
+      p->branch_var = bobj->position;
+      p->branch_dir = bobj->sense[keep];
+      var = lp_data->vars[branch_var = bobj->position];
+      switch (bobj->sense[keep]){
        case 'E':
-	 var->new_lb = var->new_ub = can->rhs[keep];
-	 var->lb = var->ub = can->rhs[keep];                             break;
+	 var->new_lb = var->new_ub = bobj->rhs[keep];
+	 var->lb = var->ub = bobj->rhs[keep];                             break;
        case 'R':
-	 var->new_lb = can->rhs[keep]; 
-         var->new_ub = var->lb + can->range[keep];
-	 var->lb = can->rhs[keep]; var->ub = var->lb + can->range[keep]; break;
+	 var->new_lb = bobj->rhs[keep]; 
+         var->new_ub = var->lb + bobj->range[keep];
+	 var->lb = bobj->rhs[keep]; var->ub = var->lb + bobj->range[keep]; break;
        case 'L':
-	 var->new_ub = can->rhs[keep];
-	 var->ub = can->rhs[keep];                                       break;
+	 var->new_ub = bobj->rhs[keep];
+	 var->ub = bobj->rhs[keep];                                       break;
        case 'G':
-	 var->new_lb = can->rhs[keep];
-	 var->lb = can->rhs[keep];                                       break;
+	 var->new_lb = bobj->rhs[keep];
+	 var->lb = bobj->rhs[keep];                                       break;
       }
-      //printf("branching on %i %c %f %f\n", branch_var, can->sense[keep], var->lb, var->ub);
-      change_col(lp_data, branch_var, can->sense[keep], var->lb, var->ub);
+      //printf("branching on %i %c %f %f\n", branch_var, bobj->sense[keep], var->lb, var->ub);
+      change_col(lp_data, branch_var, bobj->sense[keep], var->lb, var->ub);
       lp_data->status[branch_var] |= VARIABLE_BRANCHED_ON;
       break;
     case SOS1_IMPLICIT:
-      for(int j = 0; j < can->sos_cnt[keep]; j++){
-	 branch_var = can->sos_ind[keep][j];
+      for(int j = 0; j < bobj->sos_cnt[keep]; j++){
+	 branch_var = bobj->sos_ind[keep][j];
 	 change_ub(lp_data, branch_var, 0.0);
 	 lp_data->vars[branch_var]->new_ub = 0.0;
 	 lp_data->vars[branch_var]->ub = 0.0;
@@ -2202,7 +2219,7 @@ int branch(lp_prob *p, int cuts)
       //printf("\n");
       break;
     case CANDIDATE_CUT_IN_MATRIX:
-      branch_row = can->position;
+      branch_row = bobj->position;
       cut = lp_data->rows[branch_row].cut;
       /* To maintain consistency with TM we have to fix a few more things if
 	 we had a non-base, new branching cut */
@@ -2266,10 +2283,10 @@ int branch(lp_prob *p, int cuts)
 	    stat[i] = SLACK_BASIC;
 	 }
       }
-      cut->rhs = can->rhs[keep];
-      if ((cut->sense = can->sense[keep]) == 'R')
-	 cut->range = can->range[keep];
-      cut->branch = CUT_BRANCHED_ON | can->branch[keep];
+      cut->rhs = bobj->rhs[keep];
+      if ((cut->sense = bobj->sense[keep]) == 'R')
+	 cut->range = bobj->range[keep];
+      cut->branch = CUT_BRANCHED_ON | bobj->branch[keep];
       constrain_row_set(lp_data, 1, &branch_row);
       lp_data->rows[branch_row].free = FALSE;
       break;

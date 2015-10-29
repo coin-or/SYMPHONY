@@ -920,7 +920,6 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
 		 Examples/Makefile
 		 Applications/Makefile.Applications
-		 Applications/BILEVEL/Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile

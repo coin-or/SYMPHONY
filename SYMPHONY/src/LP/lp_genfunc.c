@@ -320,9 +320,11 @@ int fathom_branch(lp_prob *p)
 
       p->bound_changes_in_iter = 0;
 
-      //char name[50] = "";
-      //sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
-      //write_mps(lp_data, name);
+      if (!rs_mode_enabled && p->par.debug_lp){
+	 char name[50] = "";
+	 sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
+	 write_lp(lp_data, name);
+      }
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
 			       p->bc_level < 1)) ||
 	  p->par.should_warmstart_node == FALSE) {
@@ -692,7 +694,7 @@ OPENMP_ATOMIC_UPDATE
             }
 	    printf("\n\n");
 	 }
-#ifdef DO_TESTS
+#if 0
 	 if (cuts == 0 && p->bound_changes_in_iter == 0){
 	    printf("Error! Told not to branch, but there are no new cuts or ");
 	    printf("bound changes!\n");
@@ -2898,13 +2900,17 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
     case CGL_GOMORY_GENERATOR:
       {
          CglGomory *gomory = new CglGomory;
-	 CglTreeInfo treeInfo;
-	 if (p->par.cgl.gomory_globally_valid){
-	    treeInfo.options |= 16;
-	 }
          should_use_cgl_generator(p, &should_generate, i, (void *)gomory);
          if (should_generate == TRUE) {
+#if 0
+	    CglTreeInfo treeInfo;
+	    if (p->par.cgl.gomory_globally_valid){
+	       treeInfo.options |= 16;
+	    }
 	    gomory->generateCuts(*(p->lp_data->si), cutlist, treeInfo);
+#else
+	    gomory->generateCuts(*(p->lp_data->si), cutlist);
+#endif
 	    *was_tried = TRUE;	    
          }
          delete gomory;

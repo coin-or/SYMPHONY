@@ -176,7 +176,9 @@ int sym_close_environment(sym_environment *env)
 int sym_reset_environment(sym_environment *env)
 {
    int termcode = 0, my_tid = env->my_tid;
-   params par = env->par;
+   //params par = env->par;
+   
+   int obj_sense = env->mip->obj_sense;
    
    CALL_WRAPPER_FUNCTION( free_master_u(env) );
 
@@ -185,12 +187,15 @@ int sym_reset_environment(sym_environment *env)
    pvm_catchout(0);
 #endif
    
-   memset(env, 0, sizeof(sym_environment));
+   //memset(env, 0, sizeof(sym_environment));
 
-   env->my_tid = my_tid;
-   env->par = par;
+   //env->my_tid = my_tid;
+   //env->par = par;
+   env->par.tm_par.granularity = env->par.lp_par.granularity = 1e-7;
 
    env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+
+   env->mip->obj_sense = obj_sense;
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
@@ -310,6 +315,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cuts_strong_branch = 0; //Anahita
    lp_par->is_recourse_prob = 0; //Anahita
    lp_par->verbosity = 0;
+   lp_par->debug_lp = FALSE;
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
    lp_par->set_obj_upper_lim = TRUE;
@@ -5547,6 +5553,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    if (strcmp(key, "LP_verbosity") == 0){
       *value = lp_par->verbosity;
    }
+   else if (strcmp(key, "debug_lp") == 0 ||
+       strcmp(key, "LP_debug_lp") == 0){
+      *value = lp_par->debug_lp;
+   }
    else if (strcmp(key, "set_obj_upper_lim") == 0 ||
 	    strcmp(key, "LP_set_obj_upper_lim") == 0){
       *value = lp_par->set_obj_upper_lim;
@@ -6812,18 +6822,6 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
   }
 
   for(i = 0; i < file_num; i++){
-
-#if 0
-    if(env->mip->n){
-       free_master_u(env);
-       strcpy(env->par.infile, "");
-       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-    }
-#endif
-    
-    sym_close_environment(env);
-    env = sym_open_environment();
-    sym_parse_command_line(env, argc, argv);
 
     strcpy(infile, "");
     if (dirsep == '/')

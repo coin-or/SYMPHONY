@@ -2621,57 +2621,47 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       lp_data->objval = si->getObjValue();
 
       /* Get relevant data */
-      if (!lp_data->dualsol){
-      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+      get_x(lp_data);
+
+      if (lp_data->dualsol && lp_data->dj) {
+	 get_dj_pi(lp_data);
+
+	 //Anahita
+	 double intercept = 0;
+	 for (int t = 0; t < lp_data->n; t++){
+	    intercept += lp_data->x[t]* lp_data->dj[t];
+	 }
+	 lp_data->intcpt = intercept;
+	 
+#ifdef CHECK_DUAL_SOLUTION
+	 if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
+	    //This code checks the dual solution values
+	    double lb = 0;
+	    
+	    for (int i = 0; i <lp_data->m; i++){
+	       if (si->getRowUpper()[i] < 1000000){
+		  lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	       }else{
+		  lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	       }
+	    }
+	    
+	    if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	       write_mps(lp_data, "lp.assert");
+	    }
+	    
+	    assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+	 }
+#endif
       }
-      if (!lp_data->dj){
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-      }
-      get_dj_pi(lp_data);
-      
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
       
       //Anahita
-      if (term == LP_D_UNBOUNDED) {
-	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	    lp_data->maxm * DSIZE);
-	 get_dual_farkas_ray(lp_data);
+      if (term == LP_D_UNBOUNDED && lp_data->raysol) {
+	 get_dual_ray(lp_data);
       }
-      
-      get_x(lp_data);
-
-      //Anahita
-      int t;
-      double intercept = 0;
-      
-      for (t=0; t < lp_data->n; t++){
-	 intercept += lp_data->x[t]* lp_data->dj[t];
-      }
-
-      lp_data->intcpt = intercept;
-
-#ifndef CHECK_DUAL_SOLUTION
-      if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
-	//This code checks the dual solution values
-	double lb = 0;
-	
-	for (int i = 0; i <lp_data->m; i++){
-	  if (si->getRowUpper()[i] < 1000000){
-	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
-	  }else{
-	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
-	  }
-	}
-	
-	if (fabs(intercept + lb - lp_data->objval) > 0.1){
-	  write_mps(lp_data, "lp.assert");
-	}
-	
-	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
-      }
-#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }
@@ -2741,65 +2731,54 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    
    lp_data->termcode = term;
    
-   if (term != LP_ABANDONED){
+   if (term != LP_ABANDONED && term != LP_D_INFEASIBLE){
       
       *iterd = si->getIterationCount();
       
       lp_data->objval = si->getObjValue();
 
-
       /* Get relevant data */
-      if (!lp_data->dualsol){
-      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+      get_x(lp_data);
+
+      if (lp_data->dualsol && lp_data->dj) {
+	 get_dj_pi(lp_data);
+
+	 //Anahita
+	 double intercept = 0;
+	 for (int t = 0; t < lp_data->n; t++){
+	    intercept += lp_data->x[t]* lp_data->dj[t];
+	 }
+	 lp_data->intcpt = intercept;
+	 
+#ifdef CHECK_DUAL_SOLUTION
+	 if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
+	    //This code checks the dual solution values
+	    double lb = 0;
+	    
+	    for (int i = 0; i <lp_data->m; i++){
+	       if (si->getRowUpper()[i] < 1000000){
+		  lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	       }else{
+		  lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	       }
+	    }
+	    
+	    if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	       write_mps(lp_data, "lp.assert");
+	    }
+	    
+	    assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+	 }
+#endif
       }
-      if (!lp_data->dj){
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-      }
-      get_dj_pi(lp_data);
-      
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
-      
-      //Anahita
-      if (term == LP_D_UNBOUNDED) {
-	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	    lp_data->maxm * DSIZE);
-	 get_dual_farkas_ray(lp_data);
-      }
-      
-      get_x(lp_data);
 
       //Anahita
-      int t;
-      double intercept = 0;
-      
-      for (t=0; t < lp_data->n; t++){
-	 intercept += lp_data->x[t]* lp_data->dj[t];
+      if (term == LP_D_UNBOUNDED && lp_data->raysol) {
+	 get_dual_ray(lp_data);
       }
-
-      lp_data->intcpt = intercept;
-      
-#ifdef CHECK_DUAL_SOLUTION
-      if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
-	//This code checks the dual solution values
-	double lb = 0;
-	
-	for (int i = 0; i <lp_data->m; i++){
-	  if (si->getRowUpper()[i] < 1000000){
-	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
-	  }else{
-	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
-	  }
-	}
-	
-	if (fabs(intercept + lb - lp_data->objval) > 0.1){
-	  write_mps(lp_data, "lp.assert");
-	}
-	
-	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
-      }
-#endif
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2853,65 +2832,55 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
    
    lp_data->termcode = term;
    
-   if (term != LP_ABANDONED){
+   if (term != LP_ABANDONED && term != LP_D_INFEASIBLE){
       
       *iterd = si->getIterationCount();
       
       lp_data->objval = si->getObjValue();
 
-      // Get relevant data
-      if (lp_data->dualsol && lp_data->dj) {
-      	 get_dj_pi(lp_data);
-      }else{ //Anahita
-      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-      	 get_dj_pi(lp_data);
-      }
-
-      if (lp_data->slacks && term == LP_OPTIMAL) {
-      	 get_slacks(lp_data);
-      }
-
-      //Anahita
-      if (term == LP_D_UNBOUNDED) {
-	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	    lp_data->maxm * DSIZE);
-	 get_dual_farkas_ray(lp_data);
-      }
-      
+      /* Get relevant data */
       get_x(lp_data);
 
-      //Anahita
-      int t;
-      double intercept = 0;
-      
-      for (t=0; t < lp_data->n; t++){
-	 intercept += lp_data->x[t]* lp_data->dj[t];
-      }
+      if (lp_data->dualsol && lp_data->dj) {
+	 get_dj_pi(lp_data);
 
-      lp_data->intcpt = intercept;
-
+	 //Anahita
+	 double intercept = 0;
+	 for (int t = 0; t < lp_data->n; t++){
+	    intercept += lp_data->x[t]* lp_data->dj[t];
+	 }
+	 lp_data->intcpt = intercept;
+	 
 #ifdef CHECK_DUAL_SOLUTION
-      if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
-	//This code checks the dual solution values
-	double lb = 0;
-	
-	for (int i = 0; i <lp_data->m; i++){
-	  if (si->getRowUpper()[i] < 1000000){
-	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
-	  }else{
-	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
-	  }
-	}
-	
-	if (fabs(intercept + lb - lp_data->objval) > 0.1){
-	  write_mps(lp_data, "lp.assert");
-	}
-	
-	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
-      }
+	 if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
+	    //This code checks the dual solution values
+	    double lb = 0;
+	    
+	    for (int i = 0; i <lp_data->m; i++){
+	       if (si->getRowUpper()[i] < 1000000){
+		  lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	       }else{
+		  lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	       }
+	    }
+	    
+	    if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	       write_mps(lp_data, "lp.assert");
+	    }
+	    
+	    assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+	 }
 #endif
-	
+      }
+      if (lp_data->slacks && term == LP_OPTIMAL) {
+	 get_slacks(lp_data);
+      }
+
+      //Anahita
+      if (term == LP_D_UNBOUNDED && lp_data->raysol) {
+	 get_dual_ray(lp_data);
+      }
+      
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
    else{
@@ -3172,14 +3141,13 @@ void get_dj_pi(LPdata *lp_data)
    }
 }
 
-
-
-/*=Anahita==========================================================*/
+/*===========================================================================*/
+/*=Anahita===================================================================*/
 
 void get_dual_ray(LPdata *lp_data)
 {
    std::vector<double*> vRays;
-   vRays = lp_data->si->getDualRays(1,0);
+   vRays = lp_data->si->getDualRays(1, false);
 
    //check that there is at least one ray
    int raysReturned = static_cast<unsigned int>(vRays.size()) ;
@@ -3205,10 +3173,10 @@ void get_dual_ray(LPdata *lp_data)
    }
 }
 
+/*===========================================================================*/
+/*=Anahita===================================================================*/
 
-
-/*=Anahita==========================================================*/
-
+#if 0
 void get_dual_farkas_ray(LPdata *lp_data)
 {
    std::vector<double*> vRays;
@@ -3237,6 +3205,7 @@ void get_dual_farkas_ray(LPdata *lp_data)
       double* ray = NULL;
    }
 }
+#endif
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -3864,6 +3833,22 @@ void write_mps(LPdata *lp_data, char *fname)
 
 /*===========================================================================*/
 
+void write_lp(LPdata *lp_data, char *fname)
+{
+   const char * extension = "LP";
+   OsiXSolverInterface  *si = lp_data->si;
+   double ObjSense = si->getObjSense();
+   int i;
+   
+   for (i = 0; i < lp_data->n; i++) {
+      si->setContinuous(i);
+   }
+
+   si->writeLp(fname, extension);
+}
+
+/*===========================================================================*/
+
 void write_mip_desc_mps(MIPdesc *mip, char *fname)
 {
    int i;
@@ -4160,7 +4145,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       if ((bc_level<6 && comp_times->gomory_cuts<comp_times->lp) || 
           (bc_level>6 && comp_times->gomory_cuts<comp_times->lp/10)) {
          CglGomory *gomory = new CglGomory;
-	 CglTreeInfo *treeInfo = new CglTreeInfo;
          // TODO: change this to something based on number of cols, sparsity
          // etc.
          if (bc_level<1) {
@@ -4170,10 +4154,15 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             gomory->setLimitAtRoot(100);
             gomory->setLimit(100);
          }
+#if 0
+	 CglTreeInfo *treeInfo = new CglTreeInfo;
 	 if (par->cgl.gomory_globally_valid){
 	    treeInfo.options &= 16;
 	 }
          gomory->generateCuts(*(lp_data->si), cutlist, treeInfo);
+#else
+         gomory->generateCuts(*(lp_data->si), cutlist);
+#endif
          if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
             if (is_top_iter){
                par->gomory_generated_in_root = TRUE;
@@ -4587,7 +4576,6 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
       const double *x = lp_data->x;
       const double lpetol = lp_data->lpetol;
       const double etol1000 = lpetol*1000;
-      const double etol1100000 = lpetol*1000; //Anahita
       double *matval;
       int *matind;
          

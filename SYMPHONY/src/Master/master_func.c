@@ -2349,6 +2349,11 @@ int set_param(sym_environment *env, char *line)
       tm_par->granularity = lp_par->granularity;
       return(0);
    }
+   else if (strcmp(key, "debug_lp") == 0 ||
+	    strcmp(key, "LP_debug_lp") == 0){
+      READ_INT_PAR(lp_par->debug_lp);
+      return(0);
+   }
    else if (strcmp(key, "set_obj_upper_lim") == 0 ||
 	    strcmp(key, "LP_set_obj_upper_lim") == 0){
       READ_INT_PAR(lp_par->set_obj_upper_lim);
@@ -4561,9 +4566,6 @@ char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
    
    if (colsol){
       tmp_sol = colsol;
-      for (i = 0; i < env->mip->n; i++){
-	 assert(colsol[i] < env->mip->n);
-      }
    }else{
       tmp_sol = (double *) calloc(env->mip->n, DSIZE);
       for (i = 0; i < sol->xlength; i++){
