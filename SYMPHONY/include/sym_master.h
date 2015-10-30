@@ -137,8 +137,8 @@ void ws_free_subtree PROTO((sym_environment *env, bc_node *root,
 			    int change_type, int check_solution, int update_stats));
 void check_better_solution PROTO((sym_environment * env, bc_node *root, 
 				  int delete_node, int change_type));
-int copy_node PROTO((bc_node * n_to, bc_node *n_from));
-int copy_tree PROTO((bc_node *root_to, bc_node *root_from));
+int copy_node PROTO((warm_start_desc * ws, bc_node * n_to, bc_node *n_from));
+int copy_tree PROTO((warm_start_desc * ws, bc_node *root_to, bc_node *root_from));
 int read_node PROTO((bc_node * node, FILE *f));
 int read_tree PROTO((bc_node * root, FILE *f));
 int write_node PROTO((bc_node *node, FILE *f));

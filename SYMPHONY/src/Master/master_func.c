@@ -36,12 +36,10 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-/* not used now! to be used later!*/
 int resolve_node(sym_environment *env, bc_node *node)
 {
    node_desc * desc = &node->desc;
    LPdata *lp_data = (LPdata*)calloc(1, sizeof(LPdata));
-   lp_data->mip = create_copy_mip_desc(env->mip); //FIXME!!!
    lp_sol *best_sol = &(env->warm_start->best_sol);
    branch_desc *bpath;
    branch_obj *bobj;
@@ -293,12 +291,21 @@ int resolve_node(sym_environment *env, bc_node *node)
 
    //   lp_data->mip->m += new_desc->cutind.size;
 
-   lp_data->m = lp_data->mip->m;
-   lp_data->n = lp_data->mip->n;
+   lp_data->m = env->mip->m;
+   lp_data->n = env->mip->n;
 
    open_lp_solver(lp_data);
-   load_lp_prob(lp_data, 0, 0);
+   //This is a bit of a hack to avoid making a full copy of env->mip 
+   //Should be calling load_lp_prob(lp_data, 0, 0);
+   //Perhaps make MIPdesc an argument of load_lp_prob??
 
+   MIPdesc *mip = env->mip;
+   lp_data->si->loadProblem(lp_data->n, lp_data->m,
+			    mip->matbeg, mip->matind,
+			    mip->matval, mip->lb,
+			    mip->ub, mip->obj,
+			    mip->sense, mip->rhs,
+			    mip->rngval);
 
    /*------------------------------------------------------------------------*\
     * Now go through the branching stuff
@@ -421,6 +428,11 @@ int resolve_node(sym_environment *env, bc_node *node)
       }
       load_basis(lp_data, cstat, rstat);
    }
+
+   size_lp_arrays(lp_data, FALSE, TRUE, lp_data->m, lp_data->n, nzcnt);
+
+   // This is a hack. If lp_data->slacks is allocated, we crash
+   FREE(lp_data->slacks);
    
    return_value = dual_simplex(lp_data, &iterd);
    
@@ -428,15 +440,21 @@ int resolve_node(sym_environment *env, bc_node *node)
       return_value == LP_D_INFEASIBLE){
       node->feasibility_status = INFEASIBLE_PRUNED;
       node->node_status = NODE_STATUS__PRUNED;
+      if (lp_data->raysol){
+	 if (!node->rays){
+	    node->rays = (double *) malloc(lp_data->m*DSIZE);
+	 }
+	 memcpy(node->rays, lp_data->raysol, lp_data->m*DSIZE);
+      }
    }
 
    if(return_value == LP_OPTIMAL || return_value == LP_D_OBJLIM || 
       return_value == LP_D_ITLIM){
-      lp_data->x = (double *)malloc(DSIZE*lp_data->n);
+      //lp_data->x = (double *)malloc(DSIZE*lp_data->n);
       get_x(lp_data);
-      for(i = lp_data->n; i>=0; i--){
+      for(i = lp_data->n-1; i>=0; i--){
 	 colsol = lp_data->x[i];
-	 if(lp_data->mip->is_int[i]){
+	 if(env->mip->is_int[i]){
 	    if(colsol-floor(colsol) > env->par.lp_par.granularity &&
 	       ceil(colsol)-colsol > env->par.lp_par.granularity){
 	       break;
@@ -446,6 +464,20 @@ int resolve_node(sym_environment *env, bc_node *node)
       if(i<0){
 	 node->node_status = NODE_STATUS__PRUNED;
 	 node->feasibility_status = FEASIBLE_PRUNED;
+
+	 FREE(node->sol_ind);
+	 FREE(node->sol);
+
+	 node->sol_ind = xind = (int *)malloc(ISIZE*lp_data->n);
+	 node->sol = xval = (double *)malloc(DSIZE*lp_data->n);	    
+	 
+	 for (i = 0; i < lp_data->n; i++){
+	    if (lp_data->x[i] > lpetol || lp_data->x[i] < -lpetol){
+	       xind[cnt] = i;
+	       xval[cnt++] = lp_data->x[i];
+	    }
+	 }
+	 node->sol_size = cnt;
 
 	 if((env->warm_start->has_ub && 
 	     lp_data->objval < env->warm_start->ub)||
@@ -461,15 +493,6 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    FREE(best_sol->xind);
 	    FREE(best_sol->xval);
 	    
-	    xind = (int *)malloc(ISIZE*lp_data->n);
-	    xval = (double *)malloc(DSIZE*lp_data->n);	    
-	    	    
-	    for (i = 0; i < lp_data->n; i++){
-	       if (lp_data->x[i] > lpetol || lp_data->x[i] < -lpetol){
-		  xind[cnt] = i;
-		  xval[cnt++] = lp_data->x[i];
-	       }
-	    }
 	    best_sol->xind = (int *)malloc(ISIZE*cnt);
 	    best_sol->xval = (double *)malloc(DSIZE*cnt);	    
 	    memcpy(best_sol->xind, xind, ISIZE*cnt);
@@ -478,7 +501,18 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    best_sol->xlevel = node->bc_level;
 	    best_sol->xindex = node->bc_index;
 	    best_sol->lpetol = lpetol;
-	 }  	 
+	 }else{
+	    node->sol_size = 0;
+	    FREE(node->sol_ind);
+	    FREE(node->sol);
+	    node->node_status = NODE_STATUS__CANDIDATE;
+	 }
+      }
+      if (lp_data->dualsol){
+	 if (!node->duals){
+	    node->duals = (double *) malloc(lp_data->m*DSIZE);
+	 }
+	 memcpy(node->duals, lp_data->dualsol, lp_data->m*DSIZE);
       }
    }
 
@@ -518,11 +552,8 @@ int resolve_node(sym_environment *env, bc_node *node)
       FREE(desc);
    }
    node->lower_bound = lp_data->objval;
-   free_mip_desc(lp_data->mip);
    free_lp_arrays(lp_data);
    close_lp_solver(lp_data);  
-   FREE(xind);
-   FREE(xval);
    FREE(lp_data);
 
    return(FUNCTION_TERMINATED_NORMALLY);
@@ -531,11 +562,11 @@ int resolve_node(sym_environment *env, bc_node *node)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num, int *cuts_ind, char *cru_vars, 
-		      int change_type)
+int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
+		      int *cuts_ind, char *cru_vars, int change_type)
 {
 
-   int i, resolve = 0;
+   int i, resolve = 1;
    char deletable = TRUE;   
 
    if (root){
@@ -578,7 +609,9 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num, int *cu
 		 resolve_node(env, root);		 
 	      }
 	   }
-	   root->feasibility_status = 0; // or? ROOT_NODE;
+	   if (resolve == 0){
+	      root->feasibility_status = 0; // or? ROOT_NODE;
+	   }
 	 }
       } else{
 	 if(root->bobj.child_num > 0){
@@ -1179,7 +1212,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 /*===========================================================================*/
 /*===========================================================================*/
 
-int copy_node(bc_node * n_to, bc_node *n_from)
+int copy_node(warm_start_desc *ws, bc_node * n_to, bc_node *n_from)
 {
 
    if (!n_to || !n_from){
@@ -1211,7 +1244,21 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 	 memcpy(n_to->sol_ind, n_from->sol_ind, n_from->sol_size * ISIZE);
       }
    }
-  
+
+   //FIXME: This is a bit fragile. Assumes variable list doesn't
+   //change, etc.
+   if (n_from->duals){
+      n_to->duals = (double *) malloc(ws->rootnode->desc.uind.size*DSIZE);
+      memcpy(n_to->duals, n_from->duals,
+	     ws->rootnode->desc.uind.size*DSIZE);
+   }
+   
+   if (n_from->rays){
+      n_to->rays = (double *) malloc(n_from->desc.uind.size*DSIZE);
+      memcpy(n_to->rays, n_from->rays,
+	     n_from->desc.uind.size*DSIZE);
+   }
+   
 #ifdef TRACE_PATH
    n_to->optimal_path = n_from->optimal_path;
 #endif 
@@ -1400,7 +1447,8 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int copy_tree(bc_node *root_to, bc_node *root_from)
+int copy_tree(warm_start_desc *ws,
+	      bc_node *root_to, bc_node *root_from)
 {
    int i, childNum;
 
@@ -1410,14 +1458,14 @@ int copy_tree(bc_node *root_to, bc_node *root_from)
    }
    
    if (root_from){
-      copy_node(root_to, root_from);      
+      copy_node(ws, root_to, root_from);      
       childNum = root_to->bobj.child_num;      
       if (childNum) {
 	 root_to->children = (bc_node **) calloc(sizeof(bc_node*), childNum);
 	 for (i = 0; i < childNum; i++){
 	    root_to->children[i] = (bc_node *) calloc(1, sizeof(bc_node));
 	    root_to->children[i]->parent = root_to;
-	    copy_tree(root_to->children[i], root_from->children[i]); 
+	    copy_tree(ws, root_to->children[i], root_from->children[i]); 
 	 }
       }      
    }
@@ -3498,7 +3546,7 @@ warm_start_desc *create_copy_warm_start(warm_start_desc *ws)
 	     CSIZE* ws_copy->cuts[i]->size);
    }
    ws_copy->rootnode = (bc_node*)calloc(1,sizeof(bc_node));	 
-   copy_tree(ws_copy->rootnode, ws->rootnode);
+   copy_tree(ws, ws_copy->rootnode, ws->rootnode);
 
    if(ws->best_sol.xlength){
       ws_copy->best_sol.xind = (int*) malloc (ISIZE * ws->best_sol.xlength);
