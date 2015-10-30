@@ -61,11 +61,7 @@ typedef struct USER_PROBLEM{
    int             *vvind;      /* Var indices of violated complementarity constraints */
    int              vvnum;      /* Number of violated complementarity cons. Size of vvind */
 
-   // Added by Suresh for debugging
-   /*
-   double         *origobj_coeffs;
-   int            origvar_num;
-   */
+   double          *rowact;     /* row activities of constraints of current LP relaxation */
 
 }user_problem;
 

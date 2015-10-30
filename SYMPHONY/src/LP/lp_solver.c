@@ -2654,7 +2654,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 
       lp_data->intcpt = intercept;
 
-#ifndef CHECK_DUAL_SOLUTION
+#ifdef CHECK_DUAL_SOLUTION
       if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
          //This code checks the dual solution values
          double lb = 0;

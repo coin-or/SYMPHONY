@@ -106,9 +106,8 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 
       /* Update appropriate values for prob data structure */
       prob->feasible = *feasible;
-//      prob->vvind = (int *) realloc(prob->vvind, violcount * ISIZE);
-//      memset(prob->vvind, 0, prob->vvnum * ISIZE);
       memcpy(prob->vvind, violind, violcount * ISIZE);
+      memcpy(prob->rowact, rowact, prob->rownum * DSIZE);
       prob->vvnum = violcount;
    } else {
       *feasible = IP_FEASIBLE;

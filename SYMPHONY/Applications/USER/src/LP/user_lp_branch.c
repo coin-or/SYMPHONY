@@ -12,10 +12,14 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* System include files */
+#include "math.h"
+
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
 #include "sym_lp_u.h"
+#include "sym_qsort.h"
 
 /* USER include files */
 #include "user.h"
@@ -68,41 +72,56 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 {
    user_problem *prob = (user_problem *)user;
    branch_obj *cand;
-   int cind;
+   int vind, cind, i, *vvind, max_cand_num =1;
+   double *rhs, *comcond_viol;
 
-   *cand_num = 1; /* TODO: Change this to prob->vvnum, and the following code accordingly */
-
+   /* number of candidates */
+   *cand_num = MIN(prob->vvnum, max_cand_num);
    *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
-   cand = (*candidates)[0] = (branch_obj *) calloc(1, sizeof(branch_obj));
 
-   /*
+   /* sorting candidates as per complementarity condition violation */
+   // first, compute absolute violation of every complementarity condition
+   rhs = prob->mip->rhs;
+   comcond_viol = (double *) malloc(prob->vvnum * DSIZE);
    for (i = 0; i < prob->vvnum; i++) {
-      if (prob->ccind[prob->vvind[i]] >= 0) {
-         cind = prob->ccind[prob->vvind[i]];
-         break;
+      vind = prob->vvind[i];
+      cind = prob->ccind[vind];
+      comcond_viol[i] = fabs(x[vind]) * fabs(prob->rowact[cind] - rhs[cind]);
+   }
+   // note, sort these violations and indices according to violations
+   vvind = (int *) malloc(prob->vvnum * ISIZE);
+   memcpy(vvind, prob->vvind, prob->vvnum * ISIZE);
+   qsort_di(comcond_viol, vvind, prob->vvnum);
+
+
+   /* select the *cand_num number of candidates based to violations */
+   for (i = 0; i < *cand_num; i++) {
+      cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj));
+
+      cind = prob->ccind[vvind[prob->vvnum - 1 - i]];
+
+      cand->child_num = 2;
+      cand->cdesc[0].type = CANDIDATE_CUT_IN_MATRIX;
+      cand->cdesc[1].type = CANDIDATE_VARIABLE;
+
+      cand->cdesc[0].position = cind;
+      cand->cdesc[1].position = vvind[prob->vvnum - 1 - i];
+
+      cand->cdesc[0].sense = 'E';
+      cand->cdesc[1].sense = 'E';
+
+      if (prob->mip->sense[cind] == 'G') {
+         cand->cdesc[0].rhs = -1.0 * prob->mip->rhs[cind];
+      } else {
+         cand->cdesc[0].rhs = prob->mip->rhs[cind];
       }
-   }
-   */
-   cind = prob->ccind[prob->vvind[0]];
+      cand->cdesc[1].rhs = 0;
 
-   cand->child_num = 2;
-   cand->cdesc[0].type = CANDIDATE_CUT_IN_MATRIX;
-   cand->cdesc[1].type = CANDIDATE_VARIABLE;
-
-   cand->cdesc[0].position = cind;
-   cand->cdesc[1].position = prob->vvind[0];
-   
-   cand->cdesc[0].sense = 'E';
-   cand->cdesc[1].sense = 'E';
-   
-   if (prob->mip->sense[cind] == 'G') {
-      cand->cdesc[0].rhs = -1.0 * prob->mip->rhs[cind];
-   } else {
-      cand->cdesc[0].rhs = prob->mip->rhs[cind];
+      cand->cdesc[0].range = cand->cdesc[1].range = 0;
    }
-   cand->cdesc[1].rhs = 0;
-   
-   cand->cdesc[0].range = cand->cdesc[1].range = 0;
+
+   FREE(vvind);
+   FREE(comcond_viol);
 
    return(USER_SUCCESS);
 }
@@ -113,8 +132,8 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
 			    double ub, double granularity,
 			    int *which_is_better)
 {
-   *which_is_better = SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT;
-   return(USER_SUCCESS);
+//   *which_is_better = SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT;
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/

@@ -275,45 +275,6 @@ int user_read_data(user_problem *prob, char *infile)
 
    /* Suresh: debug code START */
    /*
-   printf("\nORIGINAL MATBEG\n");
-   for (j = 0; j < prob->mip->n+1; j++) {
-      printf("%d\n", prob->mip->matbeg[j]);
-   }
-   printf("\nORIGINAL MATVAL\n");
-   for (j = 0; j < prob->mip->matbeg[prob->mip->n]; j ++) {
-      printf("%2.4e\n", prob->mip->matval[j]);
-   }
-   printf("\nORIGINAL MATIND\n");
-   for (j = 0; j < prob->mip->matbeg[prob->mip->n]; j ++) {
-      printf("%d\n", prob->mip->matind[j]);
-   }
-   printf("\nORIGINAL UB\n");
-   for (j = 0; j < prob->mip->n; j++) {
-      printf("%2.4e\n", prob->mip->ub[j]);
-   }
-   printf("\nORIGINAL LB\n");
-   for (j = 0; j < prob->mip->n; j++) {
-      printf("%2.4e\n", prob->mip->lb[j]);
-   }
-   printf("\nORIGINAL MATBEG_ROW\n");
-   for (j = 0; j < prob->mip->m+1; j++) {
-      printf("%d\n", prob->matbeg_row[j]);
-   }
-   printf("\nORIGINAL MATVAL_ROW\n");
-   for (j = 0; j < prob->matbeg_row[prob->mip->m]; j++) {
-      printf("%2.4e\n", prob->matval_row[j]);
-   }
-   printf("\nORIGINAL MATIND_ROW\n");
-   for (j = 0; j < prob->matbeg_row[prob->mip->m]; j++) {
-      printf("%d\n", prob->matind_row[j]);
-   }
-   */
-   /*
-   for (j = 0; j < prob->mip->n; j++) {
-      printf("%s\t%2.4e\t%2.4e\n", prob->mip->colname[j], prob->mip->lb[j], prob->mip->ub[j]);
-   }
-   */
-   /*
    printf("\nORIG_OBJ\n");
    for (j = 0; j < prob->mip->n; j++) {
       printf("%s\tx%d\t%2.4e\n", prob->mip->colname[j], j, prob->mip->obj[j]);
@@ -360,10 +321,28 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    double *matrix_values, *lb, *ub, *obj, *rhs, *rngval;
    char *sense, *is_int, obj_sense = 1.0;
    
+   // number of upper level variables
+   int num_upperlevel_vars = 1;
+   // TODO: Suresh: following two names are misleading. Fix them later.
+   // number of nonzeros in lower level constraint coeffs corresponding to upper level variables
+   int nz_upperlevel = prob->mip->matbeg[num_upperlevel_vars];
+   // number of nonzeros in lower level constraint coeffs corresponding to lower level variables
+   int nz_lowerlevel = prob->mip->matbeg[prob->mip->n] - nz_upperlevel;
+   // number of lower level finite upper bound constraints on variables
+   int num_lowerlevel_ubcons = (prob->mip->n - num_upperlevel_vars - (prob->ubinfty - prob->infubsofar[num_upperlevel_vars]));
+   // number of lower level dual variables on finite upper bound constraints
+   int num_lowerlevel_dual_ubvars = num_lowerlevel_ubcons;
+   // number of lower level finite lower bound constrains on variables
+   int num_lowerlevel_lbcons = (prob->mip->n - num_upperlevel_vars - (prob->lbinfty - prob->inflbsofar[num_upperlevel_vars]));
+   // number of lower level dual variables on finite lower bound constraints
+   int num_lowerlevel_dual_lbvars = num_lowerlevel_lbcons;
+   // number of nonzeros per row in lower level part of coefficient matrix
+   int *nz_lowerlevel_row;
+
    /* set up the inital LP data */
-   n = 3 * prob->mip->n + prob->mip->m - prob->ubinfty - prob->lbinfty;
-   m = prob->mip->m + 3 * prob->mip->n - prob->ubinfty - prob->lbinfty;
-   nz = 4 * prob->mip->n - 2 * prob->ubinfty - 2 * prob->lbinfty + 2 * prob->mip->matbeg[prob->mip->n];
+   n = prob->mip->n + prob->mip->m + num_lowerlevel_dual_ubvars + num_lowerlevel_dual_lbvars;
+   m = prob->mip->m + num_lowerlevel_ubcons + num_lowerlevel_lbcons + (prob->mip->n - num_upperlevel_vars);
+   nz = prob->mip->matbeg[prob->mip->n] + 2*num_lowerlevel_ubcons + 2*num_lowerlevel_lbcons + nz_lowerlevel;
    prob->colnum = n;
    prob->rownum = m;
 
@@ -387,40 +366,26 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          } else {
             obj[i] = 0;
          }
-         /*
-         if (i < prob->mip->n) {
-            obj[i] = prob->mip->obj[i];
-         } else if (i < prob->mip->n + prob->mip->m) {
-            obj[i] = -prob->mip->rhs[i - prob->mip->n];
-         } else if (i < 2 * prob->mip->n + prob->mip->m - prob->ubinfty) {
-            obj[i] = -prob->tempub[i - prob->mip->n - prob->mip->m];
-         } else {
-            obj[i] = -prob->templb[i - 2 * prob->mip->n - prob->mip->m + prob->ubinfty];
-         }
-         */
-//         obj[i] = 0.0;
       }
    } else {
       for (i = 0; i < n; i++) {
-         /*
-         if (i < prob->mip->n) {
-            obj[i] = -prob->mip->obj[i];
-         } else if (i < prob->mip->n + prob->mip->m) {
-            obj[i] = prob->mip->rhs[i - prob->mip->n];
-         } else if (i < 2 * prob->mip->n + prob->mip->m - prob->ubinfty) {
-            obj[i] = prob->tempub[i - prob->mip->n - prob->mip->m];
-         } else {
-            obj[i] = prob->templb[i - 2 * prob->mip->n - prob->mip->m + prob->ubinfty];
-         }
-         */
          obj[i] = 0.0;
       }
    }
    env->mip->colname = (char **) malloc(sizeof(char *) * n);  
    env->mip->rowname = (char **) malloc(sizeof(char *) * m);  
 
-   /* The original primal variables */
-   for (i = 0; i < prob->mip->n; i++) {
+   /* The original upper level variables */
+   for (i = 0; i < num_upperlevel_vars; i++) {
+      is_int[i] = FALSE;
+      ub[i] = prob->mip->ub[i];
+      lb[i] = prob->mip->lb[i];
+      env->mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(env->mip->colname[i], prob->mip->colname[i], MAX_NAME_SIZE);
+      env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
+   }
+   /* The original lower level variables */
+   for (; i < prob->mip->n; i++) {
       is_int[i] = FALSE;
       ub[i] = prob->infty;
       lb[i] = -prob->infty;
@@ -428,7 +393,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       strncpy(env->mip->colname[i], prob->mip->colname[i], MAX_NAME_SIZE);
       env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
    }
-   /* The duals on original constraints */
+   /* The duals on original lower level constraints */
    for (;i < prob->mip->n + prob->mip->m; i++){
       is_int[i] = FALSE;
       if (prob->mip->sense[i - prob->mip->n] == 'L') {
@@ -448,12 +413,12 @@ int user_load_problem(sym_environment *env, user_problem *prob){
             MAX_NAME_SIZE-2);
       env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
    }
-   /* The duals on variable upper bound constraints */
-   for (j = 0; j < prob->mip->n; j++) {
+   /* The duals on lower level variable upper bound constraints */
+   for (j = num_upperlevel_vars; j < prob->mip->n; j++) {
       if (prob->mip->ub[j] >= prob->infty) {
          continue;
       }
-      index = j + prob->mip->m + prob->mip->n - prob->infubsofar[j];
+      index = prob->mip->n + prob->mip->m + ((j - num_upperlevel_vars) - (prob->infubsofar[j] - prob->infubsofar[num_upperlevel_vars]));
       is_int[index] = FALSE;
       ub[index] = 0.0;
       lb[index] = -prob->infty;
@@ -466,12 +431,12 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       i++;
    }
 
-   /* The duals on variable lower bound constraints */
-   for (j = 0; j < prob->mip->n; j++) {
+   /* The duals on lower level variable lower bound constraints */
+   for (j = num_upperlevel_vars; j < prob->mip->n; j++) {
       if (prob->mip->lb[j] <= -prob->infty) {
          continue;
       }
-      index = j + prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->inflbsofar[j];
+      index = prob->mip->n + prob->mip->m + num_lowerlevel_dual_ubvars + ((j - num_upperlevel_vars) - (prob->inflbsofar[j] - prob->inflbsofar[num_upperlevel_vars]));
       is_int[index] = FALSE;
       ub[index] = prob->infty;
       lb[index] = 0.0;
@@ -484,7 +449,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       i++;
    }
 
-   /* The original constraints */
+   /* The original lower level constraints */
    for (i = 0; i < prob->mip->m; i++) {
       sense[i] = prob->mip->sense[i];
       rhs[i] = prob->mip->rhs[i];
@@ -492,12 +457,12 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       strncpy(env->mip->rowname[i], prob->mip->rowname[i], MAX_NAME_SIZE);
       env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
    }
-   /* The upper bound constraints on variables */
-   for (j = 0; j < prob->mip->n; j++) {
+   /* The lower level upper bound constraints on variables */
+   for (j = num_upperlevel_vars; j < prob->mip->n; j++) {
       if (prob->mip->ub[j] >= prob->infty) {
          continue;
       }
-      index = j + prob->mip->m - prob->infubsofar[j];
+      index = prob->mip->m + ((j - num_upperlevel_vars) - (prob->infubsofar[j] - prob->infubsofar[num_upperlevel_vars]));
       sense[index] = 'L';
       rhs[index] = prob->mip->ub[j];
       env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
@@ -509,12 +474,12 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       i++;
    }
 
-   /* The lower bound constraints on variables */
-   for (j = 0; j < prob->mip->n; j++) {
+   /* The lower level lower bound constraints on variables */
+   for (j = num_upperlevel_vars; j < prob->mip->n; j++) {
       if (prob->mip->lb[j] <= -prob->infty) {
          continue;
       }
-      index = j + prob->mip->m + prob->mip->n - prob->ubinfty - prob->inflbsofar[j];
+      index = prob->mip->m + num_lowerlevel_ubcons + ((j - num_upperlevel_vars) - (prob->inflbsofar[j] - prob->inflbsofar[num_upperlevel_vars]));
       sense[index] = 'G';
       rhs[index] = prob->mip->lb[j];
       env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
@@ -526,11 +491,13 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       i++;
    }
 
-   /* The dual constraints */
-   for (j = 0; j < prob->mip->n; j++) {
-      index = j - prob->ubinfty - prob->lbinfty + prob->mip->m + 2 * prob->mip->n;
+   /* The lower level dual constraints */
+   for (j = num_upperlevel_vars; j < prob->mip->n; j++) {
+      index = prob->mip->m + num_lowerlevel_ubcons + num_lowerlevel_lbcons + ((j - num_upperlevel_vars));
       sense[index] = 'E';
-      rhs[index] = prob->mip->obj[j];
+      // Suresh: zero'd rhs for debugging to check if entire code works properly
+//      rhs[index] = 0;
+      rhs[index] = -prob->mip->obj[j];
       env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
       env->mip->rowname[index][0] = 'E';
       env->mip->rowname[index][1] = '_';
@@ -540,9 +507,20 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       i++;
    }
 
-   /* column sparse format entries corresponding to original variables */
+   /* column sparse format entries corresponding to original upper level variables */
    column_starts[0] = 0;
-   for (i = 0; i < prob->mip->n; i++) {
+   for (i = 0; i < num_upperlevel_vars; i++) {
+      column_starts[i+1] = column_starts[i] + prob->mip->matbeg[i+1] - prob->mip->matbeg[i];
+      if (prob->mip->matbeg[i + 1] - prob->mip->matbeg[i] > 0) {
+         for (j = (prob->mip->matbeg[i]); j < (prob->mip->matbeg[i + 1]); j++) {
+            matrix_values[nz_index] = prob->mip->matval[j];
+            matrix_indices[nz_index] = prob->mip->matind[j];
+            nz_index++;
+         }
+      }
+   }
+   /* column sparse format entries corresponding to original lower level variables */
+   for (; i < prob->mip->n; i++) {
       column_starts[i+1] = column_starts[i] + prob->mip->matbeg[i+1] - prob->mip->matbeg[i] + 2 - prob->infubind[i] - prob->inflbind[i];
       if (prob->mip->matbeg[i + 1] - prob->mip->matbeg[i] > 0) {
          for (j = (prob->mip->matbeg[i]); j < (prob->mip->matbeg[i + 1]); j++) {
@@ -553,43 +531,58 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       }
       if (!prob->infubind[i]) {
          matrix_values[nz_index] = 1.0;
-         matrix_indices[nz_index] = prob->mip->m + (i - prob->infubsofar[i]);
+         matrix_indices[nz_index] = prob->mip->m + ((i - num_upperlevel_vars) - (prob->infubsofar[i] - prob->infubsofar[num_upperlevel_vars]));
          nz_index++;
       }
       if (!prob->inflbind[i]) {
          matrix_values[nz_index] = 1.0;
-         matrix_indices[nz_index] = prob->mip->m + prob->mip->n - prob->ubinfty + (i - prob->inflbsofar[i]);
+         matrix_indices[nz_index] = prob->mip->m + num_lowerlevel_ubcons + ((i - num_upperlevel_vars) - (prob->inflbsofar[i] - prob->inflbsofar[num_upperlevel_vars]));
          nz_index++;
       }
    }
-   /* column sparse format entries corresponding to dual variables on original constraints */
+   /* column sparse format entries corresponding to dual variables on original lower level constraints */
+   // At first, find number of nonzeros per row in the lower level coefficient part of matrix
+   nz_lowerlevel_row = (int *) malloc((nz_lowerlevel) * ISIZE);
+   for (i = 0; i < prob->mip->m; i++) {
+      nz_lowerlevel_row[i] = prob->matbeg_row[i+1] - prob->matbeg_row[i];
+      if ((prob->matbeg_row[i+1] - prob->matbeg_row[i]) > 0) {
+         for (j = prob->matbeg_row[i]; j < prob->matbeg_row[i+1]; j++) {
+            if (prob->matind_row[j] < num_upperlevel_vars) {
+               nz_lowerlevel_row[i]--;
+            }
+         }
+      }
+   }
+   // Now update column sparse format entries as required
    index = 0;
    for (i = 0; i < prob->mip->m; i++) {
-      column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + prob->matbeg_row[i + 1] - prob->matbeg_row[i];
+      column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + nz_lowerlevel_row[i];
       index++;
       for (j = prob->matbeg_row[i]; j < prob->matbeg_row[i+1]; j++) {
-         matrix_values[nz_index] = prob->matval_row[j];
-         matrix_indices[nz_index] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + prob->matind_row[j];
-         nz_index++;
+         if (prob->matind_row[j] >= num_upperlevel_vars) {
+            matrix_values[nz_index] = prob->matval_row[j];
+            matrix_indices[nz_index] = prob->mip->m + num_lowerlevel_ubcons + num_lowerlevel_lbcons + (prob->matind_row[j] - num_upperlevel_vars);
+            nz_index++;
+         }
       }
    }
-   /* column sparse format entries corresponding to dual variables on primal UB constraints */
-   for (i = 0; i < prob->mip->n; i++) {
+   /* column sparse format entries corresponding to dual variables on lower level primal UB constraints */
+   for (i = num_upperlevel_vars; i < prob->mip->n; i++) {
       if (!prob->infubind[i]) {
          column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + 1;
          index++;
          matrix_values[nz_index] = 1.0;
-         matrix_indices[nz_index] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + i;
+         matrix_indices[nz_index] = prob->mip->m + num_lowerlevel_ubcons + num_lowerlevel_lbcons + (i - num_upperlevel_vars);
          nz_index++;
       }
    }
-   /* column sparse format entries corresponding to dual variables on primal LB constraints */
-   for (i = 0; i < prob->mip->n; i++) {
+   /* column sparse format entries corresponding to dual variables on lower level primal LB constraints */
+   for (i = num_upperlevel_vars; i < prob->mip->n; i++) {
       if (!prob->inflbind[i]) {
          column_starts[prob->mip->n + 1 + index] = column_starts[prob->mip->n + index] + 1;
          index++;
          matrix_values[nz_index] = 1.0;
-         matrix_indices[nz_index] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + i;
+         matrix_indices[nz_index] = prob->mip->m + num_lowerlevel_ubcons + num_lowerlevel_lbcons + (i - num_upperlevel_vars);
          nz_index++;
       }
    }
@@ -600,7 +593,6 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    index1 = 0;
    for (i = 0; i < n;) {
       if (i < prob->mip->n) {
-         //         prob->ccind[i] = prob->mip->m + 2 * prob->mip->n - prob->ubinfty - prob->lbinfty + i;
          prob->ccind[i] = -1;
          i++;
       } else if (i < prob->mip->n + prob->mip->m) {
@@ -626,44 +618,6 @@ int user_load_problem(sym_environment *env, user_problem *prob){
 			     rngval, true);
 
    /* Suresh: debug code START */
-   /*
-   printf("\nBIG MATBEG\n");
-   for (j = 0; j < n+1; j++) {
-      printf("%d\n", column_starts[j]);
-   }
-   printf("\nBIG MATVAL\n");
-   for (j = 0; j < nz; j ++) {
-      printf("%2.4e\n", matrix_values[j]);
-   }
-   printf("\nBIG MATIND\n");
-   for (j = 0; j < nz; j ++) {
-      printf("%d\n", matrix_indices[j]);
-   }
-   printf("\nORIG_UB\tINFUB_IND\n");
-   for(j = 0; j < prob->mip->n; j++) {
-   printf("%2.4e\t%d\n", prob->mip->ub[j], prob->infubind[j]);
-   }
-    */
-   /*
-   printf("\nMAT INDS\n");
-   for (j = 0; j < n; j++) {
-      if ((column_starts[j+1] - column_starts[j]) > 0) {
-         for (i = column_starts[j]; i < column_starts[j+1]; i++) {
-            printf("%d\t", matrix_indices[i]);
-         }
-         printf("\n");
-      }
-   }
-   printf("\nMAT VALS\n");
-   for (j = 0; j < n; j++) {
-      if ((column_starts[j+1] - column_starts[j]) > 0) {
-         for (i = column_starts[j]; i < column_starts[j+1]; i++) {
-            printf("%f\t", matrix_values[i]);
-         }
-         printf("\n");
-      }
-   }
-   */
    /*
    printf("\nNEW_OBJ\n");
    for (j = 0; j < n; j++) {
@@ -721,15 +675,16 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    prob->mip->ub     = (double *) realloc(prob->mip->ub, DSIZE * prob->mip->n);
    prob->mip->lb     = (double *) realloc(prob->mip->lb, DSIZE * prob->mip->n);
    prob->mip->is_int = (char *)   malloc(CSIZE * prob->mip->n);
-   /* Default values for vvind, vvnum and feasible */
+   /* Default values for vvind, vvnum, feasible and rowact */
    prob->feasible    = USER__DO_NOT_BRANCH;
    prob->vvind       = (int *)    calloc(prob->mip->n, ISIZE);
    prob->vvnum       = 0;
+   prob->rowact      = (double *) calloc(prob->mip->m, DSIZE);
    
    memcpy(prob->mip->obj, obj, DSIZE * prob->mip->n);
    memcpy(prob->mip->rhs, rhs, DSIZE * prob->mip->m);
    memcpy(prob->mip->sense, sense, CSIZE * prob->mip->m);
-   memset(prob->mip->rngval, 0, DSIZE * n);                     // TODO: Fix this assumption.
+   memset(prob->mip->rngval, 0, DSIZE * m);                     // TODO: Fix this assumption.
    memcpy(prob->mip->ub, ub, DSIZE * prob->mip->n);
    memcpy(prob->mip->lb, lb, DSIZE * prob->mip->n);
    memcpy(prob->mip->is_int, is_int, CSIZE * prob->mip->n);
@@ -754,6 +709,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    FREE(rhs);
    FREE(rngval);
    FREE(is_int);
+   FREE(nz_lowerlevel_row);
    /* TODO: Is it good to free tempub, templb, infubind, inflbind, ifubsofar, inflbsofar here? */
    FREE(prob->tempub);
    FREE(prob->templb);
