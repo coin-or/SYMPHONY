@@ -18,7 +18,7 @@
 
 MASTERNAME = spp
 
-SYMAPPLNAME = SPP
+SYMAPPLNAME = SPP+CUTS
 
 # CHANGEME: Additional sources
 # - Names of your additional C/C++ source files without any extensions
@@ -42,9 +42,9 @@ USER_MASTER_FILES  = spp_main spp_master spp_master_functions
 
 USER_TM_FILES      = 
 
-USER_LP_FILES      = spp_lp_branch spp_lp
+USER_LP_FILES      = spp_lp_branch spp_lp spp_lp_functions
 
-USER_CG_FILES      = spp_cg
+USER_CG_FILES      = spp_cg spp_cg_functions spp_cg_clique
 
 USER_CP_FILES      = spp_cp
 
