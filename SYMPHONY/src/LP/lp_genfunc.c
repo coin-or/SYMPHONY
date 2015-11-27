@@ -736,7 +736,7 @@ int fathom(lp_prob *p, int primal_feasible)
    int termcode = p->lp_data->termcode;
 
 #ifdef COMPILE_IN_LP
-   if(p->branch_dir == 'L'){
+   if(p->branch_dir == 'L' && p->branch_var >= 0){
       p->br_inf_down[p->branch_var]++;
    }else{
       p->br_inf_up[p->branch_var]++;   
