@@ -180,7 +180,7 @@ int sym_reset_environment(sym_environment *env)
    
    int obj_sense = env->mip->obj_sense;
    
-   CALL_WRAPPER_FUNCTION( free_master_u(env) );
+   free_master(env);
 
 #if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
     !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)

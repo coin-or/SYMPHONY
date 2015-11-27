@@ -2176,6 +2176,8 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    /* Remove nodes that can now be fathomed from the list */
 #pragma omp critical (tree_update)
    {
+      int var_index;
+   
       rule = tm->par.node_selection_rule;
       list = tm->samephase_cand;
       char has_exchanged = FALSE;
@@ -2185,13 +2187,19 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	 if (tm->has_ub &&
 	     node->lower_bound >= tm->ub-tm->par.granularity){
 #ifdef COMPILE_IN_LP
-	    if(node->parent){
-	       for(j = 0; j < node->parent->bobj.child_num; j++){
-		  if(node->parent->children[j] == node){
-		     if(node->parent->bobj.sense[j] == 'L'){
-			tm->br_inf_down[node->parent->bobj.name]++;
+	    if (node->parent && node->parent->bobj.type == BRANCHING_VARIABLE){
+	       for (j = 0; j < node->parent->bobj.child_num; j++){
+		  if (node->parent->children[j] == node){
+		     var_index = (node->parent->bobj.name < 0 ?
+			/* base variable : extra variable */
+			      (-node->parent->bobj.name-1) :
+			      (bfind(node->parent->bobj.name,
+				     node->desc.uind.list,
+				     node->desc.uind.size) + tm->bvarnum));
+		     if (node->parent->bobj.sense[j] == 'L'){
+			tm->br_inf_down[var_index]++;
 		     }else{
-			tm->br_inf_up[node->parent->bobj.name]++;
+			tm->br_inf_up[var_index]++;
 		     }
 		  }
 	       }
