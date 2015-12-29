@@ -70,7 +70,8 @@ will set the configuration to compile the source files with debugging flag.
 
 In order to read GMPL files, you need to have the GLPK package install. To
 install it automatically, run the {{{get.Glpk}}} script in the
-{{{ThirdParty/Glpk}}} directory. After that, Glpk should be built and linked
+{{{ThirdParty/Glpk}}} directory. After that, configure with the additional 
+argument {{{--with-gmpl}}} and Glpk should be built and linked
 automatically, enabling the ability to read GMPL files.
 
 It is possible to use compilers other than the default (which is g++). For
