@@ -2574,6 +2574,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 
+   //si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
     
    si->initialSolve();
    
@@ -3003,6 +3004,7 @@ void get_dj_pi(LPdata *lp_data)
    memcpy(lp_data->dj, lp_data->si->getReducedCost(), lp_data->n * DSIZE);
 }
 
+/*===========================================================================*/
 /*===========================================================================*/
 
 void get_slacks(LPdata *lp_data)

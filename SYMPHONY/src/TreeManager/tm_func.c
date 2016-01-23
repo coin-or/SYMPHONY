@@ -2192,10 +2192,8 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		  if (node->parent->children[j] == node){
 		     var_index = (node->parent->bobj.name < 0 ?
 			/* base variable : extra variable */
-			      (-node->parent->bobj.name-1) :
-			      (bfind(node->parent->bobj.name,
-				     node->desc.uind.list,
-				     node->desc.uind.size) + tm->bvarnum));
+				  (-node->parent->bobj.name-1) :
+				  (node->parent->bobj.name + tm->bvarnum));
 		     if (node->parent->bobj.sense[j] == 'L'){
 			tm->br_inf_down[var_index]++;
 		     }else{
