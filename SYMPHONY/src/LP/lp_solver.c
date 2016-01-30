@@ -2620,7 +2620,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       
       get_x(lp_data);
       
-#ifndef CHECK_DUAL_SOLUTION
+#ifdef CHECK_DUAL_SOLUTION
       if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
 	//This code checks the dual solution values
 	int t;
