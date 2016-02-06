@@ -4,7 +4,7 @@
 #if defined(_MSC_VER) || defined (__MNO_CYGWIN)
 #include <time.h>
 
-#ifndef __MINGW64__
+#if !(defined(__MINGW64__) || defined(__MINGW32__))
 struct timeval {
     long    tv_sec;         /* seconds */
     long    tv_usec;        /* and microseconds */
