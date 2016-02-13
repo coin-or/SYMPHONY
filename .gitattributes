@@ -172,6 +172,7 @@ SYMPHONY/test/Makefile.am -text
 SYMPHONY/test/Makefile.in -text
 SYMPHONY/test/OsiSymSolverInterfaceTest.cpp -text
 SYMPHONY/test/unitTestSym.cpp -text
+/appveyor.yml -text
 /compile -text
 /config.guess -text
 /config.sub -text
