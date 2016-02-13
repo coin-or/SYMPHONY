@@ -30,4 +30,4 @@ before_script:
 
 script:
   - patch -p0 < SYMPHONY/Osi.patch
-  - bash scripts/get.dependencies.sh build --quiet --test 
+  - bash BuildTools/get.dependencies.sh build --quiet --test 
