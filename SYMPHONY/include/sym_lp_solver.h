@@ -317,6 +317,8 @@ void write_lp PROTO((LPdata *lp_data, char *fname));
 void write_mip_desc_mps PROTO((MIPdesc *mip, char *fname));
 void write_mip_desc_lp PROTO((MIPdesc *mip, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
+// Suresh
+int check_lp_validity PROTO((LPdata *lp_data));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 		       char send_to_pool, int bc_index, int bc_level, 

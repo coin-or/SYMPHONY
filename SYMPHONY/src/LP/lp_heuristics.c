@@ -213,9 +213,6 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
 	    /* we found what we wanted */
 	    memcpy(betterSolution, x_ip, n*DSIZE);
 
-	    /* we found what we wanted */
-	    memcpy(betterSolution, x_ip, n*DSIZE);
-
 	    solution_value = new_solution_value;
             indices = p->lp_data->tmp.i1;          /* n */
             values  = p->lp_data->tmp.d;           /* n */

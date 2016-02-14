@@ -1011,7 +1011,7 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
    int size, cliquecount = 0;
    char *clique_array; 
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   
+
    int num_arcs, edge_index ; 
    char *cpt; 
    int *arcs ;
@@ -1019,170 +1019,170 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
    double bigM, *weights ;
    int jj, num_fracs, fracs;
    /*___END_EXPERIMENTAL_SECTION___*/
-   
+
    if (vrp->feas_sol_size){
       switch (new_cut->type){
-	 
-	 /*------------------------------------------------------------------*\
-	  * The subtour elimination constraints are stored as a vector of bits
-	  * indicating which side of the cut each customer is on.
-	  \*-----------------------------------------------------------------*/
-	 
-       case SUBTOUR_ELIM_SIDE:
-	 /*Here, I could just allocate enough memory up front and then
-	   reallocate at the end istead of counting the number of entries in
-	   the row first*/
-	 coef = new_cut->coef;
-	 for (i = 0; i<vrp->feas_sol_size; i++){
-	    v0 = edges[feas_sol[i] << 1];
-	    v1 = edges[(feas_sol[i] << 1) + 1];
-	    if ((coef[v0 >> DELETE_POWER] & (1 << (v0 & DELETE_AND))) &&
-		(coef[v1 >> DELETE_POWER] & (1 << (v1 & DELETE_AND)))){
-	       lhs += 1;
-	    }
-	 }
-	 new_cut->sense = 'L';
-	 break;
-	 
-       case SUBTOUR_ELIM_ACROSS:
-	 /*I could just allocate enough memory up front and then reallocate
-	   at the end instead of counting the number of entries first*/
-	 coef = new_cut->coef;
-	 for (i = 0; i < vrp->feas_sol_size; i++){
-	    v0 = edges[feas_sol[i] << 1];
-	    v1 = edges[(feas_sol[i] << 1) + 1];
-	    if ((coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1) ^
-		(coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1)){
-	       lhs += 1;
-	    }
-	 }
-	 new_cut->sense = 'G';
-	 break;
-	 
-       case CLIQUE:
-	 coef = new_cut->coef;
-	 size = (vertnum >> DELETE_POWER) + 1;
-	 memcpy(&cliquecount, coef, ISIZE);
-	 coef += ISIZE;
-	 for (i = 0; i < vrp->feas_sol_size; i++){
-	    v0 = edges[feas_sol[i] << 1];
-	    v1 = edges[(feas_sol[i] << 1) + 1];
-	    for (j = 0; j < cliquecount; j++){
-	       clique_array = coef + size * j;
-	       if ((clique_array[v0 >> DELETE_POWER] &
-		    (1 << (v0 & DELETE_AND))) &&
-		   (clique_array[v1 >> DELETE_POWER] &
-		    (1 << (v1 & DELETE_AND)))){
-		  lhs += 1;
-	       }
-	    }
-	 }
-	 break;
-       /*__BEGIN_EXPERIMENTAL_SECTION__*/
 
-       case FARKAS:
-	 coef = new_cut->coef;
-	 cpt = coef + ((vertnum >> DELETE_POWER) + 1); 
-	 memcpy((char *)&num_arcs, cpt, ISIZE);
-	 cpt += ISIZE;
-	 arcs = (int *) malloc(num_arcs * ISIZE);
-	 indicators = (char *) malloc(num_arcs);  
-	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-	 cpt += num_arcs * ISIZE;
-	 memcpy(indicators, cpt, num_arcs);
-	 cpt += num_arcs;
-	 memcpy((char *)&num_fracs, cpt, ISIZE);
-	 cpt += ISIZE;
-	 weights = (double *) malloc((num_fracs + 1) * DSIZE);
-	 memcpy((char *)weights, cpt, (num_fracs + 1) * DSIZE);
-	 bigM = (*(double *)weights);
-	 weights++;
-	 
-	 for (fracs = 0, i = 0, lhs = 0; i < vrp->feas_sol_size; i++){
-	    v0 = edges[feas_sol[i] << 1];
-	    v1 = edges[(feas_sol[i] << 1) + 1];
-	    edge_index = feas_sol[i];
-	    if (isset(coef, v1) || isset(coef,v0)){
-	       for (jj = 0; jj < num_arcs; jj++){
-		  if (arcs[jj] == edge_index){
-		     lhs += indicators[jj] ? -bigM : weights[fracs++];
-		     break;
-		  }
-	       }
-	       if (jj == num_arcs) lhs += bigM;
-	    }
-	 }
-	 weights--;
-	 FREE(arcs);
-	 FREE(indicators);
-	 FREE(weights);
-	 break;
-	 
-       case NO_COLUMNS:
-	 coef = new_cut->coef;
-	 cpt = coef+ ((vertnum >> DELETE_POWER) + 1); 
-	 memcpy((char *)&num_arcs, cpt, ISIZE);
-	 cpt += ISIZE;
-	 arcs = (int *) malloc(num_arcs * ISIZE);
-	 indicators = (char *) malloc(num_arcs);
-	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-	 cpt += num_arcs * ISIZE;
-	 memcpy(indicators, cpt, num_arcs);
-	 
-	 for (i = 0, lhs = 0 ; i < vrp->feas_sol_size; i++){
-	    v0 = vrp->edges[feas_sol[i] << 1];
-	    v1 = vrp->edges[(feas_sol[i] << 1) + 1];
-	    edge_index = feas_sol[i];
-	    if (isset(coef, v1) || isset(coef,v0)){
-	       for (jj = 0; jj < num_arcs; jj++){
-		  if ( arcs[jj] == edge_index){
-		     lhs += indicators[jj] ? 1.0 : 0.0;
-		     break;
-		  }
-	       }
-	       if (jj == num_arcs) lhs -= 1;
-	    }
-	 }
-	 FREE(arcs);
-	 FREE(indicators);
-	 break;
-	 
-       case GENERAL_NONZEROS:
-	 cpt = new_cut->coef;
-	 memcpy((char *)&num_arcs, cpt, ISIZE);
-	 cpt += ISIZE;
-	 arcs = (int *) calloc(num_arcs, ISIZE);
-	 weights = (double *) calloc(num_arcs, DSIZE);
-	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-	 cpt += num_arcs * ISIZE;
-	 memcpy((char *)weights, cpt, num_arcs * DSIZE);
-	 
-	 for (i = 0, lhs = 0; i < vrp->feas_sol_size; i++){
-	    edge_index = feas_sol[i];
-	    for (j = 0; j < num_arcs; j++){
-	       if (arcs[j] == edge_index){
-		  lhs += weights[j];
-		  break;
-	       }
-	    }
-	 }
-	 FREE(arcs);
-	 FREE(weights);
-	 break;
-       /*___END_EXPERIMENTAL_SECTION___*/
-	 
-       default:
-	 printf("Unrecognized cut type!\n");
+         /*------------------------------------------------------------------*\
+          * The subtour elimination constraints are stored as a vector of bits
+          * indicating which side of the cut each customer is on.
+          \*-----------------------------------------------------------------*/
+
+         case SUBTOUR_ELIM_SIDE:
+            /*Here, I could just allocate enough memory up front and then
+              reallocate at the end istead of counting the number of entries in
+              the row first*/
+            coef = new_cut->coef;
+            for (i = 0; i<vrp->feas_sol_size; i++){
+               v0 = edges[feas_sol[i] << 1];
+               v1 = edges[(feas_sol[i] << 1) + 1];
+               if ((coef[v0 >> DELETE_POWER] & (1 << (v0 & DELETE_AND))) &&
+                     (coef[v1 >> DELETE_POWER] & (1 << (v1 & DELETE_AND)))){
+                  lhs += 1;
+               }
+            }
+            new_cut->sense = 'L';
+            break;
+
+         case SUBTOUR_ELIM_ACROSS:
+            /*I could just allocate enough memory up front and then reallocate
+              at the end instead of counting the number of entries first*/
+            coef = new_cut->coef;
+            for (i = 0; i < vrp->feas_sol_size; i++){
+               v0 = edges[feas_sol[i] << 1];
+               v1 = edges[(feas_sol[i] << 1) + 1];
+               if ((coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1) ^
+                     (coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1)){
+                  lhs += 1;
+               }
+            }
+            new_cut->sense = 'G';
+            break;
+
+         case CLIQUE:
+            coef = new_cut->coef;
+            size = (vertnum >> DELETE_POWER) + 1;
+            memcpy(&cliquecount, coef, ISIZE);
+            coef += ISIZE;
+            for (i = 0; i < vrp->feas_sol_size; i++){
+               v0 = edges[feas_sol[i] << 1];
+               v1 = edges[(feas_sol[i] << 1) + 1];
+               for (j = 0; j < cliquecount; j++){
+                  clique_array = coef + size * j;
+                  if ((clique_array[v0 >> DELETE_POWER] &
+                           (1 << (v0 & DELETE_AND))) &&
+                        (clique_array[v1 >> DELETE_POWER] &
+                         (1 << (v1 & DELETE_AND)))){
+                     lhs += 1;
+                  }
+               }
+            }
+            break;
+            /*__BEGIN_EXPERIMENTAL_SECTION__*/
+
+         case FARKAS:
+            coef = new_cut->coef;
+            cpt = coef + ((vertnum >> DELETE_POWER) + 1); 
+            memcpy((char *)&num_arcs, cpt, ISIZE);
+            cpt += ISIZE;
+            arcs = (int *) malloc(num_arcs * ISIZE);
+            indicators = (char *) malloc(num_arcs);  
+            memcpy((char *)arcs, cpt, num_arcs * ISIZE);
+            cpt += num_arcs * ISIZE;
+            memcpy(indicators, cpt, num_arcs);
+            cpt += num_arcs;
+            memcpy((char *)&num_fracs, cpt, ISIZE);
+            cpt += ISIZE;
+            weights = (double *) malloc((num_fracs + 1) * DSIZE);
+            memcpy((char *)weights, cpt, (num_fracs + 1) * DSIZE);
+            bigM = (*(double *)weights);
+            weights++;
+
+            for (fracs = 0, i = 0, lhs = 0; i < vrp->feas_sol_size; i++){
+               v0 = edges[feas_sol[i] << 1];
+               v1 = edges[(feas_sol[i] << 1) + 1];
+               edge_index = feas_sol[i];
+               if (isset(coef, v1) || isset(coef,v0)){
+                  for (jj = 0; jj < num_arcs; jj++){
+                     if (arcs[jj] == edge_index){
+                        lhs += indicators[jj] ? -bigM : weights[fracs++];
+                        break;
+                     }
+                  }
+                  if (jj == num_arcs) lhs += bigM;
+               }
+            }
+            weights--;
+            FREE(arcs);
+            FREE(indicators);
+            FREE(weights);
+            break;
+
+         case NO_COLUMNS:
+            coef = new_cut->coef;
+            cpt = coef+ ((vertnum >> DELETE_POWER) + 1); 
+            memcpy((char *)&num_arcs, cpt, ISIZE);
+            cpt += ISIZE;
+            arcs = (int *) malloc(num_arcs * ISIZE);
+            indicators = (char *) malloc(num_arcs);
+            memcpy((char *)arcs, cpt, num_arcs * ISIZE);
+            cpt += num_arcs * ISIZE;
+            memcpy(indicators, cpt, num_arcs);
+
+            for (i = 0, lhs = 0 ; i < vrp->feas_sol_size; i++){
+               v0 = vrp->edges[feas_sol[i] << 1];
+               v1 = vrp->edges[(feas_sol[i] << 1) + 1];
+               edge_index = feas_sol[i];
+               if (isset(coef, v1) || isset(coef,v0)){
+                  for (jj = 0; jj < num_arcs; jj++){
+                     if ( arcs[jj] == edge_index){
+                        lhs += indicators[jj] ? 1.0 : 0.0;
+                        break;
+                     }
+                  }
+                  if (jj == num_arcs) lhs -= 1;
+               }
+            }
+            FREE(arcs);
+            FREE(indicators);
+            break;
+
+         case GENERAL_NONZEROS:
+            cpt = new_cut->coef;
+            memcpy((char *)&num_arcs, cpt, ISIZE);
+            cpt += ISIZE;
+            arcs = (int *) calloc(num_arcs, ISIZE);
+            weights = (double *) calloc(num_arcs, DSIZE);
+            memcpy((char *)arcs, cpt, num_arcs * ISIZE);
+            cpt += num_arcs * ISIZE;
+            memcpy((char *)weights, cpt, num_arcs * DSIZE);
+
+            for (i = 0, lhs = 0; i < vrp->feas_sol_size; i++){
+               edge_index = feas_sol[i];
+               for (j = 0; j < num_arcs; j++){
+                  if (arcs[j] == edge_index){
+                     lhs += weights[j];
+                     break;
+                  }
+               }
+            }
+            FREE(arcs);
+            FREE(weights);
+            break;
+            /*___END_EXPERIMENTAL_SECTION___*/
+
+         default:
+            printf("Unrecognized cut type!\n");
       }
-      
+
       /*check to see if the cut is actually violated by the current solution --
-	otherwise don't add it -- also check to see if its a duplicate*/
+        otherwise don't add it -- also check to see if its a duplicate*/
       if (new_cut->sense == 'G' ? lhs < new_cut->rhs : lhs > new_cut->rhs){
-	 printf("CG: ERROR -- cut is violated by feasible solution!!!\n");
-	 exit(1);
+         printf("CG: ERROR -- cut is violated by feasible solution!!!\n");
+         exit(1);
       }
    }
-   
+
    return(USER_SUCCESS);
 }
 #endif

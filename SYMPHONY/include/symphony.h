@@ -217,6 +217,7 @@ int sym_mc_solve PROTO((sym_environment *env));
 
 int sym_create_permanent_cut_pools PROTO((sym_environment *env, int *cp_num));
 cut_pool **sym_get_permanent_cut_pools PROTO((sym_environment *env));
+
 int sym_explicit_load_problem PROTO((sym_environment *env, int numcols, 
 				     int numrows, int *start, int *index, 
 				     double *value, double *collb,

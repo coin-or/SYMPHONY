@@ -851,40 +851,40 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
       }
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
       else if (strcmp(key, "feasible_solution_edges") == 0){
-	 READ_INT_PAR(cnrp->feas_sol_size);
-	 if (cnrp->feas_sol_size){
-	    int cur_node, prev_node = 0;
-	    char value1[10], value2[10];
-	    
-	    cnrp->feas_sol = (int *)calloc(cnrp->feas_sol_size, sizeof(int));
-	    for (i = 0; i < cnrp->feas_sol_size; i++){
-	       if (!fgets( line, LENGTH, f)){
-		  fprintf(stderr,
-			  "\nCNRP I/O: error reading in feasible solution\n");
-		  exit(1);
-	       }
-	       strcpy(key, "");
-	       sscanf(line, "%s%s%s", key, value1, value2);
-	       if (strcmp(key, "edge")){
-		  fprintf(stderr,
-			  "\nCNRP I/O: error reading in feasible solution\n");
-		  exit(1);
-	       }
-	       if (sscanf(value1, "%i", &prev_node) != 1){
-		  fprintf(stderr,
-			 "\nCNRP I/O: error reading in feasible solution %s\n",
-			 key);
-		  exit(1);
-	       }
-	       if (sscanf(value2, "%i", &cur_node) != 1){
-		  fprintf(stderr,
-			 "\nCNRP I/O: error reading in feasible solution %s\n",
-			 key);
-		  exit(1);
-	       }
-	       cnrp->feas_sol[i] = INDEX(prev_node, cur_node);
-	    }
-	 }
+         READ_INT_PAR(cnrp->feas_sol_size);
+         if (cnrp->feas_sol_size){
+            int cur_node, prev_node = 0;
+            char value1[10], value2[10];
+
+            cnrp->feas_sol = (int *)calloc(cnrp->feas_sol_size, sizeof(int));
+            for (i = 0; i < cnrp->feas_sol_size; i++){
+               if (!fgets( line, LENGTH, f)){
+                  fprintf(stderr,
+                        "\nCNRP I/O: error reading in feasible solution\n");
+                  exit(1);
+               }
+               strcpy(key, "");
+               sscanf(line, "%s%s%s", key, value1, value2);
+               if (strcmp(key, "edge")){
+                  fprintf(stderr,
+                        "\nCNRP I/O: error reading in feasible solution\n");
+                  exit(1);
+               }
+               if (sscanf(value1, "%i", &prev_node) != 1){
+                  fprintf(stderr,
+                        "\nCNRP I/O: error reading in feasible solution %s\n",
+                        key);
+                  exit(1);
+               }
+               if (sscanf(value2, "%i", &cur_node) != 1){
+                  fprintf(stderr,
+                        "\nCNRP I/O: error reading in feasible solution %s\n",
+                        key);
+                  exit(1);
+               }
+               cnrp->feas_sol[i] = INDEX(prev_node, cur_node);
+            }
+         }
       }
       else if (strcmp(key, "feasible_solution_nodes") == 0){
 	 READ_INT_PAR(cnrp->feas_sol_size);

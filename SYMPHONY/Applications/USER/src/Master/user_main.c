@@ -68,7 +68,6 @@ int main(int argc, char **argv)
 {
 
    int termcode;
-   char * infile;
 
    /* Create a SYMPHONY environment */
    sym_environment *env = sym_open_environment();
@@ -364,12 +363,16 @@ int user_load_problem(sym_environment *env, user_problem *prob){
          if (i < prob->mip->n) {
             obj[i] = prob->mip->obj[i];
          } else {
-            obj[i] = 0;
+            obj[i] = 0.0;
          }
       }
    } else {
       for (i = 0; i < n; i++) {
-         obj[i] = 0.0;
+         if (i < prob->mip->n) {
+            obj[i] = -prob->mip->obj[i];
+         } else {
+            obj[i] = 0.0;
+         }
       }
    }
    env->mip->colname = (char **) malloc(sizeof(char *) * n);  
@@ -455,7 +458,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       rhs[i] = prob->mip->rhs[i];
       env->mip->rowname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
       strncpy(env->mip->rowname[i], prob->mip->rowname[i], MAX_NAME_SIZE);
-      env->mip->colname[i][MAX_NAME_SIZE-1] = 0;
+      env->mip->rowname[i][MAX_NAME_SIZE-1] = 0;
    }
    /* The lower level upper bound constraints on variables */
    for (j = num_upperlevel_vars; j < prob->mip->n; j++) {
@@ -652,6 +655,16 @@ int user_load_problem(sym_environment *env, user_problem *prob){
             printf("x%d\tc%d\t%f\n", i, matrix_indices[j], matrix_values[j]);
          }
       }
+   }
+   */
+   /*
+   printf("\nNEW_ROW_NAMES\n");
+   for(i = 0; i < m; i++) {
+      printf("%s\tc%d\n", env->mip->rowname[i], i);
+   }
+   printf("\nNEW_COL_NAMES\n");
+   for(i = 0; i < n; i++) {
+      printf("%s\tx%d\n", env->mip->colname[i], i);
    }
    */
    /*

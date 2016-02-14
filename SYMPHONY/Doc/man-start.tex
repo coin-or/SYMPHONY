@@ -159,8 +159,9 @@ possible by changing the configuration settings.
 (GMPL is a subset of AMPL), you will need to install GLPK
 (\url{http://www.gnu.org/software/glpk/}). To do so automatically, run the
 \texttt{get.Glpk} script in the \texttt{ThirdParty/Glpk} directory. After
-that, Glpk should be built and linked automatically, enabling the ability to
-read GMPL files.
+that, run configure with the additional argument \texttt{--with-gmpl} and Glpk 
+will be built and linked automatically, enabling the ability to read GMPL 
+files.
 
 \subsubsection{COIN Libraries} SYMPHONY uses other COIN libraries for certain
 functionality, such as parsing MPS files, solving linear programs, generating
@@ -312,7 +313,8 @@ Chapter~\ref{API-overview}. The executable can also be used for solving
 generic MILP problems in MPS and GMPL format. In order to read GMPL files, you
 will need to have GLPK (\url{http://www.gnu.org/software/glpk/}) installed. To
 install it automatically, run the \texttt{get.Glpk} script in the
-\texttt{ThirdParty/Glpk} directory. After that, Glpk should be built and
+\texttt{ThirdParty/Glpk} directory. After that, configure with the additional
+argument \texttt{--with-gmpl} and Glpk should be built and
 linked automatically, enabling the ability to read GMPL files.
 
 For a more powerful modeling interface, FlopC++ can also be used to obtain a

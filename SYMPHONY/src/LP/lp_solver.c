@@ -2581,12 +2581,28 @@ void change_col(LPdata *lp_data, int col_ind,
 
 int initial_lp_solve (LPdata *lp_data, int *iterd)
 {
+   // TODO: Suresh: this cut validity check is to ensure a known feasible
+   // sol is feasible indeed for the current problem. Discuss this!
+#ifdef CHECK_CUT_VALIDITY
+   {
+      int violnum = check_lp_validity(lp_data);
+      if (violnum) {
+         printf("\n****************************************************\n");
+         printf(  "* Problem Found Violating Known Feasible Solution  *\n");
+         printf(  "****************************************************\n");
+         // TODO: Suresh: change this, since this return means stop abruptly
+         // even for the nodes that are infeasible or do not contain optimal
+         // solution
+         return(FUNCTION_TERMINATED_ABNORMALLY);
+      }
+   }
+#endif
 
    //int term = LP_ABANDONED;
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 
-   si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
+   //si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
 
    si->initialSolve();
 
@@ -2644,20 +2660,19 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 
       get_x(lp_data);
 
-      //Anahita
-      int t;
-      double intercept = 0;
-
-      for (t=0; t < lp_data->n; t++){
-         intercept += lp_data->x[t]* lp_data->dj[t];
-      }
-
-      lp_data->intcpt = intercept;
-
 #ifdef CHECK_DUAL_SOLUTION
       if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
          //This code checks the dual solution values
          double lb = 0;
+         //Anahita
+         int t;
+         double intercept = 0;
+
+         for (t=0; t < lp_data->n; t++){
+            intercept += lp_data->x[t]* lp_data->dj[t];
+         }
+
+         lp_data->intcpt = intercept;
 
          for (int i = 0; i <lp_data->m; i++){
             if (si->getRowUpper()[i] < 1000000){
@@ -2702,9 +2717,26 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 
 int dual_simplex(LPdata *lp_data, int *iterd)
 {
-   
+   // TODO: Suresh: this cut validity check is to ensure a known feasible
+   // sol is feasible indeed for the current problem. Discuss this!
+#ifdef CHECK_CUT_VALIDITY
+   {
+      int violnum = check_lp_validity(lp_data);
+      if (violnum) {
+         printf("\n****************************************************\n");
+         printf(  "* Problem Found Violating Known Feasible Solution  *\n");
+         printf(  "****************************************************\n");
+         // TODO: Suresh: change this, since this return means stop abruptly
+         // even for the nodes that are infeasible or do not contain optimal
+         // solution
+         return(FUNCTION_TERMINATED_ABNORMALLY);
+      }
+   }
+#endif
+
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
+
 #ifdef __OSI_CLP__
    int sp = si->specialOptions();
    if((sp&2) != 0) sp ^=2; 
@@ -2716,7 +2748,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    si->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 #endif
    si->resolve();
-   
+
    if (si->isProvenDualInfeasible()){
       term = LP_D_INFEASIBLE;
    }else if (si->isProvenPrimalInfeasible()){
@@ -2730,7 +2762,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #ifdef __OSI_CLP__
       /* If max iterations and had switched to primal, bound is no good */
       if (si->getModelPtr()->secondaryStatus() == 10){
-	 term = LP_ABANDONED;
+         term = LP_ABANDONED;
       }
 #endif
    }else if (si->isAbandoned()){
@@ -2740,69 +2772,68 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       // This is the only posibility left.
       term = LP_TIME_LIMIT;
    }
-   
+
    lp_data->termcode = term;
-   
+
    if (term != LP_ABANDONED){
-      
+
       *iterd = si->getIterationCount();
-      
+
       lp_data->objval = si->getObjValue();
 
 
       /* Get relevant data */
       if (!lp_data->dualsol){
-      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+         lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
       }
       if (!lp_data->dj){
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+         lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
       }
       get_dj_pi(lp_data);
-      
+
       if (lp_data->slacks && term == LP_OPTIMAL) {
-	 get_slacks(lp_data);
+         get_slacks(lp_data);
       }
-      
+
       //Anahita
       if (term == LP_D_UNBOUNDED) {
-	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	    lp_data->maxm * DSIZE);
-	 get_dual_farkas_ray(lp_data);
+         lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+               lp_data->maxm * DSIZE);
+         get_dual_farkas_ray(lp_data);
       }
-      
+
       get_x(lp_data);
 
-      //Anahita
-      int t;
-      double intercept = 0;
-      
-      for (t=0; t < lp_data->n; t++){
-	 intercept += lp_data->x[t]* lp_data->dj[t];
-      }
-
-      lp_data->intcpt = intercept;
-      
 #ifdef CHECK_DUAL_SOLUTION
       if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
-	//This code checks the dual solution values
-	double lb = 0;
-	
-	for (int i = 0; i <lp_data->m; i++){
-	  if (si->getRowUpper()[i] < 1000000){
-	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
-	  }else{
-	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
-	  }
-	}
-	
-	if (fabs(intercept + lb - lp_data->objval) > 0.1){
-	  write_mps(lp_data, "lp.assert");
-	}
-	
-	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+         //This code checks the dual solution values
+         double lb = 0;
+         //Anahita
+         int t;
+         double intercept = 0;
+
+         for (t=0; t < lp_data->n; t++){
+            intercept += lp_data->x[t]* lp_data->dj[t];
+         }
+
+         lp_data->intcpt = intercept;
+
+         for (int i = 0; i <lp_data->m; i++){
+            if (si->getRowUpper()[i] < 1000000){
+               lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+            }else{
+               lb += si->getRowLower()[i]*lp_data->dualsol[i];
+            }
+         }
+
+         if (fabs(intercept + lb - lp_data->objval) > 0.1){
+            write_mps(lp_data, "lp.assert");
+         }
+
+         assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
       }
 #endif
-      
+
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
    else{
@@ -2810,12 +2841,12 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #ifdef __OSI_CLP__
       if (si->getModelPtr()->secondaryStatus() != 10)
 #endif
-      printf("OSI Abandoned calculation: Code %i \n\n", term);
+         printf("OSI Abandoned calculation: Code %i \n\n", term);
    }
-   
+
    /*
-   si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
-   */
+      si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
+    */
    return(term);
 }
 
@@ -2828,13 +2859,30 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 /*===========================================================================*/
 int solve_hotstart(LPdata *lp_data, int *iterd)
 {
-   
+
+   // TODO: Suresh: this cut validity check is to ensure a known feasible
+   // sol is feasible indeed for the current problem. Discuss this!
+#ifdef CHECK_CUT_VALIDITY
+   {
+      int violnum = check_lp_validity(lp_data);
+      if (violnum) {
+         printf("\n****************************************************\n");
+         printf(  "* Problem Found Violating Known Feasible Solution  *\n");
+         printf(  "****************************************************\n");
+         // TODO: Suresh: change this, since this return means stop abruptly
+         // even for the nodes that are infeasible or do not contain optimal
+         // solution
+         return(FUNCTION_TERMINATED_ABNORMALLY);
+      }
+   }
+#endif
+
    //int term = LP_ABANDONED;
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
-    
+
    si->solveFromHotStart();
-   
+
    if (si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
    else if (si->isProvenPrimalInfeasible())
@@ -2847,80 +2895,79 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
       term = LP_D_ITLIM;
    else if (si->isAbandoned())
       term = LP_ABANDONED;
-   
+
    /* if(term == D_UNBOUNDED){
       retval=si->getIntParam(OsiMaxNumIteration, itlim); 
       CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() */
    /* } to unconfuse vi */
-   
+
    lp_data->termcode = term;
-   
+
    if (term != LP_ABANDONED){
-      
+
       *iterd = si->getIterationCount();
-      
+
       lp_data->objval = si->getObjValue();
 
       // Get relevant data
       if (lp_data->dualsol && lp_data->dj) {
-      	 get_dj_pi(lp_data);
+         get_dj_pi(lp_data);
       }else{ //Anahita
-      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
-      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-      	 get_dj_pi(lp_data);
+         lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+         lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+         get_dj_pi(lp_data);
       }
 
       if (lp_data->slacks && term == LP_OPTIMAL) {
-      	 get_slacks(lp_data);
+         get_slacks(lp_data);
       }
 
       //Anahita
       if (term == LP_D_UNBOUNDED) {
-	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	    lp_data->maxm * DSIZE);
-	 get_dual_farkas_ray(lp_data);
+         lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+               lp_data->maxm * DSIZE);
+         get_dual_farkas_ray(lp_data);
       }
-      
+
       get_x(lp_data);
-
-      //Anahita
-      int t;
-      double intercept = 0;
-      
-      for (t=0; t < lp_data->n; t++){
-	 intercept += lp_data->x[t]* lp_data->dj[t];
-      }
-
-      lp_data->intcpt = intercept;
 
 #ifdef CHECK_DUAL_SOLUTION
       if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
-	//This code checks the dual solution values
-	double lb = 0;
-	
-	for (int i = 0; i <lp_data->m; i++){
-	  if (si->getRowUpper()[i] < 1000000){
-	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
-	  }else{
-	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
-	  }
-	}
-	
-	if (fabs(intercept + lb - lp_data->objval) > 0.1){
-	  write_mps(lp_data, "lp.assert");
-	}
-	
-	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+         //This code checks the dual solution values
+         double lb = 0;
+         //Anahita
+         int t;
+         double intercept = 0;
+
+         for (t=0; t < lp_data->n; t++){
+            intercept += lp_data->x[t]* lp_data->dj[t];
+         }
+
+         lp_data->intcpt = intercept;
+
+         for (int i = 0; i <lp_data->m; i++){
+            if (si->getRowUpper()[i] < 1000000){
+               lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+            }else{
+               lb += si->getRowLower()[i]*lp_data->dualsol[i];
+            }
+         }
+
+         if (fabs(intercept + lb - lp_data->objval) > 0.1){
+            write_mps(lp_data, "lp.assert");
+         }
+
+         assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
       }
 #endif
-	
+
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
       printf("OSI Abandoned calculation: Code %i \n\n", term);
    }
-   
+
    return(term);
 }
 
@@ -2936,6 +2983,90 @@ int unmark_hotstart(LPdata *lp_data)
 {
    lp_data->si->unmarkHotStart();
    return (0);
+}
+
+/*===========================================================================*\
+ * This function checks for the validity of all constraints w.r.t. a known   *
+ * feasible solution, and returns the number of violated constraints         *
+\*===========================================================================*/
+// TODO: Suresh: discuss this!
+// Assumption: feas_sol_size = total # of vars
+// Assumption: no new variables are added in the solution process
+
+int check_lp_validity(LPdata *lp_data)
+{
+   int feas_sol_size = 0, iter1, iter2, violnum = 0, m;
+   const int *matbeg, *matind;
+   double *feas_sol, *rowact;
+   double lpetol =  lp_data->lpetol;
+   const double *matval, *rhs, *rngval;
+   const char *sense;
+
+   // TODO: Suresh: think of an alternative to fetch the solution
+//   user_send_feas_sol(env->user, &feas_sol_size, &feas_sol);
+   if (feas_sol_size) {
+
+      OsiXSolverInterface  *si = lp_data->si;
+      const CoinPackedMatrix *matrixByCol = si->getMatrixByCol();
+
+      matval = matrixByCol->getElements();
+      matind = matrixByCol->getIndices(); 
+      matbeg = matrixByCol->getVectorStarts();
+
+      rhs    = si->getRightHandSide();
+      rngval = si->getRowRange();
+      sense  = si->getRowSense();
+
+      m = si->getNumRows();
+
+      rowact = (double *) calloc(m, DSIZE);
+
+      for(iter1 = 0; iter1 < feas_sol_size; iter1++){
+         for(iter2 = matbeg[iter1]; iter2<matbeg[iter1+1]; iter2++) {
+            rowact[matind[iter2]] += matval[iter2] * feas_sol[iter1];
+         }
+      }
+
+      for (iter1 = 0; iter1 < m; iter1++) {
+         switch (sense[iter1]) {
+            case 'L': 
+               if (rowact[iter1] <= rhs[iter1] + lpetol) {
+                  /* do nothing */
+               } else {
+                  violnum++;
+               }
+               break;
+            case 'G':
+               if (rowact[iter1] + lpetol >= rhs[iter1]) {
+                  /* do nothing */
+               } else {
+                  violnum++;
+               }
+               break;
+            case 'E':
+               if (fabs(rowact[iter1] - rhs[iter1]) <= lpetol) {
+                  /* do nothing */
+               } else {
+                  violnum++;
+               }
+               break;
+            case 'R': // ranged constraint
+               if (rowact[iter1] + lpetol >= rhs[iter1] && rowact[iter1] <= rhs[iter1] + rngval[iter1] + lpetol) {
+                  /* do nothing */
+               } else {
+                  violnum++;
+               }
+               break;
+            case 'N': // free constraint
+               /* do nothing */
+               break;
+            default:
+               /* do nothing */
+               break;
+         };
+      }
+   }
+   return violnum;
 }
 
 /*===========================================================================*/

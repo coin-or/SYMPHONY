@@ -45,10 +45,10 @@ void usage(void)
 	  "[ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]\n\t"
 	  "[-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]\n\t"
           "[ -u ub ] [ -p procs ] [ -k rule ] [ -v level ] [ -c rule ]\n\t"
-	  "[ -m max ] [ -z n ] [-o tree_out_file]\n\t"
+	  "[ -m max ] [ -z n ] [-o tree_out_file] [-w 0/1]\n\t"
 	  "\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 #ifndef USE_SYM_APPLICATION
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t\n\n",
 	  "-F model: model should be read in from file 'model'",
@@ -69,6 +69,7 @@ void usage(void)
 	  "-q 0/1: whether or not to tighten root bounds",
 	  "-r 0/1: whether or not to do reduced cost tightening",
 	  "-j 0/1: whether or not to generate cgl cuts",
+	  "-w 0/1: whether or not to use hot starting in strong branching ",
 	  "-e n: set pre-processing level to 'n'",
 	  "-i iters: allow a max of 'iters' iterations in presolve",
 	  "-t time: set wallclock time limit to 'time'",
@@ -718,6 +719,19 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		  fprintf(f2, "file created\n");
 		  fclose(f2); 
 	       }
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;
+       case 'w':
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       lp_par->use_hot_starts = tmpi;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);

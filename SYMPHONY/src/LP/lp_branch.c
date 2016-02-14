@@ -735,9 +735,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             max_presolve_iter = (int)(1.0 * max_presolve_iter * 5e4/p->mip->nz);
          }
 #endif
-         //max_presolve_iter = MAX(max_presolve_iter, 25);
-         max_presolve_iter = 40;
-         if(p->par.rs_mode_enabled) max_presolve_iter = 5; 
+	 max_presolve_iter = MAX(max_presolve_iter, 40);
+	 //max_presolve_iter = 40;
+	 if(p->par.rs_mode_enabled) max_presolve_iter = 5; 
 
          if (max_presolve_iter < 5) {
             max_presolve_iter = 5;
@@ -855,11 +855,17 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                p->br_rel_down_min_level[branch_var] =  p->bc_level;
             }
             if (down_status == LP_D_INFEASIBLE || down_status == LP_D_OBJLIM || 
-                  down_status == LP_D_UNBOUNDED) {
+                down_status == LP_D_UNBOUNDED ||
+		(p->has_ub && down_obj > p->ub - p->par.granularity + p->lp_data->lpetol)) {
                // update bounds
                bnd_val[num_bnd_changes] = ceilx;
                bnd_sense[num_bnd_changes] = 'G';
                bnd_ind[num_bnd_changes] = branch_var;
+	       if (p->mip->colname){
+		  PRINT(p->par.verbosity, 5,
+			("Fixing variable index %i (%s) to 1 \n", branch_var,
+			 p->mip->colname[p->lp_data->vars[branch_var]->userind]));
+	       }
                num_bnd_changes++;
                change_lbub(lp_data, branch_var, ceilx, ub);
                vars[branch_var]->new_lb = ceilx;
@@ -902,11 +908,17 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             }
             up_is_est = FALSE;
             if (up_status == LP_D_INFEASIBLE || up_status == LP_D_OBJLIM || 
-                  up_status == LP_D_UNBOUNDED) {
+                up_status == LP_D_UNBOUNDED ||
+		(p->has_ub && up_obj > p->ub - p->par.granularity + p->lp_data->lpetol)) {
                // update bounds
                bnd_val[num_bnd_changes] = floorx;
                bnd_sense[num_bnd_changes] = 'L';
                bnd_ind[num_bnd_changes] = branch_var;
+	       if (p->mip->colname){
+		  PRINT(p->par.verbosity, 5,
+			("Fixing variable index %i (%s) to 1 \n", branch_var,
+			 p->mip->colname[p->lp_data->vars[branch_var]->userind]));
+	       }
                num_bnd_changes++;
                change_lbub(lp_data, branch_var, lb, floorx);
                vars[branch_var]->new_ub = floorx;
@@ -1463,11 +1475,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       FREE(down_violation_cnt);
       FREE(violation_col_size);
 
-      if (both_children_inf == TRUE) {
+      if (both_children_inf || num_bnd_changes > 0) {
          FREE(best_can);
          FREE(candidates);
          *candidate = NULL;
-         p->lp_stat.str_br_nodes_pruned++;
          if (should_use_hot_starts && unmark_hs){
             unmark_hotstart(lp_data);
             set_itlim_hotstart(lp_data, -1);
@@ -1475,7 +1486,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             load_basis(lp_data, rstat, cstat);
          }
          set_itlim(lp_data, -1); //both limits should be set for hotstarts
-         return (DO_NOT_BRANCH__FATHOMED);
+         if (both_children_inf){
+            p->lp_stat.str_br_nodes_pruned++;
+            return (DO_NOT_BRANCH__FATHOMED);
+         }else{
+            return (DO_NOT_BRANCH);
+         }
       }
 
       //printf("Branching on %i %c\n", best_can->position, best_can->sense[0]);
@@ -2137,13 +2153,15 @@ int branch(lp_prob *p, int cuts)
    cut_data *cut;
    node_desc *desc;
    int termcode;
-   
+   bc_node *node = p->tm->active_nodes[p->proc_index];
+   branch_obj *bobj = &node->bobj;
+
    termcode = select_branching_object(p, &cuts, &can);
-   
+
    if (termcode == ERROR__NO_BRANCHING_CANDIDATE){
       return(termcode);
    }
-   
+
    if (can == NULL){
       if (termcode == DO_NOT_BRANCH__FEAS_SOL) {
          /* a better feasible solution was found. return to do reduced cost
@@ -2162,8 +2180,7 @@ int branch(lp_prob *p, int cuts)
 
    /*------------------------------------------------------------------------*\
     * Now we evaluate can, the best of the candidates.
-   \*------------------------------------------------------------------------*/
-   // TODO: Would size of action be an issue in future?
+    \*------------------------------------------------------------------------*/
    action = lp_data->tmp.c; /* n (good estimate... can->child_num) */
    if ((termcode = select_child_u(p, can, action)) < 0)
       return(termcode);
@@ -2186,44 +2203,37 @@ int branch(lp_prob *p, int cuts)
    }
 
    desc = p->desc;
-   // TODO: Suresh: added following line since send_branching_info:
-   // generate_children: purge_pruned_nodes is partially modifying bobj of
-   // parent of current node, partially modifying action[], and partially
-   // modifying can. Due to such partial modifications, instance solving is 
-   // erratic, I think.
-   // Source: test run on one of the sample instances in USER application.
-   *can = p->tm->active_nodes[p->proc_index]->parent->bobj;
-   switch (can->cdesc[keep].type){
+   switch (bobj->cdesc[keep].type){
       case CANDIDATE_VARIABLE:
-         p->branch_var = can->cdesc[keep].position;
-         p->branch_dir = can->cdesc[keep].sense;
-         var = lp_data->vars[branch_var = can->cdesc[keep].position];
-         switch (can->cdesc[keep].sense){
+         p->branch_var = bobj->cdesc[keep].position;
+         p->branch_dir = bobj->cdesc[keep].sense;
+         var = lp_data->vars[branch_var = bobj->cdesc[keep].position];
+         switch (bobj->cdesc[keep].sense){
             case 'E':
-               var->new_lb = var->new_ub = can->cdesc[keep].rhs;
-               var->lb = var->ub = can->cdesc[keep].rhs;
+               var->new_lb = var->new_ub = bobj->cdesc[keep].rhs;
+               var->lb = var->ub = bobj->cdesc[keep].rhs;
                break;
             case 'R':
-               var->new_lb = can->cdesc[keep].rhs; 
-               var->new_ub = var->lb + can->cdesc[keep].range;
-               var->lb = can->cdesc[keep].rhs; var->ub = var->lb + can->cdesc[keep].range;
+               var->new_lb = bobj->cdesc[keep].rhs; 
+               var->new_ub = var->lb + bobj->cdesc[keep].range;
+               var->lb = bobj->cdesc[keep].rhs; var->ub = var->lb + bobj->cdesc[keep].range;
                break;
             case 'L':
-               var->new_ub = can->cdesc[keep].rhs;
-               var->ub = can->cdesc[keep].rhs;
+               var->new_ub = bobj->cdesc[keep].rhs;
+               var->ub = bobj->cdesc[keep].rhs;
                break;
             case 'G':
-               var->new_lb = can->cdesc[keep].rhs;
-               var->lb = can->cdesc[keep].rhs;
+               var->new_lb = bobj->cdesc[keep].rhs;
+               var->lb = bobj->cdesc[keep].rhs;
                break;
          }
-         //printf("branching on %i %c %f %f\n", branch_var, can->sense[keep], var->lb, var->ub);
-         change_col(lp_data, branch_var, can->cdesc[keep].sense, var->lb, var->ub);
+         //printf("branching on %i %c %f %f\n", branch_var, bobj->cdesc[keep].sense, var->lb, var->ub);
+         change_col(lp_data, branch_var, bobj->cdesc[keep].sense, var->lb, var->ub);
          lp_data->status[branch_var] |= VARIABLE_BRANCHED_ON;
          break;
       case SOS1_IMPLICIT:
-         for(int j = 0; j < can->cdesc[keep].sos_cnt; j++){
-            branch_var = can->cdesc[keep].sos_ind[j];
+         for(int j = 0; j < bobj->cdesc[keep].sos_cnt; j++){
+            branch_var = bobj->cdesc[keep].sos_ind[j];
             change_ub(lp_data, branch_var, 0.0);
             lp_data->vars[branch_var]->new_ub = 0.0;
             lp_data->vars[branch_var]->ub = 0.0;
@@ -2233,7 +2243,7 @@ int branch(lp_prob *p, int cuts)
          //printf("\n");
          break;
       case CANDIDATE_CUT_IN_MATRIX:
-         branch_row = can->cdesc[keep].position;
+         branch_row = bobj->cdesc[keep].position;
          cut = lp_data->rows[branch_row].cut;
          /* To maintain consistency with TM we have to fix a few more things if
             we had a non-base, new branching cut */
@@ -2297,14 +2307,14 @@ int branch(lp_prob *p, int cuts)
                stat[i] = SLACK_BASIC;
             }
          }
-         cut->rhs = can->cdesc[keep].rhs;
-         if ((cut->sense = can->cdesc[keep].sense) == 'R')
-            cut->range = can->cdesc[keep].range;
-         cut->branch = CUT_BRANCHED_ON | can->cdesc[keep].branch;
+         cut->rhs = bobj->cdesc[keep].rhs;
+         if ((cut->sense = bobj->cdesc[keep].sense) == 'R')
+            cut->range = bobj->cdesc[keep].range;
+         cut->branch = CUT_BRANCHED_ON | bobj->cdesc[keep].branch;
          constrain_row_set(lp_data, 1, &branch_row);
          lp_data->rows[branch_row].free = FALSE;
          break;
-   } // End of can->type switch statement
+   } // End of bobj->cdesc[keep].type switch statement
 
    /* Since this is a child we dived into, we know that TM stores the stati of
       extra vars/rows wrt the parent */
@@ -2312,7 +2322,7 @@ int branch(lp_prob *p, int cuts)
    p->desc->basis.extrarows.type = WRT_PARENT;
 
    free_candidate_completely(&can);
-   
+
    /* the new p->bc_index is received in send_branching_info() */
    p->bc_level++;
    /*p->iter_num = 0;*/

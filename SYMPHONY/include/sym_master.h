@@ -181,4 +181,5 @@ double check_feasibility_new_rhs PROTO((bc_node *node, MIPdesc *mip,
 char check_solution PROTO((sym_environment *env, lp_sol *sol,
 				       double * colsol = NULL));
 int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
+void free_master PROTO((sym_environment *env));
 #endif

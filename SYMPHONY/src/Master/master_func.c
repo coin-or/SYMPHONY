@@ -24,12 +24,14 @@
 #include <pvmtev.h>
 #endif
 
+#include "sym_messages.h"
 #include "sym_master.h"
 #include "sym_master_u.h"
 #include "sym_macros.h"
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
 #include "sym_lp_solver.h"
+#include "sym_primal_heuristics.h"
 //#include "sym_lp.h"
 #include "sym_tm.h"
 
@@ -2390,7 +2392,7 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    else if (strcmp(key, "debug_lp") == 0 ||
-         strcmp(key, "LP_debug_lp") == 0){
+	    strcmp(key, "LP_debug_lp") == 0){
       READ_INT_PAR(lp_par->debug_lp);
       return(0);
    }
@@ -4100,16 +4102,16 @@ double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip, branch_desc *bpath,
 #else
    if (level > 0){
       for (j = node->parent->bobj.child_num - 1; j >= 0; j--)
-	 if (node->parent->children[j] == node)
-	    break;
-      
+         if (node->parent->children[j] == node)
+            break;
+
       bobj = &(node->parent->bobj);
-      bpath[level-1].type = bobj->type;
-      bpath[level-1].name = bobj->name;
-      bpath[level-1].sense = bobj->sense[j];
-      bpath[level-1].rhs = bobj->rhs[j];
-      bpath[level-1].range = bobj->range[j];
-      bpath[level-1].branch = bobj->branch[j];
+      bpath[level-1].type = bobj->cdesc[j].type;
+      bpath[level-1].name = bobj->cdesc[j].name;
+      bpath[level-1].sense = bobj->cdesc[j].sense;
+      bpath[level-1].rhs = bobj->cdesc[j].rhs;
+      bpath[level-1].range = bobj->cdesc[j].range;
+      bpath[level-1].branch = bobj->cdesc[j].branch;
    }
 #endif
       
@@ -4709,10 +4711,10 @@ int trim_warm_tree(sym_environment *env, bc_node *n)
       return(0);
    if (not_pruned == 1){
       for (i = n->bobj.child_num - 1; i >= 0; i--)
-	 if (n->children[i]->node_status != NODE_STATUS__PRUNED){
-	    trim_warm_tree(env, n->children[i]);
-	    break;
-	 }
+         if (n->children[i]->node_status != NODE_STATUS__PRUNED){
+            trim_warm_tree(env, n->children[i]);
+            break;
+         }
       return(0);
    }
 
@@ -4726,22 +4728,98 @@ int trim_warm_tree(sym_environment *env, bc_node *n)
    if (i < 0){
       /* get rid of the children */
       for (i = n->bobj.child_num - 1; i >= 0; i--)
-	 free_subtree(n->children[i]);
+         free_subtree(n->children[i]);
       /* free the children description */
       FREE(n->children);
       n->bobj.child_num = 0;
 #ifndef MAX_CHILDREN_NUM
-      FREE(n->bobj.sense);
-      FREE(n->bobj.rhs);
-      FREE(n->bobj.range);
-      FREE(n->bobj.branch);
+      for (i = n->bobj.child_num - 1; i >= 0; i--) {
+         FREE(n->bobj.cdesc[i].sense);
+         FREE(n->bobj.cdesc[i].rhs);
+         FREE(n->bobj.cdesc[i].range);
+         FREE(n->bobj.cdesc[i].branch);
+      }
 #endif
    }else{
       /* try to trim every child */
       for (i = n->bobj.child_num - 1; i >= 0; i--)
-	 trim_warm_tree(env, n->children[i]);
+         trim_warm_tree(env, n->children[i]);
    }
    return(0);
+}
+
+/*===========================================================================*/
+
+void free_master(sym_environment *env)
+{
+   int i;
+   MIPdesc *tmp;
+   
+   FREE(env->best_sol.xind);
+   FREE(env->best_sol.xval);
+   
+   if ((tmp = env->mip)){
+      free_mip_desc(env->mip);
+      FREE(env->mip);
+   }
+
+   if(env->prep_mip && env->prep_mip != tmp){
+      free_mip_desc(env->prep_mip);
+      FREE(env->prep_mip);
+   }else{ //We made a copy, so don't free it again
+      env->prep_mip = NULL;
+   }
+   
+   if (env->rootdesc){
+      FREE(env->rootdesc->desc);
+      FREE(env->rootdesc->uind.list);
+      FREE(env->rootdesc->not_fixed.list);
+      FREE(env->rootdesc->cutind.list);
+      FREE(env->rootdesc);
+   }
+
+   if (env->base){
+      FREE(env->base->userind);
+      FREE(env->base);
+   }
+
+#ifdef COMPILE_IN_TM
+   if (env->warm_start){
+      free_subtree(env->warm_start->rootnode);
+      if(env->warm_start->best_sol.has_sol){
+	 FREE(env->warm_start->best_sol.xind);
+	 FREE(env->warm_start->best_sol.xval);
+      }
+      if (env->warm_start->cuts){
+	 for (i = env->warm_start->cut_num - 1; i >= 0; i--){
+	    if (env->warm_start->cuts[i]){
+	       FREE(env->warm_start->cuts[i]->coef);
+	    }
+	    FREE(env->warm_start->cuts[i]);
+	 }
+      }
+
+      FREE(env->warm_start->cuts);
+      FREE(env->warm_start);
+   }
+#ifdef COMPILE_IN_CP
+   if (env->cp){
+      for (i = 0; i < env->par.tm_par.max_cp_num; i++){
+	 env->cp[i]->msgtag = YOU_CAN_DIE;
+	 cp_close(env->cp[i]);
+      }
+      FREE(env->cp);
+   }
+#endif
+#ifdef COMPILE_IN_LP
+   if (env->sp){
+      sp_free_sp(env->sp);
+      FREE(env->sp);
+   }
+#endif
+#endif
+   
+   return;   
 }
 
 /*===========================================================================*/

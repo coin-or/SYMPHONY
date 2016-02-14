@@ -63,6 +63,11 @@ typedef struct USER_PROBLEM{
 
    double          *rowact;     /* row activities of constraints of current LP relaxation */
 
+#if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
+   int             feas_sol_size;
+   double            *feas_sol;
+#endif
+
 }user_problem;
 
 int user_read_data PROTO((user_problem *prob, char *infile));

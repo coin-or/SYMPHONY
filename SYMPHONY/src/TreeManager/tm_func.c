@@ -2132,7 +2132,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
          changed_bound = FALSE;
       }
 #ifdef COMPILE_IN_LP
-      for (i = 0; i < tm->par.max_active_nodes; i ++){
+      for (i = 0; i < tm->par.max_active_nodes; i++){
          tm->lpp[i]->has_ub = tm->has_ub;
          tm->lpp[i]->ub = tm->ub;
       }
@@ -2199,6 +2199,8 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    /* Remove nodes that can now be fathomed from the list */
 #pragma omp critical (tree_update)
    {
+      int var_index;
+   
       rule = tm->par.node_selection_rule;
       list = tm->samephase_cand;
       char has_exchanged = FALSE;
@@ -2208,6 +2210,8 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
          if (tm->has_ub &&
                node->lower_bound >= tm->ub-tm->par.granularity){
 #ifdef COMPILE_IN_LP
+/* TODO: Suresh: confirm this later.
+<<<<<<< .working
             if(node->parent){
                for(j = 0; j < node->parent->bobj.child_num; j++){
                   if(node->parent->children[j] == node){
@@ -2219,6 +2223,24 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
                   }
                }
             }
+=======
+*/
+// TODO: Suresh: Why only BRANCHING_VARIABLE below? Why not BRANCHING_*?
+	    if (node->parent){
+          for (j = 0; j < node->parent->bobj.child_num; j++){
+             if (node->parent->bobj.cdesc[j].type == BRANCHING_VARIABLE && node->parent->children[j] == node){
+                var_index = (node->parent->bobj.cdesc[j].name < 0 ?
+                      /* base variable : extra variable */
+                      (-node->parent->bobj.cdesc[j].name-1) :
+                      (node->parent->bobj.cdesc[j].name + tm->bvarnum));
+                if (node->parent->bobj.cdesc[j].sense == 'L'){
+                   tm->br_inf_down[var_index]++;
+                }else{
+                   tm->br_inf_up[var_index]++;
+                }
+             }
+          }
+	    }
 #endif
             if (i != last){
                list[i] = list[last];

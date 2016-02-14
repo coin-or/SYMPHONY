@@ -1161,64 +1161,64 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
    char *coef;
    int v0, v1;
    int i;
-   
-   
+
+
    if (cnrp->feas_sol_size){
       switch (new_cut->type){
-	 
-	 /*------------------------------------------------------------------*\
-	  * The subtour elimination constraints are stored as a vector of bits
-	  * indicating which side of the cut each customer is on.
-	  \*-----------------------------------------------------------------*/
-	 
-       case SUBTOUR_ELIM_SIDE:
-	 /*Here, I could just allocate enough memory up front and then
-	   reallocate at the end istead of counting the number of entries in
-	   the row first*/
-	 coef = new_cut->coef;
-	 for (i = 0; i<cnrp->feas_sol_size; i++){
-	    v0 = edges[feas_sol[i] << 1];
-	    v1 = edges[(feas_sol[i] << 1) + 1];
-	    if ((coef[v0 >> DELETE_POWER] & (1 << (v0 & DELETE_AND))) &&
-		(coef[v1 >> DELETE_POWER] & (1 << (v1 & DELETE_AND)))){
-	       lhs += 1;
-	    }
-	 }
-	 new_cut->sense = 'L';
-	 break;
-	 
-       case SUBTOUR_ELIM_ACROSS:
-	 /*I could just allocate enough memory up front and then reallocate
-	   at the end instead of counting the number of entries first*/
-	 coef = new_cut->coef;
-	 for (i = 0; i < cnrp->feas_sol_size; i++){
-	    v0 = edges[feas_sol[i] << 1];
-	    v1 = edges[(feas_sol[i] << 1) + 1];
-	    if ((coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1) ^
-		(coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1)){
-	       lhs += 1;
-	    }
-	 }
-	 new_cut->sense = 'G';
-	 break;
-	 
-       default:
-	 printf("Unrecognized cut type!\n");
+
+         /*------------------------------------------------------------------*\
+          * The subtour elimination constraints are stored as a vector of bits
+          * indicating which side of the cut each customer is on.
+          \*-----------------------------------------------------------------*/
+
+         case SUBTOUR_ELIM_SIDE:
+            /*Here, I could just allocate enough memory up front and then
+              reallocate at the end istead of counting the number of entries in
+              the row first*/
+            coef = new_cut->coef;
+            for (i = 0; i<cnrp->feas_sol_size; i++){
+               v0 = edges[feas_sol[i] << 1];
+               v1 = edges[(feas_sol[i] << 1) + 1];
+               if ((coef[v0 >> DELETE_POWER] & (1 << (v0 & DELETE_AND))) &&
+                     (coef[v1 >> DELETE_POWER] & (1 << (v1 & DELETE_AND)))){
+                  lhs += 1;
+               }
+            }
+            new_cut->sense = 'L';
+            break;
+
+         case SUBTOUR_ELIM_ACROSS:
+            /*I could just allocate enough memory up front and then reallocate
+              at the end instead of counting the number of entries first*/
+            coef = new_cut->coef;
+            for (i = 0; i < cnrp->feas_sol_size; i++){
+               v0 = edges[feas_sol[i] << 1];
+               v1 = edges[(feas_sol[i] << 1) + 1];
+               if ((coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1) ^
+                     (coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1)){
+                  lhs += 1;
+               }
+            }
+            new_cut->sense = 'G';
+            break;
+
+         default:
+            printf("Unrecognized cut type!\n");
       }
-      
+
       /*check to see if the cut is actually violated by the current solution --
-	otherwise don't add it -- also check to see if its a duplicate*/
+        otherwise don't add it -- also check to see if its a duplicate*/
       if (new_cut->sense == 'G' ? lhs < new_cut->rhs : lhs > new_cut->rhs){
-	 printf("CG: ERROR -- cut is violated by feasible solution!!!\n");
+         printf("CG: ERROR -- cut is violated by feasible solution!!!\n");
 #if 0
-	 printf("Solution number: %i level: %i iter_num: %i\n",
-		cg->cur_sol.xindex, cg->cur_sol.xlevel, cg->cur_sol.xiter_num);
+         printf("Solution number: %i level: %i iter_num: %i\n",
+               cg->cur_sol.xindex, cg->cur_sol.xlevel, cg->cur_sol.xiter_num);
 #endif
-	 sleep(600);
-	 exit(1);
+         sleep(600);
+         exit(1);
       }
    }
-   
+
    return(USER_SUCCESS);
 }
 #endif

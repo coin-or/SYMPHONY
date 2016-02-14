@@ -628,7 +628,7 @@ int create_subproblem_u(lp_prob *p)
    rows = lp_data->rows;
    if (p->bc_level){
       bobj = p->bdesc + p->bc_level - 1;
-      p->branch_var = bobj->name;
+      p->branch_var = -1;
       p->branch_dir = bobj->sense;
       status = lp_data->status;
       for (i = 0; i < p->bc_level; i++){
@@ -638,6 +638,7 @@ int create_subproblem_u(lp_prob *p)
             j = bobj->name < 0 ? /* base variable : extra variable */
                -bobj->name-1 :
                bfind(bobj->name, d_uind, desc->uind.size) + bvarnum;
+            p->branch_var = j;
             switch (bobj->sense){
                case 'E':
                   change_lbub(lp_data, j, bobj->rhs, bobj->rhs);
@@ -841,74 +842,74 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 #ifdef USE_SYM_APPLICATION
    cnt = collect_nonzeros(p, lp_data->x, indices, values);
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
-			       &feasible, &true_objval, branching,
-			       heur_solution);
+         &feasible, &true_objval, branching,
+         heur_solution);
 #else
    user_res = USER_DEFAULT;
 #endif
 
    switch (user_res){
-    case USER_ERROR: /* Error. Consider as feasibility not recognized. */
-      return(FALSE);
-    case USER_SUCCESS:
-    case USER_AND_PP:
-    case USER_NO_PP:
-      if (feasible == IP_HEUR_FEASIBLE){
-	 memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	 if(true_objval > t_lb + lpetol100){
-	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-			     p->mip->obj_sense);
-	 }else{
-	    dual_gap = 1e-4;
-	 }
-	 apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
-	 check_ls = FALSE;
-      }
-      break;
-    case USER_DEFAULT: /* set the default */
-      user_res = TEST_INTEGRALITY;
-      if (feasible != IP_INFEASIBLE){
-	 printf("Warning: User set feasibility status of solution, but\n");
-	 printf("SYMPHONY to check feasibility. Ignoring request.");
-	 user_res = USER_SUCCESS;
-      }
-      break;
-    default:
-      break;
+      case USER_ERROR: /* Error. Consider as feasibility not recognized. */
+         return(FALSE);
+      case USER_SUCCESS:
+      case USER_AND_PP:
+      case USER_NO_PP:
+         if (feasible == IP_HEUR_FEASIBLE){
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+            if(true_objval > t_lb + lpetol100){
+               dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+                     p->mip->obj_sense);
+            }else{
+               dual_gap = 1e-4;
+            }
+            apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+            check_ls = FALSE;
+         }
+         break;
+      case USER_DEFAULT: /* set the default */
+         user_res = TEST_INTEGRALITY;
+         if (feasible != IP_INFEASIBLE){
+            printf("Warning: User set feasibility status of solution, but\n");
+            printf("SYMPHONY to check feasibility. Ignoring request.");
+            user_res = USER_SUCCESS;
+         }
+         break;
+      default:
+         break;
    }
 
    switch (user_res){
-    case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
-      cnt = collect_nonzeros(p, lp_data->x, indices, values);
-       for (i=cnt-1; i>=0; i--){
-	 if (!vars[indices[i]]->is_int)
-	    continue; /* Not an integer variable */
-	 if (values[i] < lpetol1) break;
-       }
-      feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
-      break;
-    case TEST_INTEGRALITY:
-      x = lp_data->x;
-      for (i = n - 1; i >= 0; i--){
-	 if (!vars[i]->is_int)
-	    continue; /* Not an integer variable */
-	 valuesi = x[i];
-	 if (valuesi-floor(valuesi) > lpetol100 &&
-	     ceil(valuesi)-valuesi > lpetol100 &&
-             valuesi>vars[i]->lb-lpetol && valuesi<vars[i]->ub+lpetol){
-	    break;
-	 }
-      }
-      feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
-      break;
-    default:
-      break;
+      case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
+         cnt = collect_nonzeros(p, lp_data->x, indices, values);
+         for (i=cnt-1; i>=0; i--){
+            if (!vars[indices[i]]->is_int)
+               continue; /* Not an integer variable */
+            if (values[i] < lpetol1) break;
+         }
+         feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
+         break;
+      case TEST_INTEGRALITY:
+         x = lp_data->x;
+         for (i = n - 1; i >= 0; i--){
+            if (!vars[i]->is_int)
+               continue; /* Not an integer variable */
+            valuesi = x[i];
+            if (valuesi-floor(valuesi) > lpetol100 &&
+                  ceil(valuesi)-valuesi > lpetol100 &&
+                  valuesi>vars[i]->lb-lpetol && valuesi<vars[i]->ub+lpetol){
+               break;
+            }
+         }
+         feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
+         break;
+      default:
+         break;
    }
 
 #ifdef COMPILE_IN_LP
 
    if(p->bc_index < 1 && p->lp_stat.lp_calls < 2){
-     memcpy(p->root_lp, lp_data->x, DSIZE*n);
+      memcpy(p->root_lp, lp_data->x, DSIZE*n);
    }
 
    if(p->tm->stat.analyzed > 1){      
@@ -917,29 +918,29 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    } 
 
    if (user_res == TEST_INTEGRALITY && feasible != IP_FEASIBLE && feasible !=
-       IP_HEUR_FEASIBLE && 
-       p->par.do_primal_heuristic && !p->par.multi_criteria){
-      
+         IP_HEUR_FEASIBLE && 
+         p->par.do_primal_heuristic && !p->par.multi_criteria){
+
       if (feasible == IP_INFEASIBLE){ 
-	 true_objval = SYM_INFINITY;
+         true_objval = SYM_INFINITY;
       }
-      
+
       p->var_rank_cnt++;
       for(i = 0; i < n; i++){
 
-	 p->var_rank[i] += (fabs(x[i] - floor(x[i] + lpetol100)) >
-			    lpetol100 ? 1.0 : 0.0);
-	 
+         p->var_rank[i] += (fabs(x[i] - floor(x[i] + lpetol100)) >
+               lpetol100 ? 1.0 : 0.0);
+
       }
 
       if(p->has_ub){	 
-	 if(p->ub > t_lb + lpetol100){
-	    dual_gap = d_gap(p->ub, t_lb, 
-			     p->mip->obj_offset, p->mip->obj_sense);
-	 }else dual_gap = 1e-4;
-	 true_objval = p->ub;	 
+         if(p->ub > t_lb + lpetol100){
+            dual_gap = d_gap(p->ub, t_lb, 
+                  p->mip->obj_offset, p->mip->obj_sense);
+         }else dual_gap = 1e-4;
+         true_objval = p->ub;	 
       }
-      
+
       do_primal_heuristic = TRUE;
    }
 
@@ -947,227 +948,227 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       /* try rounding first */
 
       if (p->has_ub){
-	memset(col_sol, 0, DSIZE*lp_data->n);
-	for(i = 0; i< p->best_sol.xlength; i++) {
-	  col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
-	}
+         memset(col_sol, 0, DSIZE*lp_data->n);
+         for(i = 0; i< p->best_sol.xlength; i++) {
+            col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
+         }
       }
 
       if(p->par.rounding_enabled && dual_gap > p->par.rounding_min_gap){
-       
-	 if (round_solution(p, p->lp_data, &true_objval, heur_solution, t_lb)){
-	    feasible = IP_HEUR_FEASIBLE;
-	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	    if(true_objval > t_lb + lpetol100){
-	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-				p->mip->obj_sense);
-	    }else{
-	       dual_gap = 1e-4;
-	    }
-	    apply_local_search(p, &true_objval, col_sol, heur_solution,
-			       &dual_gap, t_lb);
-	    check_ls = FALSE;
-	 }
+
+         if (round_solution(p, p->lp_data, &true_objval, heur_solution, t_lb)){
+            feasible = IP_HEUR_FEASIBLE;
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+            if(true_objval > t_lb + lpetol100){
+               dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+                     p->mip->obj_sense);
+            }else{
+               dual_gap = 1e-4;
+            }
+            apply_local_search(p, &true_objval, col_sol, heur_solution,
+                  &dual_gap, t_lb);
+            check_ls = FALSE;
+         }
       }
 
       if(feasible != IP_HEUR_FEASIBLE &&
-	 p->par.shifting_enabled && dual_gap > p->par.shifting_min_gap && 
-	 p->bc_level % 5 == 0){
-	 if (shift_solution(p, p->lp_data, &true_objval, heur_solution, t_lb)){	 
-	    feasible = IP_HEUR_FEASIBLE;
-	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	    if(true_objval > t_lb + lpetol100){
-	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-				p->mip->obj_sense);
-	    }else{
-	       dual_gap = 1e-4;
-	    }
-	    apply_local_search(p, &true_objval, col_sol, heur_solution,
-			       &dual_gap, t_lb);
-	    check_ls = FALSE; 
-	 }
+            p->par.shifting_enabled && dual_gap > p->par.shifting_min_gap && 
+            p->bc_level % 5 == 0){
+         if (shift_solution(p, p->lp_data, &true_objval, heur_solution, t_lb)){	 
+            feasible = IP_HEUR_FEASIBLE;
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+            if(true_objval > t_lb + lpetol100){
+               dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+                     p->mip->obj_sense);
+            }else{
+               dual_gap = 1e-4;
+            }
+            apply_local_search(p, &true_objval, col_sol, heur_solution,
+                  &dual_gap, t_lb);
+            check_ls = FALSE; 
+         }
       }      
-      
+
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
-	 p->par.ds_enabled && dual_gap > p->par.ds_min_gap && !branching && 
-	 (p->bc_level % p->par.ds_frequency == 0) && is_last_iter ){// && p->bc_level < 1){ //}
-	 if (diving_search(p, &true_objval, col_sol,
-			   heur_solution, is_last_iter, t_lb)){
-	  feasible = IP_HEUR_FEASIBLE;
-	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	  if(true_objval > t_lb + lpetol100){
-	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-			     p->mip->obj_sense);
-	  }else{
-	    dual_gap = 1e-4;
-	  }
-	  apply_local_search(p, &true_objval, col_sol, heur_solution,
-			     &dual_gap, t_lb);
-	  check_ls = FALSE; 
-	}	     
+            p->par.ds_enabled && dual_gap > p->par.ds_min_gap && !branching && 
+            (p->bc_level % p->par.ds_frequency == 0) && is_last_iter ){// && p->bc_level < 1){ //}
+         if (diving_search(p, &true_objval, col_sol,
+                  heur_solution, is_last_iter, t_lb)){
+            feasible = IP_HEUR_FEASIBLE;
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+            if(true_objval > t_lb + lpetol100){
+               dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+                     p->mip->obj_sense);
+            }else{
+               dual_gap = 1e-4;
+            }
+            apply_local_search(p, &true_objval, col_sol, heur_solution,
+                  &dual_gap, t_lb);
+            check_ls = FALSE; 
+         }	     
       }	 
 
       if (user_res == TEST_INTEGRALITY && feasible != IP_FEASIBLE &&
-	  feasible != IP_HEUR_FEASIBLE) {
-	 fp_should_call_fp(p,branching,&should_call_fp,is_last_iter, t_lb); 
-	if (should_call_fp==TRUE && (!p->par.disable_obj ||
-				     (p->par.disable_obj && p->bc_level < 10))
-	    && ((p->bc_level >= 1 &&
-		 p->lp_stat.fp_last_call_ind != p->bc_index) ||  
-	     (p->bc_level < 1 && p->lp_stat.fp_calls < 1))){
-	  new_obj_val = true_objval;
-	  termcode    = feasibility_pump (p, &found_better_solution, 
-					  new_obj_val, col_sol, heur_solution);
-	  
-	  if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
-            PRINT(p->par.verbosity,0,("warning: feasibility pump faced some "
-				      "difficulties.\n"));
-	  } else if (found_better_solution) {
-            feasible    = IP_HEUR_FEASIBLE;
-            true_objval = new_obj_val;
-	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	    if(true_objval > t_lb + lpetol100){
-              dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset,
-                               p->mip->obj_sense);
-            }else{
-              dual_gap = 1e-4;
+            feasible != IP_HEUR_FEASIBLE) {
+         fp_should_call_fp(p,branching,&should_call_fp,is_last_iter, t_lb); 
+         if (should_call_fp==TRUE && (!p->par.disable_obj ||
+                  (p->par.disable_obj && p->bc_level < 10))
+               && ((p->bc_level >= 1 &&
+                     p->lp_stat.fp_last_call_ind != p->bc_index) ||  
+                  (p->bc_level < 1 && p->lp_stat.fp_calls < 1))){
+            new_obj_val = true_objval;
+            termcode    = feasibility_pump (p, &found_better_solution, 
+                  new_obj_val, col_sol, heur_solution);
+
+            if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
+               PRINT(p->par.verbosity,0,("warning: feasibility pump faced some "
+                        "difficulties.\n"));
+            } else if (found_better_solution) {
+               feasible    = IP_HEUR_FEASIBLE;
+               true_objval = new_obj_val;
+               memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+               if(true_objval > t_lb + lpetol100){
+                  dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset,
+                        p->mip->obj_sense);
+               }else{
+                  dual_gap = 1e-4;
+               }
+               apply_local_search(p, &true_objval, col_sol, heur_solution,
+                     &dual_gap, t_lb);
+               check_ls = FALSE; 
             }
-	    apply_local_search(p, &true_objval, col_sol, heur_solution,
-			       &dual_gap, t_lb);
-	    check_ls = FALSE; 
-	  }
-	}
+         }
       }
 
       int reg_factor = (int)(p->tm->stat.analyzed/100.0);
       int reg_base = p->tm->stat.analyzed; 
       if(reg_factor <= 5){
-	reg_factor += p->par.fr_frequency; 
-	reg_base = p->bc_level; 
+         reg_factor += p->par.fr_frequency; 
+         reg_base = p->bc_level; 
       }else if(reg_factor <= 10){
-	reg_factor = MAX(20, 4*p->par.fr_frequency); 
+         reg_factor = MAX(20, 4*p->par.fr_frequency); 
       }else{
-	reg_factor = MAX(100, 20*p->par.fr_frequency); 
+         reg_factor = MAX(100, 20*p->par.fr_frequency); 
       }
 
       double rs_min_gap = 0.5;
       if(p->bc_index >= 0) rs_min_gap = p->par.rs_min_gap;
-      
+
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
-	 p->par.rs_enabled && dual_gap > rs_min_gap && !branching &&
-	 p->par.rs_dive_level > 0 && 
-	 is_last_iter && 
-	 (p->lp_stat.rs_calls - p->lp_stat.rs_last_sol_call <= 20) && 
-	 (p->tm->stat.analyzed < 10000 ||
-	  (p->tm->stat.analyzed <  100000 && !p->has_ub)) &&  
-	 (p->bc_level < 1 || reg_factor % reg_base == 0)){
-	 if(restricted_search (p, &true_objval, col_sol, heur_solution,
-			       RINS_SEARCH, t_lb)){
-	  feasible    = IP_HEUR_FEASIBLE;
-	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n);	  
-	  if(true_objval > t_lb + lpetol100){
-	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-			     p->mip->obj_sense);
-	  }else{
-	    dual_gap = 1e-4;
-	  }
-	  apply_local_search(p, &true_objval, col_sol, heur_solution,
-			     &dual_gap, t_lb);
-	  check_ls = FALSE; 
-	}
+            p->par.rs_enabled && dual_gap > rs_min_gap && !branching &&
+            p->par.rs_dive_level > 0 && 
+            is_last_iter && 
+            (p->lp_stat.rs_calls - p->lp_stat.rs_last_sol_call <= 20) && 
+            (p->tm->stat.analyzed < 10000 ||
+             (p->tm->stat.analyzed <  100000 && !p->has_ub)) &&  
+            (p->bc_level < 1 || reg_factor % reg_base == 0)){
+         if(restricted_search (p, &true_objval, col_sol, heur_solution,
+                  RINS_SEARCH, t_lb)){
+            feasible    = IP_HEUR_FEASIBLE;
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n);	  
+            if(true_objval > t_lb + lpetol100){
+               dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+                     p->mip->obj_sense);
+            }else{
+               dual_gap = 1e-4;
+            }
+            apply_local_search(p, &true_objval, col_sol, heur_solution,
+                  &dual_gap, t_lb);
+            check_ls = FALSE; 
+         }
       }
 
       double fr_min_gap = 0.5;
       if(p->bc_index >= 0) fr_min_gap = p->par.fr_min_gap;
-      
-      if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
-	 p->par.fr_enabled && dual_gap > fr_min_gap && !branching &&
-	 p->par.fr_dive_level > 0 && 
-	 is_last_iter && //p->bc_level < 1 &&
-	 (p->lp_stat.fr_calls - p->lp_stat.fr_last_sol_call <= 20) && 
-	 (p->bc_level < 1 || (reg_factor % reg_base == 0)) &&
-	 (p->tm->stat.analyzed < 10000 || 
-	  (p->tm->stat.analyzed <  100000 && !p->has_ub))){ 
 
-	 if(restricted_search (p, &true_objval, col_sol, heur_solution,
-			       FR_SEARCH, t_lb)){
-	  feasible    = IP_HEUR_FEASIBLE;
-	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n); //no need -- 
-	  if(true_objval > t_lb + lpetol100){
-	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-			     p->mip->obj_sense);
-	  }else{
-	    dual_gap = 1e-4;
-	  }	  
-	  apply_local_search(p, &true_objval, col_sol, heur_solution,
-			     &dual_gap, t_lb);
-	  check_ls = FALSE; 
-	}
+      if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
+            p->par.fr_enabled && dual_gap > fr_min_gap && !branching &&
+            p->par.fr_dive_level > 0 && 
+            is_last_iter && //p->bc_level < 1 &&
+            (p->lp_stat.fr_calls - p->lp_stat.fr_last_sol_call <= 20) && 
+            (p->bc_level < 1 || (reg_factor % reg_base == 0)) &&
+            (p->tm->stat.analyzed < 10000 || 
+             (p->tm->stat.analyzed <  100000 && !p->has_ub))){ 
+
+         if(restricted_search (p, &true_objval, col_sol, heur_solution,
+                  FR_SEARCH, t_lb)){
+            feasible    = IP_HEUR_FEASIBLE;
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n); //no need -- 
+            if(true_objval > t_lb + lpetol100){
+               dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+                     p->mip->obj_sense);
+            }else{
+               dual_gap = 1e-4;
+            }	  
+            apply_local_search(p, &true_objval, col_sol, heur_solution,
+                  &dual_gap, t_lb);
+            check_ls = FALSE; 
+         }
       }
    }
-   
+
    if(user_res == TEST_INTEGRALITY &&
-      p->par.do_primal_heuristic && (feasible == IP_FEASIBLE ||
-				     feasible == IP_HEUR_FEASIBLE) &&
-      (p->par.ls_enabled || p->par.lb_enabled) && !p->par.multi_criteria){
+         p->par.do_primal_heuristic && (feasible == IP_FEASIBLE ||
+            feasible == IP_HEUR_FEASIBLE) &&
+         (p->par.ls_enabled || p->par.lb_enabled) && !p->par.multi_criteria){
 
       if(feasible == IP_FEASIBLE){ 
-	 memcpy(col_sol, p->lp_data->x, DSIZE*lp_data->n);
-	 if(true_objval > t_lb + lpetol100){
-	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-			     p->mip->obj_sense);
-	 }else{
-	    dual_gap = 1e-4;
-	 }
+         memcpy(col_sol, p->lp_data->x, DSIZE*lp_data->n);
+         if(true_objval > t_lb + lpetol100){
+            dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+                  p->mip->obj_sense);
+         }else{
+            dual_gap = 1e-4;
+         }
       }
 
       if(check_ls){
-	 if(apply_local_search(p, &true_objval, col_sol, heur_solution,
-			       &dual_gap, t_lb)){
-	    if(feasible == IP_FEASIBLE) force_heur_sol = TRUE;
-	 }
+         if(apply_local_search(p, &true_objval, col_sol, heur_solution,
+                  &dual_gap, t_lb)){
+            if(feasible == IP_FEASIBLE) force_heur_sol = TRUE;
+         }
       }
 
       double lb_min_gap = p->par.lb_min_gap;
 
       if(p->par.lb_enabled && dual_gap > lb_min_gap && p->par.lb_dive_level > 0){
-	 if(lbranching_search (p, &true_objval, col_sol, heur_solution, t_lb)){
-	    if(feasible == IP_FEASIBLE) force_heur_sol = TRUE; 
-	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	    if(true_objval > t_lb + lpetol100){
-	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset,
-				p->mip->obj_sense);
-	    }else{
-	       dual_gap = 1e-4;
-	    }
-	    /* do local search inside lbranching */
-	    apply_local_search(p, &true_objval, col_sol, heur_solution,
-			       &dual_gap, t_lb);
-	 }
+         if(lbranching_search (p, &true_objval, col_sol, heur_solution, t_lb)){
+            if(feasible == IP_FEASIBLE) force_heur_sol = TRUE; 
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+            if(true_objval > t_lb + lpetol100){
+               dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset,
+                     p->mip->obj_sense);
+            }else{
+               dual_gap = 1e-4;
+            }
+            /* do local search inside lbranching */
+            apply_local_search(p, &true_objval, col_sol, heur_solution,
+                  &dual_gap, t_lb);
+         }
       } 
    }   
 
 #endif
-   
+
    if ((feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE)
-       && p->par.multi_criteria){
+         && p->par.multi_criteria){
       if (feasible == IP_HEUR_FEASIBLE || force_heur_sol) {
          cnt = collect_nonzeros(p, heur_solution, indices, values);        
       } else {
          cnt = collect_nonzeros(p, lp_data->x, indices, values);        
       }
       if (analyze_multicriteria_solution(p, indices, values, cnt,
-					 &true_objval, lpetol, branching,
-					 feasible) > 0){
-	 if(feasible == IP_FEASIBLE &&
-	    (p->par.mc_add_optimality_cuts || branching)){
-	       feasible = IP_FEASIBLE_BUT_CONTINUE;
-	 }
+               &true_objval, lpetol, branching,
+               feasible) > 0){
+         if(feasible == IP_FEASIBLE &&
+               (p->par.mc_add_optimality_cuts || branching)){
+            feasible = IP_FEASIBLE_BUT_CONTINUE;
+         }
       }
    }
-   
+
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
-       feasible == IP_HEUR_FEASIBLE){
+         feasible == IP_HEUR_FEASIBLE){
       if (feasible == IP_HEUR_FEASIBLE || force_heur_sol) {
          cnt = collect_nonzeros(p, heur_solution, indices, values);        
       } else {
@@ -1189,42 +1190,42 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       cut_pool *cp = p->tm->cpp[p->cut_pool];
 #pragma omp critical(cut_pool)
       if (cp){
-	 lp_sol *cur_sol = &(p->cgp->cur_sol);
-	 cur_sol->xind = indices;
-	 cur_sol->xval = values;
-	 cur_sol->lpetol = lp_data->lpetol;
-	 cur_sol->xlevel = p->bc_level;
-	 cur_sol->xindex = p->bc_index;
-	 cur_sol->xiter_num = p->iter_num;
-	 cur_sol->objval = true_objval;
-	 cur_sol->xlength = cnt;
-	 if (feasible == IP_HEUR_FEASIBLE || force_heur_sol) {
-	    cp_new_row_num = check_cuts_u(cp, cur_sol, heur_solution);
-	 } else {
-	    cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
-	 }
+         lp_sol *cur_sol = &(p->cgp->cur_sol);
+         cur_sol->xind = indices;
+         cur_sol->xval = values;
+         cur_sol->lpetol = lp_data->lpetol;
+         cur_sol->xlevel = p->bc_level;
+         cur_sol->xindex = p->bc_index;
+         cur_sol->xiter_num = p->iter_num;
+         cur_sol->objval = true_objval;
+         cur_sol->xlength = cnt;
+         if (feasible == IP_HEUR_FEASIBLE || force_heur_sol) {
+            cp_new_row_num = check_cuts_u(cp, cur_sol, heur_solution);
+         } else {
+            cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
+         }
       }
 #endif
       if (cp_new_row_num){
-	 feasible = IP_INFEASIBLE;
+         feasible = IP_INFEASIBLE;
       }else{
-	 /* Send the solution value to the treemanager */
-	 if (p->has_ub && true_objval >= p->ub - p->par.granularity){
-	    if (!p->par.multi_criteria){
-	       PRINT(p->par.verbosity, 0,
-		     ("\n* Found Another Feasible Solution.\n"));
-	       if (p->mip->obj_sense == SYM_MAXIMIZE){
-		  PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
-					      + p->mip->obj_offset));
-	       }else{
-		  PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
-					      + p->mip->obj_offset));
-	       }
-	    }
-	    return(feasible);
-	 }
+         /* Send the solution value to the treemanager */
+         if (p->has_ub && true_objval >= p->ub - p->par.granularity){
+            if (!p->par.multi_criteria){
+               PRINT(p->par.verbosity, 0,
+                     ("\n* Found Another Feasible Solution.\n"));
+               if (p->mip->obj_sense == SYM_MAXIMIZE){
+                  PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
+                           + p->mip->obj_offset));
+               }else{
+                  PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
+                           + p->mip->obj_offset));
+               }
+            }
+            return(feasible);
+         }
       }
-      
+
       /* Send the solution value to the treemanager */
       /* if (p->has_ub && true_objval >= p->ub - p->par.granularity){ */
       /* 	 if (!p->par.multi_criteria){ */
@@ -1264,74 +1265,74 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
 
 
-   
+
       p->has_ub = TRUE;
       p->ub = true_objval;
 #ifdef COMPILE_IN_LP
       p->tm->lp_stat.ip_sols++;
 #endif
       if (p->par.set_obj_upper_lim) {
-	 set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + lpetol);
+         set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + lpetol);
       }
       if (!p->par.multi_criteria){
-	 p->best_sol.xlevel = p->bc_level;
-	 p->best_sol.xindex = p->bc_index;
-	 p->best_sol.xiter_num = p->iter_num;
-	 p->best_sol.xlength = cnt;
-	 p->best_sol.lpetol = lpetol;
-	 p->best_sol.objval = true_objval;
-	 FREE(p->best_sol.xind);
-	 FREE(p->best_sol.xval);
-	 if(cnt){
-	    p->best_sol.xind = (int *) malloc(cnt*ISIZE);
-	    p->best_sol.xval = (double *) malloc(cnt*DSIZE);
-	    memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
-	    memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
-	 }
-	 if(!p->best_sol.has_sol)
-	    p->best_sol.has_sol = TRUE;
-	 PRINT(p->par.verbosity, 0,
-	       ("\n****** Found Better Feasible Solution !\n"));
-	 if (feasible == IP_HEUR_FEASIBLE){
-	    PRINT(p->par.verbosity, 2,
-		  ("****** After Calling Heuristics !\n"));
-	 }
-	 if (p->mip->obj_sense == SYM_MAXIMIZE){
-	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", -true_objval
-					+ p->mip->obj_offset));
-	 }else{
-	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
-					+ p->mip->obj_offset));
-	 }
+         p->best_sol.xlevel = p->bc_level;
+         p->best_sol.xindex = p->bc_index;
+         p->best_sol.xiter_num = p->iter_num;
+         p->best_sol.xlength = cnt;
+         p->best_sol.lpetol = lpetol;
+         p->best_sol.objval = true_objval;
+         FREE(p->best_sol.xind);
+         FREE(p->best_sol.xval);
+         if(cnt){
+            p->best_sol.xind = (int *) malloc(cnt*ISIZE);
+            p->best_sol.xval = (double *) malloc(cnt*DSIZE);
+            memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
+            memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+         }
+         if(!p->best_sol.has_sol)
+            p->best_sol.has_sol = TRUE;
+         PRINT(p->par.verbosity, 0,
+               ("\n****** Found Better Feasible Solution !\n"));
+         if (feasible == IP_HEUR_FEASIBLE){
+            PRINT(p->par.verbosity, 2,
+                  ("****** After Calling Heuristics !\n"));
+         }
+         if (p->mip->obj_sense == SYM_MAXIMIZE){
+            PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", -true_objval
+                     + p->mip->obj_offset));
+         }else{
+            PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
+                     + p->mip->obj_offset));
+         }
       }
 #ifdef COMPILE_IN_LP
 #pragma omp critical (new_ub)
       {
-	 install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
-			feasible);
+         install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
+               feasible);
       }
 #if 0
       if (p->bc_index>0) {
-	 tighten_root_bounds(p);
+         tighten_root_bounds(p);
       }
 #endif
       if (!p->par.multi_criteria){
-	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
+         display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
       sp_add_solution(p,cnt,indices,values,true_objval+p->mip->obj_offset,
-		      p->bc_index);
+            p->bc_index);
 #else
-	 s_bufid = init_send(DataInPlace);
-	 send_dbl_array(&true_objval, 1);
-	 send_int_array(&(p->bc_index), 1);
-	 send_int_array(&feasible, 1);
-	 send_char_array(&branching, 1);
-	 send_msg(p->tree_manager, UPPER_BOUND);
-	 freebuf(s_bufid);
+      s_bufid = init_send(DataInPlace);
+      send_dbl_array(&true_objval, 1);
+      send_int_array(&(p->bc_index), 1);
+      send_int_array(&feasible, 1);
+      send_char_array(&branching, 1);
+      send_msg(p->tree_manager, UPPER_BOUND);
+      freebuf(s_bufid);
 #endif
 #if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
-	 send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-				  lpetol, true_objval, cnt, indices, values);
+      send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
+            lpetol, true_objval, cnt, indices, values);
 #endif
    }   
    if (feasible == IP_FEASIBLE){
@@ -1346,8 +1347,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 #if 0
    if(is_last_iter){
       for (i=p->lp_data->mip->n-1; i>=0; i--){
-	 if (vars[i]->is_int)
-	    p->lp_data->si->setInteger(i);
+         if (vars[i]->is_int)
+            p->lp_data->si->setInteger(i);
       }
       write_mps(p->lp_data, "test");
    }
@@ -2266,91 +2267,91 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    for (i = 0; i < cut_num; i++){
 
       switch (cuts[i]->type){
-	 
-      case EXPLICIT_ROW:
-	 real_nzcnt = 0;
-	 row_list[explicit_row_num] =
-	    (waiting_row *) malloc(sizeof(waiting_row));
-	 row_list[explicit_row_num]->cut = cuts[i];
-	 nzcnt = ((int *) (cuts[i]->coef))[0];
-	 matval = (double *) (cuts[i]->coef + DSIZE);
-	 matind = (int *) (cuts[i]->coef + (nzcnt + 1)*DSIZE);
-	 row_matval = row_list[explicit_row_num]->matval = 
-            (double *) malloc(nzcnt * DSIZE);
-	 row_matind = row_list[explicit_row_num]->matind = 
-            (int *) malloc(nzcnt * ISIZE);
-         if (is_userind_in_order) {
-            memcpy(row_matind, matind, nzcnt*ISIZE);
-            memcpy(row_matval, matval, nzcnt*DSIZE);
-            real_nzcnt = nzcnt;
-         } else {
-            for (j = 0; j < n; j++){
-               for (k = 0; k < nzcnt; k++){
-                  if (matind[k] == vars[j]->userind){
-                     row_matind[real_nzcnt]   = j;
-                     row_matval[real_nzcnt++] = matval[k];
+
+         case EXPLICIT_ROW:
+            real_nzcnt = 0;
+            row_list[explicit_row_num] =
+               (waiting_row *) malloc(sizeof(waiting_row));
+            row_list[explicit_row_num]->cut = cuts[i];
+            nzcnt = ((int *) (cuts[i]->coef))[0];
+            matval = (double *) (cuts[i]->coef + DSIZE);
+            matind = (int *) (cuts[i]->coef + (nzcnt + 1)*DSIZE);
+            row_matval = row_list[explicit_row_num]->matval = 
+               (double *) malloc(nzcnt * DSIZE);
+            row_matind = row_list[explicit_row_num]->matind = 
+               (int *) malloc(nzcnt * ISIZE);
+            if (is_userind_in_order) {
+               memcpy(row_matind, matind, nzcnt*ISIZE);
+               memcpy(row_matval, matval, nzcnt*DSIZE);
+               real_nzcnt = nzcnt;
+            } else {
+               for (j = 0; j < n; j++){
+                  for (k = 0; k < nzcnt; k++){
+                     if (matind[k] == vars[j]->userind){
+                        row_matind[real_nzcnt]   = j;
+                        row_matval[real_nzcnt++] = matval[k];
+                     }
                   }
                }
             }
-         }
-	 row_list[explicit_row_num++]->nzcnt = real_nzcnt;
-	 cuts[i] = NULL;
-	 break;
-	 
-      case OPTIMALITY_CUT_FIRST:
-	 row_list[explicit_row_num] =
-	    (waiting_row *) malloc(sizeof(waiting_row));
-	 row_matind = row_list[explicit_row_num]->matind =
-            (int *) malloc (lp_data->n * ISIZE);
-	 row_matval = row_list[explicit_row_num]->matval =
-	    (double *) malloc (lp_data->n * DSIZE);
-	 row_list[explicit_row_num]->cut = cuts[i];
-	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
-	    if (vars[j]->userind == p->mip->n)
-	       continue;
-	    row_matind[nzcnt] = j;
-	    row_matval[nzcnt++] = obj1[vars[j]->userind];
-	 }
-	 cuts[i]->sense = 'L';
-	 cuts[i]->deletable = FALSE;
-	 cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-         row_list[explicit_row_num++]->nzcnt = nzcnt;
-	 cuts[i] = NULL;
-	 break;
+            row_list[explicit_row_num++]->nzcnt = real_nzcnt;
+            cuts[i] = NULL;
+            break;
 
-      case OPTIMALITY_CUT_SECOND:
-	 row_list[explicit_row_num] =
-	    (waiting_row *) malloc(sizeof(waiting_row));
-	 row_list[explicit_row_num]->matind =
-	    (int *) malloc (lp_data->n * ISIZE);
-	 row_list[explicit_row_num]->matval =
-	    (double *) malloc (lp_data->n * DSIZE);
-	 row_list[explicit_row_num]->cut = cuts[i];
-	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
-	    if (vars[j]->userind == p->mip->n)
-	       continue;
-	    row_list[explicit_row_num]->matind[nzcnt] = j;
-	    row_list[explicit_row_num]->matval[nzcnt++] =
-	       obj2[vars[j]->userind];
-	 }
-	 cuts[i]->sense = 'L';
-	 cuts[i]->deletable = FALSE;
-	 cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-         row_list[explicit_row_num++]->nzcnt = nzcnt;
-	 cuts[i] = NULL;
-	 break;
+         case OPTIMALITY_CUT_FIRST:
+            row_list[explicit_row_num] =
+               (waiting_row *) malloc(sizeof(waiting_row));
+            row_matind = row_list[explicit_row_num]->matind =
+               (int *) malloc (lp_data->n * ISIZE);
+            row_matval = row_list[explicit_row_num]->matval =
+               (double *) malloc (lp_data->n * DSIZE);
+            row_list[explicit_row_num]->cut = cuts[i];
+            for (nzcnt = 0, j = 0; j < lp_data->n; j++){
+               if (vars[j]->userind == p->mip->n)
+                  continue;
+               row_matind[nzcnt] = j;
+               row_matval[nzcnt++] = obj1[vars[j]->userind];
+            }
+            cuts[i]->sense = 'L';
+            cuts[i]->deletable = FALSE;
+            cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+            row_list[explicit_row_num++]->nzcnt = nzcnt;
+            cuts[i] = NULL;
+            break;
 
-       default: /* A user cut type */
+         case OPTIMALITY_CUT_SECOND:
+            row_list[explicit_row_num] =
+               (waiting_row *) malloc(sizeof(waiting_row));
+            row_list[explicit_row_num]->matind =
+               (int *) malloc (lp_data->n * ISIZE);
+            row_list[explicit_row_num]->matval =
+               (double *) malloc (lp_data->n * DSIZE);
+            row_list[explicit_row_num]->cut = cuts[i];
+            for (nzcnt = 0, j = 0; j < lp_data->n; j++){
+               if (vars[j]->userind == p->mip->n)
+                  continue;
+               row_list[explicit_row_num]->matind[nzcnt] = j;
+               row_list[explicit_row_num]->matval[nzcnt++] =
+                  obj2[vars[j]->userind];
+            }
+            cuts[i]->sense = 'L';
+            cuts[i]->deletable = FALSE;
+            cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+            row_list[explicit_row_num++]->nzcnt = nzcnt;
+            cuts[i] = NULL;
+            break;
+
+         default: /* A user cut type */
 #if defined(COMPILE_IN_CG) && defined(CHECK_CUT_VALIDITY)
-	  check_validity_of_cut_u(p->cgp, cuts[i]);
+            check_validity_of_cut_u(p->cgp, cuts[i]);
 #endif
-	  if (l != i){
-	     cuts[l++] = cuts[i];
-	     cuts[i] = NULL;
-	  }else{
-	     l++;
-	  }
-	 break;
+            if (l != i){
+               cuts[l++] = cuts[i];
+               cuts[i] = NULL;
+            }else{
+               l++;
+            }
+            break;
       }
    }
 
@@ -2366,8 +2367,8 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 
    for (i = 0; i < l; i++){
       if (cuts[i]){
-	 (*new_rows)[i]->cut = cuts[i];
-	 cuts[i] = NULL;
+         (*new_rows)[i]->cut = cuts[i];
+         cuts[i] = NULL;
       }
    }
        
@@ -2561,9 +2562,9 @@ int generate_cuts_in_lp_u(lp_prob *p, double *xx)
    char deleted_cut;
    cut_data **cuts = NULL;
    int i, j;
-   
+
    colind_sort_extra(p);
-   
+
 #if defined(COMPILE_IN_CG) || defined(COMPILE_IN_CP) 
    {
 #ifdef COMPILE_IN_CP
@@ -2580,199 +2581,199 @@ int generate_cuts_in_lp_u(lp_prob *p, double *xx)
 
 #ifdef USE_SYM_APPLICATION
       user_res2 = user_send_lp_solution(p->user,
-					lp_data->n, lp_data->vars, x,
-					LP_SOL_WITHIN_LP);
+            lp_data->n, lp_data->vars, x,
+            LP_SOL_WITHIN_LP);
 #else
       user_res2 = USER_DEFAULT;
 #endif
-      
+
       if (user_res2 == USER_DEFAULT)
-	 user_res2 = p->par.pack_lp_solution_default;
-      
+         user_res2 = p->par.pack_lp_solution_default;
+
       switch (user_res2){
-       case USER_ERROR: 
-	 return(ERROR__USER);
-       case USER_SUCCESS:
-       case USER_AND_PP:
-       case USER_NO_PP:
-	 break;
-       case SEND_NONZEROS:
-       case SEND_FRACTIONS:
-	 cur_sol->xind = xind = lp_data->tmp.i1; /* n */
-	 cur_sol->xval = xval = lp_data->tmp.d; /* n */
-	 cur_sol->lpetol = lpetol = lp_data->lpetol;
-	 cur_sol->xlevel = p->bc_level;
-	 cur_sol->xindex = p->bc_index;
-	 cur_sol->xiter_num = p->iter_num;
-	 cur_sol->objval = lp_data->objval;
-	 if (p->has_ub)
-	    p->cgp->ub = p->ub;
-	 cur_sol->xlength = xlength = user_res2 == SEND_NONZEROS ?
-	                             collect_nonzeros(p, x, xind, xval) :
-		                     collect_fractions(p, x, xind, xval);
-	 break;
+         case USER_ERROR: 
+            return(ERROR__USER);
+         case USER_SUCCESS:
+         case USER_AND_PP:
+         case USER_NO_PP:
+            break;
+         case SEND_NONZEROS:
+         case SEND_FRACTIONS:
+            cur_sol->xind = xind = lp_data->tmp.i1; /* n */
+            cur_sol->xval = xval = lp_data->tmp.d; /* n */
+            cur_sol->lpetol = lpetol = lp_data->lpetol;
+            cur_sol->xlevel = p->bc_level;
+            cur_sol->xindex = p->bc_index;
+            cur_sol->xiter_num = p->iter_num;
+            cur_sol->objval = lp_data->objval;
+            if (p->has_ub)
+               p->cgp->ub = p->ub;
+            cur_sol->xlength = xlength = user_res2 == SEND_NONZEROS ?
+               collect_nonzeros(p, x, xind, xval) :
+               collect_fractions(p, x, xind, xval);
+            break;
       }
 #ifdef COMPILE_IN_CG      
       if (p->cgp->par.do_findcuts && !new_row_num)
-	 find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
+         find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
 #endif
 
       if (p->cgp->cuts_to_add_num){
-	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-		       p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
-		       &cg_new_row_num, &cg_new_rows);
-	 p->cgp->cuts_to_add_num = 0;
-	 if (cg_new_row_num){
-	    for (i = 0; i < cg_new_row_num; i++){
-	       if (cg_new_rows[i]->cut->name != CUT__SEND_TO_CP)
-		  cg_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-	       cg_new_rows[i]->source_pid = INTERNAL_CUT_GEN;
-	       for (j = p->waiting_row_num - 1; j >= 0; j--){
-		  if (same_cuts_u(p, p->waiting_rows[j],
-				  cg_new_rows[i]) !=
-		      DIFFERENT_CUTS){
-		     free_waiting_row(cg_new_rows+i);
-		     break;
-		  }
-	       }
-	       if (j < 0){
-		  add_new_rows_to_waiting_rows(p, cg_new_rows+i, 1);
-	       }
-	    }
-	    FREE(cg_new_rows);
-	 }
+         unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+               p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
+               &cg_new_row_num, &cg_new_rows);
+         p->cgp->cuts_to_add_num = 0;
+         if (cg_new_row_num){
+            for (i = 0; i < cg_new_row_num; i++){
+               if (cg_new_rows[i]->cut->name != CUT__SEND_TO_CP)
+                  cg_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+               cg_new_rows[i]->source_pid = INTERNAL_CUT_GEN;
+               for (j = p->waiting_row_num - 1; j >= 0; j--){
+                  if (same_cuts_u(p, p->waiting_rows[j],
+                           cg_new_rows[i]) !=
+                        DIFFERENT_CUTS){
+                     free_waiting_row(cg_new_rows+i);
+                     break;
+                  }
+               }
+               if (j < 0){
+                  add_new_rows_to_waiting_rows(p, cg_new_rows+i, 1);
+               }
+            }
+            FREE(cg_new_rows);
+         }
       }
 #if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
-      
-      if ((p->iter_num == 1 && (p->bc_level > 0 || p->phase==1)) ||
-	  (p->iter_num % p->par.cut_pool_check_freq == 0) ||
-	  (!cg_new_row_num)){
-	 cut_pool *cp = p->tm->cpp[p->cut_pool];
-	 p->comp_times.separation += used_time(&p->tt);
-	 cur_sol->lp = 0;
-#pragma omp critical(cut_pool)
-	 if (cp){
-	    if (cp->cuts_to_add_num == 0){
-	       cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
-	    }else{
-	       cp_new_row_num = cp->cuts_to_add_num;
-	    }
 
-	    if (++cp->reorder_count % 10 == 0){
-	       delete_duplicate_cuts(cp);
-	       order_cuts_by_quality(cp);
-	       cp->reorder_count = 0;
-	    }
-	    if (cp_new_row_num){
-	       unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-			     cp->cuts_to_add_num, cp->cuts_to_add,
-			     &cp_new_row_num, &cp_new_rows);
-	       cp->cuts_to_add_num = 0;
-	    }
-	 }
-	 if (cp_new_row_num){
-	    for (i = 0; i < cp_new_row_num; i++){
-	       if (cp_new_rows[i]->cut->name != CUT__SEND_TO_CP)
-		  cp_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-	       cp_new_rows[i]->source_pid = INTERNAL_CUT_POOL;
-	       for (j = p->waiting_row_num - 1; j >= 0; j--){
-		  if (same_cuts_u(p, p->waiting_rows[j], cp_new_rows[i]) !=
-		      DIFFERENT_CUTS){
-		     free_waiting_row(cp_new_rows+i);
-		     break;
-		  }
-	       }
-	       if (j < 0){
-		  add_new_rows_to_waiting_rows(p, cp_new_rows+i, 1);
-	       }
-	    }
-	    FREE(cp_new_rows);
-	 }
-	 p->comp_times.cut_pool += used_time(&p->tt);
+      if ((p->iter_num == 1 && (p->bc_level > 0 || p->phase==1)) ||
+            (p->iter_num % p->par.cut_pool_check_freq == 0) ||
+            (!cg_new_row_num)){
+         cut_pool *cp = p->tm->cpp[p->cut_pool];
+         p->comp_times.separation += used_time(&p->tt);
+         cur_sol->lp = 0;
+#pragma omp critical(cut_pool)
+         if (cp){
+            if (cp->cuts_to_add_num == 0){
+               cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
+            }else{
+               cp_new_row_num = cp->cuts_to_add_num;
+            }
+
+            if (++cp->reorder_count % 10 == 0){
+               delete_duplicate_cuts(cp);
+               order_cuts_by_quality(cp);
+               cp->reorder_count = 0;
+            }
+            if (cp_new_row_num){
+               unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+                     cp->cuts_to_add_num, cp->cuts_to_add,
+                     &cp_new_row_num, &cp_new_rows);
+               cp->cuts_to_add_num = 0;
+            }
+         }
+         if (cp_new_row_num){
+            for (i = 0; i < cp_new_row_num; i++){
+               if (cp_new_rows[i]->cut->name != CUT__SEND_TO_CP)
+                  cp_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+               cp_new_rows[i]->source_pid = INTERNAL_CUT_POOL;
+               for (j = p->waiting_row_num - 1; j >= 0; j--){
+                  if (same_cuts_u(p, p->waiting_rows[j], cp_new_rows[i]) !=
+                        DIFFERENT_CUTS){
+                     free_waiting_row(cp_new_rows+i);
+                     break;
+                  }
+               }
+               if (j < 0){
+                  add_new_rows_to_waiting_rows(p, cp_new_rows+i, 1);
+               }
+            }
+            FREE(cp_new_rows);
+         }
+         p->comp_times.cut_pool += used_time(&p->tt);
       }
 #endif
    }
 #endif      
-   
+
 #ifdef USE_SYM_APPLICATION
    user_res = user_generate_cuts_in_lp(p->user, lp_data, lp_data->n,
-				       lp_data->vars, x,
-				       &new_row_num, &cuts);
+         lp_data->vars, x,
+         &new_row_num, &cuts);
 #else
    user_res = GENERATE_CGL_CUTS;
 #endif
-  
+
    switch(user_res){
-    case USER_ERROR:
-      FREE(cuts);
-      return(ERROR__USER);
-    case GENERATE_CGL_CUTS:
-    case USER_DEFAULT:
-      /* Add to the user's list of cuts */
+      case USER_ERROR:
+         FREE(cuts);
+         return(ERROR__USER);
+      case GENERATE_CGL_CUTS:
+      case USER_DEFAULT:
+         /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
-      if (p->par.cgl.generate_cgl_cuts){
-         int bound_changes = 0;
-         /*
-         double ub = p->has_ub ? p->ub : SYM_INFINITY;
-	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
-			   p->bc_index, p->bc_level, p->node_iter_num, 
-                            p->par.max_cut_num_per_iter_root,
-                           ub, &bound_changes, &(p->lp_stat), &(p->comp_times),
-                           p->par.verbosity);
-                           */
-	 generate_cgl_cuts_new(p, &new_row_num, &cuts, FALSE,
-			       &bound_changes);
-	 if (bound_changes>0) {
-	    p->bound_changes_in_iter += bound_changes;
-	 }
-	 // if(p->bc_index < 1 && p->iter_num == 1 ){
-	 //  p->par.cgl = lp_data->cgl;
-	 // }
-      }
+         if (p->par.cgl.generate_cgl_cuts){
+            int bound_changes = 0;
+            /*
+               double ub = p->has_ub ? p->ub : SYM_INFINITY;
+               generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
+               p->bc_index, p->bc_level, p->node_iter_num, 
+               p->par.max_cut_num_per_iter_root,
+               ub, &bound_changes, &(p->lp_stat), &(p->comp_times),
+               p->par.verbosity);
+             */
+            generate_cgl_cuts_new(p, &new_row_num, &cuts, FALSE,
+                  &bound_changes);
+            if (bound_changes>0) {
+               p->bound_changes_in_iter += bound_changes;
+            }
+            // if(p->bc_index < 1 && p->iter_num == 1 ){
+            //  p->par.cgl = lp_data->cgl;
+            // }
+         }
 #endif
-      /* Fall through to next case */
-      
-    case DO_NOT_GENERATE_CGL_CUTS:
-    case USER_SUCCESS:
-    case USER_AND_PP:
-    case USER_NO_PP:
-      /* Process the generated cuts */
-      if (new_row_num){
-	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-		       new_row_num, cuts, &new_row_num, &new_rows);
-	 for (i = 0; i < new_row_num; i++){
-	    if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
-	       new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-	    new_rows[i]->source_pid = INTERNAL_CUT_GEN;
-	 }
-      }
-      /* Test whether any of the new cuts are identical to any of
-         the old ones. */
-      if (p->waiting_row_num && new_row_num){
-	 for (i = 0, deleted_cut = FALSE; i < new_row_num;
-	      deleted_cut = FALSE){
-	    for (j = p->waiting_row_num - 1; j >= 0; j--){
-	       if (same_cuts_u(p, p->waiting_rows[j], new_rows[i]) !=
-		   DIFFERENT_CUTS){
-		  free_waiting_row(new_rows+i);
-		  new_rows[i] = new_rows[--new_row_num];
-		  deleted_cut = TRUE;
-		  break;
-	       }
-	    }
-	    if (!deleted_cut) i++;
-	 }
-      }
-      if (new_row_num){
-	 add_new_rows_to_waiting_rows(p, new_rows, new_row_num);
-	 FREE(new_rows);
-      }
-      FREE(cuts);
-      return(FUNCTION_TERMINATED_NORMALLY);
-    default:
-      /* Unexpected return value. Do something!! */
-      FREE(cuts);
-      return(ERROR__USER);
+         /* Fall through to next case */
+
+      case DO_NOT_GENERATE_CGL_CUTS:
+      case USER_SUCCESS:
+      case USER_AND_PP:
+      case USER_NO_PP:
+         /* Process the generated cuts */
+         if (new_row_num){
+            unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+                  new_row_num, cuts, &new_row_num, &new_rows);
+            for (i = 0; i < new_row_num; i++){
+               if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
+                  new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+               new_rows[i]->source_pid = INTERNAL_CUT_GEN;
+            }
+         }
+         /* Test whether any of the new cuts are identical to any of
+            the old ones. */
+         if (p->waiting_row_num && new_row_num){
+            for (i = 0, deleted_cut = FALSE; i < new_row_num;
+                  deleted_cut = FALSE){
+               for (j = p->waiting_row_num - 1; j >= 0; j--){
+                  if (same_cuts_u(p, p->waiting_rows[j], new_rows[i]) !=
+                        DIFFERENT_CUTS){
+                     free_waiting_row(new_rows+i);
+                     new_rows[i] = new_rows[--new_row_num];
+                     deleted_cut = TRUE;
+                     break;
+                  }
+               }
+               if (!deleted_cut) i++;
+            }
+         }
+         if (new_row_num){
+            add_new_rows_to_waiting_rows(p, new_rows, new_row_num);
+            FREE(new_rows);
+         }
+         FREE(cuts);
+         return(FUNCTION_TERMINATED_NORMALLY);
+      default:
+         /* Unexpected return value. Do something!! */
+         FREE(cuts);
+         return(ERROR__USER);
    }      
 }
 
@@ -2781,28 +2782,28 @@ int generate_cuts_in_lp_u(lp_prob *p, double *xx)
 void print_stat_on_cuts_added_u(lp_prob *p, int added_rows)
 {
    int user_res;
-   
+
 #ifdef USE_SYM_APPLICATION
    user_res = user_print_stat_on_cuts_added(p->user, added_rows,
-					    p->waiting_rows);
+         p->waiting_rows);
 #else
    user_res = USER_DEFAULT;
 #endif
 
    switch(user_res){
-    case USER_ERROR:
-    case USER_DEFAULT:
-      /* print out how many cuts have been added */
-      PRINT(p->par.verbosity, 5,
-	    ("Number of cuts added to the problem: %i\n", added_rows));
-      break;
-    case USER_SUCCESS:
-    case USER_AND_PP:
-    case USER_NO_PP:
-      break;
-    default:
-      /* Unexpected return value. Do something!! */
-      break;
+      case USER_ERROR:
+      case USER_DEFAULT:
+         /* print out how many cuts have been added */
+         PRINT(p->par.verbosity, 5,
+               ("Number of cuts added to the problem: %i\n", added_rows));
+         break;
+      case USER_SUCCESS:
+      case USER_AND_PP:
+      case USER_NO_PP:
+         break;
+      default:
+         /* Unexpected return value. Do something!! */
+         break;
    }      
 }
 
@@ -2817,7 +2818,7 @@ void purge_waiting_rows_u(lp_prob *p)
    int   max_cut_num_per_iter;
 
    REMALLOC(p->lp_data->tmp.cv, char, p->lp_data->tmp.cv_size, wrow_num,
-	    BB_BUNCH);
+         BB_BUNCH);
    delete_rows = p->lp_data->tmp.cv; /* wrow_num */
 
    memset(delete_rows, 0, wrow_num);
@@ -2829,35 +2830,35 @@ void purge_waiting_rows_u(lp_prob *p)
 #endif
 
    switch (user_res){
-    case USER_ERROR: /* purge all */
-      free_waiting_rows(wrows, wrow_num);
-      p->waiting_row_num = 0;
-      break;
-    case USER_DEFAULT: /* the only default is to keep enough for one
-			  iteration */
-      max_cut_num_per_iter = (p->bc_level<1) ? p->par.max_cut_num_per_iter_root
-                                             : p->par.max_cut_num_per_iter;
-      if (wrow_num - max_cut_num_per_iter > 0){
-	 free_waiting_rows(wrows + max_cut_num_per_iter,
-			   wrow_num-max_cut_num_per_iter);
-	 p->waiting_row_num = max_cut_num_per_iter;
-      }
-      break;
-    case USER_SUCCESS:
-    case USER_AND_PP:
-    case USER_NO_PP:
-      for (i = j = 0; i < wrow_num; i++){
-	 if (delete_rows[i]){
-	    free_waiting_row(wrows + i);
-	 }else{
-	    wrows[j++] = wrows[i];
-	 }
-      }
-      p->waiting_row_num = j;
-      break;
-    default:
-      /* Unexpected return value. Do something!! */
-      break;
+      case USER_ERROR: /* purge all */
+         free_waiting_rows(wrows, wrow_num);
+         p->waiting_row_num = 0;
+         break;
+      case USER_DEFAULT: /* the only default is to keep enough for one
+                            iteration */
+         max_cut_num_per_iter = (p->bc_level<1) ? p->par.max_cut_num_per_iter_root
+            : p->par.max_cut_num_per_iter;
+         if (wrow_num - max_cut_num_per_iter > 0){
+            free_waiting_rows(wrows + max_cut_num_per_iter,
+                  wrow_num-max_cut_num_per_iter);
+            p->waiting_row_num = max_cut_num_per_iter;
+         }
+         break;
+      case USER_SUCCESS:
+      case USER_AND_PP:
+      case USER_NO_PP:
+         for (i = j = 0; i < wrow_num; i++){
+            if (delete_rows[i]){
+               free_waiting_row(wrows + i);
+            }else{
+               wrows[j++] = wrows[i];
+            }
+         }
+         p->waiting_row_num = j;
+         break;
+      default:
+         /* Unexpected return value. Do something!! */
+         break;
    }
 }
 

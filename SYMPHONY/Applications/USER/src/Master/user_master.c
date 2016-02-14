@@ -88,53 +88,90 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    FILE *f;
    char line[50], key[50], value[50], c, tmp;
-   int i;
+   int i, j;
    /* This gives you access to the user data structure*/
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
 
-   /* This code is just a template for customization. Uncomment to use.*/
-#if 0
+#if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
+   prob->feas_sol_size = 0;
+   prob->feas_sol = NULL;
+#endif
+
    if (strcmp(filename, "")){
       if ((f = fopen(filename, "r")) == NULL){
-	 printf("SYMPHONY: file %s can't be opened\n", filename);
-	 return(USER_ERROR); /*error check for existence of parameter file*/
+         printf("SYMPHONY: file %s can't be opened\n", filename);
+         return(USER_ERROR); /*error check for existence of parameter file*/
       }
-      
+
       /* Here you can read in the parameter settings from the file. See the 
-	 function bc_readparams() for an example of how this is done. */
+         function bc_readparams() for an example of how this is done. */
       while(NULL != fgets(line, MAX_LINE_LENGTH, f)){  /*read in parameters*/
-	 strcpy(key, "");
-	 sscanf(line, "%s%s", key, value);
-	 
-	 if (strcmp(key, "input_file") == 0){
-	    par->infile[MAX_FILE_NAME_LENGTH] = 0;
-	    strncpy(par->infile, value, MAX_FILE_NAME_LENGTH);
-	 }
-      }      
-      
-      fclose(f);
-   }
+         strcpy(key, "");
+         sscanf(line, "%s%s", key, value);
+
+         if (strcmp(key, "input_file") == 0){
+            par->infile[MAX_FILE_NAME_LENGTH] = 0;
+            strncpy(par->infile, value, MAX_FILE_NAME_LENGTH);
+         }
+
+         /************************* cutgen parameters ***************************/
+
+#if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
+         else if (strcmp(key, "feasible_solution_size") == 0){
+            READ_INT_PAR(prob->feas_sol_size);
+            if (prob->feas_sol_size){
+               double value1;
+
+               prob->feas_sol = (double *)calloc(prob->feas_sol_size, DSIZE);
+               for (i = 0; i < prob->feas_sol_size; i++){
+                  if (!fgets( line, MAX_LINE_LENGTH, f)){
+                     fprintf(stderr,
+                           "\nUSER I/O: error reading in feasible solution\n");
+                     exit(1);
+                  }
+                  sscanf(line, "%d %lf", &j, &value1);
+                  // TODO: Suresh: this check if too restrictive to ask to 
+                  // input feasible solution value even if the value is zero
+                  if (j != i){
+                     fprintf(stderr,
+                           "\nUSER I/O: error reading in feasible solution. Missing feasible solution value.\n");
+                     exit(1);
+                  }
+                  // TODO: Suresh: a check if value1 is indeed a double is required
+                  prob->feas_sol[i] = value1;
+               } // TODO: Suresh: No check if feasible solution size is same as num_vars
+            }
+         }
 #endif
+      }
+   } else {
+      goto EXIT;
+   }
 
    /* Here you can parse the command line for options. By convention, the
       users options should be capital letters */
 
+EXIT:
+
    for (i = 1; i < argc; i++){
       sscanf(argv[i], "%c %c", &tmp, &c);
       if (tmp != '-')
-	 continue;
+         continue;
       switch (c) {
-       case 'H':
-	 user_usage();
-	 exit(0);
-	 break;
-       case 'F':
-	 strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
-	 break;
+         case 'H':
+            user_usage();
+            exit(0);
+            break;
+         case 'F': // TODO: Suresh: this is a confusion with option for instance file
+            strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
+            break;
       };
    }
-   
+
+   if (f)
+      fclose(f);
+
    return(USER_SUCCESS);
 }
 
@@ -466,6 +503,31 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
    return(USER_DEFAULT);
 }   
 
+/*===========================================================================*\
+ * This is a debugging feature which might
+ * allow you to find out why a known feasible solution is being cut off.
+ * This function allows for double solutions, as opposed to above function.
+\*===========================================================================*/
+
+// TODO: Suresh: newly added. Discuss later!
+int user_send_feas_sol(void *user, int *feas_sol_size, double **feas_sol)
+{
+#ifdef CHECK_CUT_VALIDITY
+   user_problem *prob = (user_problem *) user;
+
+   if (prob->feas_sol_size) {
+      *feas_sol_size = prob->feas_sol_size;
+      *feas_sol = (double *)calloc(*feas_sol_size, DSIZE);
+      memcpy(*feas_sol, prob->feas_sol, *feas_sol_size * DSIZE);
+   } else {
+      *feas_sol_size = 0;
+   }
+   return(USER_SUCCESS);
+#else
+   return(USER_DEFAULT);
+#endif
+}
+
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -487,7 +549,7 @@ int user_free_master(void **user)
 
 /*===========================================================================*\
  * This function is used to lift the user created cuts during warm starting *
-/*===========================================================================*/
+\*===========================================================================*/
 
 int user_ws_update_cuts (void *user, int *size, char **coef, double * rhs, 
 			 char *sense, char type, int new_col_num, 

@@ -130,9 +130,11 @@ int check_validity_of_cut_u(cg_prob *p, cut_data *new_cut)
        return (FUNCTION_TERMINATED_NORMALLY);
 
     default:
+       {
 #ifdef USE_SYM_APPLICATION
       CALL_USER_FUNCTION( user_check_validity_of_cut(p->user, new_cut) );
 #endif
+       }
    }
    return(FUNCTION_TERMINATED_NORMALLY);
 }

@@ -1148,7 +1148,7 @@ void process_ub_message(tm_prob *tm)
 
 void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 {
-   int old_cutnum = tm->cut_num, new_cutnum = cutnum, *itmp, i;
+   int old_cutnum, new_cutnum = cutnum, *itmp, i;
    cut_data **cuts;
 #ifndef COMPILE_IN_LP   
    int s_bufid;
@@ -1160,10 +1160,10 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 #endif
 #pragma omp critical (cut_pool)
    {
+      old_cutnum = tm->cut_num;
       REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, old_cutnum +
 	      new_cutnum, (old_cutnum / tm->stat.created + 5) * BB_BUNCH);
       cuts = tm->cuts;
-      tm->cut_num += new_cutnum;
       for (i = 0; i < new_cutnum; i++){
 #ifdef COMPILE_IN_LP
 	 cuts[old_cutnum + i] = rows[i].cut;
@@ -1175,6 +1175,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 	 cuts[itmp[i]]->name = itmp[i];
 #endif
       }
+      tm->cut_num += new_cutnum;
    }
 #ifndef COMPILE_IN_LP
    if (sender){ /* Do we have to return the names? */
