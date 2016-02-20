@@ -179,13 +179,21 @@ below).
 
 \subsubsection{Downloading}
 
-You can obtain the SYMPHONY source code either via the subversion repository
-or in the form of archived releases. The recommended method in Unix is to use
-subversion because it makes it easier to obtain updates. In a Unix-like
-environment (such as Linux or CYGWIN), the following command may be used to
-obtain SYMPHONY from source using SVN in most cases: {\color{Brown}
+You can obtain the SYMPHONY source code either via the subversion repository,
+or via the mirror on github using git, or in the form of archived releases.
+The recommended method in Unix is to use subversion because it makes it easier
+to obtain updates. In a Unix-like environment (such as Linux or CYGWIN), the
+following command may be used to obtain SYMPHONY from source using SVN in most
+cases: 
+{\color{Brown}
 \begin{verbatim}
  svn checkout https://projects.coin-or.org/svn/SYMPHONY/stable/5.6 SYMPHONY-5.6
+\end{verbatim}
+}
+To obtain via git from github, you can do
+{\color{Brown}
+\begin{verbatim}
+git clone --branch=stable/5.6 https://github.com/coin-or/SYMPHONY/ SYMPHONY-5.6
 \end{verbatim}
 }
 Alternatively, you can get point releases of the source code as a compressed
@@ -205,14 +213,24 @@ the distribution.
 
 \subsubsection{Configuring}\label{configuring}
 
-The first step is to run a configuration script that will allow the
+First, switch into the root of the SYMPHONY source checkout.
+If you obtained SYMPHONY via git, the the next step is to fetch the
+externals, as follows (this is unnecessary with SVN).
+{\color{Brown}
+\begin{verbatim}
+git clone --branch=stable/5.6 https://github.com/coin-or-tools/BuildTools/
+BuildTools/get.dependencies fetch
+\end{verbatim}
+} 
+Next, you will run a configuration script that will allow the
 compilation process to be customized for your environment. to perform this
 step, switch into the root directory of the distribution and type
 {\color{Brown}
 \begin{verbatim}
  ./configure 
 \end{verbatim}
-} This will set up the default configuration files. If you want to override
+} 
+This will set up the default configuration files. If you want to override
 the default settings, you can either run the configuration script with
 command-line options or else modify the options in the file
 {\color{Brown}\texttt{share/config.site}}. A complete list of options with
