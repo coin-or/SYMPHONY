@@ -158,8 +158,8 @@ Compiled, but not well tested: SPX
 ### SEQUENTIAL
 
 Sequential configurations are now automatically built and tested on Linux, OS X, and Windows using
- * Travis-CI (travis-ci.org/coin-or/symphony)
- * Appveyor (https://ci.appveyor.com/project/tkralphs/symphony)
+ * [Travis-CI](https://travis-ci.org/coin-or/symphony)
+ * [Appveyor](https://ci.appveyor.com/project/tkralphs/symphony)
 
 ### SHARED MEMORY PARLLEL (OpenMP)
 
