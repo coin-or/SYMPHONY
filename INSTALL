@@ -37,7 +37,7 @@ obtain SYMPHONY from source using SVN in most cases:
 
 To obtain via git from github, you can do
 
-{{{git clone --branch=stable/5.6 https://github.com/coin-or/SYMPHONY/}}}
+{{{git clone --branch=stable/5.6 https://github.com/coin-or/SYMPHONY/ SYMPHONY-5.6}}}
 
 Alternatively, you can download release versions of the source code from the
 [http://www.coin-or.org/download/source/SYMPHONY download page] of COIN-OR. If
