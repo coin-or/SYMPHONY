@@ -61,7 +61,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         [ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]
         [-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]
         [ -u ub ] [ -p procs ] [ -k rule ] [ -v level ] [ -c rule ]
-        [ -m max ] [ -z n ] [-o tree_out_file]
+        [ -m max ] [ -z n ] [-o tree_out_file] [-w 0/1]
 
 
         -F model: model should be read in from file 'model'
@@ -79,6 +79,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         -q 0/1: whether or not to tighten root bounds
         -r 0/1: whether or not to do reduced cost tightening
         -j 0/1: whether or not to generate cgl cuts
+        -w 0/1: whether or not to use hot starting in strong branching
         -e n: set pre-processing level to 'n'
         -i iters: allow a max of 'iters' iterations in presolve
         -t time: set wallclock time limit to 'time'
