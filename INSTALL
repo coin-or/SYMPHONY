@@ -24,15 +24,20 @@ functions that change SYMPHONY's default execution of its algorithm. For
 information on customizing SYMPHONY using callbacks, a quick start guide is
 provided below.
 
-=== DOWNLOADING ===
+=== DOWNLOADING SOURCE ===
 
-You can obtain the SYMPHONY source code either via the subversion repository
-or in the form of archived release. The recommended method in Unix is to use
-subversion because it makes it easier to obtain updates. In a Unix-like
+You can obtain the SYMPHONY source code either via the subversion repository,
+via Github, or in the form of archived release. The recommended method in Unix
+is to use subversion because it makes it easier to obtain updates and to
+download the correct versions of dependencies. In a Unix-like
 environment (such as Linux or CYGWIN), the following command may be used to
 obtain SYMPHONY from source using SVN in most cases:
 
 {{{svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.6 SYMPHONY-5.6}}}
+
+To obtain via git from github, you can do
+
+{{{git clone --branch=stable/5.6 https://github.com/coin-or/SYMPHONY/}}}
 
 Alternatively, you can download release versions of the source code from the
 [http://www.coin-or.org/download/source/SYMPHONY download page] of COIN-OR. If
@@ -46,10 +51,28 @@ SYMPHONY-XX containing the distribution.
 === CONFIGURING ===
 
 The first step is to run a configuration script that will allow the
-compilation process to be customized for your environment. to perform this
-step, switch into the root directory of the distribution and type
+compilation process to be customized for your environment. To perform this
+step, first switch into the root directory
 
-{{{./configure}}}
+{{{cd SYMPHONY-5.6}}}
+
+of the distribution and type.
+
+If you checked out the git repo, you can then obtain the dependencies by 
+typing the following (this is unnecessary with SVN).
+
+{{{
+git clone --branch=stable/5.6 https://github.com/coin-or-tools/BuildTools/
+BuildTools/get.dependencies fetch
+}}}
+
+The finally, do
+
+{{{
+./configure
+}}}
+
+With git, you need to fetch the dependencies first.
 
 This will set up the default configuration files. If you want to override the
 default settings, you can either run the configuration script with

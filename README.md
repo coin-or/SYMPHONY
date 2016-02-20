@@ -1,8 +1,14 @@
-# SYMPHONY Version 5.6.10 README
+# SYMPHONY Version 5.6.14 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
 2000-2015 by Ted Ralphs and others. This README may be redistributed freely.
+
+# CURRENT BUILD STATUS
+
+[![Build Status](https://travis-ci.org/coin-or/SYMPHONY.svg?branch=master)](https://travis-ci.org/coin-or/SYMPHONY)
+
+[![Build status](https://ci.appveyor.com/api/projects/status/220ltxwv2w2ac51s/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/symphony/branch/master)
 
 # DOCUMENTATION
 
@@ -150,17 +156,13 @@ Compiled, but not well tested: SPX
 
 ### SEQUENTIAL
 
-Known configurations that build and pass unit test
-
-- gcc 4.* on LINUX
-- MSVC++ Version 9-11 compiler in CYGWIN using the autotools 
-- MSVC++ Version 9-11 IDE
-- gcc 4.* on Mac OSX 10.4.8
-- clang
+Sequential configurations are now automatically built and tested on Linux, OS X, and Windows using
+ * Travis-CI (travis-ci.org/coin-or/symphony)
+ * Appveyor (https://ci.appveyor.com/project/tkralphs/symphony)
 
 ### SHARED MEMORY PARLLEL (OpenMP)
 
-Builds and passes unit test with gcc 4.* and CLP on LINUX.
+Builds and passes unit test with gcc 4 and 5 and CLP on LINUX.
 
 ### DISTRIBUTED MEMORY PARALLEL (PVM)
 
@@ -228,8 +230,18 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
 
+### Release 5.6.14
+  * Fixing small bug with re-setting environment in user applications.
+  * Fixing some memory errors arising with applications when extra variables are used.
+  * Fixing small bug with tracking variable indices in branching.
+  * Moving code inside critical block to prevent memory access errors in shared memory parallel mode.
+  * Added switches for turning hot starting on and off
+  * Updates to documentation
+  * Small fixes
+  * Added support for Travis and Appveyor
+
 ### Release 5.6.13
-  * Updating externals to get relevant bug fixes
+  * Release to update externals and pick up bug fixes in other projects
 
 ### Release 5.6.12
   * Fixed function for determining duals and reduced costs.
