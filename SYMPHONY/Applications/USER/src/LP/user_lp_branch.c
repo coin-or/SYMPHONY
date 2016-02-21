@@ -72,7 +72,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 {
    user_problem *prob = (user_problem *)user;
    branch_obj *cand;
-   int vind, cind, i, *vvind, max_cand_num =2;
+   int vind, cind, i, *vvind, max_cand_num =1;
    double *rhs, *comcond_viol;
 
    /* number of candidates */

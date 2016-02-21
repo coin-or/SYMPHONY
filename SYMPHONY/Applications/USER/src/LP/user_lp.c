@@ -92,8 +92,8 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 
    for (i = 0; i < varnum; i++) {
       if (prob->ccind[indices[i]] >= 0) {
-         if (fabs(values[i]) > lpetol &&
-               fabs(rowact[prob->ccind[indices[i]]] -
+         if (fabs(values[i]) > lpetol && 
+               fabs(rowact[prob->ccind[indices[i]]] - 
                   rhs[prob->ccind[indices[i]]]) > lpetol){
             violind[violcount] = indices[i];
             violcount++;

@@ -1275,8 +1275,9 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
          set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + lpetol);
       }
       if (!p->par.multi_criteria){
-         p->best_sol.xlevel = p->bc_level;
-         p->best_sol.xindex = p->bc_index;
+         // TODO: Suresh: visit back later!
+         p->best_sol.xlevel = p->bc_level + 1;
+         p->best_sol.xindex = p->bc_index + 1;
          p->best_sol.xiter_num = p->iter_num;
          p->best_sol.xlength = cnt;
          p->best_sol.lpetol = lpetol;

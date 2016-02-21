@@ -2590,10 +2590,8 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
          printf("\n****************************************************\n");
          printf(  "* Problem Found Violating Known Feasible Solution  *\n");
          printf(  "****************************************************\n");
-         // TODO: Suresh: change this, since this return means stop abruptly
-         // even for the nodes that are infeasible or do not contain optimal
-         // solution
-         return(FUNCTION_TERMINATED_ABNORMALLY);
+         // TODO: Suresh: Confirm this return!
+//         return(LP_VIOL_KNOWN_SOL);
       }
    }
 #endif
@@ -2726,10 +2724,8 @@ int dual_simplex(LPdata *lp_data, int *iterd)
          printf("\n****************************************************\n");
          printf(  "* Problem Found Violating Known Feasible Solution  *\n");
          printf(  "****************************************************\n");
-         // TODO: Suresh: change this, since this return means stop abruptly
-         // even for the nodes that are infeasible or do not contain optimal
-         // solution
-         return(FUNCTION_TERMINATED_ABNORMALLY);
+         // TODO: Suresh: Confirm this return!
+//         return(LP_VIOL_KNOWN_SOL);
       }
    }
 #endif
@@ -2869,10 +2865,8 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
          printf("\n****************************************************\n");
          printf(  "* Problem Found Violating Known Feasible Solution  *\n");
          printf(  "****************************************************\n");
-         // TODO: Suresh: change this, since this return means stop abruptly
-         // even for the nodes that are infeasible or do not contain optimal
-         // solution
-         return(FUNCTION_TERMINATED_ABNORMALLY);
+         // TODO: Suresh: Confirm this return!
+//         return(LP_VIOL_KNOWN_SOL);
       }
    }
 #endif
@@ -3002,10 +2996,147 @@ int check_lp_validity(LPdata *lp_data)
    const double *matval, *rhs, *rngval;
    const char *sense;
 
+#if 0
    // TODO: Suresh: think of an alternative to fetch the solution
-//   user_send_feas_sol(env->user, &feas_sol_size, &feas_sol);
-   if (feas_sol_size) {
+   // user_send_feas_sol(env->user, &feas_sol_size, &feas_sol);
+   feas_sol_size = 133;
+   feas_sol = (double*) malloc(feas_sol_size * DSIZE);
+   feas_sol[0] = 10;
+   feas_sol[1] = 0;
+   feas_sol[2] = 0;
+   feas_sol[3] = 0;
+   feas_sol[4] = 0;
+   feas_sol[5] = 0;
+   feas_sol[6] = 0;
+   feas_sol[7] = 0;
+   feas_sol[8] = 2.1869805674;
+   feas_sol[9] = 0;
+   feas_sol[10] = 0;
+   feas_sol[11] = 0.9424597562;
+   feas_sol[12] = 0;
+   feas_sol[13] = 2.7326286419;
+   feas_sol[14] = 0;
+   feas_sol[15] = 13.2950338211;
+   feas_sol[16] = 0;
+   feas_sol[17] = 0;
+   feas_sol[18] = 3.058284476;
+   feas_sol[19] = 0;
+   feas_sol[20] = 2.2673713581;
+   feas_sol[21] = 34.4827586207;
+   feas_sol[22] = 10;
+   feas_sol[23] = 15.4820143885;
+   feas_sol[24] = 0;
+   feas_sol[25] = 0;
+   feas_sol[26] = 4.0007442322;
+   feas_sol[27] = 0;
+   feas_sol[28] = 5;
+   feas_sol[29] = 34.4827586207;
+   feas_sol[30] = 17;
+   feas_sol[31] = 10;
+   feas_sol[32] = 5.8620689655;
+   feas_sol[33] = 31.6551724138;
+   feas_sol[34] = 18.6206896552;
+   feas_sol[35] = 987.12757;
+   feas_sol[36] = 864.8704241463;
+   feas_sol[37] = 495.0221497105;
+   feas_sol[38] = 574.835304349;
+   feas_sol[39] = 1569.496467202;
+   feas_sol[40] = 1815.6315890349;
+   feas_sol[41] = 0;
+   feas_sol[42] = 0;
+   feas_sol[43] = -0.690647482;
+   feas_sol[44] = -1.1568345324;
+   feas_sol[45] = -12;
+   feas_sol[46] = 0;
+   feas_sol[47] = -0.1208633094;
+   feas_sol[48] = -51.758022646;
+   feas_sol[49] = -1.9856115108;
+   feas_sol[50] = -2.1344805108;
+   feas_sol[51] = -16.5;
+   feas_sol[52] = -51.609153646;
+   feas_sol[53] = 0.0863309353;
+   feas_sol[54] = 0.0863309353;
+   feas_sol[55] = 0;
+   feas_sol[56] = 0;
+   feas_sol[57] = 0;
+   feas_sol[58] = 0;
+   feas_sol[59] = 0;
+   feas_sol[60] = 0;
+   feas_sol[61] = 0;
+   feas_sol[62] = 0;
+   feas_sol[63] = 0;
+   feas_sol[64] = 0;
+   feas_sol[65] = 0;
+   feas_sol[66] = 0;
+   feas_sol[67] = 0;
+   feas_sol[68] = 0;
+   feas_sol[69] = 0;
+   feas_sol[70] = 0;
+   feas_sol[71] = 0;
+   feas_sol[72] = 0;
+   feas_sol[73] = 0;
+   feas_sol[74] = -0.08757;
+   feas_sol[75] = 0;
+   feas_sol[76] = 0;
+   feas_sol[77] = 0;
+   feas_sol[78] = -0.1726618705;
+   feas_sol[79] = 0;
+   feas_sol[80] = 0;
+   feas_sol[81] = -0.08757;
+   feas_sol[82] = -0.1726618705;
+   feas_sol[83] = 0;
+   feas_sol[84] = 0;
+   feas_sol[85] = 0;
+   feas_sol[86] = 0;
+   feas_sol[87] = 0;
+   feas_sol[88] = 0;
+   feas_sol[89] = 0;
+   feas_sol[90] = 0;
+   feas_sol[91] = 0;
+   feas_sol[92] = -15.8791366906;
+   feas_sol[93] = 51.609153646;
+   feas_sol[94] = 50.918506164;
+   feas_sol[95] = 50.4523191136;
+   feas_sol[96] = 39.609153646;
+   feas_sol[97] = 51.609153646;
+   feas_sol[98] = 51.4882903366;
+   feas_sol[99] = 0.6043165468;
+   feas_sol[100] = 0;
+   feas_sol[101] = 0;
+   feas_sol[102] = 0;
+   feas_sol[103] = 0;
+   feas_sol[104] = 0.5352517986;
+   feas_sol[105] = 0;
+   feas_sol[106] = 0.6043165468;
+   feas_sol[107] = 0;
+   feas_sol[108] = 0;
+   feas_sol[109] = 0;
+   feas_sol[110] = 0;
+   feas_sol[111] = 0.5352517986;
+   feas_sol[112] = 0;
+   feas_sol[113] = 0;
+   feas_sol[114] = 0;
+   feas_sol[115] = 0;
+   feas_sol[116] = 0.690647482;
+   feas_sol[117] = 1.1568345324;
+   feas_sol[118] = 0;
+   feas_sol[119] = 0;
+   feas_sol[120] = 0;
+   feas_sol[121] = 0;
+   feas_sol[122] = 0;
+   feas_sol[123] = 0;
+   feas_sol[124] = 0;
+   feas_sol[125] = 0;
+   feas_sol[126] = 0;
+   feas_sol[127] = 0;
+   feas_sol[128] = 0;
+   feas_sol[129] = 0;
+   feas_sol[130] = 0;
+   feas_sol[131] = 0;
+   feas_sol[132] = 0;
+#endif
 
+   if (feas_sol_size) {
       OsiXSolverInterface  *si = lp_data->si;
       const CoinPackedMatrix *matrixByCol = si->getMatrixByCol();
 

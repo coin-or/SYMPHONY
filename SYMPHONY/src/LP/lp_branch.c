@@ -1580,7 +1580,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          }
 
 #ifdef SENSITIVITY_ANALYSIS
-         if (p->par.sensitivity_rhs){      
+         if (p->par.sensitivity_rhs){
             can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
             //Anahita
             can->rays = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));

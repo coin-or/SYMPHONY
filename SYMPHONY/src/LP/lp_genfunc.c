@@ -336,6 +336,17 @@ int fathom_branch(lp_prob *p)
       } else {
          termcode = dual_simplex(lp_data, &iterd);
       }
+#if 0
+#ifdef CHECK_CUT_VALIDITY
+//      if (termcode == LP_VIOL_KNOWN_SOL) {
+         PRINT(verbosity, 0, ("\n****************************************************\n"));
+//         PRINT(verbosity, 0, (  "* Problem Found Violating Known Feasible Solution  *\n"));
+         PRINT(verbosity, 0, (  "* Node # = %i ******************** Node level = %i *\n", p->bc_index, p->bc_level));
+         PRINT(verbosity, 0, (  "****************************************************\n"));
+//         return (FUNCTION_TERMINATED_ABNORMALLY);
+//      }
+#endif
+#endif
       p->objval = lp_data->objval;
       #ifdef SENSITIVITY_ANALYSIS
       // Save for later, since they get over-written during branching
