@@ -1,8 +1,14 @@
-# SYMPHONY Version 5.6.10 README
+# SYMPHONY Version 5.6.14 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
 2000-2015 by Ted Ralphs and others. This README may be redistributed freely.
+
+# CURRENT BUILD STATUS
+
+[![Build Status](https://travis-ci.org/coin-or/SYMPHONY.svg?branch=master)](https://travis-ci.org/coin-or/SYMPHONY)
+
+[![Build status](https://ci.appveyor.com/api/projects/status/220ltxwv2w2ac51s/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/symphony/branch/master)
 
 # DOCUMENTATION
 
@@ -53,7 +59,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         [ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]
         [-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]
         [ -u ub ] [ -p procs ] [ -k rule ] [ -v level ] [ -c rule ]
-        [ -m max ] [ -z n ] [-o tree_out_file]
+        [ -m max ] [ -z n ] [-o tree_out_file] [-w 0/1]
 
 
         -F model: model should be read in from file 'model'
@@ -71,6 +77,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         -q 0/1: whether or not to tighten root bounds
         -r 0/1: whether or not to do reduced cost tightening
         -j 0/1: whether or not to generate cgl cuts
+        -w 0/1: whether or not to use hot starting in strong branching
         -e n: set pre-processing level to 'n'
         -i iters: allow a max of 'iters' iterations in presolve
         -t time: set wallclock time limit to 'time'
@@ -150,17 +157,13 @@ Compiled, but not well tested: SPX
 
 ### SEQUENTIAL
 
-Known configurations that build and pass unit test
-
-- gcc 4.* on LINUX
-- MSVC++ Version 9-11 compiler in CYGWIN using the autotools 
-- MSVC++ Version 9-11 IDE
-- gcc 4.* on Mac OSX 10.4.8
-- clang
+Sequential configurations are now automatically built and tested on Linux, OS X, and Windows using
+ * [Travis-CI](https://travis-ci.org/coin-or/symphony)
+ * [Appveyor](https://ci.appveyor.com/project/tkralphs/symphony)
 
 ### SHARED MEMORY PARLLEL (OpenMP)
 
-Builds and passes unit test with gcc 4.* and CLP on LINUX.
+Builds and passes unit test with gcc 4 and 5 and CLP on LINUX.
 
 ### DISTRIBUTED MEMORY PARALLEL (PVM)
 
@@ -227,6 +230,19 @@ https://projects.coin-or.org/SYMPHONY/newticket
 Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
+
+### Release 5.6.14
+  * Fixing small bug with re-setting environment in user applications.
+  * Fixing some memory errors arising with applications when extra variables are used.
+  * Fixing small bug with tracking variable indices in branching.
+  * Moving code inside critical block to prevent memory access errors in shared memory parallel mode.
+  * Added switches for turning hot starting on and off
+  * Updates to documentation
+  * Small fixes
+  * Added support for Travis and Appveyor
+
+### Release 5.6.13
+  * Release to update externals and pick up bug fixes in other projects
 
 ### Release 5.6.12
   * Fixed function for determining duals and reduced costs.
