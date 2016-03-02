@@ -336,7 +336,7 @@ int fathom_branch(lp_prob *p)
       } else {
          termcode = dual_simplex(lp_data, &iterd);
       }
-#if 0
+      // TODO: Suresh: added this! Check back later!
 #ifdef CHECK_CUT_VALIDITY
 //      if (termcode == LP_VIOL_KNOWN_SOL) {
          PRINT(verbosity, 0, ("\n****************************************************\n"));
@@ -345,7 +345,6 @@ int fathom_branch(lp_prob *p)
          PRINT(verbosity, 0, (  "****************************************************\n"));
 //         return (FUNCTION_TERMINATED_ABNORMALLY);
 //      }
-#endif
 #endif
       p->objval = lp_data->objval;
       #ifdef SENSITIVITY_ANALYSIS

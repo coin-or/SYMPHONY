@@ -121,7 +121,6 @@ int add_violated_slacks(lp_prob *p, int cand_num, branch_obj **candidates)
 
 int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 {
-
    LPdata *lp_data = p->lp_data;
    var_desc **vars;
    row_data *rows;
@@ -1643,7 +1642,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                         total_iters+=*(can->iterd+j);
                      } else {
                         load_basis(lp_data, cstat, rstat);
-                        // Suresh: testing this b/w dual_simplex and initial_lp_solve
                         can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
                         total_iters+=*(can->iterd+j);
                      }
@@ -1711,7 +1709,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   can->intcpt[j] = lp_data->intcpt;
 
 #ifdef SENSITIVITY_ANALYSIS
-                  if (p->par.sensitivity_analysis){      
+                  if (p->par.sensitivity_analysis){
                      get_dj_pi(lp_data);
                      if (p->par.sensitivity_rhs){
                         can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
@@ -1814,14 +1812,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   if (can->termcode[j] == LP_D_ITLIM)
                      itlim++;
 #endif
-                  //                  }
                   /* Changing back the bounds after presolving */
                   change_lbub(lp_data, branch_var, lb, ub);
                   break;
 
-            case CANDIDATE_CUT_IN_MATRIX:
+               case CANDIDATE_CUT_IN_MATRIX:
                   branch_row = can->cdesc[j].position;
-                  //                  for (j = 0; j < can->child_num; j++){
                   change_row(lp_data, branch_row,
                         can->cdesc[j].sense, can->cdesc[j].rhs, can->cdesc[j].range);
                   check_ub(p);
@@ -1837,7 +1833,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   can->intcpt[j] = lp_data->intcpt;
 
 #ifdef SENSITIVITY_ANALYSIS
-                  if (p->par.sensitivity_analysis){      
+                  if (p->par.sensitivity_analysis){
                      get_dj_pi(lp_data);
                      if (p->par.sensitivity_rhs){
                         can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
@@ -1922,7 +1918,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   if (can->termcode[j] == LP_D_ITLIM)
                      itlim++;
 #endif
-                  //                  }
                   cut = rows[branch_row].cut;
                   /* Changing back after presolving */
                   change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
@@ -1930,7 +1925,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   //free_row_set(lp_data, 1, &branch_row);
                   break;
 
-         } /* end of switch(can->cdesc[j].type) */
+            } /* end of switch(can->cdesc[j].type) */
       } /* end of for loop over child_num */
 
       switch ((j = compare_candidates_u(p, oldobjval, best_can, can))){

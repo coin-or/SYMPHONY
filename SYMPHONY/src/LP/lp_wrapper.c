@@ -831,7 +831,10 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
    //get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
-   indices = lp_data->tmp.i1; /* n */
+   // TODO: Suresh: set this separate memory for indices since tmp.i1 is 
+   // being overwritten for the case of USER APPLICATIONS
+//   indices = lp_data->tmp.i1; /* n */
+   indices = (int *) calloc(lp_data->n, sizeof(int));
    values = lp_data->tmp.d; /* n */
 
    double dual_gap = 100;
@@ -1194,8 +1197,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
          cur_sol->xind = indices;
          cur_sol->xval = values;
          cur_sol->lpetol = lp_data->lpetol;
-         cur_sol->xlevel = p->bc_level;
-         cur_sol->xindex = p->bc_index;
+         cur_sol->xlevel = p->bc_level + 1;
+         cur_sol->xindex = p->bc_index + 1;
          cur_sol->xiter_num = p->iter_num;
          cur_sol->objval = true_objval;
          cur_sol->xlength = cnt;
@@ -1275,7 +1278,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
          set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + lpetol);
       }
       if (!p->par.multi_criteria){
-         // TODO: Suresh: visit back later!
          p->best_sol.xlevel = p->bc_level + 1;
          p->best_sol.xindex = p->bc_index + 1;
          p->best_sol.xiter_num = p->iter_num;
@@ -1321,7 +1323,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
          display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
       sp_add_solution(p,cnt,indices,values,true_objval+p->mip->obj_offset,
-            p->bc_index);
+            p->bc_index + 1);
 #else
       s_bufid = init_send(DataInPlace);
       send_dbl_array(&true_objval, 1);
@@ -1355,6 +1357,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    }
 #endif   
    //printf("feasible: solution = %f\n", lp_data->objval);
+   FREE(indices);
    return(feasible);
 }
    
@@ -1800,21 +1803,21 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
                printf("(%.3f) than parent (%.3f)\n", can->objval[i],  oldobjval);
             }
 #endif
-	 break;
-       case LP_OPT_FEASIBLE:
-       case LP_D_UNBOUNDED:
-       case LP_D_OBJLIM:
-	 //if(!p->par.is_recourse_prob){
-	 //can->objval[i] = MAXDOUBLE / 2; //Anahita
-	 //}
-	 break;
-       case LP_D_ITLIM:
-	 can->objval[i] = MAX(can->objval[i], oldobjval);
-	 break;
-       case LP_D_INFEASIBLE:
-       case LP_ABANDONED:
-	 can->objval[i] = oldobjval;
-	 break;
+            break;
+         case LP_OPT_FEASIBLE:
+         case LP_D_UNBOUNDED:
+         case LP_D_OBJLIM:
+            //if(!p->par.is_recourse_prob){
+            //can->objval[i] = MAXDOUBLE / 2; //Anahita
+            //}
+            break;
+         case LP_D_ITLIM:
+            can->objval[i] = MAX(can->objval[i], oldobjval);
+            break;
+         case LP_D_INFEASIBLE:
+         case LP_ABANDONED:
+            can->objval[i] = oldobjval;
+            break;
       }
    }
 

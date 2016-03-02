@@ -2351,8 +2351,6 @@ void open_lp_solver(LPdata *lp_data)
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else
-   // TODO: Suresh: added following line for testing with varying tolerances
-   // lp_data->si->setDblParam(OsiPrimalTolerance, 1e-10);
    lp_data->si->getDblParam(OsiPrimalTolerance, lp_data->lpetol);
 #endif
 }
@@ -2586,6 +2584,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 #ifdef CHECK_CUT_VALIDITY
    {
       int violnum = check_lp_validity(lp_data);
+      /*
       if (violnum) {
          printf("\n****************************************************\n");
          printf(  "* Problem Found Violating Known Feasible Solution  *\n");
@@ -2593,6 +2592,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
          // TODO: Suresh: Confirm this return!
 //         return(LP_VIOL_KNOWN_SOL);
       }
+      */
    }
 #endif
 
@@ -2720,6 +2720,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #ifdef CHECK_CUT_VALIDITY
    {
       int violnum = check_lp_validity(lp_data);
+      /*
       if (violnum) {
          printf("\n****************************************************\n");
          printf(  "* Problem Found Violating Known Feasible Solution  *\n");
@@ -2727,6 +2728,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
          // TODO: Suresh: Confirm this return!
 //         return(LP_VIOL_KNOWN_SOL);
       }
+      */
    }
 #endif
 
@@ -2743,6 +2745,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    //si->getModelPtr()->setSubstitution(3);
    si->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 #endif
+ 
    si->resolve();
 
    if (si->isProvenDualInfeasible()){
@@ -2831,8 +2834,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #endif
 
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
-   }   
-   else{
+   } else {
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
 #ifdef __OSI_CLP__
       if (si->getModelPtr()->secondaryStatus() != 10)
@@ -2858,6 +2860,7 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 
    // TODO: Suresh: this cut validity check is to ensure a known feasible
    // sol is feasible indeed for the current problem. Discuss this!
+#if 0
 #ifdef CHECK_CUT_VALIDITY
    {
       int violnum = check_lp_validity(lp_data);
@@ -2869,6 +2872,7 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 //         return(LP_VIOL_KNOWN_SOL);
       }
    }
+#endif
 #endif
 
    //int term = LP_ABANDONED;
@@ -2996,9 +3000,9 @@ int check_lp_validity(LPdata *lp_data)
    const double *matval, *rhs, *rngval;
    const char *sense;
 
-#if 0
    // TODO: Suresh: think of an alternative to fetch the solution
    // user_send_feas_sol(env->user, &feas_sol_size, &feas_sol);
+   // Primal kb2 opt solution from 1Cand
    feas_sol_size = 133;
    feas_sol = (double*) malloc(feas_sol_size * DSIZE);
    feas_sol[0] = 10;
@@ -3134,7 +3138,6 @@ int check_lp_validity(LPdata *lp_data)
    feas_sol[130] = 0;
    feas_sol[131] = 0;
    feas_sol[132] = 0;
-#endif
 
    if (feas_sol_size) {
       OsiXSolverInterface  *si = lp_data->si;
@@ -3196,7 +3199,11 @@ int check_lp_validity(LPdata *lp_data)
                break;
          };
       }
+      FREE(rowact);
    }
+   // TODO: Suresh: check back later this freeing since this is error if feas_sol does not exist
+   if (feas_sol)
+      FREE(feas_sol);
    return violnum;
 }
 
@@ -3424,15 +3431,15 @@ void get_dj_pi(LPdata *lp_data)
    /* djs may not be correct on fixed variables */
    /* fix assumes minimization */
    for (t=0; t < numberColumns; t++) {
-     if (lower[t] == upper[t]) {
-       int k;
-       double value=objective[t];
-       for (k=columnStart[t];k<columnStart[t]+columnLength[t];k++) {
-	 int iRow=row[k];
-	 value -= elementByColumn[k]*pi[iRow];
-       }
-       dj[t] = value;
-     }
+      if (lower[t] == upper[t]) {
+         int k;
+         double value=objective[t];
+         for (k=columnStart[t];k<columnStart[t]+columnLength[t];k++) {
+            int iRow=row[k];
+            value -= elementByColumn[k]*pi[iRow];
+         }
+         dj[t] = value;
+      }
    }
 }
 
