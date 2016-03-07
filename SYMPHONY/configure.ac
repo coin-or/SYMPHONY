@@ -828,8 +828,13 @@ AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
 AC_SUBST(SYM_OPENMP_FLAGS)
 AC_SUBST(SYM_OPENMP_LIBS)
 if test $sym_openmp = true; then
-  SYM_OPENMP_FLAGS=-fopenmp
-  SYM_OPENMP_LIBS=-lgomp
+  if test x$coin_cxx_is_cl = xtrue; then
+    SYM_OPENMP_FLAGS=-openmp 
+    SYM_OPENMP_LIBS=
+  else
+    SYM_OPENMP_FLAGS=-fopenmp
+    SYM_OPENMP_LIBS=-lgomp
+  fi
 else
   SYM_OPENMP_FLAGS= 
   SYM_OPENMP_LIBS=
@@ -886,7 +891,7 @@ case "$CXX" in
      CLLCFLAGS=$CXXFLAGS
      CXXFLAGS="$CXXFLAGS -TP"
      if test $sym_openmp = true; then
-         CXXFLAGS="$CXXFLAGS /openmp"
+     	 CXXFLAGS="$CXXFLAGS -openmp"
      fi
   ;;
   g++* | *\g++* | */g++*)
