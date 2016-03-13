@@ -205,6 +205,8 @@ typedef struct LPDATA{
    //Anahita
    double    *raysol;
    double    intcpt;
+   // Suresh
+   double *primal_raysol;
    //
    double    *slacks;      /* maxm */
    double    *ub;
@@ -280,7 +282,8 @@ void get_dj_pi PROTO((LPdata *lp_data));
 
 //Anahita
 void get_dual_ray PROTO((LPdata *lp_data));
-
+//Suresh
+void get_primal_ray PROTO((LPdata *lp_data));
 //Anahita
 void get_dual_farkas_ray PROTO((LPdata *lp_data));
 
@@ -318,7 +321,7 @@ void write_mip_desc_mps PROTO((MIPdesc *mip, char *fname));
 void write_mip_desc_lp PROTO((MIPdesc *mip, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 // Suresh
-int check_lp_validity PROTO((LPdata *lp_data));
+int check_lp_validity PROTO((LPdata *lp_data, int sol_size, double *sol));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 		       char send_to_pool, int bc_index, int bc_level, 

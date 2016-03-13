@@ -436,7 +436,8 @@ OPENMP_ATOMIC_UPDATE
          }
       }
       switch (termcode){
-         case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
+         case LP_D_INFEASIBLE:
+            /* this is impossible (?) as of now */
             return(ERROR__DUAL_INFEASIBLE);
          case LP_D_ITLIM:
          case LP_TIME_LIMIT:
@@ -783,27 +784,27 @@ int fathom(lp_prob *p, int primal_feasible)
    
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
-	    ("fathoming node (no more cols to check)\n\n"));
+            ("fathoming node (no more cols to check)\n\n"));
       if (primal_feasible){
-	 switch (termcode){
-	  case LP_OPT_FEASIBLE:
-	    send_node_desc(p, FEASIBLE_PRUNED);
-	    break;
-	  case LP_OPTIMAL:
-	    send_node_desc(p, OVER_UB_PRUNED);
-	    break;
-	  case LP_D_ITLIM:
-	    send_node_desc(p, ITERATION_LIMIT);
-	    break;
-	  case LP_TIME_LIMIT:
-	    send_node_desc(p, TIME_LIMIT);
-	    break;
-	  default:
-	    send_node_desc(p, OVER_UB_PRUNED);
-	    break;
-	 }
+         switch (termcode){
+            case LP_OPT_FEASIBLE:
+               send_node_desc(p, FEASIBLE_PRUNED);
+               break;
+            case LP_OPTIMAL:
+               send_node_desc(p, OVER_UB_PRUNED);
+               break;
+            case LP_D_ITLIM:
+               send_node_desc(p, ITERATION_LIMIT);
+               break;
+            case LP_TIME_LIMIT:
+               send_node_desc(p, TIME_LIMIT);
+               break;
+            default:
+               send_node_desc(p, OVER_UB_PRUNED);
+               break;
+         }
       }else{
-	 send_node_desc(p, INFEASIBLE_PRUNED);
+         send_node_desc(p, INFEASIBLE_PRUNED);
       }
       return(TRUE);
    }
@@ -812,100 +813,100 @@ int fathom(lp_prob *p, int primal_feasible)
       colgen = FATHOM__GENERATE_COLS__RESOLVE;
 
    switch (colgen){
-    case FATHOM__DO_NOT_GENERATE_COLS__DISCARD:
-      PRINT(p->par.verbosity, 1, ("Pruning node\n\n"));
-      send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
-		     DISCARDED_NODE);
-      return(TRUE);
+      case FATHOM__DO_NOT_GENERATE_COLS__DISCARD:
+         PRINT(p->par.verbosity, 1, ("Pruning node\n\n"));
+         send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
+               DISCARDED_NODE);
+         return(TRUE);
 
-    case FATHOM__DO_NOT_GENERATE_COLS__SEND:
-      PRINT(p->par.verbosity, 1, ("Sending node for pricing\n\n"));
-      send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
-		     INFEASIBLE_HOLD_FOR_NEXT_PHASE);
-      return(TRUE);
+      case FATHOM__DO_NOT_GENERATE_COLS__SEND:
+         PRINT(p->par.verbosity, 1, ("Sending node for pricing\n\n"));
+         send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
+               INFEASIBLE_HOLD_FOR_NEXT_PHASE);
+         return(TRUE);
 
-    case FATHOM__GENERATE_COLS__RESOLVE:
-      check_ub(p);
-      /* Note that in case of COLGEN_REPRICING we must have UB. */
-      if (! p->has_ub){
-	 PRINT(p->par.verbosity, 1,
-	       ("\nCan't generate cols before sending (no UB)\n"));
-	 send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
-			INFEASIBLE_HOLD_FOR_NEXT_PHASE);
-	 return(TRUE);
-      }
-      PRINT(p->par.verbosity, 1,
-	    ("\nGenerating columns before fathoming/resolving\n"));
-      new_cols = price_all_vars(p);
-      p->comp_times.pricing += used_time(&p->tt);
-      new_vars = new_cols->num_vars + new_cols->rel_ub + new_cols->rel_lb;
-      if (new_cols->dual_feas == NOT_TDF){
-	 /* Don't have total dual feasibility. The non-dual-feasible vars
-	  * have already been added. Go back and resolve. */
-	 PRINT(p->par.verbosity, 2,
-	       ("%i variables added in price-out.\n", new_vars));
-	 free_col_set(&new_cols);
-	 return(FALSE);
-      }
-      /* Now we know that we have total dual feasibility */
-      if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity +
-	   p->lp_data->lpetol) ||
-	  termcode == LP_D_OBJLIM || termcode == LP_OPT_FEASIBLE){
-	 /* fathomable */
-	 if (termcode == LP_D_OBJLIM ||
-	     (p->has_ub && lp_data->objval > p->ub - p->par.granularity +
-	      p->lp_data->lpetol)){
-	    PRINT(p->par.verbosity, 1,
-		  ("Fathoming node (discovered tdf & high cost)\n\n"));
-	 }else{
-	    PRINT(p->par.verbosity, 1,
-		  ("Fathoming node (discovered tdf & feasible)\n\n"));
-	 }
-	 send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
-			OVER_UB_PRUNED);
-	 free_col_set(&new_cols);
-	 return(TRUE);
-      }
-      /* If we ever arrive here then we must have tdf and the function
-       * was called with a primal infeasible LP.
-       *
-       * Again, note that in case of COLGEN_REPRICING, since we do that
-       * only in the root node, the lp relaxation MUST be primal feasible,
-       *
-       * If TDF_HAS_ALL, then whatever can be used to restore
-       * primal feasibility is already in the matrix so don't bother
-       * to figure out restorability, just return and resolve the problem
-       * (if new_vars == 0 then even returning is unnecessary, the node
-       * can be fathomed, nothing can restore feasibility).
-       */
-      if (new_cols->dual_feas == TDF_HAS_ALL){
-	 if (new_vars == 0){
-	    PRINT(p->par.verbosity, 1,
-		  ("fathoming node (no more cols to check)\n\n"));
-	    send_node_desc(p, INFEASIBLE_PRUNED);
-	    free_col_set(&new_cols);
-	    return(TRUE);
-	 }else{
-	    free_col_set(&new_cols);
-	    return(FALSE);
-	 }
-      }
-      /* Sigh. There were too many variables not fixable even though we have
-       * proved tdf. new_cols contains a good many of the non-fixables, use
-       * new_cols to start with in restore_lp_feasibility(). */
-      if (! restore_lp_feasibility(p, new_cols)){
-	 PRINT(p->par.verbosity, 1,
-	       ("Fathoming node (discovered tdf & not restorable inf.)\n\n"));
-	 send_node_desc(p, INFEASIBLE_PRUNED);
-	 free_col_set(&new_cols);
-	 return(TRUE);
-      }
-      /* So primal feasibility is restorable. Exactly one column has been
-       * added (released or a new variable) to destroy the proof of
-       * infeasibility */
-      free_col_set(&new_cols);
-      p->comp_times.pricing += used_time(&p->tt);
-      return(FALSE);
+      case FATHOM__GENERATE_COLS__RESOLVE:
+         check_ub(p);
+         /* Note that in case of COLGEN_REPRICING we must have UB. */
+         if (! p->has_ub){
+            PRINT(p->par.verbosity, 1,
+                  ("\nCan't generate cols before sending (no UB)\n"));
+            send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
+                  INFEASIBLE_HOLD_FOR_NEXT_PHASE);
+            return(TRUE);
+         }
+         PRINT(p->par.verbosity, 1,
+               ("\nGenerating columns before fathoming/resolving\n"));
+         new_cols = price_all_vars(p);
+         p->comp_times.pricing += used_time(&p->tt);
+         new_vars = new_cols->num_vars + new_cols->rel_ub + new_cols->rel_lb;
+         if (new_cols->dual_feas == NOT_TDF){
+            /* Don't have total dual feasibility. The non-dual-feasible vars
+             * have already been added. Go back and resolve. */
+            PRINT(p->par.verbosity, 2,
+                  ("%i variables added in price-out.\n", new_vars));
+            free_col_set(&new_cols);
+            return(FALSE);
+         }
+         /* Now we know that we have total dual feasibility */
+         if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity +
+                  p->lp_data->lpetol) ||
+               termcode == LP_D_OBJLIM || termcode == LP_OPT_FEASIBLE){
+            /* fathomable */
+            if (termcode == LP_D_OBJLIM ||
+                  (p->has_ub && lp_data->objval > p->ub - p->par.granularity +
+                   p->lp_data->lpetol)){
+               PRINT(p->par.verbosity, 1,
+                     ("Fathoming node (discovered tdf & high cost)\n\n"));
+            }else{
+               PRINT(p->par.verbosity, 1,
+                     ("Fathoming node (discovered tdf & feasible)\n\n"));
+            }
+            send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
+                  OVER_UB_PRUNED);
+            free_col_set(&new_cols);
+            return(TRUE);
+         }
+         /* If we ever arrive here then we must have tdf and the function
+          * was called with a primal infeasible LP.
+          *
+          * Again, note that in case of COLGEN_REPRICING, since we do that
+          * only in the root node, the lp relaxation MUST be primal feasible,
+          *
+          * If TDF_HAS_ALL, then whatever can be used to restore
+          * primal feasibility is already in the matrix so don't bother
+          * to figure out restorability, just return and resolve the problem
+          * (if new_vars == 0 then even returning is unnecessary, the node
+          * can be fathomed, nothing can restore feasibility).
+          */
+         if (new_cols->dual_feas == TDF_HAS_ALL){
+            if (new_vars == 0){
+               PRINT(p->par.verbosity, 1,
+                     ("fathoming node (no more cols to check)\n\n"));
+               send_node_desc(p, INFEASIBLE_PRUNED);
+               free_col_set(&new_cols);
+               return(TRUE);
+            }else{
+               free_col_set(&new_cols);
+               return(FALSE);
+            }
+         }
+         /* Sigh. There were too many variables not fixable even though we have
+          * proved tdf. new_cols contains a good many of the non-fixables, use
+          * new_cols to start with in restore_lp_feasibility(). */
+         if (! restore_lp_feasibility(p, new_cols)){
+            PRINT(p->par.verbosity, 1,
+                  ("Fathoming node (discovered tdf & not restorable inf.)\n\n"));
+            send_node_desc(p, INFEASIBLE_PRUNED);
+            free_col_set(&new_cols);
+            return(TRUE);
+         }
+         /* So primal feasibility is restorable. Exactly one column has been
+          * added (released or a new variable) to destroy the proof of
+          * infeasibility */
+         free_col_set(&new_cols);
+         p->comp_times.pricing += used_time(&p->tt);
+         return(FALSE);
    }
 
    return(TRUE); /* fake return */

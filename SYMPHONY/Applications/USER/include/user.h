@@ -45,6 +45,8 @@ typedef struct USER_PROBLEM{
    int              con_sense_e;/* */
    int              con_sense_g;/* */
    int              con_sense_l;/* */
+   int             origvar_num; /* original # of vars */
+   double      *origobj_coeffs; /* original obj fn coeffs */
    int              ubinfty;    /* number of infinity UBs */
    int              lbinfty;    /* number of -infinity LBs */
    double          *tempub;     /* condensed finite UBs */
@@ -55,6 +57,7 @@ typedef struct USER_PROBLEM{
    int             *inflbind;   /* indicator of a -infinite LB */
    double           infty;      /* */
    int             *ccind;      /* Index of complementarity constraint */
+   int             ccnum;       /* number of complementarity conditions */
    MIPdesc         *mip;        /* MIP data structure to store problem data */
 
    int              feasible;   /* Feasibility status of current LP relaxation */

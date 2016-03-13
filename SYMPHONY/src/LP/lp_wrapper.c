@@ -831,8 +831,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
    //get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
-   // TODO: Suresh: set this separate memory for indices since tmp.i1 is 
-   // being overwritten for the case of USER APPLICATIONS
+   // Suresh: set this separate memory for indices since tmp.i1 is 
+   // being overwritten for the case of APPLICATIONS
 //   indices = lp_data->tmp.i1; /* n */
    indices = (int *) calloc(lp_data->n, sizeof(int));
    values = lp_data->tmp.d; /* n */

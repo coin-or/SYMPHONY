@@ -54,6 +54,18 @@ int main(int argc, char **argv)
 
 #else
 
+/*===========================================================================*\
+   For solving LO problems in parallel, following changes are required. 
+
+   1. num_upperlevel_vars = 0 in user_load_problem.
+   2. Obj = 0 in user_load_problem.
+   3. Uncomment debugging info in main function to print original obj fn value.
+   4. Comment maxUB/minLB code in user_read_problem function.
+   5. Ensure rhs[index] in original dual variables to be original obj fn coeffs.
+   6. Ensure origvar_num and origobj_coeffs in user_read_problem.
+
+\*===========================================================================*/
+
 #include "symphony.h"
 #include "sym_master.h"
 #include <stdlib.h>
@@ -93,9 +105,9 @@ int main(int argc, char **argv)
    CALL_FUNCTION( user_load_problem(env, prob) );
 
    CALL_FUNCTION( sym_solve(env) );
-     
-   // Added by Suresh for debugging
+
    /*
+   // Added by Suresh for debugging
    printf("\n\n");
    double obj_val = 0.0;
    int n = env->best_sol.xlength;
@@ -109,8 +121,7 @@ int main(int argc, char **argv)
    }
    printf("\n\nORIGINAL OBJECTIVE FUNCTION VALUE = %06f\n\n", obj_val);
    */
-
-
+     
    CALL_FUNCTION( sym_close_environment(env) );
    
    return(0);
@@ -137,6 +148,12 @@ int user_read_data(user_problem *prob, char *infile)
    prob->mip->n  = mps.getNumCols();
    prob->mip->obj_sense = 1.0; // TODO: Remove this 'minimize' assumption.
    prob->infty = mps.getInfinity();
+
+   /*
+   double maxUB, minLB;
+   maxUB = -prob->infty;
+   minLB = prob->infty;
+   */
    
    prob->mip->obj    = (double *) malloc(DSIZE * prob->mip->n);
    prob->mip->rhs    = (double *) malloc(DSIZE * prob->mip->m);
@@ -160,6 +177,11 @@ int user_read_data(user_problem *prob, char *infile)
    memcpy(prob->mip->lb, const_cast <double *> (mps.getColLower()),
 	  DSIZE * prob->mip->n);
 
+   // Suresh: for retrieving original obj fn value
+   prob->origvar_num = prob->mip->n;
+   prob->origobj_coeffs    = (double *) malloc(DSIZE * prob->mip->n);
+   memcpy(prob->origobj_coeffs, prob->mip->obj, DSIZE * prob->mip->n);
+
    // Save names
    for (j = 0; j < prob->mip->n; j++){
       prob->mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
@@ -172,14 +194,6 @@ int user_read_data(user_problem *prob, char *infile)
       strncpy(prob->mip->rowname[j], mps.rowName(j), MAX_NAME_SIZE);
       prob->mip->rowname[j][MAX_NAME_SIZE-1] = 0;
    }
-
-   // Added by Suresh for debugging
-   /*
-   prob->origvar_num = prob->mip->n;
-   prob->origobj_coeffs = (double *) malloc(DSIZE * prob->mip->n);
-   memcpy(prob->origobj_coeffs, const_cast <double *> (mps.getObjCoefficients()),
-	  DSIZE * prob->mip->n);
-     */
 
    //user defined matind, matval, matbeg--fill as column ordered
    const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
@@ -233,6 +247,37 @@ int user_read_data(user_problem *prob, char *infile)
       }
    }
 
+   /*
+   // Suresh: added this for finite bounds on vars for bilevel problems
+   // find max of finite UBs and min of finite LBs
+   for (j = 0; j < prob->mip->n; j++) {
+      if ((prob->mip->ub[j] < prob->infty) && (prob->mip->ub[j] > maxUB)) {
+         maxUB = prob->mip->ub[j];
+      }
+      if ((prob->mip->lb[j] > -prob->infty) && (prob->mip->lb[j] < minLB)) {
+         minLB = prob->mip->lb[j];
+      }
+   }
+
+   if (maxUB <= -prob->infty) {
+      maxUB = 1e10;
+   }
+   if (minLB >= prob->infty) {
+      minLB = -1e10;
+   }
+
+  // Suresh: added this for finite bounds on vars for bilevel problems
+   // change infinity UBs and -infinity LBs to finite maxUB and minLB
+   for (j = 0; j < prob->mip->n; j++) {
+      if (prob->mip->ub[j] >= prob->infty) {
+         prob->mip->ub[j] = maxUB;
+      }
+      if (prob->mip->lb[j] <= -prob->infty) {
+         prob->mip->lb[j] = minLB;
+      }
+   }
+   */
+
    // count number of infinity UBs and -infinity LBs, and also their indicators.
    for (j = 0; j < prob->mip->n; j++) {
       prob->infubsofar[j] = prob->ubinfty;
@@ -271,42 +316,6 @@ int user_read_data(user_problem *prob, char *infile)
          counter++;
       }
    }
-
-   /* Suresh: debug code START */
-   /*
-   printf("\nORIG_OBJ\n");
-   for (j = 0; j < prob->mip->n; j++) {
-      printf("%s\tx%d\t%2.4e\n", prob->mip->colname[j], j, prob->mip->obj[j]);
-   }
-   printf("\nORIG_LB\n");
-   for (j = 0; j < prob->mip->n; j++) {
-      printf("%s\tx%d\t%2.4e\n", prob->mip->colname[j], j, prob->mip->lb[j]);
-   }
-   printf("\nORIG_UB\n");
-   for (j = 0; j < prob->mip->n; j++) {
-      printf("%s\tx%d\t%2.4e\n", prob->mip->colname[j], j, prob->mip->ub[j]);
-   }
-   printf("\nORIG_SENSE\n");
-   for (j = 0; j < prob->mip->m; j++) {
-      printf("%s\tc%d\t%c\n", prob->mip->rowname[j], j, prob->mip->sense[j]);
-   }
-   printf("\nORIG_RHS\n");
-   for (j = 0; j < prob->mip->m; j++) {
-      printf("%s\tc%d\t%2.4e\n", prob->mip->rowname[j], j, prob->mip->rhs[j]);
-   }
-   */
-   /*
-   int i;
-   printf("\nORIG_COEFF\n");
-   for (i = 0; i < prob->mip->n; i++) {
-      if ((prob->mip->matbeg[i+1] - prob->mip->matbeg[i]) > 0) {
-         for (j = prob->mip->matbeg[i]; j < prob->mip->matbeg[i+1]; j++) {
-            printf("x%d\tc%d\t%2.4e\n", i, prob->mip->matind[j], prob->mip->matval[j]);
-         }
-      }
-   }
-   */
-   /* Suresh: debug code END */
 
    return (FUNCTION_TERMINATED_NORMALLY);
 }
@@ -361,7 +370,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    if (prob->mip->obj_sense > 0.0) {
       for (i = 0; i < n; i++) {
          if (i < prob->mip->n) {
-            obj[i] = prob->mip->obj[i];
+            obj[i] = -prob->mip->obj[i];
          } else {
             obj[i] = 0.0;
          }
@@ -369,7 +378,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    } else {
       for (i = 0; i < n; i++) {
          if (i < prob->mip->n) {
-            obj[i] = -prob->mip->obj[i];
+            obj[i] = prob->mip->obj[i];
          } else {
             obj[i] = 0.0;
          }
@@ -500,7 +509,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
       sense[index] = 'E';
       // Suresh: zero'd rhs for debugging to check if entire code works properly
 //      rhs[index] = 0;
-      rhs[index] = -prob->mip->obj[j];
+      rhs[index] = prob->mip->obj[j];
       env->mip->rowname[index] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
       env->mip->rowname[index][0] = 'E';
       env->mip->rowname[index][1] = '_';
@@ -592,6 +601,7 @@ int user_load_problem(sym_environment *env, user_problem *prob){
 
    /* Assign memory and fill complementarity constraint indices for variables */
    prob->ccind          =   (int *) malloc(n * ISIZE);
+   prob->ccnum          =   0;
    index = 0;
    index1 = 0;
    for (i = 0; i < n;) {
@@ -605,11 +615,13 @@ int user_load_problem(sym_environment *env, user_problem *prob){
             index1++;
          } else {
             prob->ccind[i] = index1;
+            prob->ccnum++;
             i++;
             index1++;
          }
       } else {
          prob->ccind[i] = index1;
+         prob->ccnum++;
          i++;
          index1++;
       }
@@ -619,61 +631,6 @@ int user_load_problem(sym_environment *env, user_problem *prob){
    sym_explicit_load_problem(env, n, m, column_starts, matrix_indices,
 			     matrix_values, lb, ub, is_int, obj, 0, sense, rhs,
 			     rngval, true);
-
-   /* Suresh: debug code START */
-   /*
-   printf("\nNEW_OBJ\n");
-   for (j = 0; j < n; j++) {
-      printf("%s\tx%d\t%f\n", env->mip->colname[j], j, obj[j]);
-   }
-   */
-   /*
-   printf("\nNEW_LB\n");
-   for (j = 0; j < n; j++) {
-      printf("%s\tx%d\t%2.4e\n", env->mip->colname[j], j, lb[j]);
-   }
-   printf("\nNEW_UB\n");
-   for (j = 0; j < n; j++) {
-      printf("%s\tx%d\t%2.4e\n", env->mip->colname[j], j, ub[j]);
-   }
-   printf("\nNEW_SENSE\n");
-   for (j = 0; j < m; j++) {
-      printf("%s\tc%d\t%c\n", env->mip->rowname[j], j, sense[j]);
-   }
-   */
-   /*
-   printf("\nNEW_RHS\n");
-   for (j = 0; j < m; j++) {
-      printf("%s\tc%d\t%f\n", env->mip->rowname[j], j, rhs[j]);
-   }
-   */
-   /*
-   printf("\nNEW_COEFF\n");
-   for (i = 0; i < n; i++) {
-      if ((column_starts[i+1] - column_starts[i]) > 0) {
-         for (j = column_starts[i]; j < column_starts[i+1]; j++) {
-            printf("x%d\tc%d\t%f\n", i, matrix_indices[j], matrix_values[j]);
-         }
-      }
-   }
-   */
-   /*
-   printf("\nNEW_ROW_NAMES\n");
-   for(i = 0; i < m; i++) {
-      printf("%s\tc%d\n", env->mip->rowname[i], i);
-   }
-   printf("\nNEW_COL_NAMES\n");
-   for(i = 0; i < n; i++) {
-      printf("%s\tx%d\n", env->mip->colname[i], i);
-   }
-   */
-   /*
-   printf("\nNEW_CCIND\n");
-   for (i = 0; i < n; i++) {
-      printf("%s\tx%d\t%d\n", env->mip->colname[i], i, prob->ccind[i]);
-   }
-   */
-   /* Suresh: debug code END */
 
    /* Change prob->mip values to final problem values */
    prob->mip->n = n;

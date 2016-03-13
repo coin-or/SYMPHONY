@@ -71,6 +71,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 		     char branching, double *heur_solution)
 {
    user_problem * prob = (user_problem *)user;
+
    double *rowact, *rhs, *matval;
    int *matbeg, *matind;
 
