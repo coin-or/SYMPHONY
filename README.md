@@ -1,4 +1,4 @@
-# SYMPHONY Version 5.6.14 README
+# SYMPHONY Version 5.6.15 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
@@ -230,6 +230,10 @@ https://projects.coin-or.org/SYMPHONY/newticket
 Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
+
+### Release 5.6.15
+  * Fix for configuration issue with OpenMP when building with Visual Studio
+    compiler under Msys2
 
 ### Release 5.6.14
   * Fixing small bug with re-setting environment in user applications.

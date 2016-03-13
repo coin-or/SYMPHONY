@@ -10,7 +10,9 @@ SYMPHONY with default configuration settings in most cases. For more detailed
 installation instructions and for more information on custom configurations,
 please see the SYMPHONY [ user's manual].
 
-== Building SYMPHONY in Unix-like environments (UNIX/LINUX/CYGWIN/MINGW/OSX) ==
+== Building SYMPHONY in Unix-like environments (UNIX / LINUX / CYGWIN / MSys / OSX) ==
+
+For more detailed information on MSys and CYGWIN installs, see below.
 
 SYMPHONY uses the COIN-OR build system and the GNU autotools to automate the
 build process. The build process should therefore be identical in all
@@ -54,7 +56,9 @@ The first step is to run a configuration script that will allow the
 compilation process to be customized for your environment. To perform this
 step, first switch into the root directory
 
-{{{cd SYMPHONY-5.6}}}
+{{{
+cd SYMPHONY-5.6
+}}}
 
 of the distribution and type.
 
@@ -81,13 +85,17 @@ command-line options or else modify the options in the file
 be used (Clp is the default). A list of options together with brief
 explanations can be seen both in the file 'share/config.site' and by typing
 
-{{{./configure --help=recursive}}}
+{{{
+./configure --help=recursive
+}}}
 
 In order to enable or disable an option, either update the file
 {{{share/config.site}}} or add the option as an argument to configuration
 script. As an instance for the second case, running
 
-{{{./configure --enable-debug}}}
+{{{
+./configure --enable-debug
+}}}
 
 will set the configuration to compile the source files with debugging flag.
 
@@ -101,22 +109,24 @@ It is possible to use compilers other than the default (which is g++). For
 example, to perform at automated build of SYMPHONY using the MSVC++ compiler
 {{{cl}}} with GNU autotools in the CYGWIN environment configure with
 
-{{{./configure --enable-msvc}}}
+{{{
+./configure --enable-msvc
+}}}
 
-Please see further details on building in this configuration [ here]
+Please see further details on building in this configuration below.
 
 === BUILDING ===
 
   1. After configuring, the code can be built by typing the commands
 
-{{{
-make 
-make install
-}}}
+   {{{
+   make 
+   make install
+   }}}
 
-This will first create the required libraries and binaries and then will
-install SYMPHONY. By default, the library 'libSym' and the executable
-{{{symphony}}} will be installed to the {{{lib/}}} and {{{bin/}}} directories.
+  This will first create the required libraries and binaries and then will
+  install SYMPHONY. By default, the library 'libSym' and the executable
+  {{{symphony}}} will be installed to the {{{lib/}}} and {{{bin/}}} directories.
 
   2. The SYMPHONY library, together with the header files in the subdirectory
   {{{include/}}}, can then be used to call SYMPHONY from any C/C++ code. The
@@ -127,266 +137,334 @@ install SYMPHONY. By default, the library 'libSym' and the executable
   directory. After that, Glpk should be built and linked automatically,
   enabling the ability to read GMPL files.
 
-For a more powerful modeling interface, FlopC++ can also be used to obtain a
-capability similar to ILOG's Concert technology for building math programming
-models (see SYMPHONY/Examples/FLOPC++).
+  For a more powerful modeling interface, FlopC++ can also be used to obtain a
+  capability similar to ILOG's Concert technology for building math programming
+  models (see SYMPHONY/Examples/FLOPC++).
 
-If you are planning to use the interactive optimizer, it is recommended to run
-the configuration script with
+  If you are planning to use the interactive optimizer, it is recommended to run
+  the configuration script with
 
-{{{./configure --enable-gnu-packages}}}
+  {{{./configure --enable-gnu-packages}}}
 
-This will allow the interactive shell to be able to behave exactly like a
-Linux terminal command line, i.e., it will keep the history of the used
-commands, will complete the input word to possible commands, etc. Make sure
-that you have the needed package ({{{readline.h}}} and {{{history.h}}} include
-files and their libraries) on the system files path.
+  This will allow the interactive shell to be able to behave exactly like a
+  Linux terminal command line, i.e., it will keep the history of the used
+  commands, will complete the input word to possible commands, etc. Make sure
+  that you have the needed package ({{{readline.h}}} and {{{history.h}}} include
+  files and their libraries) on the system files path.
 
   3. To test SYMPHONY after building, type
 
-{{{make test}}}
+  {{{make test}}}
 
-to execute an automated unit test. To test out the optimizer manually. a
-sample MPS file called {{{sample.mps}}} and a sample GMPL/AMPL file called
-{{{sample.mod}}} together with its data file {{{sample.dat}}} are included
-with the distribution. You can use either the command-line or the interactive
-optimizer. To solve the sample MPS model, type
+  to execute an automated unit test. To test out the optimizer manually. a
+  sample MPS file called {{{sample.mps}}} and a sample GMPL/AMPL file called
+  {{{sample.mod}}} together with its data file {{{sample.dat}}} are included
+  with the distribution. You can use either the command-line or the interactive
+  optimizer. To solve the sample MPS model, type
 
-{{{bin/symphony -F SYMPHONY/Datasets/sample.mps}}}
+  {{{bin/symphony -F SYMPHONY/Datasets/sample.mps}}}
 
-To solve the GMPL model, use the "-F" switch to specify the file name and the
-"-D" for the data file name if the input is in GMPL/AMPL format, i.e., type
+  To solve the GMPL model, use the "-F" switch to specify the file name and the
+  "-D" for the data file name if the input is in GMPL/AMPL format, i.e., type
 
-{{{bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat}}}
+  {{{bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat}}}
 
-For more MPS data files for further testing, see the MIPLIB library in the
-{{{Data/Sample}}} subdirectory. To run the interactive optimizer, execute
-SYMPHONY without any command-line arguments, i.e., type
+  For more MPS data files for further testing, see the MIPLIB library in the
+  {{{Data/Sample}}} subdirectory. To run the interactive optimizer, execute
+  SYMPHONY without any command-line arguments, i.e., type
 
-{{{bin/symphony}}}
+  {{{bin/symphony}}}
 
-and then type {{{help}}} or {{{?}}} to see a list of available commands.
+  and then type {{{help}}} or {{{?}}} to see a list of available commands.
 
   4. After the SYMPHONY library and the executable are compiled and tested,
   you can type
 
-{{{make clean}}}
+  {{{make clean}}}
 
-if you want to save disk space.
+  if you want to save disk space.
 
   5. That's it! Now you are ready to use SYMPHONY callable library or solve
   generic MILP problems through the executable.
 
 === SHARED MEMORY PARALLEL ===
 
- 1. To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
- compiler. Version \VER\  builds with OpenMP support enabled automatically when
- the compiler provides it. This should be the case for all recent versions of
- gcc and recent Microsoft compilers. Clang on OS X does not support OpenMP,
- though it is possible to build a version that does yourself. You can manually
- enable or disable OpenMP support with configure options by doing, e.g.,
+  1. To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
+  compiler. Version \VER\  builds with OpenMP support enabled automatically when
+  the compiler provides it. This should be the case for all recent versions of
+  gcc and recent Microsoft compilers. Clang on OS X does not support OpenMP,
+  though it is possible to build a version that does yourself. You can manually
+  enable or disable OpenMP support with configure options by doing, e.g.,
 
- {{{./configure --enable-openmp}}}
+  {{{./configure --enable-openmp}}}
 
- In the Microsoft Visual Studio, enable OpenMP
- support in the properties for the SYMPHONY projects (it doesn't need to be
- enabled for the dependent projects). In a future version, this will also be
- made the default.
+  In the Microsoft Visual Studio, enable OpenMP
+  support in the properties for the SYMPHONY projects (it doesn't need to be
+  enabled for the dependent projects). In a future version, this will also be
+  made the default.
 
- 2. Follow the instructions above for building and testing.
+  2. Follow the instructions above for building and testing.
 
- 3. To invoke SYMPHONY from the command-line with multiple threads, specify the
- number of \emph{additional} worker threads with the \code{-p} option, i.e.,
- invoking SYMPHONY with 
+  3. To invoke SYMPHONY from the command-line with multiple threads, specify the
+  number of \emph{additional} worker threads with the \code{-p} option, i.e.,
+  invoking SYMPHONY with 
 
- {{{bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps}}}
+  {{{bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps}}}
 
- will utilize two worker threads to process subproblems in parallel.
- When more than 1 thread is used, the first thread is the ``master''
- thread and only prints out periodic status messages, as well as doing some
- bookkeeping work. Therefore, it is recommended to always use at least one
- worker thread (\code{-p 1}}). Starting in version 5.6.0, the number of
- threads used is automatically set equal to the number of available cores if no
- option is specified. For a fully sequential run with just one thread, invoke
- SYMPHONY with 
+  will utilize two worker threads to process subproblems in parallel.
+  When more than 1 thread is used, the first thread is the ``master''
+  thread and only prints out periodic status messages, as well as doing some
+  bookkeeping work. Therefore, it is recommended to always use at least one
+  worker thread (\code{-p 1}}). Starting in version 5.6.0, the number of
+  threads used is automatically set equal to the number of available cores if no
+  option is specified. For a fully sequential run with just one thread, invoke
+  SYMPHONY with 
 
- {{{bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps}}}
+  {{{bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps}}}
 
 === DISTRIBUTED PARALLEL ===
 
- 1. If you wish to compile a distributed version of the code, first make sure
- you have PVM installed. You can obtain it from http://www.csm.ornl.gov/pvm/.
+  1. If you wish to compile a distributed version of the code, first make sure
+  you have PVM installed. You can obtain it from http://www.csm.ornl.gov/pvm/.
 
- 2. To configure for a parallel build, invoke the configuration script as
- follows:
+  2. To configure for a parallel build, invoke the configuration script as
+  follows:
 
-{{{./configure --with-pvm}}}
+  {{{./configure --with-pvm}}}
 
-Be sure that PVM is installed either in system path or that you have the
-environment variable PVM_ROOT set properly. Note that there are a number of
-different parallel configurations. The default configuration is to build two
-parallel modules. The first one consists of the master, tree management, and
-cut management modules, while the second one consists of the node processing,
-and cut generation modules. For other configuration options, see the
-{{{share/config.site file}}}
+  Be sure that PVM is installed either in system path or that you have the
+  environment variable PVM_ROOT set properly. Note that there are a number of
+  different parallel configurations. The default configuration is to build two
+  parallel modules. The first one consists of the master, tree management, and
+  cut management modules, while the second one consists of the node processing,
+  and cut generation modules. For other configuration options, see the
+  {{{share/config.site file}}}
 
- 3. Follow the build instructions above to build the code. Note that this will
- also compile the sequential version.
+  3. Follow the build instructions above to build the code. Note that this will
+  also compile the sequential version.
 
- 4. Make sure there are links from your {{{$HOME/pvm3/bin/$PVM_ARCH/}}}
- subdirectory to each of the executables in your {{{bin/' directory}}} This is
- required by PVM.
+  4. Make sure there are links from your {{{$HOME/pvm3/bin/$PVM_ARCH/}}}
+  subdirectory to each of the executables in your {{{bin/' directory}}} This is
+  required by PVM.
 
- 5. Start the PVM daemon by typing {{{pvm}}} on the command line and then
- typing {{{quit}}}.
+  5. Start the PVM daemon by typing {{{pvm}}} on the command line and then
+  typing {{{quit}}}.
 
- 6. As above, test SYMPHONY using the sample MPS file called {{{sample.mps}}}
- included with the distribution. To specify the file name, use the {{{-F}}}
- command-line option, i.e., in the root directory, type
+  6. As above, test SYMPHONY using the sample MPS file called {{{sample.mps}}}
+  included with the distribution. To specify the file name, use the {{{-F}}}
+  command-line option, i.e., in the root directory, type
 
-{{{bin/symphony_m$(EXT) -F SYMPHONY/Datasets/sample.mps}}}
+  {{{bin/symphony_m$(EXT) -F SYMPHONY/Datasets/sample.mps}}}
 
-where {{{$(EXT)}}} is an extension to be added according to the chosen module
-dependencies. To obtain more MPS data files for further testing, download the
-MIPLIB library.
+  where {{{$(EXT)}}} is an extension to be added according to the chosen module
+  dependencies. To obtain more MPS data files for further testing, download the
+  MIPLIB library.
 
 === BUILDING APPLICATIONS ===
 
- 1. In order to compile SYMPHONY's applications, you must first compile the
- application-specific library with
+  1. In order to compile SYMPHONY's applications, you must first compile the
+  application-specific library with
 
-{{{ ./configure --with-application make make install }}}
+  {{{ 
+  ./configure --with-application 
+  make 
+  make install 
+  }}}
 
-This will create the application library called {{{libSymAppl}}} to be used
-while building custom applications. Note that the sequential version library
-and executable will also be made and installed.
+  This will create the application library called {{{libSymAppl}}} to be used
+  while building custom applications. Note that the sequential version library
+  and executable will also be made and installed.
 
- 2. After building the library, go to one of the application subdirectories in
-the {{{SYMPHONY/Applications/}}} directory and type {{{make}}} there. For more
-information, including the parallel configuration instructions, see the
-INSTALL file of the corresponding application.
+  2. After building the library, go to one of the application subdirectories in
+  the {{{SYMPHONY/Applications/}}} directory and type {{{make}}} there. For more
+  information, including the parallel configuration instructions, see the
+  INSTALL file of the corresponding application.
 
 == COMPILING The SYMPHONY Library and Executable (Microsoft Windows) ==
 
-Here is a sketch outline of how to compile SYMPHONY in Microsoft Windows.
-These instructions will lead you through the steps required to compile
-SYMPHONY as a generic MILP solver. This process will create * a generic
-callable library that allows SYMPHONY to be called from an application and *
-an executable that can be used as a stand-alone application to solve MILPs
-written in either MPS, LP, or GMPL file format. SYMPHONY can be further
-customized by implementing one of more than 50 callback functions that change
-SYMPHONY's default execution of its algorithm. For information on customizing
-SYMPHONY using callbacks, a quick start guide is provided below. Note that in
-the Windows version, detailed timing information is not currently provided.
+  Here is a sketch outline of how to compile SYMPHONY in Microsoft Windows.
+  These instructions will lead you through the steps required to compile
+  SYMPHONY as a generic MILP solver. This process will create * a generic
+  callable library that allows SYMPHONY to be called from an application and *
+  an executable that can be used as a stand-alone application to solve MILPs
+  written in either MPS, LP, or GMPL file format. SYMPHONY can be further
+  customized by implementing one of more than 50 callback functions that change
+  SYMPHONY's default execution of its algorithm. For information on customizing
+  SYMPHONY using callbacks, a quick start guide is provided below. Note that in
+  the Windows version, detailed timing information is not currently provided.
 
-First, obtain the source code as described above. Unpack the archive to create
-the directory SYMPHONY-XX. You now have three options. You can either build
-using the MSVC++ IDE, build on the command-line with MSVC++ executable, or use
-the NMAKE utility.
+  First, obtain the source code as described above. Unpack the archive to create
+  the directory SYMPHONY-XX. You now have three options. You can either build
+  using the MSVC++ IDE, build on the command-line with MSVC++ executable, or use
+  the NMAKE utility.
 
-== Building With the MSVC++ IDE ==
+  The recommended and best-supported way of building in Windows is from a command
+  prompt using the MSys2 shell. You can build with either the MSVC++ or the MinGW 
+  compilers in this way. This gives you the most flexibility and power over the
+  build options.
 
+=== BUILDING WITH MSys2 or CYGWIN ===
+
+  1. First, install either MSys2 or CYGWIN
+    * To install MSys2, download and unzip/tar http://kent.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20150512.tar.xz
+    * To install CYGWIN, go [https://cygwin.com/install.html here]
+  2. Modify your Windows path.
+    * For Msys2 Add {{{msys64\usr\bin}}}, {{{msys64\mingw32\bin}}}, and 
+    {{{msys64\mingw32\bin}}} to your Windows path. 
+    * For CYGWIN, add the CYGWIN bin directory to your Windows path (probably 
+    {{{cygwin64\bin}}}).
+
+  3. Open a Windows terminal.
+ 
+  4. If building with the Visual Studio compiler, execute {{{vcvarsall.bat}}}.
+   
+  5. At the command prompt, type {{{bash}}}. 
+
+  6. At the {{{bash}}} prompt, do
+  {{{
+  pacman -S make wget tar patch dos2unix diffutils svn
+  svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.6 SYMPHONY-5.6
+  }}}
+  Then next
+    * To build with the Visual Studio compiler, do
+    {{{
+    ./configure --build=x86_64-w64-mingw32 --enable-msvc
+    make
+    make install
+    }}}
+    * To build with the MinGW 32-bit compiler, do
+    {{{
+    pacman -S mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran   
+    ./configure --build=x86_64-w64-mingw32 --host=i686-w64-mingw32
+    make
+    make install
+    }}}
+    * To build with the Visual Studio compiler, do
+    {{{
+    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
+    ./configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32
+    make
+    make install
+    }}}
+  Note that it is also possible to obtain SYMPHONY with git. See *Nix 
+  instructions above for details on how to modify these instructions
+  for that case.
+
+  4. To test SYMPHONY after building, type
+
+  {{{make test}}}
+
+  to execute an automated unit test. To test out the optimizer manually. a
+  sample MPS file called {{{sample.mps}}} and a sample GMPL/AMPL file called
+  {{{sample.mod}}} together with its data file {{{sample.dat}}} are included
+  with the distribution. You can use either the command-line or the interactive
+  optimizer. To solve the sample MPS model, type
+
+  {{{bin/symphony -F SYMPHONY/Datasets/sample.mps}}}
+
+  For more MPS data files for further testing, see the MIPLIB library in the
+  {{{Data/Sample}}} subdirectory. To run the interactive optimizer, execute
+  SYMPHONY without any command-line arguments, i.e., type
+
+  {{{bin/symphony}}}
+
+  and then type {{{help}}} or {{{?}}} to see a list of available commands.
+
+=== BUILDING WITH the MSVC++ IDE ===
+
+  These instructions are for MSVC++ Version 10. Instructions for other versions
+  should be similar. '''The MSVC++ are not regularly tested so please let us know
+  if they are broken.'''
+
+  1. Go to {{{SYMPHONY/MSVisualStudio/v10}}} directory and open the solution
+  file {{{symphony.sln}}}.
+
+  1. Note that there are a number of additional preprocessor definitions that
+  control the functionality of SYMPHONY. These definitions are described in
+  {{{sym.mak}}}, a Unix-style makefile included in the distribution. To enable
+  the functionality associated with a particular definition, simply add it to
+  the list of definitions of {{{libSymphony}}} project together with the
+  required libraries and paths. For instance, if you want to enable GMPL reader
+  option, you need to * add the directory of the header files of GLPK to the
+  include files path * add {{{USE_GLPMPL}}} to the defines * add the GLPK
+  library to the solution
+
+  1. Make sure that the project {{{symphony}}} is set as the startup project by
+  choosing "Set as Startup Project" from the Project menu after selecting the
+  symphony project in the Solution Explorer. Choose {{{Build Solution}}} from
+  the {{{Build}}} menu. This should successfully build the SYMPHONY library and
+  the corresponding executable.
+
+  1. To test the executable, go to the {{{Debug}}} tab and choose {{{Start
+  Without Debugging.}}} and then type {{{help}}} or {{{?}}} to see a list of
+  available commands.
+
+=== BUILDING WITH VISUAL STUDIO FROM COMMAND LINE (deprecated) ===
+  
 These instructions are for MSVC++ Version 10. Instructions for other versions
 should be similar.
 
- 1. Go to {{{SYMPHONY/MSVisualStudio/v10}}} directory and open the solution
- file {{{symphony.sln}}}.
+  1. Open a command line terminal. Go to 'SYMPHONY/MSVisualStudio/v10'
+  directory and type
 
- 1. Note that there are a number of additional preprocessor definitions that
- control the functionality of SYMPHONY. These definitions are described in
- {{{sym.mak}}}, a Unix-style makefile included in the distribution. To enable
- the functionality associated with a particular definition, simply add it to
- the list of definitions of {{{libSymphony}}} project together with the
- required libraries and paths. For instance, if you want to enable GMPL reader
- option, you need to * add the directory of the header files of GLPK to the
- include files path * add {{{USE_GLPMPL}}} to the defines * add the GLPK
- library to the solution
+  {{{devenv symphony.sln /Build "Debug|Win32}}}
 
- 1. Make sure that the project {{{symphony}}} is set as the startup project by
- choosing "Set as Startup Project" from the Project menu after selecting the
- symphony project in the Solution Explorer. Choose {{{Build Solution}}} from
- the {{{Build}}} menu. This should successfully build the SYMPHONY library and
- the corresponding executable.
+  This will create the 32-bit debug version of SYMPHONY. You can build 64-bit
+  with
 
- 1. To test the executable, go to the {{{Debug}}} tab and choose {{{Start
- Without Debugging.}}} and then type {{{help}}} or {{{?}}} to see a list of
- available commands.
+  {{{devenv symphony.sln /Build "Debug|x64"}}}
 
-== Building in a Windows Terminal ==
+  For each command, the library {{{libSymphony.lib}}} and the executable
+  {{{symphony}}} will be created in directories according to platform and
+  configuration. The library, together with the header files in
+  {{{SYMPHONY\include\}}}, can then be used to call SYMPHONY from any C/C++
+  code. The API for calling SYMPHONY is described in the user's manual.
 
-These instructions are for MSVC++ Version 10. Instructions for other versions
-should be similar.
+  1. To test the executable, type
 
- 1. Open a command line terminal. Go to 'SYMPHONY/MSVisualStudio/v10'
- directory and type
+  {{{symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps}}}
 
- {{{devenv symphony.sln /Build "Debug|Win32}}}
+  In the appropriate directory. If you want to use the interactive optimizer,
+  simply type
 
-This will create the 32-bit debug version of SYMPHONY. You can build 64-bit
-with
+  {{{symphony.exe}}}
 
-{{{devenv symphony.sln /Build "Debug|x64"}}}
+  and then type {{{help}}} or {{{?}}} to see a list of available commands.
 
-For each command, the library {{{libSymphony.lib}}} and the executable
-{{{symphony}}} will be created in directories according to platform and
-configuration. The library, together with the header files in
-{{{SYMPHONY\include\}}}, can then be used to call SYMPHONY from any C/C++
-code. The API for calling SYMPHONY is described in the user's manual.
+  3. If SYMPHONY is modified, type
 
- 1. To test the executable, type
+  {{{devenv symphony.sln /Rebuild "Debug|Win32"}}}
 
- {{{symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps}}}
+  in order to clean and rebuild everything.
 
-In the appropriate directory. If you want to use the interactive optimizer,
-simply type
+== BUILDING WITH THE NMAKE Utility (deprecated) ==
 
-{{{symphony.exe}}}
+  Note: the {{{sym.mak}}} file is no longer maintained, but may work.
 
-and then type {{{help}}} or {{{?}}} to see a list of available commands.
+  1. Go to {{{MSVisualStudio}}} directory and edit the {{{sym.mak}}} makefile
+  to reflect your environment. This involves specifying the LP solver to be
+  used, assigning some variables and setting various paths. Only minor edits
+  should be required. An explanation of what has to be set is contained in the
+  comments in the makefile. Note that, you have to first create the COIN
+  libraries Cgl, Clp, Osi, OsiClp and CoinUtils.
 
-3. If SYMPHONY is modified, type
+  1. Once configuration is done, open a command line terminal and type
 
- {{{devenv symphony.sln /Rebuild "Debug|Win32"}}}
+  {{{nmake sym.mak}}}
 
-in order to clean and rebuild everything.
+  This will make the SYMPHONY library {{{libSymphony.lib}}} and the executable
+  {{{symphony}}} in {{{Debug}}} directory. The library, together with the header
+  files in {{{SYMPHONY\include\}}}, can then be used to call SYMPHONY from any
+  C/C++ code. The API for calling SYMPHONY is described in the user's manual.
 
-== Building With the MSVC++ compiler in CYGWIN ==
+  3. To test the executable, type
 
-It is possible to perform at automated build of SYMPHONY using the MSVC++
-compiler {{{cl}}} with GNU autotools in the CYGWIN environment. To do so,
-follow the instructions for building in Unix-like environments, except when
-configuring, use the command
+  {{{symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps}}}
 
- ./configure --enable-msvc
+  in the output directory. If you want to use the interactive optimizer, simply
+  type
 
-== Building With the NMAKE Utility ==
+  {{{symphony.exe}}}
 
-Note: the {{{sym.mak}}} file is no longer maintained, but may work.
-
- 1. Go to {{{MSVisualStudio}}} directory and edit the {{{sym.mak}}} makefile
-to reflect your environment. This involves specifying the LP solver to be
-used, assigning some variables and setting various paths. Only minor edits
-should be required. An explanation of what has to be set is contained in the
-comments in the makefile. Note that, you have to first create the COIN
-libraries Cgl, Clp, Osi, OsiClp and CoinUtils.
-
- 1. Once configuration is done, open a command line terminal and type
-
-{{{nmake sym.mak}}}
-
-This will make the SYMPHONY library {{{libSymphony.lib}}} and the executable
-{{{symphony}}} in {{{Debug}}} directory. The library, together with the header
-files in {{{SYMPHONY\include\}}}, can then be used to call SYMPHONY from any
-C/C++ code. The API for calling SYMPHONY is described in the user's manual.
-
- 3. To test the executable, type
-
- {{{symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps}}}
-
-in the output directory. If you want to use the interactive optimizer, simply
-type
-
- {{{symphony.exe}}}
-
-and then type {{{help}}} or {{{?}}} to see a list of available commands.
+  and then type {{{help}}} or {{{?}}} to see a list of available commands.
  
