@@ -52,10 +52,14 @@
 \*===========================================================================*/
 
 void user_usage(void){
-  printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
+  printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
 	 "-H: help (solver-specific switches)",
 	 "-F model: model should be read in from file 'model'",
 	 "          (MPS format is assumed unless -D is also present)",
+	 "-X auxfile: auxiliary information for the bilevel application when 'model'", 
+    "             is a bilevel instance should be read in from file 'auxfile'",
+    "-B bilevel: indicator representing if 'model' is a bilevel instance (1) or a",
+    "             single level instance (0)",
 	 "-D data: model is in AMPL format and data is in file 'data'");
 }
 
@@ -88,11 +92,14 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    FILE *f;
    char line[50], key[50], value[50], c, tmp;
-   int i, j;
+   int i, j, tmpi;
    /* This gives you access to the user data structure*/
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
 
+   // Suresh: added following two parameters for check_lp_validity function
+   // to check if a known feasible solution is indeed feasible for the relation
+   // problem at hand. User needs to pass the solution to the function.
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
    prob->feas_sol_size = 0;
    prob->feas_sol = NULL;
@@ -114,9 +121,18 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
             par->infile[MAX_FILE_NAME_LENGTH] = 0;
             strncpy(par->infile, value, MAX_FILE_NAME_LENGTH);
          }
+         else if (strcmp(key, "aux_file") == 0){
+            par->auxfile[MAX_FILE_NAME_LENGTH] = 0;
+            strncpy(par->auxfile, value, MAX_FILE_NAME_LENGTH);
+         }
+         else if (strcmp(key, "bilevel") == 0){
+            READ_INT_PAR(par->bilevel);
+         }
 
          /************************* cutgen parameters ***************************/
-
+         // Suresh: added following two parameters for check_lp_validity function
+         // to check if a known feasible solution is indeed feasible for the relation
+         // problem at hand. User needs to pass the solution to the function.
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
          else if (strcmp(key, "feasible_solution_size") == 0){
             READ_INT_PAR(prob->feas_sol_size);
@@ -163,8 +179,24 @@ EXIT:
             user_usage();
             exit(0);
             break;
-         case 'F': // TODO: Suresh: this is a confusion with option for instance file
+         case 'F':
             strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
+            break;
+         case 'X':
+            strncpy(par->auxfile, argv[++i], MAX_FILE_NAME_LENGTH);
+            break;
+         case 'B':
+            if (i < argc - 1){
+               if (!sscanf(argv[i+1], "%i", &tmpi)){
+                  printf("Warning: Missing argument to command-line switch -%c\n",
+                        c);
+               }else{
+                  i++;
+                  par->bilevel = tmpi;
+               }
+            }else{
+               printf("Warning: Missing argument to command-line switch -%c\n",c);
+            }
             break;
       };
    }

@@ -20,11 +20,34 @@
 \*---------------------------------------------------------------------------*/
 
 typedef struct USER_PARAMETERS{
-   /* Name of file containingthe instance data */
+   /* Name of file containing the instance data */
    char             infile[MAX_FILE_NAME_LENGTH + 1];
+   /* Name of the file containing auxiliary data related to instance */
+   char             auxfile[MAX_FILE_NAME_LENGTH + 1];
+   /* Indicator representing if infile contains a bilevel instance (1) or a single
+      level instance (0) */
+   // TODO: Suresh - this is kind of redundant with auxfile
+   bool             bilevel;
    int              test;
    char             test_dir[MAX_FILE_NAME_LENGTH +1]; /* Test files directory */
 }user_parameters;
+
+/*---------------------------------------------------------------------------*\
+ * Use this data structure to store the auxiliary data after it is read in.
+\*---------------------------------------------------------------------------*/
+
+typedef struct AUX_DATA{
+   int         num_lower_vars;       /* Number of lower level variables */
+   int         num_lower_cons;       /* Number of lower level constraints */
+   int        *index_lower_vars;     /* Indices of lower level variables */
+   int        *index_lower_cons;     /* Indices of lower level constraints */
+   double     *coeff_lower_obj;      /* Coefficients of lower level obj fn. */
+   int         sense_lower_obj;      /* Lower level objective sense: +1 = min, -1 = max */
+   double     *coeff_upper_cons;     /* Coefficients of upper level constraint
+                                        for interdiction problems */
+   double      rhs_upper_cons;       /* RHS of upper level constraint for
+                                        interdiction problems */
+}aux_data;
 
 /*---------------------------------------------------------------------------*\
  * Use this data structure to store the instance data after it is read in.
@@ -70,10 +93,13 @@ typedef struct USER_PROBLEM{
    int             feas_sol_size;
    double            *feas_sol;
 #endif
+   aux_data        aux;         /* Auxiliary data for bilevel instance */
 
 }user_problem;
 
 int user_read_data PROTO((user_problem *prob, char *infile));
 int user_load_problem PROTO((sym_environment *env, user_problem *prob));
+int user_read_aux_data PROTO((user_problem *prob, char *infile));
+int user_load_bilevel_problem PROTO((sym_environment *env, user_problem *prob));
 
 #endif
