@@ -59,7 +59,7 @@ void user_usage(void){
 	 "-X auxfile: auxiliary information for the bilevel application when 'model'", 
     "             is a bilevel instance should be read in from file 'auxfile'",
     "-B bilevel: indicator representing if 'model' is a bilevel instance (1) or a",
-    "             single level instance (0)",
+    "             single level instance (0):-  default value = 0",
 	 "-D data: model is in AMPL format and data is in file 'data'");
 }
 
@@ -96,6 +96,10 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
    /* This gives you access to the user data structure*/
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
+
+   // default values
+   par->bilevel = 0;
+   par->auxfile[MAX_FILE_NAME_LENGTH] = ' ';
 
    // Suresh: added following two parameters for check_lp_validity function
    // to check if a known feasible solution is indeed feasible for the relation
@@ -200,6 +204,11 @@ EXIT:
             break;
       };
    }
+
+      if ( par->bilevel && (!strcmp(par->auxfile, "")) ){
+         printf("SYMPHONY: Missing auxiliary file name. An auxiliary file is required\n");
+         return(USER_ERROR); /*error check for existence of auxiliary file*/
+      }
 
    if (f)
       fclose(f);
