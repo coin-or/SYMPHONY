@@ -62,7 +62,6 @@ int main(int argc, char **argv)
    3. Uncomment debugging info in main function to print original obj fn value.
    4. Comment maxUB/minLB code in user_read_problem function.
    5. Ensure rhs[index] in original dual variables to be original obj fn coeffs.
-   6. Ensure origvar_num and origobj_coeffs in user_read_problem.
 
 \*===========================================================================*/
 
@@ -78,7 +77,6 @@ int user_test(sym_environment *env);
 
 int main(int argc, char **argv)
 {
-
    int termcode;
 
    /* Create a SYMPHONY environment */
@@ -105,6 +103,7 @@ int main(int argc, char **argv)
    if (prob->par.bilevel) {
 
       CALL_FUNCTION( user_read_aux_data(prob, prob->par.auxfile) );
+      CALL_FUNCTION( user_rearrange_mat_vec(prob) );
       CALL_FUNCTION( user_load_bilevel_problem(env, prob) );
 
    } else {
@@ -115,22 +114,6 @@ int main(int argc, char **argv)
 
    CALL_FUNCTION( sym_solve(env) );
 
-   /*
-   // Added by Suresh for debugging
-   printf("\n\n");
-   double obj_val = 0.0;
-   int n = env->best_sol.xlength;
-   int i = 0;
-   for (i = 0; i < n; i++) {
-   if (env->best_sol.xind[i] < prob->origvar_num) {
-   obj_val += env->best_sol.xval[i]*prob->origobj_coeffs[env->best_sol.xind[i]];
-   } else {
-   continue;
-   }
-   }
-   printf("\n\nORIGINAL OBJECTIVE FUNCTION VALUE = %06f\n\n", obj_val);
-    */
-
    CALL_FUNCTION( sym_close_environment(env) );
 
    return(0);
@@ -140,9 +123,9 @@ int main(int argc, char **argv)
 /*===========================================================================*\
 \*===========================================================================*/
 
-int user_read_data(user_problem *prob, char *infile)
-{
-   int j, counter;
+int user_read_data(user_problem *prob, char *infile) {
+
+   int j;
    CoinMpsIO mps;
 
    mps.messageHandler()->setLogLevel(0);
@@ -164,14 +147,14 @@ int user_read_data(user_problem *prob, char *infile)
    minLB = prob->infty;
    */
    
-   prob->mip->obj    = (double *) malloc(DSIZE * prob->mip->n);
-   prob->mip->rhs    = (double *) malloc(DSIZE * prob->mip->m);
-   prob->mip->sense  = (char *)   malloc(CSIZE * prob->mip->m);
-   prob->mip->rngval = (double *) malloc(DSIZE * prob->mip->m);
-   prob->mip->ub     = (double *) malloc(DSIZE * prob->mip->n);
-   prob->mip->lb     = (double *) malloc(DSIZE * prob->mip->n);
-   prob->mip->colname = (char **) malloc(sizeof(char *) * prob->mip->n);  
-   prob->mip->rowname = (char **) malloc(sizeof(char *) * prob->mip->m);  
+   prob->mip->obj     = (double *) malloc(DSIZE * prob->mip->n);
+   prob->mip->rhs     = (double *) malloc(DSIZE * prob->mip->m);
+   prob->mip->sense   = (char *)   malloc(CSIZE * prob->mip->m);
+   prob->mip->rngval  = (double *) malloc(DSIZE * prob->mip->m);
+   prob->mip->ub      = (double *) malloc(DSIZE * prob->mip->n);
+   prob->mip->lb      = (double *) malloc(DSIZE * prob->mip->n);
+   prob->mip->colname = (char **)  malloc(sizeof(char *) * prob->mip->n);
+   prob->mip->rowname = (char **)  malloc(sizeof(char *) * prob->mip->m);
    
    memcpy(prob->mip->obj, const_cast <double *> (mps.getObjCoefficients()),
 	  DSIZE * prob->mip->n);
@@ -185,11 +168,13 @@ int user_read_data(user_problem *prob, char *infile)
 	  DSIZE * prob->mip->n);
    memcpy(prob->mip->lb, const_cast <double *> (mps.getColLower()),
 	  DSIZE * prob->mip->n);
-
-   // Suresh: for retrieving original obj fn value
-   prob->origvar_num = prob->mip->n;
-   prob->origobj_coeffs    = (double *) malloc(DSIZE * prob->mip->n);
-   memcpy(prob->origobj_coeffs, prob->mip->obj, DSIZE * prob->mip->n);
+   if (mps.integerColumns() == NULL) {
+      prob->mip->is_int  = (char *) calloc(prob->mip->n, CSIZE);
+   } else {
+      prob->mip->is_int  = (char *) malloc(CSIZE * prob->mip->n);
+      memcpy(prob->mip->is_int, const_cast <char *> (mps.integerColumns()),
+            CSIZE * prob->mip->n);
+   }
 
    // Save names
    for (j = 0; j < prob->mip->n; j++){
@@ -234,25 +219,14 @@ int user_read_data(user_problem *prob, char *infile)
    memcpy(prob->matind_row, const_cast<int *> (matrixByRow->getIndices()), 
 	  ISIZE * prob->matbeg_row[prob->mip->m]);
   
-   //count number of different type constraints.
-   prob->con_sense_e = 0;
-   prob->con_sense_l = 0;
-   prob->con_sense_g = 0;
-   prob->ubinfty = 0;
-   prob->lbinfty = 0;
-   prob->infubind     = (int *) calloc(prob->mip->n, ISIZE);
-   prob->inflbind     = (int *) calloc(prob->mip->n, ISIZE);
-   prob->infubsofar   = (int *) malloc(ISIZE * prob->mip->n);
-   prob->inflbsofar   = (int *) malloc(ISIZE * prob->mip->n);
+   // A check
    for (j = 0; j < prob->mip->m; j++) {
       if (prob->mip->sense[j] == 'E') {
-         prob->con_sense_e++;
       } else if (prob->mip->sense[j] == 'L') {
-         prob->con_sense_l++;
       } else if (prob->mip->sense[j] == 'G') {
-         prob->con_sense_g++;
       } else {
-         printf("\nNOOOOOOO!! ERROR!! ERROR!!\n");
+         printf("\nUSER I/O: MPS file contains unknown constraint sense!!\n\n");
+         return(USER_FUNC_ERROR);
       }
    }
 
@@ -287,6 +261,25 @@ int user_read_data(user_problem *prob, char *infile)
    }
    */
 
+   return (FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+int user_load_problem(sym_environment *env, user_problem *prob) {
+   
+   int i, j, index, index1, n, m, nz, nz_index = 0, *column_starts, *matrix_indices;
+   double *matrix_values, *lb, *ub, *obj, *rhs, *rngval;
+   char *sense, *is_int, obj_sense = 1.0;
+
+   /* Find some info about bounds */
+   prob->ubinfty = 0;
+   prob->lbinfty = 0;
+   prob->infubind     = (int *) calloc(prob->mip->n, ISIZE);
+   prob->inflbind     = (int *) calloc(prob->mip->n, ISIZE);
+   prob->infubsofar   = (int *) malloc(ISIZE * prob->mip->n);
+   prob->inflbsofar   = (int *) malloc(ISIZE * prob->mip->n);
    // count number of infinity UBs and -infinity LBs, and also their indicators.
    for (j = 0; j < prob->mip->n; j++) {
       prob->infubsofar[j] = prob->ubinfty;
@@ -300,43 +293,6 @@ int user_read_data(user_problem *prob, char *infile)
          prob->inflbind[j] = 1;
       }
    }
-
-   prob->tempub     = (double *) malloc(DSIZE * (prob->mip->n - prob->ubinfty));
-   prob->templb     = (double *) malloc(DSIZE * (prob->mip->n - prob->lbinfty));
-
-   // Fill temporary UB arrays
-   counter = 0;
-   for (j = 0; j < prob->mip->n; j++) {
-      if (prob->mip->ub[j] >= prob->infty) {
-         continue;
-      } else {
-         prob->tempub[counter] = prob->mip->ub[j];
-         counter++;
-      }
-   }
-
-   // Fill temporary LB arrays
-   counter = 0;
-   for (j = 0; j < prob->mip->n; j++) {
-      if (prob->mip->lb[j] <= -prob->infty) {
-         continue;
-      } else {
-         prob->templb[counter] = prob->mip->lb[j];
-         counter++;
-      }
-   }
-
-   return (FUNCTION_TERMINATED_NORMALLY);
-}
-
-/*===========================================================================*\
-\*===========================================================================*/
-
-int user_load_problem(sym_environment *env, user_problem *prob) {
-   
-   int i, j, index, index1, n, m, nz, nz_index = 0, *column_starts, *matrix_indices;
-   double *matrix_values, *lb, *ub, *obj, *rhs, *rngval;
-   char *sense, *is_int, obj_sense = 1.0;
    
    // number of upper level variables
    int num_upperlevel_vars = 1;
@@ -664,7 +620,7 @@ int user_load_problem(sym_environment *env, user_problem *prob) {
    memcpy(prob->mip->obj, obj, DSIZE * prob->mip->n);
    memcpy(prob->mip->rhs, rhs, DSIZE * prob->mip->m);
    memcpy(prob->mip->sense, sense, CSIZE * prob->mip->m);
-   memset(prob->mip->rngval, 0, DSIZE * m);                     // TODO: Fix this assumption.
+   memset(prob->mip->rngval, 0, sizeof(prob->mip->rngval));                     // TODO: Fix this assumption.
    memcpy(prob->mip->ub, ub, DSIZE * prob->mip->n);
    memcpy(prob->mip->lb, lb, DSIZE * prob->mip->n);
    memcpy(prob->mip->is_int, is_int, CSIZE * prob->mip->n);
@@ -690,9 +646,7 @@ int user_load_problem(sym_environment *env, user_problem *prob) {
    FREE(rngval);
    FREE(is_int);
    FREE(nz_lowerlevel_row);
-   /* TODO: Is it good to free tempub, templb, infubind, inflbind, ifubsofar, inflbsofar here? */
-   FREE(prob->tempub);
-   FREE(prob->templb);
+   /* TODO: Is it good to free infubind, inflbind, ifubsofar, inflbsofar here? */
    FREE(prob->inflbsofar);
    FREE(prob->infubsofar);
    FREE(prob->inflbind);
@@ -709,11 +663,11 @@ int user_load_problem(sym_environment *env, user_problem *prob) {
  * TODO: Suresh - extend this function to read interdiction related aux data too!
 \*===========================================================================*/
 
-int user_read_aux_data(user_problem *prob, char *infile)
-{
+int user_read_aux_data(user_problem *prob, char *infile) {
+
    FILE *f;
    char line[50], key[50], value[50];
-   int var_count = 0, cons_count = 0, obj_coeff_count = 0;
+   int var_count = 0, cons_count = 0, obj_coeff_count = 0, i;
    aux_data *aux = &(prob->aux);
 
    if (!strcmp(infile, "")){
@@ -763,8 +717,385 @@ int user_read_aux_data(user_problem *prob, char *infile)
       }
    }
 
+   /* Fill out indicator arrays */
+   aux->indicator_lower_vars  = (char*) calloc(prob->mip->n, CSIZE);
+   aux->indicator_lower_cons  = (char*) calloc(prob->mip->m, CSIZE);
+   for (i = 0; i < aux->num_lower_vars; i++) {
+      aux->indicator_lower_vars[aux->index_lower_vars[i]] = 1;
+   }
+   for (i = 0; i < aux->num_lower_cons; i++) {
+      aux->indicator_lower_cons[aux->index_lower_cons[i]] = 1;
+   }
+
    if (f)
       fclose(f);
+
+   return (FUNCTION_TERMINATED_NORMALLY);
+}
+
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+int user_rearrange_mat_vec(user_problem *prob) {
+
+   int n, m, nz, *column_starts, *temp_matrix_indices, *matrix_indices_col, *row_starts, *matrix_indices_row;
+   int i, j, counter, counter2, *permutation_row, *permutation_col;
+   int num_upper_vars, num_upper_cons;
+   double *temp_matrix_values, *matrix_values_col, *matrix_values_row, *lb, *ub, *obj, *rhs, *rngval;
+   char *is_int, *sense, **colname, **rowname, *indicator_lower_vars, *indicator_lower_cons;
+   aux_data *aux = &(prob->aux);
+
+   // Same number of variables, constraints, and number of nonzeros
+   n = prob->mip->n;
+   m = prob->mip->m;
+   nz = prob->mip->matbeg[n];
+
+   // number of upper level variables and constraints
+   num_upper_vars = n - aux->num_lower_vars;
+   num_upper_cons = m - aux->num_lower_cons;
+
+   /* Allocate the arrays */
+   column_starts              = (int *) malloc((n + 1) * ISIZE);
+   matrix_indices_col         = (int *) malloc((nz) * ISIZE);
+   matrix_values_col          = (double *) malloc((nz) * DSIZE);
+   temp_matrix_indices        = (int *) malloc((nz) * ISIZE);
+   temp_matrix_values         = (double *) malloc((nz) * DSIZE);
+   row_starts                 = (int *) malloc((m + 1) * ISIZE);
+   matrix_indices_row         = (int *) malloc((nz) * ISIZE);
+   matrix_values_row          = (double *) malloc((nz) * DSIZE);
+   obj                        = (double *) malloc(n * DSIZE);
+   lb                         = (double *) malloc(n * DSIZE);
+   ub                         = (double *) malloc(n * DSIZE);
+   rhs                        = (double *) malloc(m * DSIZE);
+   sense                      = (char *) malloc(m * CSIZE);
+   rngval                     = (double *) calloc(m, DSIZE);
+   is_int                     = (char *) malloc(n * CSIZE);
+   permutation_col            = (int *) malloc(n * ISIZE);
+   permutation_row            = (int *) malloc(m * ISIZE);
+   indicator_lower_vars       = (char *) malloc(n * CSIZE);
+   indicator_lower_cons       = (char *) malloc(m * CSIZE);
+
+   /* Fill out rearranged arrays corresponding to variables */
+   counter = 0;
+   for (i = 0; i < n; i++) {
+      if (!aux->indicator_lower_vars[i]) {
+         lb[counter] = prob->mip->lb[i];
+         ub[counter] = prob->mip->ub[i];
+         obj[counter] = prob->mip->obj[i];
+         is_int[counter] = prob->mip->is_int[i];
+         counter++;
+      }
+   }
+   for (i = 0; i < n; i++) {
+      if (aux->indicator_lower_vars[i]) {
+         lb[counter] = prob->mip->lb[i];
+         ub[counter] = prob->mip->ub[i];
+         obj[counter] = prob->mip->obj[i];
+         is_int[counter] = prob->mip->is_int[i];
+         counter++;
+      }
+   }
+
+   /* Fill out rearranged arrays corresponding to constraints */
+   counter = 0;
+   for (i = 0; i < m; i++) {
+      if (!aux->indicator_lower_cons[i]) {
+         sense[counter] = prob->mip->sense[i];
+         rngval[counter] = prob->mip->rngval[i];
+         rhs[counter] = prob->mip->rhs[i];
+         counter++;
+      }
+   }
+   for (i = 0; i < m; i++) {
+      if (aux->indicator_lower_cons[i]) {
+         sense[counter] = prob->mip->sense[i];
+         rngval[counter] = prob->mip->rngval[i];
+         rhs[counter] = prob->mip->rhs[i];
+         counter++;
+      }
+   }
+
+   /* Permute variable indices w.r.t. rearrangement */
+   counter = 0;
+   for (i = 0; i < n; i++) {
+      if (!aux->indicator_lower_vars[i]) {
+         permutation_col[i] = counter;
+         counter++;
+      }
+   }
+   for (i = 0; i < n; i++) {
+      if (aux->indicator_lower_vars[i]) {
+         permutation_col[i] = counter;
+         counter++;
+      }
+   }
+
+   /* Permute constraint indices w.r.t. rearrangement */
+   counter = 0;
+   for (i = 0; i < m; i++) {
+      if (!aux->indicator_lower_cons[i]) {
+         permutation_row[i] = counter;
+         counter++;
+      }
+   }
+   for (i = 0; i < m; i++) {
+      if (aux->indicator_lower_cons[i]) {
+         permutation_row[i] = counter;
+         counter++;
+      }
+   }
+
+   /* Fill out column ordered arrays w.r.t. rearrangement */
+   // Initially, create temporary arrays upon rearranging entire columns
+   counter = 0;
+   counter2 = 0;
+   for (i = 0; i < n; i++) {
+      if (!aux->indicator_lower_vars[i]) {
+//         if (prob->mip->matbeg[i+1] - prob->mip->matbeg[i]) {
+            column_starts[counter2] = counter;
+            counter2++;
+            for (j = prob->mip->matbeg[i]; j < prob->mip->matbeg[i+1]; j++) {
+               temp_matrix_indices[counter] = prob->mip->matind[j];
+               temp_matrix_values[counter] = prob->mip->matval[j];
+               counter++;
+            }
+//         }
+      }
+   }
+   for (i = 0; i < n; i++) {
+      if (aux->indicator_lower_vars[i]) {
+//         if (prob->mip->matbeg[i+1] - prob->mip->matbeg[i]) {
+            column_starts[counter2] = counter;
+            counter2++;
+            for (j = prob->mip->matbeg[i]; j < prob->mip->matbeg[i+1]; j++) {
+               temp_matrix_indices[counter] = prob->mip->matind[j];
+               temp_matrix_values[counter] = prob->mip->matval[j];
+               counter++;
+            }
+//         }
+      }
+   }
+   column_starts[counter2] = counter;
+   // Then, create actual column ordered arrays upon rearranging rows within each column
+   counter = 0;
+   counter2 = 0;
+   for (i = 0; i < n; i++) {
+//      if (column_starts[i+1] - column_starts[i]) {
+         for (j = column_starts[i]; j < column_starts[i+1]; j++) {
+            if (!aux->indicator_lower_cons[temp_matrix_indices[j]]) {
+               matrix_indices_col[counter] = temp_matrix_indices[j];
+               matrix_values_col[counter] = temp_matrix_values[j];
+               counter++;
+            }
+         }
+         for (j = column_starts[i]; j < column_starts[i+1]; j++) {
+            if (aux->indicator_lower_cons[temp_matrix_indices[j]]) {
+               matrix_indices_col[counter] = temp_matrix_indices[j];
+               matrix_values_col[counter] = temp_matrix_values[j];
+               counter++;
+            }
+         }
+//      }
+   }
+   // Then, permute row indices to represent the new row numbers after rearrangement
+   for (i = 0; i < nz; i++) {
+      matrix_indices_col[i] = permutation_row[matrix_indices_col[i]];
+   }
+
+   /* Fill out row ordered arrays w.r.t. rearrangement */
+   // Initially, create temporary arrays upon rearranging entire rows
+   memset(temp_matrix_indices, 0, sizeof(temp_matrix_indices));
+   memset(temp_matrix_values, 0, sizeof(temp_matrix_values));
+   counter = 0;
+   counter2 = 0;
+   for (i = 0; i < m; i++) {
+      if (!aux->indicator_lower_cons[i]) {
+//         if (prob->matbeg_row[i+1] - prob->matbeg_row[i]) {
+            row_starts[counter2] = counter;
+            counter2++;
+            for (j = prob->matbeg_row[i]; j < prob->matbeg_row[i+1]; j++) {
+               temp_matrix_indices[counter] = prob->matind_row[j];
+               temp_matrix_values[counter] = prob->matval_row[j];
+               counter++;
+            }
+//         }
+      }
+   }
+   for (i = 0; i < m; i++) {
+      if (aux->indicator_lower_cons[i]) {
+//         if (prob->matbeg_row[i+1] - prob->matbeg_row[i]) {
+            row_starts[counter2] = counter;
+            counter2++;
+            for (j = prob->matbeg_row[i]; j < prob->matbeg_row[i+1]; j++) {
+               temp_matrix_indices[counter] = prob->matind_row[j];
+               temp_matrix_values[counter] = prob->matval_row[j];
+               counter++;
+            }
+//         }
+      }
+   }
+   row_starts[counter2] = counter;
+   // Then, create actual row ordered arrays upon rearranging columns within each row 
+   counter = 0;
+   counter2 = 0;
+   for (i = 0; i < m; i++) {
+//      if (row_starts[i+1] - row_starts[i]) {
+         for (j = row_starts[i]; j < row_starts[i+1]; j++) {
+            if (!aux->indicator_lower_vars[temp_matrix_indices[j]]) {
+               matrix_indices_row[counter] = temp_matrix_indices[j];
+               matrix_values_row[counter] = temp_matrix_values[j];
+               counter++;
+            }
+         }
+         for (j = row_starts[i]; j < row_starts[i+1]; j++) {
+            if (aux->indicator_lower_vars[temp_matrix_indices[j]]) {
+               matrix_indices_row[counter] = temp_matrix_indices[j];
+               matrix_values_row[counter] = temp_matrix_values[j];
+               counter++;
+            }
+         }
+//      }
+   }
+   // Then, permute column indices to represent the new column numbers after rearrangement
+   for (i = 0; i < nz; i++) {
+      matrix_indices_row[i] = permutation_col[matrix_indices_row[i]];
+   }
+
+   /* Rearrange indicator vectors */
+   counter = 0;
+   for (j = 0; j < n; j++) {
+      if (!aux->indicator_lower_vars[j]) {
+         indicator_lower_vars[counter] = 0;
+         counter++;
+      }
+   }
+   for (j = 0; j < n; j++) {
+      if (aux->indicator_lower_vars[j]) {
+         indicator_lower_vars[counter] = 1;
+         counter++;
+      }
+   }
+   counter = 0;
+   for (j = 0; j < m; j++) {
+      if (!aux->indicator_lower_cons[j]) {
+         indicator_lower_cons[counter] = 0;
+         counter++;
+      }
+   }
+   for (j = 0; j < m; j++) {
+      if (aux->indicator_lower_cons[j]) {
+         indicator_lower_cons[counter] = 1;
+         counter++;
+      }
+   }
+
+   /* Rearrange column and row names */
+   colname = (char **) malloc(sizeof(char *) * n);
+   rowname = (char **) malloc(sizeof(char *) * m);
+
+   counter = 0;
+   for (j = 0; j < n; j++){
+      if (!aux->indicator_lower_vars[j]) {
+         colname[counter] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+         strncpy(colname[counter], prob->mip->colname[j], MAX_NAME_SIZE);
+         colname[counter][MAX_NAME_SIZE-1] = 0;
+         counter++;
+      }
+   }
+   for (j = 0; j < n; j++){
+      if (aux->indicator_lower_vars[j]) {
+         colname[counter] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+         strncpy(colname[counter], prob->mip->colname[j], MAX_NAME_SIZE);
+         colname[counter][MAX_NAME_SIZE-1] = 0;
+         counter++;
+      }
+   }
+
+   counter = 0;
+   for (j = 0; j < m; j++){
+      if (!aux->indicator_lower_cons[j]) {
+         rowname[counter] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+         strncpy(rowname[counter], prob->mip->rowname[j], MAX_NAME_SIZE);
+         rowname[counter][MAX_NAME_SIZE-1] = 0;
+         counter++;
+      }
+   }
+   for (j = 0; j < m; j++){
+      if (aux->indicator_lower_cons[j]) {
+         rowname[counter] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+         strncpy(rowname[counter], prob->mip->rowname[j], MAX_NAME_SIZE);
+         rowname[counter][MAX_NAME_SIZE-1] = 0;
+         counter++;
+      }
+   }
+
+   /* Change original values to rearranged values */
+   prob->mip->n = n;
+   prob->mip->m = m;
+   prob->mip->nz = nz;
+
+   prob->mip->is_int  = (char *)   malloc(CSIZE * prob->mip->n);
+   
+   memcpy(prob->mip->obj, obj, DSIZE * prob->mip->n);
+   memcpy(prob->mip->rhs, rhs, DSIZE * prob->mip->m);
+   memcpy(prob->mip->sense, sense, CSIZE * prob->mip->m);
+   memcpy(prob->mip->rngval, rngval, DSIZE * prob->mip->m);
+   memcpy(prob->mip->ub, ub, DSIZE * prob->mip->n);
+   memcpy(prob->mip->lb, lb, DSIZE * prob->mip->n);
+   memcpy(prob->mip->is_int, is_int, CSIZE * prob->mip->n);
+   for (j = 0; j < n; j++){
+      prob->mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(prob->mip->colname[j], colname[j], MAX_NAME_SIZE);
+      prob->mip->colname[j][MAX_NAME_SIZE-1] = 0;
+   }
+   for (j = 0; j < m; j++){
+      prob->mip->rowname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(prob->mip->rowname[j], rowname[j], MAX_NAME_SIZE);
+      prob->mip->rowname[j][MAX_NAME_SIZE-1] = 0;
+   }
+
+   memcpy(prob->mip->matbeg, column_starts, ISIZE * (prob->mip->n + 1));
+   memcpy(prob->mip->matval, matrix_values_col, DSIZE * prob->mip->matbeg[prob->mip->n]);
+   memcpy(prob->mip->matind, matrix_indices_col, ISIZE * prob->mip->matbeg[prob->mip->n]);
+
+   memcpy(prob->matbeg_row, row_starts, ISIZE * (prob->mip->m + 1));
+   memcpy(prob->matval_row, matrix_values_row, DSIZE * prob->matbeg_row[prob->mip->m]);
+   memcpy(prob->matind_row, matrix_indices_row, ISIZE * prob->matbeg_row[prob->mip->m]);
+
+   // Change lower level variables and constraint indices in auxiliary info structure
+   for (j = num_upper_vars; j < prob->mip->n; j++) {
+      aux->index_lower_vars[j - num_upper_vars] = j;
+   }
+   for (j = num_upper_cons; j < prob->mip->m; j++) {
+      aux->index_lower_cons[j - num_upper_cons] = j;
+   }
+
+   // Finally, replace indicator arrays too
+   memcpy(aux->indicator_lower_vars, indicator_lower_vars, CSIZE * prob->mip->n);
+   memcpy(aux->indicator_lower_cons, indicator_lower_cons, CSIZE * prob->mip->m);
+
+   FREE(column_starts);
+   FREE(matrix_indices_col);
+   FREE(matrix_values_col);
+   FREE(row_starts);
+   FREE(matrix_indices_row);
+   FREE(matrix_values_row);
+   FREE(temp_matrix_indices);
+   FREE(temp_matrix_values);
+   FREE(permutation_col);
+   FREE(permutation_row);
+   FREE(lb);
+   FREE(ub);
+   FREE(obj);
+   FREE(sense);
+   FREE(rhs);
+   FREE(rngval);
+   FREE(is_int);
+   FREE(colname);
+   FREE(rowname);
+   FREE(indicator_lower_vars);
+   FREE(indicator_lower_cons);
 
    return (FUNCTION_TERMINATED_NORMALLY);
 }
@@ -775,15 +1106,35 @@ int user_read_aux_data(user_problem *prob, char *infile)
  *        Assumptions in bilevel benchmarks:
  *         1. All upper level variables occur before any lower level variables.
  *         2. All upper level constraints occur before any lower level constraint.
- *       Confirm this!
 \*===========================================================================*/
 
 int user_load_bilevel_problem(sym_environment *env, user_problem *prob) {
-   
+
    int i, j, index, index1, n, m, nz, nz_index = 0, *column_starts, *matrix_indices;
    double *matrix_values, *lb, *ub, *obj, *rhs, *rngval;
    char *sense, *is_int, obj_sense = 1.0; // TODO: obj_sense = 1.0 always?
    aux_data *aux = &(prob->aux);
+
+   /* Find some info about bounds */
+   prob->ubinfty = 0;
+   prob->lbinfty = 0;
+   prob->infubind     = (int *) calloc(prob->mip->n, ISIZE);
+   prob->inflbind     = (int *) calloc(prob->mip->n, ISIZE);
+   prob->infubsofar   = (int *) malloc(ISIZE * prob->mip->n);
+   prob->inflbsofar   = (int *) malloc(ISIZE * prob->mip->n);
+   // count number of infinity UBs and -infinity LBs, and also their indicators.
+   for (j = 0; j < prob->mip->n; j++) {
+      prob->infubsofar[j] = prob->ubinfty;
+      if (prob->mip->ub[j] >= prob->infty) {
+         prob->ubinfty++;
+         prob->infubind[j] = 1;
+      }
+      prob->inflbsofar[j] = prob->lbinfty;
+      if (prob->mip->lb[j] <= -prob->infty) {
+         prob->lbinfty++;
+         prob->inflbind[j] = 1;
+      }
+   }
 
    /****************************************************************************\
     * Consider the coefficient matrix (of both upper and lower level primal cons)
@@ -1202,7 +1553,8 @@ int user_load_bilevel_problem(sym_environment *env, user_problem *prob) {
    memcpy(prob->mip->obj, obj, DSIZE * prob->mip->n);
    memcpy(prob->mip->rhs, rhs, DSIZE * prob->mip->m);
    memcpy(prob->mip->sense, sense, CSIZE * prob->mip->m);
-   memset(prob->mip->rngval, 0, DSIZE * m);                     // TODO: Fix this assumption.
+//   memset(prob->mip->rngval, 0, DSIZE * m);
+   memset(prob->mip->rngval, 0, sizeof(prob->mip->rngval));                     // TODO: Fix this assumption.
    memcpy(prob->mip->ub, ub, DSIZE * prob->mip->n);
    memcpy(prob->mip->lb, lb, DSIZE * prob->mip->n);
    memcpy(prob->mip->is_int, is_int, CSIZE * prob->mip->n);
@@ -1228,9 +1580,7 @@ int user_load_bilevel_problem(sym_environment *env, user_problem *prob) {
    FREE(rngval);
    FREE(is_int);
    FREE(nz_lowerlevel_row);
-   /* TODO: Is it good to free tempub, templb, infubind, inflbind, ifubsofar, inflbsofar here? */
-   FREE(prob->tempub);
-   FREE(prob->templb);
+   /* TODO: Is it good to free infubind, inflbind, ifubsofar, inflbsofar here? */
    FREE(prob->inflbsofar);
    FREE(prob->infubsofar);
    FREE(prob->inflbind);

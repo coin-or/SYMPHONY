@@ -93,7 +93,6 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
    memcpy(vvind, prob->vvind, prob->vvnum * ISIZE);
    qsort_di(comcond_viol, vvind, prob->vvnum);
 
-
    /* select the *cand_num number of candidates based to violations */
    for (i = 0; i < *cand_num; i++) {
       cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj));

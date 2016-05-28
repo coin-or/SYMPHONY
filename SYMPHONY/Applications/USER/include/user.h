@@ -41,6 +41,8 @@ typedef struct AUX_DATA{
    int         num_lower_cons;       /* Number of lower level constraints */
    int        *index_lower_vars;     /* Indices of lower level variables */
    int        *index_lower_cons;     /* Indices of lower level constraints */
+   char       *indicator_lower_vars; /* Indicator for being a lower variable */
+   char       *indicator_lower_cons; /* Indicator for being a lower constraint */
    double     *coeff_lower_obj;      /* Coefficients of lower level obj fn. */
    int         sense_lower_obj;      /* Lower level objective sense: +1 = min, -1 = max */
    double     *coeff_upper_cons;     /* Coefficients of upper level constraint
@@ -65,15 +67,8 @@ typedef struct USER_PROBLEM{
    int             *matbeg_row; /* */
    int             *matind_row; /* */
    double          *matval_row; /* */
-   int              con_sense_e;/* */
-   int              con_sense_g;/* */
-   int              con_sense_l;/* */
-   int             origvar_num; /* original # of vars */
-   double      *origobj_coeffs; /* original obj fn coeffs */
    int              ubinfty;    /* number of infinity UBs */
    int              lbinfty;    /* number of -infinity LBs */
-   double          *tempub;     /* condensed finite UBs */
-   double          *templb;     /* condensed finite LBs */
    int             *infubsofar; /* number of infinite UBs so far */
    int             *inflbsofar; /* number of infinite LBs so far */
    int             *infubind;   /* indicator of a infinite UB */
@@ -99,7 +94,8 @@ typedef struct USER_PROBLEM{
 
 int user_read_data PROTO((user_problem *prob, char *infile));
 int user_load_problem PROTO((sym_environment *env, user_problem *prob));
-int user_read_aux_data PROTO((user_problem *prob, char *infile));
-int user_load_bilevel_problem PROTO((sym_environment *env, user_problem *prob));
+int user_read_aux_data (user_problem *prob, char *infile);
+int user_load_bilevel_problem (sym_environment *env, user_problem *prob);
+int user_rearrange_mat_vec (user_problem *prob);
 
 #endif
