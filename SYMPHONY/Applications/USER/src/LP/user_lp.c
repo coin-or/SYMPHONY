@@ -107,6 +107,8 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 
       /* Update appropriate values for prob data structure */
       prob->feasible = *feasible;
+      prob->vvind       = (int *)    malloc(violcount * ISIZE);
+      prob->rowact      = (double *) malloc(prob->rownum * DSIZE);
       memcpy(prob->vvind, violind, violcount * ISIZE);
       memcpy(prob->rowact, rowact, prob->rownum * DSIZE);
       prob->vvnum = violcount;

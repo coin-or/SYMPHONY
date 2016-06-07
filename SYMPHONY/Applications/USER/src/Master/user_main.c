@@ -612,10 +612,10 @@ int user_load_problem(sym_environment *env, user_problem *prob) {
    prob->mip->lb     = (double *) realloc(prob->mip->lb, DSIZE * prob->mip->n);
    prob->mip->is_int = (char *)   malloc(CSIZE * prob->mip->n);
    /* Default values for vvind, vvnum, feasible and rowact */
-   prob->feasible    = USER__DO_NOT_BRANCH;
-   prob->vvind       = (int *)    calloc(prob->mip->n, ISIZE);
-   prob->vvnum       = 0;
-   prob->rowact      = (double *) calloc(prob->mip->m, DSIZE);
+//   prob->mip->feasible    = USER__DO_NOT_BRANCH;
+//   prob->mip->vvind       = (int *)    calloc(prob->mip->n, ISIZE);
+//   prob->mip->vvnum       = 0;
+//   prob->mip->rowact      = (double *) calloc(prob->mip->m, DSIZE);
    
    memcpy(prob->mip->obj, obj, DSIZE * prob->mip->n);
    memcpy(prob->mip->rhs, rhs, DSIZE * prob->mip->m);
@@ -1545,10 +1545,10 @@ int user_load_bilevel_problem(sym_environment *env, user_problem *prob) {
    prob->mip->lb     = (double *) realloc(prob->mip->lb, DSIZE * prob->mip->n);
    prob->mip->is_int = (char *)   malloc(CSIZE * prob->mip->n);
    /* Default values for vvind, vvnum, feasible and rowact */
-   prob->feasible    = USER__DO_NOT_BRANCH;
-   prob->vvind       = (int *)    calloc(prob->mip->n, ISIZE);
-   prob->vvnum       = 0;
-   prob->rowact      = (double *) calloc(prob->mip->m, DSIZE);
+//   prob->mip->feasible    = USER__DO_NOT_BRANCH;
+//   prob->mip->vvind       = (int *)    calloc(prob->mip->n, ISIZE);
+//   prob->mip->vvnum       = 0;
+//   prob->mip->rowact      = (double *) calloc(prob->mip->m, DSIZE);
    
    memcpy(prob->mip->obj, obj, DSIZE * prob->mip->n);
    memcpy(prob->mip->rhs, rhs, DSIZE * prob->mip->m);

@@ -83,14 +83,14 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
    // first, compute absolute violation of every complementarity condition
    rhs = prob->mip->rhs;
    comcond_viol = (double *) malloc(prob->vvnum * DSIZE);
+   vvind = (int *) malloc(prob->vvnum * ISIZE);
    for (i = 0; i < prob->vvnum; i++) {
       vind = prob->vvind[i];
+      vvind[i] = vind;
       cind = prob->ccind[vind];
       comcond_viol[i] = fabs(x[vind]) * fabs(prob->rowact[cind] - rhs[cind]);
    }
-   // note, sort these violations and indices according to violations
-   vvind = (int *) malloc(prob->vvnum * ISIZE);
-   memcpy(vvind, prob->vvind, prob->vvnum * ISIZE);
+   // sort these violations and indices according to violations
    qsort_di(comcond_viol, vvind, prob->vvnum);
 
    /* select the *cand_num number of candidates based to violations */

@@ -880,6 +880,7 @@ typedef struct MIPDESC{
    
    //  MIPdiff *mip_diff;
    double * opt_sol;   
+
 }MIPdesc;
 
 /*===========================================================================*\

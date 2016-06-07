@@ -2697,7 +2697,7 @@ int generate_cuts_in_lp_u(lp_prob *p, double *xx)
       }
 #endif
    }
-#endif      
+#endif
 
 #ifdef USE_SYM_APPLICATION
    user_res = user_generate_cuts_in_lp(p->user, lp_data, lp_data->n,

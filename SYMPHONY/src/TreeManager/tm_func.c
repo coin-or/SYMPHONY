@@ -319,293 +319,293 @@ int solve(tm_prob *tm)
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
-   \*------------------------------------------------------------------------*/
+    \*------------------------------------------------------------------------*/
 
    no_work_start = wall_clock(NULL);
 
    tm->termcode = TM_UNFINISHED;
    for (; tm->phase <= 1; tm->phase++){
       if (tm->phase == 1 && !tm->par.warm_start){
-	 if ((tm->termcode = tasks_before_phase_two(tm)) ==
-	     FUNCTION_TERMINATED_NORMALLY){
-	    tm->termcode = TM_FINISHED; /* Continue normally */
-	 }
+         if ((tm->termcode = tasks_before_phase_two(tm)) ==
+               FUNCTION_TERMINATED_NORMALLY){
+            tm->termcode = TM_FINISHED; /* Continue normally */
+         }
       }
 #pragma omp parallel default(shared) private(now, then2, then3)
-{
+      {
 #ifdef _OPENMP
-      int i, ret, thread_num = omp_get_thread_num(), scand_num;
+         int i, ret, thread_num = omp_get_thread_num(), scand_num;
 #else
-      int i, ret, thread_num = 0, scand_num;
+         int i, ret, thread_num = 0, scand_num;
 #endif
-      tm->termcodes[thread_num] = TM_UNFINISHED;
-      then  = wall_clock(NULL);
-      then2 = wall_clock(NULL);
-      then3 = wall_clock(NULL);
-      while (tm->termcode == TM_UNFINISHED){
-	 /*------------------------------------------------------------------*\
-	  * while there are nodes being processed or while there are nodes
-	  * waiting to be processed, continue to execute this loop
-	 \*------------------------------------------------------------------*/
-	 i = NEW_NODE__STARTED;
-	 while (tm->lp.free_num > 0
-		&& (tm->par.time_limit >= 0.0 ?
-		(wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE) &&
-		(tm->par.node_limit >= 0 ?
-		tm->stat.analyzed < tm->par.node_limit : TRUE)
-		&& ((tm->has_ub && (tm->stat.analyzed > 0 && tm->par.gap_limit >= 0.0)) ?
-		 d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) > tm->par.gap_limit : TRUE)
-		&& !(tm->par.find_first_feasible && tm->has_ub && 
-		     tm->lp_stat.ip_sols > 0) &&
-		!(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit) &&
-		c_count <= 0){
+         tm->termcodes[thread_num] = TM_UNFINISHED;
+         then  = wall_clock(NULL);
+         then2 = wall_clock(NULL);
+         then3 = wall_clock(NULL);
+         while (tm->termcode == TM_UNFINISHED){
+            /*------------------------------------------------------------------*\
+             * while there are nodes being processed or while there are nodes
+             * waiting to be processed, continue to execute this loop
+             \*------------------------------------------------------------------*/
+            i = NEW_NODE__STARTED;
+            while (tm->lp.free_num > 0
+                  && (tm->par.time_limit >= 0.0 ?
+                     (wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE) &&
+                  (tm->par.node_limit >= 0 ?
+                   tm->stat.analyzed < tm->par.node_limit : TRUE)
+                  && ((tm->has_ub && (tm->stat.analyzed > 0 && tm->par.gap_limit >= 0.0)) ?
+                     d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) > tm->par.gap_limit : TRUE)
+                  && !(tm->par.find_first_feasible && tm->has_ub && 
+                     tm->lp_stat.ip_sols > 0) &&
+                  !(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit) &&
+                  c_count <= 0){
 #pragma omp critical (tree_update)
-            {
-            scand_num = tm->samephase_candnum;
-            }
-	    if (scand_num > 0
+               {
+                  scand_num = tm->samephase_candnum;
+               }
+               if (scand_num > 0
 #ifndef __PVM__
-		&& (thread_num != 0 || tm->par.max_active_nodes == 1)
+                     && (thread_num != 0 || tm->par.max_active_nodes == 1)
 #endif
-		){
-	       i = start_node(tm, thread_num);
-	    }else{
-	       i = NEW_NODE__NONE;
-	    }
+                  ){
+                  i = start_node(tm, thread_num);
+               }else{
+                  i = NEW_NODE__NONE;
+               }
 #pragma omp master
-{
-   //printf("Master entering omp master thread %d\n", thread_num); 
-            now = wall_clock(NULL);
-	    if (tm->stat.analyzed>tm->active_node_num &&
-		tm->has_ub && tm->par.tighten_root_bounds){
-	       tighten_root_bounds(tm);
-	    }
-	    //printf("%f %f %f\n", now, then2, timeout2); 
-	    if (now - then2 > timeout2){
-	       if(tm->par.verbosity >= -1 ){
-		  print_tree_status(tm);
-	       }
-	       then2 = now;
-	    }
-	    if (now - then3 > timeout3){
-	       write_log_files(tm);
-	       then3 = now;
-	    }
- 
-	    if (ramp_up){
-	       ramp_up_tm += (wall_clock(NULL) -
-				no_work_start) * (tm->lp.free_num + 1);
-	    }
-	    if (ramp_down){
-	       ramp_down_time += (wall_clock(NULL) -
-				  no_work_start) * (tm->lp.free_num + 1);
-	    }
-	       
-	    if (!tm->lp.free_num){
-	       ramp_down = FALSE;
-	       ramp_up = FALSE;
-	    }else if (ramp_up){
-	       no_work_start = wall_clock(NULL);
-	    }else{
-	       ramp_down = TRUE;
-	       no_work_start = wall_clock(NULL);
-	    }
+               {
+                  //printf("Master entering omp master thread %d\n", thread_num); 
+                  now = wall_clock(NULL);
+                  if (tm->stat.analyzed>tm->active_node_num &&
+                        tm->has_ub && tm->par.tighten_root_bounds){
+                     tighten_root_bounds(tm);
+                  }
+                  //printf("%f %f %f\n", now, then2, timeout2); 
+                  if (now - then2 > timeout2){
+                     if(tm->par.verbosity >= -1 ){
+                        print_tree_status(tm);
+                     }
+                     then2 = now;
+                  }
+                  if (now - then3 > timeout3){
+                     write_log_files(tm);
+                     then3 = now;
+                  }
 
-}
+                  if (ramp_up){
+                     ramp_up_tm += (wall_clock(NULL) -
+                           no_work_start) * (tm->lp.free_num + 1);
+                  }
+                  if (ramp_down){
+                     ramp_down_time += (wall_clock(NULL) -
+                           no_work_start) * (tm->lp.free_num + 1);
+                  }
+
+                  if (!tm->lp.free_num){
+                     ramp_down = FALSE;
+                     ramp_up = FALSE;
+                  }else if (ramp_up){
+                     no_work_start = wall_clock(NULL);
+                  }else{
+                     ramp_down = TRUE;
+                     no_work_start = wall_clock(NULL);
+                  }
+
+               }
 #pragma omp master
-	    if(tm->par.node_selection_rule == DEPTH_FIRST_THEN_BEST_FIRST &&
-	       tm->has_ub){
-	      tm->par.node_selection_rule = LOWEST_LP_FIRST;
-	    }
+               if(tm->par.node_selection_rule == DEPTH_FIRST_THEN_BEST_FIRST &&
+                     tm->has_ub){
+                  tm->par.node_selection_rule = LOWEST_LP_FIRST;
+               }
 
-	    if (i != NEW_NODE__STARTED)
-	       break;
+               if (i != NEW_NODE__STARTED)
+                  break;
 
 #ifdef COMPILE_IN_LP
 #ifdef _OPENMP
-	    if (tm->par.verbosity > 1)
-	       printf("Thread %i now processing node %i\n", thread_num,
-		      tm->lpp[thread_num]->bc_index);
+               if (tm->par.verbosity > 1)
+                  printf("Thread %i now processing node %i\n", thread_num,
+                        tm->lpp[thread_num]->bc_index);
 #endif
 
-	    ret = process_chain(tm->lpp[thread_num]); 
+               ret = process_chain(tm->lpp[thread_num]); 
 
-	    switch(ret){
+               switch(ret){
 
-	     case FUNCTION_TERMINATED_NORMALLY:
-	       break;
-	       
-	     case ERROR__NO_BRANCHING_CANDIDATE:
-OPENMP_ATOMIC_WRITE
-	       tm->termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
-	       break;
-	       
-	     case ERROR__ILLEGAL_RETURN_CODE:
-OPENMP_ATOMIC_WRITE
-	       tm->termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
-	       break;
-	       
-	     case ERROR__NUMERICAL_INSTABILITY:
-OPENMP_ATOMIC_WRITE
-	       tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
-	       break;
-	       
-	     case ERROR__COMM_ERROR:
-OPENMP_ATOMIC_WRITE
-	       tm->termcode = TM_ERROR__COMM_ERROR;
-	       
-	     case ERROR__USER:
-OPENMP_ATOMIC_WRITE
-	       tm->termcode = TM_ERROR__USER;
-	       break;
+                  case FUNCTION_TERMINATED_NORMALLY:
+                     break;
 
-	     case ERROR__DUAL_INFEASIBLE:
-	       if(tm->lpp[thread_num]->bc_index < 1 ) {		  
-OPENMP_ATOMIC_WRITE
-		  tm->termcode = TM_UNBOUNDED;
-	       }else{
-OPENMP_ATOMIC_WRITE
-		  tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
-	       }
-	       break;	       
-	    }
+                  case ERROR__NO_BRANCHING_CANDIDATE:
+                     OPENMP_ATOMIC_WRITE
+                        tm->termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
+                     break;
+
+                  case ERROR__ILLEGAL_RETURN_CODE:
+                     OPENMP_ATOMIC_WRITE
+                        tm->termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
+                     break;
+
+                  case ERROR__NUMERICAL_INSTABILITY:
+                     OPENMP_ATOMIC_WRITE
+                        tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
+                     break;
+
+                  case ERROR__COMM_ERROR:
+                     OPENMP_ATOMIC_WRITE
+                        tm->termcode = TM_ERROR__COMM_ERROR;
+
+                  case ERROR__USER:
+                     OPENMP_ATOMIC_WRITE
+                        tm->termcode = TM_ERROR__USER;
+                     break;
+
+                  case ERROR__DUAL_INFEASIBLE:
+                     if(tm->lpp[thread_num]->bc_index < 1 ) {		  
+                        OPENMP_ATOMIC_WRITE
+                           tm->termcode = TM_UNBOUNDED;
+                     }else{
+                        OPENMP_ATOMIC_WRITE
+                           tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
+                     }
+                     break;	       
+               }
 #endif
-	 }
+            }
 
-	 if (tm->termcode != TM_UNFINISHED){
-	    break;
-	 }
-	 
+            if (tm->termcode != TM_UNFINISHED){
+               break;
+            }
+
 #pragma omp master
-{
-	 if (c_count > 0){
-	    tm->termcode = TM_SIGNAL_CAUGHT;
-	    c_count = 0;
-	 }
-}
+            {
+               if (c_count > 0){
+                  tm->termcode = TM_SIGNAL_CAUGHT;
+                  c_count = 0;
+               }
+            }
 
-         if (tm->par.time_limit >= 0.0 &&
-	     wall_clock(NULL) - start_time > tm->par.time_limit){
-	    tm->termcodes[thread_num] = TM_TIME_LIMIT_EXCEEDED;
-	 }else if (tm->par.node_limit >= 0 &&
-		   tm->stat.analyzed >= tm->par.node_limit){
-	    if (tm->active_node_num + tm->samephase_candnum > 0){
-	       tm->termcode = tm->termcodes[thread_num] = TM_NODE_LIMIT_EXCEEDED;
-	    }else{
-	       tm->termcodes[thread_num] = TM_FINISHED;
-	    }
-	 }else if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
-	    tm->termcodes[thread_num] = TM_FINISHED;
-	 }else if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
-	    find_tree_lb(tm);
-	    if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
-	       if (tm->lb < tm->ub){
-		  tm->termcodes[thread_num] = TM_TARGET_GAP_ACHIEVED;
-	       }else{
-		  tm->termcodes[thread_num] = TM_FINISHED;
-	       }
-	    }
-	 }
-	 if (tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
-	    tm->termcodes[thread_num] = TM_ITERATION_LIMIT_EXCEEDED;
-	 }
+            if (tm->par.time_limit >= 0.0 &&
+                  wall_clock(NULL) - start_time > tm->par.time_limit){
+               tm->termcodes[thread_num] = TM_TIME_LIMIT_EXCEEDED;
+            }else if (tm->par.node_limit >= 0 &&
+                  tm->stat.analyzed >= tm->par.node_limit){
+               if (tm->active_node_num + tm->samephase_candnum > 0){
+                  tm->termcode = tm->termcodes[thread_num] = TM_NODE_LIMIT_EXCEEDED;
+               }else{
+                  tm->termcodes[thread_num] = TM_FINISHED;
+               }
+            }else if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
+               tm->termcodes[thread_num] = TM_FINISHED;
+            }else if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+               find_tree_lb(tm);
+               if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
+                  if (tm->lb < tm->ub){
+                     tm->termcodes[thread_num] = TM_TARGET_GAP_ACHIEVED;
+                  }else{
+                     tm->termcodes[thread_num] = TM_FINISHED;
+                  }
+               }
+            }
+            if (tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
+               tm->termcodes[thread_num] = TM_ITERATION_LIMIT_EXCEEDED;
+            }
 
-         if (tm->termcodes[thread_num] != TM_UNFINISHED){
-OPENMP_ATOMIC_WRITE
-	    tm->termcode = tm->termcodes[thread_num];
-	    break;
-	 }
+            if (tm->termcodes[thread_num] != TM_UNFINISHED){
+               OPENMP_ATOMIC_WRITE
+                  tm->termcode = tm->termcodes[thread_num];
+               break;
+            }
 
-         if (tm->termcode != TM_UNFINISHED){
-	    tm->termcodes[thread_num] = tm->termcode;
-	    break;
-	 }
-	 
-	 if (i == NEW_NODE__ERROR){
-OPENMP_ATOMIC_WRITE
-	    tm->termcode = tm->termcodes[thread_num] = SOMETHING_DIED;
-	 }
+            if (tm->termcode != TM_UNFINISHED){
+               tm->termcodes[thread_num] = tm->termcode;
+               break;
+            }
 
-         if (tm->samephase_candnum == 0 && tm->active_node_num == 0 &&
-	     tm->stat.analyzed > 0){
-	    tm->termcodes[thread_num] = TM_FINISHED;
-	    break;
-	 }
-	 
+            if (i == NEW_NODE__ERROR){
+               OPENMP_ATOMIC_WRITE
+                  tm->termcode = tm->termcodes[thread_num] = SOMETHING_DIED;
+            }
+
+            if (tm->samephase_candnum == 0 && tm->active_node_num == 0 &&
+                  tm->stat.analyzed > 0){
+               tm->termcodes[thread_num] = TM_FINISHED;
+               break;
+            }
+
 #ifndef COMPILE_IN_LP
-	 struct timeval timeout = {5, 0};
-	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
-	 if (r_bufid && !process_messages(tm, r_bufid)){
-            find_tree_lb(tm);
-	    tm->termcode = SOMETHING_DIED;
-	    break;
-	 }
-#endif
-#pragma omp master
-{	    
-	 now = wall_clock(NULL);
-	 if (now - then > timeout4){
-	    if (!processes_alive(tm)){
+            struct timeval timeout = {5, 0};
+            r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
+            if (r_bufid && !process_messages(tm, r_bufid)){
                find_tree_lb(tm);
                tm->termcode = SOMETHING_DIED;
-	    }
-	    then = now;
-	 }
-#if 0
-         for (i = 0; i < tm->par.max_active_nodes; i++){
-	    if (tm->active_nodes[i]){
-	       break;
-	    }
-	 }
-	 if (i == tm->par.max_active_nodes){
-	    tm->active_node_num = 0;
-	 }
+               break;
+            }
 #endif
-	 if (now - then2 > timeout2){
-	    if(tm->par.verbosity >=0 ){
-	       print_tree_status(tm);
-	    }
-	    then2 = now;
-	 }
-	 if (now - then3 > timeout3){
-	    write_log_files(tm);
-	    then3 = now;
-	 }
-} // pragma
-      }
-} // pragma
+#pragma omp master
+            {	    
+               now = wall_clock(NULL);
+               if (now - then > timeout4){
+                  if (!processes_alive(tm)){
+                     find_tree_lb(tm);
+                     tm->termcode = SOMETHING_DIED;
+                  }
+                  then = now;
+               }
+#if 0
+               for (i = 0; i < tm->par.max_active_nodes; i++){
+                  if (tm->active_nodes[i]){
+                     break;
+                  }
+               }
+               if (i == tm->par.max_active_nodes){
+                  tm->active_node_num = 0;
+               }
+#endif
+               if (now - then2 > timeout2){
+                  if(tm->par.verbosity >=0 ){
+                     print_tree_status(tm);
+                  }
+                  then2 = now;
+               }
+               if (now - then3 > timeout3){
+                  write_log_files(tm);
+                  then3 = now;
+               }
+            } // pragma
+         }
+      } // pragma
 
       if (tm->termcode == TM_UNBOUNDED){
-	 break;
+         break;
       }
 
       if (tm->samephase_candnum == 0 && tm->active_node_num == 0 &&
-	  tm->stat.analyzed > 0){
-	 int ii = tm->par.max_active_nodes;
-        for (ii = 1; ii < tm->par.max_active_nodes; ii++){
-	   if (tm->termcodes[ii]  == TM_UNFINISHED){
-	      break;
-	   }
-	}
-	if (ii == tm->par.max_active_nodes){
-OPENMP_ATOMIC_WRITE
-	   tm->termcode = TM_FINISHED;
-	}else{
-	   if (now - then2 > timeout2){
-	      if(tm->par.verbosity >=0 ){
-		 printf("Waiting for all threads to exit...");
-		 print_tree_status(tm);
-	      }
-	      then2 = now;
-	   }
-	}
+            tm->stat.analyzed > 0){
+         int ii = tm->par.max_active_nodes;
+         for (ii = 1; ii < tm->par.max_active_nodes; ii++){
+            if (tm->termcodes[ii]  == TM_UNFINISHED){
+               break;
+            }
+         }
+         if (ii == tm->par.max_active_nodes){
+            OPENMP_ATOMIC_WRITE
+               tm->termcode = TM_FINISHED;
+         }else{
+            if (now - then2 > timeout2){
+               if(tm->par.verbosity >=0 ){
+                  printf("Waiting for all threads to exit...");
+                  print_tree_status(tm);
+               }
+               then2 = now;
+            }
+         }
       }
 
       if (tm->nextphase_candnum == 0)
-	 break;
+         break;
 
       if (tm->termcode != TM_UNFINISHED)
-	 break;
+         break;
    }
    find_tree_lb(tm);
    tm->comp_times.ramp_up_tm = ramp_up_tm;

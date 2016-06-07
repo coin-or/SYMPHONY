@@ -404,7 +404,25 @@ int user_send_lp_data(void *user, void **user_lp)
       Otherwise, this code should be virtually
       identical to that of user_receive_lp_data() in the LP process.*/
 
-   *user_lp = user;
+   user_problem *cblp_lp = (user_problem *) calloc(1, sizeof(user_problem));
+
+   *user_lp = (void *)cblp_lp;
+   
+   cblp_lp->par = prob->par;
+   cblp_lp->colnum = prob->colnum;
+   cblp_lp->rownum = prob->rownum;
+   cblp_lp->ccnum = prob->ccnum;
+   cblp_lp->ccind = prob->ccind;
+   cblp_lp->mip = prob->mip;
+
+   cblp_lp->feasible = prob->feasible;
+   cblp_lp->vvnum = prob->vvnum;
+   cblp_lp->vvind = (int *) calloc(prob->colnum, ISIZE);
+   cblp_lp->rowact = (double *) calloc(prob->rownum, DSIZE);
+   cblp_lp->feas_sol_size = prob->feas_sol_size;
+   cblp_lp->feas_sol = prob->feas_sol;
+   cblp_lp->aux = prob->aux;
+
 #else
    /* Here, we send that data using message passing and the rest is
       done in user_receive_lp_data() in the LP process */
@@ -579,7 +597,6 @@ int user_free_master(void **user)
 {
    user_problem *prob = (user_problem *) (*user);
 
-   FREE(prob->vvind);
    FREE(prob->ccind);
    FREE(prob->mip);
    FREE(prob);

@@ -81,7 +81,6 @@ typedef struct USER_PROBLEM{
    int              feasible;   /* Feasibility status of current LP relaxation */
    int             *vvind;      /* Var indices of violated complementarity constraints */
    int              vvnum;      /* Number of violated complementarity cons. Size of vvind */
-
    double          *rowact;     /* row activities of constraints of current LP relaxation */
 
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
