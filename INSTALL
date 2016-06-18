@@ -66,7 +66,7 @@ If you checked out the git repo, you can then obtain the dependencies by
 typing the following (this is unnecessary with SVN).
 
 {{{
-git clone --branch=stable/5.6 https://github.com/coin-or-tools/BuildTools/
+git clone --branch=stable/0.8 https://github.com/coin-or-tools/BuildTools/
 BuildTools/get.dependencies fetch
 }}}
 
