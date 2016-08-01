@@ -12,7 +12,6 @@ environment:
       ADD_PATH: /mingw32/bin
     - HOST_ARCH_ARG: --enable-msvc
       ADD_PATH: /mingw64/bin
-      
 
 install:
   - C:\"Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
@@ -25,3 +24,16 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; patch -p0 < SYMPHONY/Osi.patch"
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$PATH:$ADD_PATH; BuildTools/get.dependencies.sh build --monolithic --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --test"
 
+deploy:
+  provider: BinTray
+  username: tkralphs
+  api_key:
+    secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
+  subject: coin-or
+  repo: generic
+  package: SYMPHONY
+  version: 0.0.0
+  publish: true
+  override: true
+  explode: true
+  artifact: SYMPHONY\build\bin\sympony.exe
