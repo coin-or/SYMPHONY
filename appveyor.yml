@@ -36,4 +36,4 @@ deploy:
   publish: true
   override: true
   explode: true
-  artifact: SYMPHONY\build\bin\sympony.exe
+  artifact: /.*\.exe/
