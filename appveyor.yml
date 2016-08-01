@@ -36,4 +36,4 @@ deploy:
   publish: true
   override: true
   explode: true
-  artifact: /.*\.exe/
+  artifact: /.*\\build\\.*/
