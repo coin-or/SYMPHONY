@@ -31,6 +31,7 @@ build_script:
 
 after_build:
   - ps: echo $APPVEYOR_REPO_BRANCH
+  - cmd: echo %APPVEYOR_REPO_BRANCH%
   - ps: if ($APPVEYOR_REPO_BRANCH -eq "master"){$VERSION = "trunk"}else{$VERSION = $APPVEYOR_REPO_BRANCH -replace '.*(\d+\.\d+(\.\d+)).*', '$1'}
   - ps: echo $VERSION
   - cmd: echo %VERSION% 
