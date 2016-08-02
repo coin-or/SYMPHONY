@@ -32,10 +32,9 @@ build_script:
 after_build:
   - ps: if ($env:APPVEYOR_REPO_BRANCH -eq "master"){$VERSION = "trunk"}else{$VERSION = $env:APPVEYOR_REPO_BRANCH -replace '.*(\d+\.\d+(\.\d+)).*', '$1'}
   - ps: echo $VERSION
-  - cmd: echo %VERSION% 
-  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
-  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\lib
-  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\include
-  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\share
-  - curl -T %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip -utkralphs:%BINTRAY_API% https://api.bintray.com/content/coin-or/generic/%APPVEYOR_PROJECT_NAME%/%VERSION%/%APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip
+  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\bin
+  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\lib
+  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\include
+  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\share
+  - ps: curl -T $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip -utkralphs:$env:BINTRAY_API https://api.bintray.com/content/coin-or/generic/$env:APPVEYOR_PROJECT_NAME/$VERSION/$env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip
 
