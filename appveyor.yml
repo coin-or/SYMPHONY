@@ -6,11 +6,14 @@ environment:
     MSYS2_BASEVER: 20150512
     MSYS2_ARCH: x86_64
   matrix:
-    - HOST_ARCH_ARG: --host=x86_64-w64-mingw32
+    - ARCH: x86_64-w64-mingw32
+      HOST_ARCH_ARG: --host=x86_64-w64-mingw32
       ADD_PATH: /mingw64/bin
-    - HOST_ARCH_ARG: --host=i686-w64-mingw32
+    - ARCH: i686-w64-mingw32
+      HOST_ARCH_ARG: --host=i686-w64-mingw32
       ADD_PATH: /mingw32/bin
-    - HOST_ARCH_ARG: --enable-msvc
+    - ARCH: win32
+      HOST_ARCH_ARG: --enable-msvc
       ADD_PATH: /mingw64/bin
 
 install:
@@ -24,6 +27,13 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; patch -p0 < SYMPHONY/Osi.patch"
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$PATH:$ADD_PATH; BuildTools/get.dependencies.sh build --monolithic --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --test"
 
+after_build:
+  - 7z a -r %ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
+
+artifacts: 
+  -path: %ARCH%.zip
+   name: Binaries
+
 deploy:
   provider: BinTray
   username: tkralphs
@@ -36,4 +46,4 @@ deploy:
   publish: true
   override: true
   explode: true
-  artifact: /.*\\build\\.*/
+  artifact: %ARCH%.zip
