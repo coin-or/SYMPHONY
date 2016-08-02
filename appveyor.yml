@@ -28,10 +28,10 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$PATH:$ADD_PATH; BuildTools/get.dependencies.sh build --monolithic --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --test"
 
 after_build:
-  - 7z a -r %ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
+  - 7z a -r Binaries.zip %APPVEYOR_BUILD_FOLDER%\bin
 
 artifacts: 
-  - path: %ARCH%.zip
+  - path: Binaries.zip
     name: Binaries
 
 deploy:
@@ -46,4 +46,4 @@ deploy:
   publish: true
   override: true
   explode: true
-  artifact: %ARCH%.zip
+  artifact: Binaries.zip
