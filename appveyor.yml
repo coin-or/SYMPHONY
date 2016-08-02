@@ -30,9 +30,7 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$PATH:$ADD_PATH; BuildTools/get.dependencies.sh build --monolithic --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --test"
 
 after_build:
-  - ps: echo $APPVEYOR_REPO_BRANCH
-  - cmd: echo %APPVEYOR_REPO_BRANCH%
-  - ps: if ($APPVEYOR_REPO_BRANCH -eq "master"){$VERSION = "trunk"}else{$VERSION = $APPVEYOR_REPO_BRANCH -replace '.*(\d+\.\d+(\.\d+)).*', '$1'}
+  - ps: if ($env:APPVEYOR_REPO_BRANCH -eq "master"){$VERSION = "trunk"}else{$VERSION = $env:APPVEYOR_REPO_BRANCH -replace '.*(\d+\.\d+(\.\d+)).*', '$1'}
   - ps: echo $VERSION
   - cmd: echo %VERSION% 
   - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
