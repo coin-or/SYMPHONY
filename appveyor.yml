@@ -30,6 +30,10 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$PATH:$ADD_PATH; BuildTools/get.dependencies.sh build --monolithic --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --test"
 
 after_build:
-  - 7z a -r %ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
-  - curl -T %ARCH%.zip -utkralphs:%BINTRAY_API% https://api.bintray.com/content/coin-or/generic/%APPVEYOR_PROJECT_NAME%/0.0.0/%ARCH%.zip
+  - ps: if ($APPVEYOR_REPO_BRANCH -eq "master"){$VERSION = "trunk"}else{$VERSION = $APPVEYOR_REPO_BRANCH -relace '.*(\d+\.\d+(\.\d+)).*', '$1'} 
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\lib
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\include
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\share
+  - curl -T %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip -utkralphs:%BINTRAY_API% https://api.bintray.com/content/coin-or/generic/%APPVEYOR_PROJECT_NAME%/%VERSION%/%APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip
 
