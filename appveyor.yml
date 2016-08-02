@@ -5,6 +5,8 @@ environment:
   global:
     MSYS2_BASEVER: 20150512
     MSYS2_ARCH: x86_64
+    BINTRAY_API:
+      secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
   matrix:
     - ARCH: x86_64-w64-mingw32
       HOST_ARCH_ARG: --host=x86_64-w64-mingw32
@@ -28,22 +30,6 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$PATH:$ADD_PATH; BuildTools/get.dependencies.sh build --monolithic --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --test"
 
 after_build:
-  - 7z a -r Binaries.zip %APPVEYOR_BUILD_FOLDER%\bin
+  - 7z a -r %ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
+  - curl -T %ARCH%.zip -utkralphs:%BINTRAY_API% https://api.bintray.com/content/coin-or/generic/%APPVEYOR_PROJECT_NAME%/0.0.0/%ARCH%.zip
 
-artifacts: 
-  - path: Binaries.zip
-    name: Binaries
-
-deploy:
-  provider: BinTray
-  username: tkralphs
-  api_key:
-    secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
-  subject: coin-or
-  repo: generic
-  package: SYMPHONY
-  version: 0.0.0
-  publish: true
-  override: true
-  explode: true
-  artifact: Binaries.zip
