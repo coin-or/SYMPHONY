@@ -31,8 +31,8 @@ after_build:
   - 7z a -r %ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
 
 artifacts: 
-  -path: %ARCH%.zip
-   name: Binaries
+  - path: %ARCH%.zip
+    name: Binaries
 
 deploy:
   provider: BinTray
