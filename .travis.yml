@@ -39,6 +39,6 @@ script:
 after_script:
   - if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=trunk; else export VERSION=`echo $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
   - export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
-  - export TGZ_FILE=`echo $PROJECT-$VERSION-$PLATFORM.tgz
+  - export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
   - tar -czvf $TGZ_FILE SYMPHONY/lib/* SYMPHONY/bin/* SYMPHONY/include/* SYMPHONY/share/*
   - curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/generic/$PROJECT/$VERSION/$TGZ_FILE
