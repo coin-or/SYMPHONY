@@ -15,14 +15,18 @@ environment:
     - ARCH: i686-w64-mingw32
       HOST_ARCH_ARG: --host=i686-w64-mingw32
       ADD_PATH: /mingw32/bin
-    - ARCH: win32
+    - ARCH: win32-msvc12
+      HOST_ARCH_ARG: --enable-msvc
+      ADD_PATH: /mingw64/bin
+    - ARCH: win32-msvc14
       HOST_ARCH_ARG: --enable-msvc
       ADD_PATH: /mingw64/bin
 
 install:
   - for /f "delims=" %%i in ('C:\msys64\usr\bin\bash -lc "if [ $APPVEYOR_REPO_BRANCH = 'master' ]; then echo 'trunk'; else echo $APPVEYOR_REPO_BRANCH | cut -d "/" -f 2; fi"') do set VERSION=%%i
   - echo %VERSION%
-  - C:\"Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
+  - IF "%ARCH%"=="win32-msvc12" (C:\"Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat")
+  - IF "%ARCH%"=="win32-msvc14" (C:\"Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat")
   - C:\msys64\usr\bin\bash -lc ""
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S make wget tar patch dos2unix diffutils ca-certificates mingw-w64-i686-ca-certificates mingw-w64-x86_64-ca-certificates mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran"
 
