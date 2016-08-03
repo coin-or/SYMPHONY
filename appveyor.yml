@@ -7,6 +7,7 @@ environment:
     MSYS2_ARCH: x86_64
     BINTRAY_API:
       secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
+    BINTRAY_USERNAME: tkralphs
   matrix:
     - ARCH: x86_64-w64-mingw32
       HOST_ARCH_ARG: --host=x86_64-w64-mingw32
@@ -36,7 +37,8 @@ after_build:
   - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\lib
   - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\include
   - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\share
-  - ps: $CREDENTIAL = New-Object System.Management.Automation.PSCredential (tkralphs, $env:BINTRAY_API)
+  - ps: $bt_passwd = ConvertTo-SecureString “$env:BINTRAY_API” -AsPlainText -Force
+  - ps: $bt_credential = New-Object System.Management.Automation.PSCredential ($env:BINTRAY_USERNAME, $bt_passwd)
   - ps: $HEADERS = @{"X-Bintray-Package"=$env:APPVEYOR_PROJECT_NAME;"X-Bintray-Version"=$VERSION;"X-Bintray-Publish"=1;"X-Bintray-Override"=1;}
   - ps: $result = Invoke-WebRequest -Uri https://api.bintray.com/content/coin-or/generic/$env:APPVEYOR_PROJECT_NAME/$VERSION/$env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip -Credential $CREDENTIAL -Method PUT -Header $HEADERS -InFile $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip 
 
