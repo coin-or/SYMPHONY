@@ -31,10 +31,12 @@ build_script:
 
 after_build:
   - ps: if ($env:APPVEYOR_REPO_BRANCH -eq "master"){$VERSION = "trunk"}else{$VERSION = $env:APPVEYOR_REPO_BRANCH -replace '.*(\d+\.\d+(\.\d+)).*', '$1'}
-  - ps: echo $VERSION
+  - ps: Write-Host $VERSION
   - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\bin
   - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\lib
   - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\include
   - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\share
-  - ps: curl -T $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip -utkralphs:$env:BINTRAY_API https://api.bintray.com/content/coin-or/generic/$env:APPVEYOR_PROJECT_NAME/$VERSION/$env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip
+  - $CREDENTIAL = New-Object System.Management.Automation.PSCredential (tkralphs, $env:BINTRAY_API)
+  - $HEADERS = @{"X-Bintray-Package=$env:APPVEYOR_PROJECT_NAME;"X-Bintray-Version=$VERSION;"X-Bintray-Publish"=1;X-Bintray-Override=1;}
+  - ps: $result = Invoke-WebRequest -Uri https://api.bintray.com/content/coin-or/generic/$env:APPVEYOR_PROJECT_NAME/$VERSION/$env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip -Credential $CREDENTIAL -Method PUT -Header $HEADERS -InFile $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip 
 
