@@ -9,26 +9,26 @@ environment:
       secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
     BINTRAY_USERNAME: tkralphs
   matrix:
-    - ARCH: x86_64-w64-mingw32
-      HOST_ARCH_ARG: --host=x86_64-w64-mingw32
-      ADD_PATH: /mingw64/bin
-    - ARCH: i686-w64-mingw32
-      HOST_ARCH_ARG: --host=i686-w64-mingw32
-      ADD_PATH: /mingw32/bin
     - ARCH: win32-msvc12
       HOST_ARCH_ARG: --enable-msvc
       ADD_PATH: /mingw64/bin
     - ARCH: win32-msvc14
       HOST_ARCH_ARG: --enable-msvc
       ADD_PATH: /mingw64/bin
+    - ARCH: x86_64-w64-mingw32
+      HOST_ARCH_ARG: --host=x86_64-w64-mingw32
+      ADD_PATH: /mingw64/bin
+    - ARCH: i686-w64-mingw32
+      HOST_ARCH_ARG: --host=i686-w64-mingw32
+      ADD_PATH: /mingw32/bin
 
 install:
   - for /f "delims=" %%i in ('C:\msys64\usr\bin\bash -lc "if [ $APPVEYOR_REPO_BRANCH = 'master' ]; then echo 'trunk'; else echo $APPVEYOR_REPO_BRANCH | cut -d "/" -f 2; fi"') do set VERSION=%%i
   - echo %VERSION%
-  - IF "%ARCH%"=="win32-msvc12" (C:\"Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat")
-  - IF "%ARCH%"=="win32-msvc14" (C:\"Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat")
+  - IF %ARCH%==win32-msvc12 (CALL C:\"Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat")
+  - IF %ARCH%==win32-msvc14 (CALL C:\"Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat")
   - C:\msys64\usr\bin\bash -lc ""
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S make wget tar patch dos2unix diffutils ca-certificates mingw-w64-i686-ca-certificates mingw-w64-x86_64-ca-certificates mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran"
+  - C:\msys64\usr\bin\bash -lc "which cl"
 
 build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; git clone --branch=stable/0.8 https://github.com/coin-or-tools/BuildTools"
