@@ -20,6 +20,8 @@ environment:
       ADD_PATH: /mingw64/bin
 
 install:
+  - for /f "delims=" %i in ('C:\msys64\usr\bin\bash -lc "if [ $APPVEYOR_REPO_BRANCH = 'master' ]; then echo 'trunk'; else echo $APPVEYOR_REPO_BRANCH | cut -d "/" -f 2; fi"') do set VERSION=%i
+  - echo %VERSION%
   - C:\"Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
   - C:\msys64\usr\bin\bash -lc ""
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S make wget tar patch dos2unix diffutils ca-certificates mingw-w64-i686-ca-certificates mingw-w64-x86_64-ca-certificates mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran"
@@ -31,14 +33,9 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$PATH:$ADD_PATH; BuildTools/get.dependencies.sh build --monolithic --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --test"
 
 after_build:
-  - ps: if ($env:APPVEYOR_REPO_BRANCH -eq "master"){$VERSION = "trunk"}else{$VERSION = $env:APPVEYOR_REPO_BRANCH -replace '.*(\d+\.\d+(\.\d+)).*', '$1'}
-  - ps: Write-Host $VERSION
-  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\bin
-  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\lib
-  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\include
-  - ps: 7z a -r $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip $env:APPVEYOR_BUILD_FOLDER\share
-  - ps: $bt_passwd = ConvertTo-SecureString “$env:BINTRAY_API” -AsPlainText -Force
-  - ps: $bt_credential = New-Object System.Management.Automation.PSCredential ($env:BINTRAY_USERNAME, $bt_passwd)
-  - ps: $HEADERS = @{"X-Bintray-Package"=$env:APPVEYOR_PROJECT_NAME;"X-Bintray-Version"=$VERSION;"X-Bintray-Publish"=1;"X-Bintray-Override"=1;}
-  - ps: $result = Invoke-WebRequest -Uri https://api.bintray.com/content/coin-or/generic/$env:APPVEYOR_PROJECT_NAME/$VERSION/$env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip -Credential $CREDENTIAL -Method PUT -Header $HEADERS -InFile $env:APPVEYOR_PROJECT_NAME-$VERSION-$env:ARCH.zip 
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\include
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\lib
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\share
+  - curl -T %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip -utkralphs:%BINTRAY_API% https://api.bintray.com/content/coin-or/generic/%APPVEYOR_PROJECT_NAME%/%VERSION%/%ARCH%.zip
 
