@@ -1,7 +1,8 @@
 language: cpp
 env:
   global: 
-    - secure: "gngXreGlUA1bOulP+Qjj7C2SbOC8oh5tewD039f/VHNbw01EsQA4cLYTgpIOxr+AhlDgBmn6h/o3b+Rql9Jv/trtBxYmrlpNxoZP9XdrcjfFeMThehbwABrqA5U8WU51Fuvnw4ogHzItV9xea5yetSSwO7S30P0eoYdfUwIa/gtCB9No+Ry+qZntupmw9Dt+Gy+Cb6JDT0feuegbxXmY3cjyX48+Je2TvZyJ+pKIuMDNNRwI4eW7kEDItP0grN8O8hGRKEYQnKjawEYKp5g+l6lSs1Ti4g68EtZPdtDzeW/aqfpLbAXUzUG/6hAe/kockioCuJI+Ut/ANoWfUoV0YxlfvqfOTfjU2xM648BWHeHO214f+0uXs18oxaDpv4JLKZHgL+F8+kMAEwRWmtpWp5oztZyAmFdJF8D9j9Tv/v47xZdvCNlkhrfO3UqS8SSAmzbVYK/x1mCxUdaWSdYLVLgVZRLOupTo2HzhiSzCJ+Epv5I/usPSeJtdN/w/NWfLhev4KoODd/74+u58YAoArQyRV/GMqXD6MnTqyieDdM6oVd6U2zS2yqr1Mim/NOBc82NejMO9zoodMGpankHSx/FKxbhiMc0ArAradIABmmXsd9BS018McMZj5iKq1VzZ4ahvwv4d2Pgliyd1CTCx+14YCtVvtZ6UW4Iq+aI7ejo="
+    - secure: "KXrNrSs66/J5fb8pRYTUhIjEiXizlZ7p0xVROPla+GWfwyLJIAiswbwYOBpR1kSTn51E+j6j14UWL36GC31TK5WXRJoWoyVXi1RH+zZfvESAwqI6OmhzTWQd84fyXJ+vx5Yg0qEhPGH0HFGaNrpAvsBtr8lmsoLgocEaMikqxQ8="
+    - secure: "DNKV1qVOY7tq3w0w6jVbZ56kEY9ufUJbx0AijxDnrvj8gVjjVEyz50kphfwSj1MdnSonpkPscsv/njxEKQym1m6AsKxBUA4DAeOIRfb91fHlVRXZHMuQD5f7JjeTSzw0PS31SvkQ477PleW14yr36jvd3SF/4SbQqVSn6wbvRHY="
     
 matrix:
   include:
@@ -26,6 +27,7 @@ matrix:
     - os: osx
 
 before_script:
+  - echo $TEST
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then  export PLATFORM=osx$OSX-x86_64-clang`clang -dumpversion`; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$OSX" == "10.10" ]]; then brew update; brew install gcc; export PLATFORM=osx10.10-x86_64-clang`clang -dumpversion`; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PLATFORM=linux-x86_64-gcc`gcc -dumpversion`; fi
@@ -41,6 +43,5 @@ after_script:
   - export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
   - export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
   - echo $TGZ_FILE
-  - ls SYMPHONY
-  - tar -czvf $TGZ_FILE SYMPHONY/lib/* SYMPHONY/bin/* SYMPHONY/include/* SYMPHONY/share/*
+  - tar -czvf $TGZ_FILE build/lib/* build/bin/* build/include/* build/share/*
   - curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/generic/$PROJECT/$VERSION/$TGZ_FILE
