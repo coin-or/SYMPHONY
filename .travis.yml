@@ -2,7 +2,6 @@ language: cpp
 env:
   global: 
     - secure: "KXrNrSs66/J5fb8pRYTUhIjEiXizlZ7p0xVROPla+GWfwyLJIAiswbwYOBpR1kSTn51E+j6j14UWL36GC31TK5WXRJoWoyVXi1RH+zZfvESAwqI6OmhzTWQd84fyXJ+vx5Yg0qEhPGH0HFGaNrpAvsBtr8lmsoLgocEaMikqxQ8="
-    - secure: "DNKV1qVOY7tq3w0w6jVbZ56kEY9ufUJbx0AijxDnrvj8gVjjVEyz50kphfwSj1MdnSonpkPscsv/njxEKQym1m6AsKxBUA4DAeOIRfb91fHlVRXZHMuQD5f7JjeTSzw0PS31SvkQ477PleW14yr36jvd3SF/4SbQqVSn6wbvRHY="
     
 matrix:
   include:
@@ -27,7 +26,6 @@ matrix:
     - os: osx
 
 before_script:
-  - echo $TEST
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then  export PLATFORM=osx$OSX-x86_64-clang`clang -dumpversion`; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$OSX" == "10.10" ]]; then brew update; brew install gcc; export PLATFORM=osx10.10-x86_64-clang`clang -dumpversion`; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PLATFORM=linux-x86_64-gcc`gcc -dumpversion`; fi
@@ -44,4 +42,4 @@ after_script:
   - export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
   - echo $TGZ_FILE
   - tar -czvf $TGZ_FILE build/lib/* build/bin/* build/include/* build/share/*
-  - curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/generic/$PROJECT/$VERSION/$TGZ_FILE
+  - curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/download/$PROJECT/$VERSION/$TGZ_FILE
