@@ -26,6 +26,10 @@ installation and usage. Please see the documentation for more details.
 *                              INSTALLATION                                  *
 ******************************************************************************
 
+Binaries for most platforms are available for download from Bintray:
+
+https://bintray.com/coin-or/download/SYMPHONY
+
 If you downloaded a source distribution and would like instructions on
 building SYMPHONY or you downloaded a binary distribution and would like to
 know how to install it, please see the INSTALL file.
