@@ -440,12 +440,14 @@ int resolve_node(sym_environment *env, bc_node *node)
       return_value == LP_D_INFEASIBLE){
       node->feasibility_status = INFEASIBLE_PRUNED;
       node->node_status = NODE_STATUS__PRUNED;
+#ifdef SENSITIVITY_ANALYSIS
       if (lp_data->raysol){
 	 if (!node->rays){
 	    node->rays = (double *) malloc(lp_data->m*DSIZE);
 	 }
 	 memcpy(node->rays, lp_data->raysol, lp_data->m*DSIZE);
       }
+#endif
    }
 
    if(return_value == LP_OPTIMAL || return_value == LP_D_OBJLIM || 
@@ -508,12 +510,14 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    node->node_status = NODE_STATUS__CANDIDATE;
 	 }
       }
+#ifdef SENSITIVITY_ANALYSIS
       if (lp_data->dualsol){
 	 if (!node->duals){
 	    node->duals = (double *) malloc(lp_data->m*DSIZE);
 	 }
 	 memcpy(node->duals, lp_data->dualsol, lp_data->m*DSIZE);
       }
+#endif
    }
 
    for(i = 0; i < 2*(level+1)+BB_BUNCH; i++){
@@ -1245,6 +1249,7 @@ int copy_node(warm_start_desc *ws, bc_node * n_to, bc_node *n_from)
       }
    }
 
+#ifdef SENSITIVITY_ANALYSIS
    //FIXME: This is a bit fragile. Assumes variable list doesn't
    //change, etc.
    if (n_from->duals){
@@ -1258,6 +1263,7 @@ int copy_node(warm_start_desc *ws, bc_node * n_to, bc_node *n_from)
       memcpy(n_to->rays, n_from->rays,
 	     n_from->desc.uind.size*DSIZE);
    }
+#endif
    
 #ifdef TRACE_PATH
    n_to->optimal_path = n_from->optimal_path;

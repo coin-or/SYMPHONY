@@ -202,10 +202,12 @@ typedef struct LPDATA{
    double    *x;           /* maxn */ /* BB */
    double    *dj;          /* maxn */ /* BB */
    double    *dualsol;     /* maxm */ /* BB */
+#ifdef SENSITIVITY_ANALYSIS
    //Anahita
    double    *raysol;
    double    intcpt;
    //
+#endif
    double    *slacks;      /* maxm */
    double    *ub;
    double    *lb;

@@ -1696,10 +1696,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
                //get_x(lp_data);
+#ifdef SENSITIVITY_ANALYSIS
 	       //Anahita
 	       can->intcpt[j] = lp_data->intcpt;
 	       
-#ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
                   get_dj_pi(lp_data);
 		  if (p->par.sensitivity_rhs){
@@ -1820,10 +1820,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
 
+#ifdef SENSITIVITY_ANALYSIS
 	       //Anahita
 	       can->intcpt[j] = lp_data->intcpt;
 
-#ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
                   get_dj_pi(lp_data);
 		  if (p->par.sensitivity_rhs){
