@@ -34,7 +34,7 @@ before_script:
 
 script:
   - patch -p0 < SYMPHONY/Osi.patch
-  - bash BuildTools/get.dependencies.sh build --verbosity=1 --test
+  - bash BuildTools/get.dependencies.sh build --verbosity=2 --test
 
 after_script:
   - if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=trunk; else export VERSION=`echo $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
