@@ -59,8 +59,9 @@ typedef struct TM_PROB{
    int             has_ub;
    char            has_ub_estimate;
    double          start_time;
-   double          ub;       /* the best global upper bound found */
-   double          lb;       /* the best global lower bound known */
+   double          ub;         /* the best global upper bound found */
+   double          lb;         /* the best global lower bound known */
+   double          printed_lb; /* the lower bound we print for user */
    lp_sol          best_sol;
    double          obj_offset; /* constant to be added to the objective value*/
    char            obj_sense;  /* objective sense*/

@@ -518,6 +518,15 @@ void send_node_desc(lp_prob *p, int node_type)
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;   
+#ifdef DO_TESTS
+   if (n->bc_index && (n->lower_bound < p->tm->lb - .001 ||
+                       n->lower_bound < n->parent->lower_bound - .001)){
+      printf("#####Warning: lower bound decrease detected\n");
+      printf("     From parent: %f\n", n->parent->lower_bound - n->lower_bound);
+      printf("     From global: %f\n", p->tm->lb - n->lower_bound);
+   }
+#endif
+
    p->tm->stat.analyzed++;
    
    if (p->bc_level > 0) {
@@ -655,7 +664,9 @@ void send_node_desc(lp_prob *p, int node_type)
    if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
       n->node_status = (node_type == TIME_LIMIT ?
 			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
-      n->lower_bound = lp_data->objval;
+      //I think lp_data->objval is the latest objective value from branching subproblem
+      //here and thus is not valid 
+      //n->lower_bound = lp_data->objval;
       insert_new_node(tm, n);
       if (!repricing)
 	 return;
@@ -663,7 +674,17 @@ void send_node_desc(lp_prob *p, int node_type)
 
    if (!repricing || n->node_status != NODE_STATUS__PRUNED){
 
-      n->lower_bound = lp_data->objval;
+#ifdef DO_TESTS
+      if (n->bc_index && (n->lower_bound < p->tm->lb - .001 ||
+                          n->lower_bound < n->parent->lower_bound - .001)){
+         printf("#####Warning: lower bound decrease detected\n");
+         printf("     From parent: %f\n", n->parent->lower_bound - n->lower_bound);
+         printf("     From global: %f\n", p->tm->lb - n->lower_bound);
+      }
+#endif
+      //I think lp_data->objval is the latest objective value from branching subproblem
+      //here and thus is not valid 
+      //n->lower_bound = lp_data->objval;
 
       new_lp_desc = create_explicit_node_desc(p);
       

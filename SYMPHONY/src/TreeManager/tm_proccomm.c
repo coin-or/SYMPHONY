@@ -700,7 +700,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    receive_dbl_array(&n->lower_bound, 1);
 #ifdef DO_TESTS
    if (n->lower_bound < old_lower_bound - 10){
-      printf("#####Error: lower bound descrease in node from %.3f to %.3f\n",
+      printf("#####Error: lower bound decrease in node from %.3f to %.3f\n",
 	     old_lower_bound, n->lower_bound);
    }
 #endif

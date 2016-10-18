@@ -461,6 +461,11 @@ OPENMP_ATOMIC_UPDATE
 	    PRINT(verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 #ifdef COMPILE_IN_LP
+#ifdef DO_TESTS
+            if (lp_data->objval < p->tm->lb - .001 && p->bc_index > 0){
+               printf("#####Warning: lower bound corruption detected\n");
+            }
+#endif
 	    p->tm->active_nodes[p->proc_index]->lower_bound = lp_data->objval;
             if (p->node_iter_num < 2 && p->bc_index > 0 && 
                   p->par.should_use_rel_br) {
