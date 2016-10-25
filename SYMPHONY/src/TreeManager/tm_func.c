@@ -393,15 +393,17 @@ int solve(tm_prob *tm)
 	    }
  
 	    if (ramp_up){
-	       ramp_up_tm += (wall_clock(NULL) -
-				no_work_start) * (tm->lp.free_num + 1);
+	       ramp_up_tm = wall_clock(NULL) - start_time;
 	    }
 	    if (ramp_down){
-	       ramp_down_time += (wall_clock(NULL) -
-				  no_work_start) * (tm->lp.free_num + 1);
+	       ramp_down_time += wall_clock(NULL) - no_work_start;
 	    }
 	       
-	    if (!tm->lp.free_num){
+#ifdef COMPILE_IN_LP
+	    if (tm->active_node_num >= tm->par.max_active_nodes-1){
+#else
+            if (!tm->lp.free_num){
+#endif
 	       ramp_down = FALSE;
 	       ramp_up = FALSE;
 	    }else if (ramp_up){
