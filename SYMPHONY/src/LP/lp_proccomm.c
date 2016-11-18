@@ -1604,6 +1604,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 	 }
       }while (! r_bufid);
       receive_char_array(&dive, 1);
+      receive_int_array(keep, 1);
       /* get the new nodenum (and the index of the branching cut if unknown)
        * if we dive */
       p->comp_times.idle_diving += wall_clock(NULL) - start;

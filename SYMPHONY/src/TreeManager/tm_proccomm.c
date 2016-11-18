@@ -972,6 +972,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
       s_bufid = init_send(DataInPlace);
       ch = (char) dive;
       send_char_array(&ch, 1);
+      send_int_array(&keep, 1);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
 	 /* Give the index of the node kept and also the index of the
 	  * branching cut if necessary */
