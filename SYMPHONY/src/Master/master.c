@@ -218,7 +218,7 @@ int sym_set_defaults(sym_environment *env)
    /************************* Global defaults ********************************/
    env->ub = 0;
    env->has_ub = FALSE;
-   env->lb = -MAXDOUBLE;
+   env->lb = -SYM_INFINITY;
    env->termcode = TM_NO_PROBLEM;
    env->par.verbosity = 0;
    env->par.random_seed = 17;

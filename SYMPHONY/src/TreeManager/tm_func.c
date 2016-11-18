@@ -406,6 +406,7 @@ int solve(tm_prob *tm)
 #endif
 	       ramp_down = FALSE;
 	       ramp_up = FALSE;
+               //printf("Ramp-up %f %d %d\n", ramp_up_tm, tm->par.max_active_nodes, tm->active_node_num);
 	    }else if (ramp_up){
 	       no_work_start = wall_clock(NULL);
 	    }else{
@@ -1519,9 +1520,10 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }
 #endif
 	 if (tm->par.keep_description_of_pruned == DISCARD ||
-	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
+	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL ||
+             tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL){
 	    child->parent = node;
-	    if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
+	    if (tm->par.keep_description_of_pruned != DISCARD)
 #pragma omp critical (write_pruned_node_file)
 	       write_pruned_nodes(tm, child);
 #pragma omp critical (tree_update)
@@ -1537,118 +1539,13 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		default:
 		  vbc_node_pr_reason = VBC_PRUNED;
 	       }
-	       /* following is no longer needed because this care is taken
-		* care of in install_new_ub
-		*/
-	       /*
-	       if (feasible[i]) {
-		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
-	       }
-	       */
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
 				  VBC_PRUNED);
 	    }
-
-	    if (--child_num == 0){
-	       *keep = -1;
-	       return(DO_NOT_DIVE);
-	    }
-	    if (*keep == child_num) *keep = i;
-#ifdef TRACE_PATH
-	    if (optimal_path == child_num) optimal_path = i;
-#endif
-	    action[i] = action[child_num];
-	    objval[i] = objval[child_num];
-	    feasible[i--] = feasible[child_num];
-	    continue;
-	 }
-      }else{
-	 child->node_status = NODE_STATUS__CANDIDATE;
-	 /* child->lp = child->cg = 0;   zeroed out by calloc */
-	 child->cp = node->cp;
-      }
-
-      /* child->children = NULL;   zeroed out by calloc */
-      /* child->child_num = 0;   zeroed out by calloc */
-      /* child->died = 0;   zeroed out by calloc */
-      desc = &child->desc;
-      /* all this is set by calloc
-       * desc->uind.type = 0;            WRT_PARENT and no change
-       * desc->uind.size = 0;
-       * desc->uind.added = 0;
-       * desc->uind.list = NULL;
-       
-       * desc->not_fixed.type = 0;       WRT_PARENT and no change
-       * desc->not_fixed.size = 0;
-       * desc->not_fixed.added = 0;
-       * desc->not_fixed.list = NULL;
-
-       * desc->cutind.type = 0;          WRT_PARENT and no change
-       * desc->cutind.size = 0;
-       * desc->cutind.added = 0;
-       * desc->cutind.list = NULL;
-
-       * desc->basis.basis_exists = FALSE;    This has to be validated!!!
-       * desc->basis.{[base,extra][rows,vars]}
-                    .type = 0;           WRT_PARENT and no change
-                    .size = 0;
-		    .list = NULL;
-		    .stat = NULL;
-       */
-
-      if (node->desc.basis.basis_exists){
-	 desc->basis.basis_exists = TRUE;
-      }
-
-      /* If we have a non-base, new branching cut then few more things
-         might have to be fixed */
-      if (new_branching_cut && bobj->name >= 0){
-	 /* Fix cutind and the basis description */
-	 desc->cutind.size = 1;
-	 desc->cutind.added = 1;
-	 desc->cutind.list = (int *) malloc(ISIZE);
-	 desc->cutind.list[0] = bobj->name;
-	 if (desc->basis.basis_exists){
-	    desc->basis.extrarows.size = 1;
-	    desc->basis.extrarows.list = (int *) malloc(ISIZE);
-	    desc->basis.extrarows.list[0] = bobj->name;
-	    desc->basis.extrarows.stat = (int *) malloc(ISIZE);
-	    desc->basis.extrarows.stat[0] = SLACK_BASIC;
-	 }
-      }
-
-      desc->desc_size = node->desc.desc_size;
-      desc->desc = node->desc.desc;
-      desc->nf_status = node->desc.nf_status;
-
-
-#ifdef SENSITIVITY_ANALYSIS
-      if (tm->par.sensitivity_analysis && 
-	  action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
-	 child->duals = bobj->duals[i];
-	 bobj->duals[i] = 0;
-      }
-#endif
-
-      if (child->node_status != NODE_STATUS__PRUNED && feasible[i]){
-	 if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	    child->sol_size = bobj->sol_sizes[i];
-	    child->sol_ind = bobj->sol_inds[i];
-	    bobj->sol_inds[i]=0;
-	    child->sol = bobj->solutions[i];
-	    bobj->solutions[i] = 0;
-	    child->feasibility_status = NOT_PRUNED_HAS_CAN_SOLUTION;
-	 }
-      }
-      
-      if (child->node_status == NODE_STATUS__PRUNED){
-
-	 if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	 
+	 }else{ /* tm->par.keep_description_of_pruned == KEEP_IN_MEMORY */
 	    child->feasibility_status = OVER_UB_PRUNED;	   
-	    
 	    if (feasible[i]){
 	       child->sol_size = bobj->sol_sizes[i];
 	       child->sol_ind = bobj->sol_inds[i];
@@ -1657,68 +1554,83 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       bobj->solutions[i] = 0;
 	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	    }
-
 	    if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
 	       child->feasibility_status = INFEASIBLE_PRUNED;
 	    }
 	 }
+      }else{
+	 child->node_status = NODE_STATUS__CANDIDATE;
+	 /* child->lp = child->cg = 0;   zeroed out by calloc */
+	 child->cp = node->cp;
+         if (feasible[i]){
+            if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+               child->sol_size = bobj->sol_sizes[i];
+               child->sol_ind = bobj->sol_inds[i];
+               bobj->sol_inds[i]=0;
+               child->sol = bobj->solutions[i];
+               bobj->solutions[i] = 0;
+               child->feasibility_status = NOT_PRUNED_HAS_CAN_SOLUTION;
+            }
+         }
+      }
 
-#ifdef TRACE_PATH
-	 if (child->optimal_path){
-	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
-	    sleep(600);
-	    if (tm->par.logging){
-	       write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
-	       write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
-			     TRUE, tm->par.logging);
-	       write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
-	    }
-	    exit(1);
-	 }
+      if (child->node_status == NODE_STATUS__CANDIDATE ||
+          tm->par.keep_description_of_pruned != DISCARD){
+         desc = &child->desc;
+         
+         if (node->desc.basis.basis_exists){
+            desc->basis.basis_exists = TRUE;
+         }
+         
+         /* If we have a non-base, new branching cut then few more things
+            might have to be fixed */
+         if (new_branching_cut && bobj->name >= 0){
+            /* Fix cutind and the basis description */
+            desc->cutind.size = 1;
+            desc->cutind.added = 1;
+            desc->cutind.list = (int *) malloc(ISIZE);
+            desc->cutind.list[0] = bobj->name;
+            if (desc->basis.basis_exists){
+               desc->basis.extrarows.size = 1;
+               desc->basis.extrarows.list = (int *) malloc(ISIZE);
+               desc->basis.extrarows.list[0] = bobj->name;
+               desc->basis.extrarows.stat = (int *) malloc(ISIZE);
+               desc->basis.extrarows.stat[0] = SLACK_BASIC;
+            }
+         }
+         
+         desc->desc_size = node->desc.desc_size;
+         desc->desc = node->desc.desc;
+         desc->nf_status = node->desc.nf_status;
+         
+#ifdef SENSITIVITY_ANALYSIS
+         if (tm->par.sensitivity_analysis && 
+             action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
+            child->duals = bobj->duals[i];
+            bobj->duals[i] = 0;
+         }
 #endif
-	 if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
-	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
-#pragma omp critical (write_pruned_node_file)
-	    write_pruned_nodes(tm, child);
-#pragma omp critical (tree_update)
-	    if (tm->par.vbc_emulation== VBC_EMULATION_FILE_NEW) {
-	       int vbc_node_pr_reason;
-	       switch (action[i]) {
-		case PRUNE_THIS_CHILD_INFEASIBLE:
-		  vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
-		  break;
-		case PRUNE_THIS_CHILD_FATHOMABLE:
-		  vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
-		  break;
-		default:
-		  vbc_node_pr_reason = VBC_PRUNED;
-	       }
-	       /* following is no longer needed because this care is taken
-		* care of in install_new_ub
-		*/
-	       /*
-		  if (feasible[i]) {
-		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
-	       }
-	       */
-	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
-	    } else {
-	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-				  VBC_PRUNED);
-	    }
+      }
 
-	    if (--child_num == 0){
-	       *keep = -1;
-	       return(DO_NOT_DIVE);
-	    }
-	    if (*keep == child_num) *keep = i;
+      if (child->node_status == NODE_STATUS__PRUNED){
+         if (--child_num == 0){
+            *keep = -1;
+            return(DO_NOT_DIVE);
+         }
+         if (*keep == child_num){
+            *keep = i;
+         }else if (*keep == i){
+            /*We pruned the child we were supposed to keep*/
+            dive = DO_NOT_DIVE;
+         }
 #ifdef TRACE_PATH
-	    if (optimal_path == child_num) optimal_path = i;
+         if (optimal_path == child_num){
+            optimal_path = i;
+         }
 #endif
-	    action[i] = action[child_num];
-	    objval[i] = objval[child_num];
-	    feasible[i--] = feasible[child_num];
-	 }
+         action[i] = action[child_num];
+         objval[i] = objval[child_num];
+         feasible[i--] = feasible[child_num];
 	 continue;
       }
 
@@ -3984,7 +3896,7 @@ void sym_catch_c(int num)
 
 int find_tree_lb(tm_prob *tm)
 {
-   double lb = MAXDOUBLE;
+   double lb = -SYM_INFINITY;
    bc_node **samephase_cand;
 
 #pragma omp critical (tree_update)
@@ -4040,7 +3952,7 @@ int find_tree_lb(tm_prob *tm)
    // In parallel execution, the lower bound can be slightly non-monotonic in rare
    // circumstances. This is algorithmically expected, but we keep the bound in the output
    // non-monotonic because this is what the user expects. 
-   if (tm->stat.analyzed <= 1){
+   if (tm->stat.analyzed <= 1 || tm->printed_lb >= SYM_INFINITY){
       tm->printed_lb = lb;
    }else{
       tm->printed_lb = MAX(lb, tm->printed_lb);
