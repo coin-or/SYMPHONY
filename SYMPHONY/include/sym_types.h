@@ -285,11 +285,7 @@ typedef struct BRANCH_OBJ{
 /*===========================================================================*/
 
 typedef struct STR_INT{
-#ifdef _OPENMP
-   char      *str;
-#else
    char       str[MAX_LINE_LENGTH +1];
-#endif
    int        code;
 }str_int;
 
