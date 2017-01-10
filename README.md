@@ -10,7 +10,9 @@ and is freely redistributable. All source code and documentation is Copyright
 
 [![Build status](https://ci.appveyor.com/api/projects/status/220ltxwv2w2ac51s/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/symphony/branch/master)
 
-[ ![Download](https://api.bintray.com/packages/coin-or/download/SYMPHONY/images/download.svg) ](https://bintray.com/coin-or/download/SYMPHONY/5.6)
+[ ![Download](https://api.bintray.com/packages/coin-or/download/SYMPHONY/images/download.svg?version=5.6) ](https://bintray.com/coin-or/download/SYMPHONY/5.6)
+
+[![DOI](https://zenodo.org/badge/23689820.svg)](https://zenodo.org/badge/latestdoi/23689820)
 
 # DOCUMENTATION
 
