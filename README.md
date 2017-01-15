@@ -253,6 +253,11 @@ Laboratories" funded by the German Federal Ministry of Education and Research
 ### Release 5.6.15
   * Fix for configuration issue with OpenMP when building with Visual Studio
     compiler under Msys2
+  * Fix for bugs in PVM version
+  * Fix for bugs in computing lower bounds
+  * Fix for compilation error with gcc 6
+  * Other minor fixes
+  * Enabling binary uploads with BinTray
 
 ### Release 5.6.14
   * Fixing small bug with re-setting environment in user applications.
