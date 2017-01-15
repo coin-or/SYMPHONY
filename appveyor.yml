@@ -3,8 +3,9 @@ platform:
 
 environment:
   global:
-    MSYS2_BASEVER: 20150512
-    MSYS2_ARCH: x86_64
+    BINTRAY_API:
+      secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
+    BINTRAY_USERNAME: tkralphs
     BINTRAY_API:
       secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
     BINTRAY_USERNAME: tkralphs
@@ -40,13 +41,9 @@ build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$ADD_PATH:$PATH; BuildTools/get.dependencies.sh build --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --verbosity=2 --test"
 
 after_build:
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\build\bin
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\build\include
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\build\lib
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\build\share
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\README.md
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\LICENSE
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\INSTALL
-  - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\SYMPHONY/AUTHORS
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\bin
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\include
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\lib
+  - 7z a -r %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\share
   - curl -T %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip -utkralphs:%BINTRAY_API% -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/download/%APPVEYOR_PROJECT_NAME%/%VERSION%/%APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip
 

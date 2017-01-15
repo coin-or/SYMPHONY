@@ -700,7 +700,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    receive_dbl_array(&n->lower_bound, 1);
 #ifdef DO_TESTS
    if (n->lower_bound < old_lower_bound - 10){
-      printf("#####Error: lower bound descrease in node from %.3f to %.3f\n",
+      printf("#####Error: lower bound decrease in node from %.3f to %.3f\n",
 	     old_lower_bound, n->lower_bound);
    }
 #endif
@@ -972,6 +972,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
       s_bufid = init_send(DataInPlace);
       ch = (char) dive;
       send_char_array(&ch, 1);
+      send_int_array(&keep, 1);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
 	 /* Give the index of the node kept and also the index of the
 	  * branching cut if necessary */

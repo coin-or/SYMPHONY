@@ -2617,6 +2617,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
+      
       get_x(lp_data);
       
 #ifdef CHECK_DUAL_SOLUTION
@@ -2728,6 +2729,32 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       
       get_x(lp_data);
       
+#ifdef CHECK_DUAL_SOLUTION
+      if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
+	//This code checks the dual solution values
+	int t;
+	double intercept = 0;
+	double lb = 0;
+	
+	for (t=0; t < lp_data->n; t++){
+	  intercept += lp_data->x[t]* lp_data->dj[t];
+	}
+	for (int i = 0; i <lp_data->m; i++){
+	  if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	  }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	  }
+	}
+	
+	if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	  write_mps(lp_data, "lp.assert");
+	}
+	
+	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+      }
+#endif
+      
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
    else{
@@ -2796,6 +2823,32 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
       
       get_x(lp_data);
       
+#ifdef CHECK_DUAL_SOLUTION
+      if (term == LP_D_INFEASIBLE || term == LP_OPTIMAL) {
+	//This code checks the dual solution values
+	int t;
+	double intercept = 0;
+	double lb = 0;
+	
+	for (t=0; t < lp_data->n; t++){
+	  intercept += lp_data->x[t]* lp_data->dj[t];
+	}
+	for (int i = 0; i <lp_data->m; i++){
+	  if (si->getRowUpper()[i] < 1000000){
+	    lb += si->getRowUpper()[i]*lp_data->dualsol[i];
+	  }else{
+	    lb += si->getRowLower()[i]*lp_data->dualsol[i];
+	  }
+	}
+	
+	if (fabs(intercept + lb - lp_data->objval) > 0.1){
+	  write_mps(lp_data, "lp.assert");
+	}
+	
+	assert(fabs(intercept + lb - lp_data->objval) <= 0.1);
+      }
+#endif
+	
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
    else{
@@ -3026,8 +3079,34 @@ void get_x(LPdata *lp_data)
 
 void get_dj_pi(LPdata *lp_data)
 {
+   const double * pi;
+   const CoinPackedMatrix * matrix = lp_data->si->getMatrixByCol();
+   const int * row = matrix->getIndices();
+   const int * columnLength = matrix->getVectorLengths();
+   const CoinBigIndex * columnStart = matrix->getVectorStarts();
+   const double * elementByColumn = matrix->getElements();
+   const double * objective = lp_data->si->getObjCoefficients();
+   const double * lower = lp_data->si->getColLower();
+   const double * upper = lp_data->si->getColUpper();
+   double * dj = lp_data->dj;
+   int numberColumns = lp_data->n;
+   int t;
    memcpy(lp_data->dualsol, lp_data->si->getRowPrice(), lp_data->m * DSIZE);
-   memcpy(lp_data->dj, lp_data->si->getReducedCost(), lp_data->n * DSIZE);
+   pi=lp_data->dualsol;
+   memcpy(dj, lp_data->si->getReducedCost(), lp_data->n * DSIZE);
+   /* djs may not be correct on fixed variables */
+   /* fix assumes minimization */
+   for (t=0; t < numberColumns; t++) {
+     if (lower[t] == upper[t]) {
+       int k;
+       double value=objective[t];
+       for (k=columnStart[t];k<columnStart[t]+columnLength[t];k++) {
+	 int iRow=row[k];
+	 value -= elementByColumn[k]*pi[iRow];
+       }
+       dj[t] = value;
+     }
+   }
 }
 
 /*===========================================================================*/
