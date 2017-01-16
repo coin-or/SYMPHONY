@@ -6,9 +6,6 @@ environment:
     BINTRAY_API:
       secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
     BINTRAY_USERNAME: tkralphs
-    BINTRAY_API:
-      secure: a9n4jf90wlFCdaYa6fOmYxsF97ur2dnK8Ys3gn5R90JBzTDq6cD2GlEwmmts75mq
-    BINTRAY_USERNAME: tkralphs
   matrix:
     - ARCH: win32-msvc9
       HOST_ARCH_ARG: --enable-msvc=MD
