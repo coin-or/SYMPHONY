@@ -1,4 +1,4 @@
-# SYMPHONY Version 5.6.15 README
+# SYMPHONY Version 5.6.16 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
@@ -249,6 +249,9 @@ Laboratories" funded by the German Federal Ministry of Education and Research
 (BMBF Grant 05M14ZAM) and by the DFG SFB/Transregio 154
 
 ## CHANGELOG
+
+### Release 5.6.16
+  * Fix problem with appveyor configuration
 
 ### Release 5.6.15
   * Fix for configuration issue with OpenMP when building with Visual Studio
