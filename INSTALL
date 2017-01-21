@@ -334,7 +334,8 @@ Please see further details on building in this configuration below.
     }}}
     * To build with the MinGW 32-bit compiler, do
     {{{
-    pacman -S mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran   
+    pacman -S mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran
+    export PATH=$PATH:/mingw32/bin
     ./configure --build=x86_64-w64-mingw32 --host=i686-w64-mingw32
     make
     make install
@@ -342,6 +343,7 @@ Please see further details on building in this configuration below.
     * To build with the Visual Studio compiler, do
     {{{
     pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
+    export PATH=$PATH:/mingw32/bin
     ./configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32
     make
     make install
