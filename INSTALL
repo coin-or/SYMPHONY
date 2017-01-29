@@ -306,26 +306,29 @@ Please see further details on building in this configuration below.
 === BUILDING WITH MSys2 or CYGWIN ===
 
   1. First, install either MSys2 or CYGWIN
-    * To install MSys2, download and unzip/tar http://kent.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20150512.tar.xz
+    * To install MSys2, download the installer [https://msys2.github.io/ here]
     * To install CYGWIN, go [https://cygwin.com/install.html here]
+
   2. Modify your Windows path.
-    * For Msys2 Add {{{msys64\usr\bin}}}, {{{msys64\mingw32\bin}}}, and 
-    {{{msys64\mingw32\bin}}} to your Windows path. 
-    * For CYGWIN, add the CYGWIN bin directory to your Windows path (probably 
+    * For Msys2, add the MSys2 {{{bin}}} {{{msys64\usr\bin}}} to your Windows {{{PATH}}}. 
+    * For CYGWIN, add the CYGWIN {{{bin}}} directory to your Windows {{{PATH}}} (probably 
     {{{cygwin64\bin}}}).
 
   3. Open a Windows terminal.
- 
+
   4. If building with the Visual Studio compiler, execute {{{vcvarsall.bat}}}.
-   
+
   5. At the command prompt, type {{{bash}}}. 
 
-  6. At the {{{bash}}} prompt, do
-  {{{
-  pacman -S make wget tar patch dos2unix diffutils svn
-  svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.6 SYMPHONY-5.6
-  }}}
-  Then next
+  6. Install required packages:
+    * For MSys2, at the {{{bash}}} prompt, do
+    {{{
+    pacman -S make wget tar patch dos2unix diffutils svn
+    svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.6 SYMPHONY-5.6
+    }}}
+    * For CYGWIN, install gcc, gfortran, wget, tar, patch, dos2unix, and svn (and any other packages that seem to be missing)
+
+  7. Then next
     * To build with the Visual Studio compiler, do
     {{{
     ./configure --build=x86_64-w64-mingw32 --enable-msvc
@@ -334,16 +337,16 @@ Please see further details on building in this configuration below.
     }}}
     * To build with the MinGW 32-bit compiler, do
     {{{
-    pacman -S mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran
+    pacman -S mingw-w64-i686-gcc mingw-w64-i686-gcc-fortran   
     export PATH=$PATH:/mingw32/bin
     ./configure --build=x86_64-w64-mingw32 --host=i686-w64-mingw32
     make
     make install
     }}}
-    * To build with the Visual Studio compiler, do
+    * To build with the MinGW 64-bit compiler, do
     {{{
     pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
-    export PATH=$PATH:/mingw32/bin
+    export PATH=$PATH:/mingw64/bin
     ./configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32
     make
     make install
@@ -352,7 +355,7 @@ Please see further details on building in this configuration below.
   instructions above for details on how to modify these instructions
   for that case.
 
-  4. To test SYMPHONY after building, type
+  8. To test SYMPHONY after building, type
 
   {{{make test}}}
 
@@ -381,7 +384,7 @@ Please see further details on building in this configuration below.
   1. Go to {{{SYMPHONY/MSVisualStudio/v10}}} directory and open the solution
   file {{{symphony.sln}}}.
 
-  1. Note that there are a number of additional preprocessor definitions that
+  2. Note that there are a number of additional preprocessor definitions that
   control the functionality of SYMPHONY. These definitions are described in
   {{{sym.mak}}}, a Unix-style makefile included in the distribution. To enable
   the functionality associated with a particular definition, simply add it to
@@ -391,13 +394,13 @@ Please see further details on building in this configuration below.
   include files path * add {{{USE_GLPMPL}}} to the defines * add the GLPK
   library to the solution
 
-  1. Make sure that the project {{{symphony}}} is set as the startup project by
+  3. Make sure that the project {{{symphony}}} is set as the startup project by
   choosing "Set as Startup Project" from the Project menu after selecting the
   symphony project in the Solution Explorer. Choose {{{Build Solution}}} from
   the {{{Build}}} menu. This should successfully build the SYMPHONY library and
   the corresponding executable.
 
-  1. To test the executable, go to the {{{Debug}}} tab and choose {{{Start
+  4. To test the executable, go to the {{{Debug}}} tab and choose {{{Start
   Without Debugging.}}} and then type {{{help}}} or {{{?}}} to see a list of
   available commands.
 
@@ -422,7 +425,7 @@ should be similar.
   {{{SYMPHONY\include\}}}, can then be used to call SYMPHONY from any C/C++
   code. The API for calling SYMPHONY is described in the user's manual.
 
-  1. To test the executable, type
+  2. To test the executable, type
 
   {{{symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps}}}
 
@@ -450,7 +453,7 @@ should be similar.
   comments in the makefile. Note that, you have to first create the COIN
   libraries Cgl, Clp, Osi, OsiClp and CoinUtils.
 
-  1. Once configuration is done, open a command line terminal and type
+  2. Once configuration is done, open a command line terminal and type
 
   {{{nmake sym.mak}}}
 
