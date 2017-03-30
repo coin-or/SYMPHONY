@@ -29,6 +29,7 @@
 
 #include "sym_proto.h"
 #include "sym_constants.h" 
+#include "sym_bach_types.h"
 
 typedef struct LP_SOL{
    int            lp;          /* the tid of the lp process asssociated with
@@ -415,7 +416,12 @@ typedef struct BC_NODE{
    
    int         num_fp_calls_in_path;
    int         frac_cnt;
-   double      frac_avg; 
+   double      frac_avg;
+
+#ifdef USE_BACH
+   bach_node  *bnode;
+#endif
+   
 }bc_node;
 
 /*===========================================================================*\

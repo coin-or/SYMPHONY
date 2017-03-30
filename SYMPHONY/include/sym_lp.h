@@ -189,9 +189,9 @@ typedef struct LP_PROB{
    int             cgl_impr_cnt; 
    int             is_diving; 
    
-   #ifdef USE_BACH
+#ifdef USE_BACH
     bach_node*  bnode;
-   #endif
+#endif
    
 }lp_prob;
 

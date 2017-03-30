@@ -23,9 +23,6 @@
 #include "omp.h"
 #endif
 
-#define USE_BACH
-#define BACH_DEBUG
-
 #include "sym_lp.h"
 #include "sym_master.h" 
 #include "sym_proccomm.h"
@@ -1484,31 +1481,23 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
   
   // BACH HERE!
-    #ifdef USE_BACH
-      // Obtain objective value and condition number
-      double objval = lp_data->objval;
-      double conditionNumber = bach_condition_number(lp_data);
-      
-      // Send value to the records
-      bach_record_value(p->bc_index, p->bnode, objval, conditionNumber);
-      
-      // Get decision to branch or continue
-      int bachcode = bach_should_we_branch(p->bnode);
-      
-      // If it says branch, then return the function
-      if(bachcode==BACH_BRANCH) {
-        PRINT(p->par.verbosity, 1, ("Branching because of ill-conditioned basis matrix.\n"));
-        action = USER__DO_BRANCH; // 1
-        //user_res = USER__DO_NOT_BRANCH; // 0
-        //user_res = USER__BRANCH_IF_TAILOFF; // 3
-        //user_res = USER__BRANCH_IF_MUST; // 2
-        user_res = USER__DO_BRANCH;
-      } else if(bachcode==BACH_CONTINUE) {
-        user_res = USER__DO_NOT_BRANCH;
-      }
-    #endif
-    
-  
+#ifdef USE_BACH
+   // Get decision to branch or continue
+   int bachcode = bach_should_we_branch(p->bnode);
+   
+   // If it says branch, then return the function
+   if (bachcode == BACH_BRANCH){
+      PRINT(p->par.verbosity, 1,
+	    ("Branching because of ill-conditioned basis matrix.\n"));
+      action = USER__DO_BRANCH; // 1
+      //user_res = USER__DO_NOT_BRANCH; // 0
+      //user_res = USER__BRANCH_IF_TAILOFF; // 3
+      //user_res = USER__BRANCH_IF_MUST; // 2
+      user_res = USER__DO_BRANCH;
+   } else if(bachcode==BACH_CONTINUE) {
+      user_res = USER__DO_NOT_BRANCH;
+   }
+#endif
 
    switch (user_res){
     case USER_SUCCESS:

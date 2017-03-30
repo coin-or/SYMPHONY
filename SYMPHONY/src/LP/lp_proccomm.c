@@ -813,7 +813,7 @@ void send_node_desc(lp_prob *p, int node_type)
 		  }
 	       }
 
-	       char *reason = (char *)malloc(50*CSIZE);
+	       char reason[100];
 	       PRINT_TIME2(p->tm, f);
 	       sprintf(reason, "%s %i", "branched", n->bc_index + 1);
 	       if (n->bc_index==0) {
@@ -835,8 +835,11 @@ void send_node_desc(lp_prob *p, int node_type)
 	       }
 	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir,
 		       lp_data->objval+p->mip->obj_offset, sum_inf, num_inf);
+#ifdef USE_BACH
+	       sprintf(reason, "%s %.0f %.0f", reason, n->bnode->conditions[0],
+		       n->bnode->conditions[n->bnode->counter-1]);
+#endif
 	       fprintf(f, "%s\n", reason);
-	       FREE(reason);
 	       fclose(f); 
 	    }
 	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_LIVE){

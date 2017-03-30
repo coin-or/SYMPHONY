@@ -14,14 +14,9 @@
 
 #define COMPILE_FOR_LP
 
-
 #ifdef _OPENMP
 #include "omp.h"
 #endif
-
-
-#define USE_BACH
-#define BACH_DEBUG
 
 #include <stdlib.h>
 #include <math.h>
@@ -192,15 +187,16 @@ int process_chain(lp_prob *p)
 	 PRINT(p->par.verbosity, 4, ("Diving set to %i\n\n", p->dive));
       }
       
-      #ifdef USE_BACH
+#ifdef USE_BACH
         bach_init_node(p->bc_index, p->par.verbosity, p->par.bach_method, &(p->bnode));
-      #endif
+#endif
       
       termcode = fathom_branch(p);
       
-      #ifdef USE_BACH
-        bach_free_node(p->bnode);
-      #endif
+#ifdef USE_BACH
+      //p->tm->active_nodes[0]->parent->bnode = p->bnode;
+      bach_free_node(p->bnode);
+#endif
      
         
 #ifdef COMPILE_IN_LP
@@ -361,24 +357,21 @@ int fathom_branch(lp_prob *p)
       p->lp_stat.lp_calls++;
       p->lp_stat.lp_node_calls++;
 
+#ifdef USE_BACH
+      // Obtain objective value and condition number
+      double objval = lp_data->objval;
+      double conditionNumber = bach_condition_number(lp_data);
       
-      /* #ifdef USE_BACH
-        // Obtain objective value and condition number
-        double objval = lp_data->objval;
-        double conditionNumber = bach_condition_number(lp_data);
-        
-        // Send value to the records
-        bach_record_value(p->bc_index, p->bnode, objval, conditionNumber);
-        
-        // Get decision to branch or continue
-        int bachcode = bach_should_we_branch(p->bnode);
-        
-        // If it says branch, then return the function
-        if(bachcode==BACH_BRANCH) {
-          PRINT(verbosity, 1, ("Branching because of ill-conditioned basis matrix.\n"));
-          return(ERROR__USER);
-        }
-      #endif */
+      // Send value to the records
+      bach_node *new_bach_node = bach_record_value(p->bc_index, p->bnode,
+						   objval, conditionNumber);
+      if (new_bach_node){
+	 p->tm->active_nodes[0]->parent->bnode = p->bnode;
+	 p->tm->active_nodes[0]->bnode = p->bnode = new_bach_node;
+      }else{
+	 p->tm->active_nodes[0]->bnode = p->bnode;
+      }
+#endif
       
       
       
@@ -3650,19 +3643,22 @@ int bach_init_node(int nodeID, int verbosity, int mode, bach_node** bnode ) {
     return 1;
 }
 
-int bach_record_value(int ID, bach_node* bachnode, double objval, double conditionnumber) {
-    
-  #ifdef BACH_DEBUG
-    printf(" BACH New Record [Node %i | %i] (Obj: %g, Condition: %g) @%i\n",ID,bachnode->id, objval,conditionnumber,bachnode->counter);
-  #endif
+bach_node* bach_record_value(int ID, bach_node* bachnode, double objval, double conditionnumber) {
+
+   bool new_node = FALSE;
+#ifdef BACH_DEBUG
+    printf(" BACH New Record [Node %i | %i] (Obj: %g, Condition: %g) @%i\n",
+	   ID,bachnode->id, objval,conditionnumber,bachnode->counter);
+#endif
   
   // If node is a child of an earlier node, start a new bach node
     if(ID!=bachnode->id) {
       //bach_print_all_values(bachnode);
       int verbosity = bachnode->verbosity;
       int method = bachnode->method;
-      bach_free_node(bachnode);
+      //bach_free_node(bachnode);
       bach_init_node(ID,verbosity,method,&bachnode);
+      new_node = TRUE;
     }
     
     // Initialize variables
@@ -3686,13 +3682,28 @@ int bach_record_value(int ID, bach_node* bachnode, double objval, double conditi
     bachnode->counter++;
     
     // Return success message
-    return 1;
+    return new_node ? bachnode : NULL;
 }
 
 double bach_condition_number(LPdata* lp_data) {
 
+   double condNumber = 0;
+
+#ifdef __OSI_CPLEX__
+
+   int solntype;
+   
+   CPXsolninfo(lp_data->si->getEnvironmentPtr(), lp_data->si->getLpPtr(),
+               NULL, &solntype, NULL, NULL);
+
+   if(solntype == CPX_BASIC_SOLN){
+      CPXgetdblquality(lp_data->si->getEnvironmentPtr(),
+                       lp_data->si->getLpPtr(), &condNumber, CPX_EXACT_KAPPA); 
+   }
+   
+#else
+
   // Initialize variables
-  double condNumber = 0;
   int status = -100;
   CoinWarmStartBasis* warm = lp_data->si->getPointerToWarmStart();
   const CoinPackedMatrix* columnCopy = lp_data->si->getMatrixByCol();
@@ -3735,6 +3746,8 @@ double bach_condition_number(LPdata* lp_data) {
   
   delete[] rowIsBasic;
   delete[] columnIsBasic;
+
+#endif
   
   return condNumber;
 }

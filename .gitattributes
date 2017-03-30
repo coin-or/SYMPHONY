@@ -179,6 +179,7 @@ SYMPHONY/include/config_sym_default.h -text
 SYMPHONY/include/stamp-h1 -text
 SYMPHONY/include/stamp-h2 -text
 SYMPHONY/include/sym_bach.h -text
+SYMPHONY/include/sym_bach_types.h -text
 SYMPHONY/include/sym_prep.h -text
 SYMPHONY/include/sym_prep_params.h -text
 SYMPHONY/include/sym_primal_heuristics.h -text

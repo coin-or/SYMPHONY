@@ -1380,7 +1380,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    printf("\nError opening vbc emulation file\n\n");
 	 }else{
 	    PRINT_TIME2(tm, f);
-	    char reason[50];
+	    char reason[100];
 	    char branch_dir = 'M';
 	    sprintf (reason, "%s %i %i", "candidate", child->bc_index+1,
 		     node->bc_index+1);
@@ -1829,7 +1829,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 {
    int i, new_child_num;
    branch_obj *bobj = &node->parent->bobj;
-   char reason[30];
+   char reason[100];
    char branch_dir = 'M';
 
    if (tm->par.vbc_emulation != VBC_EMULATION_FILE_NEW && 
@@ -1862,7 +1862,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	    sprintf(reason," 0");
 	 }
 	    
-	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
+	 sprintf(reason,"%s %c", reason, branch_dir);
 	 break;
        case VBC_PRUNED_FATHOMED:
 	 sprintf(reason, "%s", "fathomed");
@@ -1882,7 +1882,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 }else{
 	    sprintf(reason," 0");
 	 }
-	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
+	 sprintf(reason,"%s %c", reason, branch_dir);
 	 break;
        case VBC_FEAS_SOL_FOUND:
 	 /* This case has already been dealt in install_new_ub(), hence
@@ -1932,7 +1932,13 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 printf("\nError opening vbc emulation file\n\n");
       }else{
 	 PRINT_TIME2(tm, f);
-	 fprintf(f, "%s", reason);
+#ifdef USE_BACH
+	 if (node->bnode){
+	    sprintf(reason, "%s %.0f %.0f", reason, node->bnode->conditions[0],
+		    node->bnode->conditions[node->bnode->counter-1]);
+	 }
+#endif
+	 fprintf(f, "%s\n", reason);
 	 fclose(f);
       }
    }
