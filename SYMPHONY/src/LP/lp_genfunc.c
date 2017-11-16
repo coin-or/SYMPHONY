@@ -2429,7 +2429,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 			     send_to_pool);
       
       should_stop_adding_cgl_cuts(p, i, &should_stop);
-      if(i < 0 && num_cuts > 0) should_stop = TRUE;
+      if(i < 0 && *num_cuts > 0) should_stop = TRUE;
       //}
       if (should_stop == TRUE) {
          break;
