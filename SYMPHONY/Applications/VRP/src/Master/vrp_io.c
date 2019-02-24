@@ -402,7 +402,7 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	      deg = (int)(dist->coordx[node-1]);
 	      min = dist->coordx[node-1] - deg;
 	      dist->coordx[node-1] = MY_PI * (deg + 5.0*min/3.0 ) / 180.0;
-	      deg = floor(dist->coordy[node-1]);
+	      deg = (int)(dist->coordy[node-1]);
 	      min = dist->coordy[node-1] - deg;
 	      dist->coordy[node-1] = MY_PI * (deg + 5.0*min/3.0 ) / 180.0;
 	   }

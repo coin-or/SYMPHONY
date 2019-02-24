@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -575,8 +575,9 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-	       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
-		  cp_par->verbosity = env->par.verbosity = tmpi;
+	       prep_par->verbosity = tm_par->verbosity = lp_par->verbosity =
+               cg_par->verbosity = cp_par->verbosity = env->par.verbosity =
+               tmpi;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);

@@ -5,6 +5,8 @@
 #include <time.h>
 
 #if !(defined(__MINGW64__) || defined(__MINGW32__))
+
+#if (__GNUC__ <= 7) || ((__GNUC__ == 7) && (__GNUC_MINOR__ < 3))  
 struct timeval {
     long    tv_sec;         /* seconds */
     long    tv_usec;        /* and microseconds */
@@ -37,6 +39,6 @@ struct rusage {
 #pragma warning(disable:4700)
 #pragma warning(disable:4018)
 
-
+#endif
 #endif
 #endif

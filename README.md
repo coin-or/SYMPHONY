@@ -1,8 +1,8 @@
-# SYMPHONY Version 5.6.16 README
+# SYMPHONY Version 5.6 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
-2000-2015 by Ted Ralphs and others. This README may be redistributed freely.
+2000-2019 by Ted Ralphs and others. This README may be redistributed freely.
 
 # CURRENT BUILD STATUS
 
@@ -253,6 +253,10 @@ Laboratories" funded by the German Federal Ministry of Education and Research
 (BMBF Grant 05M14ZAM) and by the DFG SFB/Transregio 154
 
 ## CHANGELOG
+
+### Release 5.6.17
+  * Update appveyor
+  * Fix several reported bugs (see PRs 10-12, Issue 2)
 
 ### Release 5.6.16
   * Fix problem with appveyor configuration
