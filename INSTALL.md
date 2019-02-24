@@ -81,7 +81,7 @@ WSL (which is a great option if you already know your way around Unix), it is
 recommended to use MSys2, since it provides a minimal toolset that is easy to
 install. To get MSys2, either download the installer
 [here](https://msys2.github.io/) or download and unzip MSys2 base from
-[here](http://kent.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20150512.tar.xz) 
+[here](http://kent.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20190512.tar.xz) 
 (this is an out-of-date version, there may be a better place to get an archive
 version). 
 
