@@ -575,8 +575,9 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-	       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
-		  cp_par->verbosity = env->par.verbosity = tmpi;
+	       prep_par->verbosity = tm_par->verbosity = lp_par->verbosity =
+               cg_par->verbosity = cp_par->verbosity = env->par.verbosity =
+               tmpi;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
