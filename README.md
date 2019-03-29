@@ -18,7 +18,7 @@ and is freely redistributable. All source code and documentation is Copyright
 
 [ ![Download](https://api.bintray.com/packages/coin-or/download/SYMPHONY/images/download.svg?version=5.6) ](https://bintray.com/coin-or/download/SYMPHONY/5.6)
 
-Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/SYMPHONY) 
+Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/SYMPHONY). Binaries can also be installed on specific platforms, as follows. 
 
  * *Linux*: On Debian, SYMPHONY is available in the package `coinor-symphony` and can be installed with apt. On Fedora, SYMPHONY is available in the package `coin-or-SYMPHONY`. Pre-compiled binaries are also available on [BinTray](http://bintray.com/coin-or/download/SYMPHONY) and as part of the [COIN-OR Optimization Suite](https://www.coin-or.org/download/binary/OptimizationSuite/).
  * *Windows*: The easiest way to get SYMPHONY on Windows is to download binaries from [BinTray](http://bintray.com/coin-or/download/SYMPHONY) or just use the Windows installer for the [COIN Optimization Suite](http://www.coin-or.org/download/binary/OptimizationSuite), which provides Visual Studio compatible libraries and binaries (these are slightly out of date, however). 
@@ -225,12 +225,13 @@ that fixes the problem.
 See the Depdencies file for a list of the external COIN-OR libraries on which
 SYMPHONY depends.
 
+### BUG REPORTS
+
+To report a bug please file a ticket at 
+
+https://github.com/coin-or/SYMPHONY/issues/new
+
 ## SUPPORT
-
-### LIST SERVE
-
-There is a list serve for SYMPHONY users. To subscribe, go to 
-http://list.coin-or.org/mailman/listinfo/coin-symphony 
 
 ### AUTHORS
 
@@ -238,14 +239,6 @@ SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and Laci Ladanyi
 (ladanyi@us.ibm.com). Menal Guzelsoy (menal.guzelsoy@gmail.com) and Ashutosh
 Mahajan (amahajan@iitb.ac.in.edu) have been instrumental in development since
 version 5.0.
-
-### BUG REPORTS
-
-To report a bug please file a ticket at 
-
-https://github.com/coin-or/SYMPHONY/issues/new
-
-Please note the version of SYMPHONY you are using when filing the ticket.
 
 ### ACKNOWLEDGEMENTS
 
