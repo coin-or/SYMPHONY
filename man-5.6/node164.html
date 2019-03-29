@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>sym_get_obj_sense</TITLE>
+<META NAME="description" CONTENT="sym_get_obj_sense">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node165.html">
+<LINK REL="previous" HREF="node163.html">
+<LINK REL="up" HREF="node149.html">
+<LINK REL="next" HREF="node165.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html2845"
+  HREF="node165.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2841"
+  HREF="node149.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2835"
+  HREF="node163.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2843"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2846"
+  HREF="node165.html">sym_is_continuous</A>
+<B>Up:</B> <A NAME="tex2html2842"
+  HREF="node149.html">Data Query Functions</A>
+<B> Previous:</B> <A NAME="tex2html2836"
+  HREF="node163.html">sym_get_obj2_coeff</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007141500000000000000">
+sym_get_obj_sense</A>
+</H3>
+[f]sym_get_obj_sense
+<PRE>
+int sym_get_obj_sense(sym_environment *env, int *sense)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This routine is used to get the objective sense.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>sym_environment *env</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the SYMPHONY environment.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *sense</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to an integer indicating the objective 
+sense. In return, it will be <TT>1</TT> in case of minimization and <TT>-1</TT>
+in case of maximization.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_ABNORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Function invoked unsuccessfully.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_NORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Function invoked successfully.</TD>
+</TR>
+</TABLE>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2016-02-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

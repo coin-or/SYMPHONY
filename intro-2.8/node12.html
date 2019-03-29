@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Design of SYMPHONY</TITLE>
+<META NAME="description" CONTENT="The Design of SYMPHONY">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node19.html">
+<LINK REL="previous" HREF="node5.html">
+<LINK REL="up" HREF="symphony.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html171"
+ HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html169"
+ HREF="symphony.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html163"
+ HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html172"
+ HREF="node13.html">Computing Environment</A>
+<B>Up:</B> <A NAME="tex2html170"
+ HREF="symphony.html">SYMPHONY: A Parallel Framework </SUP></A>
+<B> Previous:</B> <A NAME="tex2html164"
+ HREF="node11.html">Algorithm Overview</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00040000000000000000">&#160;</A>
+<A NAME="design">&#160;</A>
+<BR>
+The Design of SYMPHONY
+</H1>
+
+<P>
+In this section we describe the details of how each of the high-level
+functions from the last section is implemented in SYMPHONY. SYMPHONY
+was designed with two major goals in mind--effectiveness for a wide
+variety of problem settings and ease of use. The effectiveness of
+SYMPHONY stems from the enhancements and extensions to the generic
+algorithm (to be described in this section), most of which are
+transparent to the the casual user. The ease of use comes from the
+well-designed user interface to the library. To implement a branch and
+cut algorithm, the user provides files containing C subroutines that
+implement program functions requiring knowledge of the problem
+setting. The most obvious example of this is separation subroutines,
+which are a mainstay of any branch and cut implementation. Although it
+is possible to use generic separation routines, the most effective
+algorithms are those that utilize problem structure in searching
+for violated constraints. In addition to the required subroutines, the
+user can provide other optional subroutines that customize the
+execution of the algorithm. The interfaces between the library and the
+user functions are straightforward and do not require the user to have
+any knowledge of the inner workings of SYMPHONY.
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html173"
+ HREF="node13.html">Computing Environment</A>
+<LI><A NAME="tex2html174"
+ HREF="node14.html">Configuration of the Modules</A>
+<LI><A NAME="tex2html175"
+ HREF="node15.html">Data Structures and Storage</A>
+<UL>
+<LI><A NAME="tex2html176"
+ HREF="node16.html">Variables</A>
+<LI><A NAME="tex2html177"
+ HREF="node17.html">Constraints</A>
+<LI><A NAME="tex2html178"
+ HREF="node18.html">Search Tree</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html171"
+ HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html169"
+ HREF="symphony.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html163"
+ HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html172"
+ HREF="node13.html">Computing Environment</A>
+<B>Up:</B> <A NAME="tex2html170"
+ HREF="symphony.html">SYMPHONY: A Parallel Framework </SUP></A>
+<B> Previous:</B> <A NAME="tex2html164"
+ HREF="node11.html">Algorithm Overview</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

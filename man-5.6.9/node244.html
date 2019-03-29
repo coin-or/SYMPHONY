@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_print_branch_stat</TITLE>
+<META NAME="description" CONTENT="user_print_branch_stat">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node245.html">
+<LINK REL="previous" HREF="node243.html">
+<LINK REL="up" HREF="node224.html">
+<LINK REL="next" HREF="node245.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3926"
+  HREF="node245.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3922"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3916"
+  HREF="node243.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3924"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3927"
+  HREF="node245.html">user_add_to_desc</A>
+<B>Up:</B> <A NAME="tex2html3923"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3917"
+  HREF="node243.html">user_select_child</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007321600000000000000">
+user_print_branch_stat</A>
+</H3>
+[cf]user_print_branch_stat
+<PRE>
+int user_print_branch_stat(void *user, branch_obj *can, cut_data *cut,
+                           int n, var_desc **vars, char *action)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Print out information about branching candidate <TT>can</TT>, such as a
+more explicit problem-specific description than SYMPHONY can provide (for
+instance, end points of an edge). If <TT>verbosity</TT> is set
+high enough, the identity of the branching object and the children
+(with objective values and termination codes for the pre-solved LPs) is
+printed out to the standard output by SYMPHONY.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>branch_obj *can</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>The branching candidate.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data *cut</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>The description of the cut if the
+branching object is a cut.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int n</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>Number of variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>var_desc **vars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>Array of variables in the current relaxation.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char *action</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>Array of actions for the children.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. Ignored by SYMPHONY.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>The user printed out whatever she wanted to.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>SYMPHONY prints out its own branching information.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>branch()</TT> after the best candidate has been
+selected, pre-solved, and the action is decided on for the children.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3926"
+  HREF="node245.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3922"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3916"
+  HREF="node243.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3924"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3927"
+  HREF="node245.html">user_add_to_desc</A>
+<B>Up:</B> <A NAME="tex2html3923"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3917"
+  HREF="node243.html">user_select_child</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2015-03-10</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Global parameters</TITLE>
+<META NAME="description" CONTENT="Global parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node129.html">
+<LINK REL="previous" HREF="node127.html">
+<LINK REL="up" HREF="node127.html">
+<LINK REL="next" HREF="node129.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html1789"
+ HREF="node129.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1786"
+ HREF="node127.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1780"
+ HREF="node127.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1788"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1790"
+ HREF="node129.html">Master Process parameters</A>
+<B>Up:</B> <A NAME="tex2html1787"
+ HREF="node127.html">SYMPHONY Parameters</A>
+<B> Previous:</B> <A NAME="tex2html1781"
+ HREF="node127.html">SYMPHONY Parameters</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000111000000000000000">
+Global parameters</A>
+</H2>
+<DL>
+<DD><P>
+<DT><STRONG><TT>verbosity</TT> - integer (0).</STRONG>
+<DD>Sets the verbosity of all processes to the given value. In general,
+the greater this number the more verbose each process is. Experiment
+to find out what this means.
+
+<P>
+<DT><STRONG><TT>random_seed</TT> - integer (17).</STRONG>
+<DD>A random seed.
+
+<P>
+<DT><STRONG><TT>granularity</TT> - double (1e-6).</STRONG>
+<DD>should be set to ``the minimum difference between two distinct
+objective function values'' less the epsilon tolerance. E.g., if every
+variable is integral and the objective coefficients are integral then
+for any feasible solution the objective value is integer, so <TT>granularity</TT> could be correctly set to .99999.
+
+<P>
+<DT><STRONG><TT>upper_bound</TT> - double (none)</STRONG>
+<DD>.
+The value of the best known upper bound.
+
+<P>
+</DL>
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_is_feasible</TITLE>
+<META NAME="description" CONTENT="user_is_feasible">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node217.html">
+<LINK REL="previous" HREF="node215.html">
+<LINK REL="up" HREF="node203.html">
+<LINK REL="next" HREF="node217.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html3502"
+  HREF="node217.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html3498"
+  HREF="node203.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html3492"
+  HREF="node215.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html3500"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3503"
+  HREF="node217.html">user_send_feasible_solution</A>
+<B>Up:</B> <A NAME="tex2html3499"
+  HREF="node203.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3493"
+  HREF="node215.html">user_create_subproblem</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00832900000000000000">
+user_is_feasible</A>
+</H3>
+<PRE>
+int user_is_feasible(void *user, double lpetol, int varnum, int
+                     *indices, double *values, int *feasible, 
+                     double *objval)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+User tests the feasibility of the solution to the current LP relaxation. There
+is no post-processing. Possible defaults are testing integrality (<TT>TEST_INTEGRALITY</TT>) and testing whether the solution is binary (<TT>TEST_ZERO_ONE</TT>).
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double lpetol</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>The <IMG
+ WIDTH="12" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img53.png"
+ ALT="$ \epsilon$"> tolerance of the LP solver.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>The length of the <TT>indices</TT> and <TT>values</TT>
+arrays.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>User indices of variables at nonzero level in the
+current solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *values</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>Values of the variables listed in <TT>indices</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *feasible</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>Feasibility status of the solution (<TT>NOT_FEASIBLE</TT>, or <TT>FEASIBLE</TT>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *objval</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>The user can return the ``true'' objective
+function value of the solution in the case it is feasible, i.e., eliminating
+the round-off error.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. Solution is considered to be not feasible.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User checked IP feasibility.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Regulated by the parameter <TT>is_feasible_default</TT>,
+but set to <TT>TEST_INTEGRALITY</TT> unless overridden by the user.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TEST_INTEGRALITY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Test integrality of the given solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TEST_ZERO_ONE</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Tests whether the solution is binary.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>select_branching_object()</TT> after
+pre-solving the LP relaxation of a child corresponding to a candidate and from
+<TT>fathom_branch()</TT> after solving an LP relaxation.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html3502"
+  HREF="node217.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html3498"
+  HREF="node203.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html3492"
+  HREF="node215.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html3500"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3503"
+  HREF="node217.html">user_send_feasible_solution</A>
+<B>Up:</B> <A NAME="tex2html3499"
+  HREF="node203.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3493"
+  HREF="node215.html">user_create_subproblem</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

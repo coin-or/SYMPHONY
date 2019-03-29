@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using the NMAKE Utility</TITLE>
+<META NAME="description" CONTENT="Using the NMAKE Utility">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node104.html">
+<LINK REL="previous" HREF="node102.html">
+<LINK REL="up" HREF="node101.html">
+<LINK REL="next" HREF="node104.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1815"
+  HREF="node104.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1811"
+  HREF="node101.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1805"
+  HREF="node102.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1813"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1816"
+  HREF="node104.html">Using the MSVC++ IDE</A>
+<B>Up:</B> <A NAME="tex2html1812"
+  HREF="node101.html">Microsoft Visual C++</A>
+<B> Previous:</B> <A NAME="tex2html1806"
+  HREF="node102.html">Using the MSDEV Utility</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00622200000000000000">
+Using the NMAKE Utility</A>
+</H3>
+
+<P>
+
+<UL>
+<LI>Edit the file 
+<FONT COLOR="#a52a2a"><TT>user.mak</TT></FONT> to reflect your environment. 
+Only minor edits should be required. An explanation of 
+what has to be set is contained in the comments in the makefile. 
+This basically 
+requires the same routines that one needs to walk through in 
+
+<FONT COLOR="#a52a2a"><TT>SYMPHONY</TT></FONT>'s makefile. 
+See the related parts of <A HREF="node31.html#using_nmake">2.2.3.4</A> section 
+of 
+<FONT COLOR="#a52a2a"><TT>SYMPHONY</TT></FONT> above.
+
+<P>
+</LI>
+<LI>Once configuration is done, type 
+
+<PRE>
+  nmake /f user.mak
+</PRE>
+The executable 
+<FONT COLOR="#a52a2a"><TT>user.exe</TT></FONT> will be created under the 
+
+<FONT COLOR="#a52a2a"><TT>Debug</TT></FONT> directory.
+</LI>
+<LI>To test the executable, type 
+
+<PRE>
+ Debug\user.exe -F ..\..\sample.user
+</PRE>
+</LI>
+</UL>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2009-07-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

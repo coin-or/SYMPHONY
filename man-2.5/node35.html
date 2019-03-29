@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_receive_lp_data</TITLE>
+<META NAME="description" CONTENT="user_receive_lp_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html536" HREF="node36.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html534" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html528" HREF="node34.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html537" HREF="node36.html">user_free_lp</A>
+<B>Up:</B> <A NAME="tex2html535" HREF="node30.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html529" HREF="node34.html">var_desc</A>
+<BR> <P>
+<H3><A NAME="SECTION00022200000000000000">user_receive_lp_data</A></H3>
+<P>
+<A NAME="user_receive_lp_data">&#160;</A>
+<PRE>int user_receive_lp_data (void **user)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user has to receive here all problem-specific information sent
+from the master, set up necessary data structures, etc. Note that the
+data need only be actively received and the user data structure
+allocated if either the TM or LP modules are configured as separate
+processes. Otherwise, data will have been copied into appropriate
+locations in the master function <A HREF="node25.html#user_send_lp_data"><TT>user_send_lp_data()</TT></A>. The two
+cases can be handled by means of <TT>#ifdef</TT> statements. See comments
+in the source code stubs for more details. Note that the data must be
+received in exactly the same order as it was sent from the master. See
+Section <A HREF="node8.html#communication">1.5</A> for more notes on receiving data.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=528 HEIGHT=13 ALIGN=BOTTOM ALT="tabular1320" SRC="img32.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=453 HEIGHT=35 ALIGN=BOTTOM ALT="tabular1322" SRC="img33.gif"  > <P>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>lp_initialize()</TT> at process start.
+<P>
+ </DL>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

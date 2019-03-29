@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_display_solution</TITLE>
+<META NAME="description" CONTENT="user_display_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html596" HREF="node42.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html594" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html588" HREF="node40.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html597" HREF="node42.html">user_shall_we_branch</A>
+<B>Up:</B> <A NAME="tex2html595" HREF="node30.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html589" HREF="node40.html">user_send_feasible_solution</A>
+<BR> <P>
+<H3><A NAME="SECTION00022800000000000000">user_display_solution</A></H3>
+<P>
+<PRE>int user_display_solution(void *user, int which_sol,
+                          int varnum, int *indices, double *values)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+Given a solution to an LP relaxation (the indices and values of the nonzero
+variables) the user can (graphically) display it. The <TT>which_sol</TT>
+argument shows what kind of solution is passed to the function: <TT>
+DISP_FEAS_SOLUTION</TT> indicates a solution feasible to the original IP
+problem, <TT>DISP_RELAXED_SOLUTION</TT> indicates the solution to any LP
+relaxation and <TT>DISP_FINAL_RELAXED_SOLUTION</TT> indicates the solution to
+an LP relaxation when no cut has been found. There is no post-processing.
+Default options print out user indices and values of nonzero or fractional
+variables on the standard output.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=665 HEIGHT=186 ALIGN=BOTTOM ALT="tabular1366" SRC="img46.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=699 HEIGHT=211 ALIGN=BOTTOM ALT="tabular1368" SRC="img47.gif"  > <P>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>fathom_branch()</TT> with <TT>
+DISP_FEAS_SOLUTION</TT> or <TT>DISP_RELAXED_SOLUTION</TT> after solving an LP
+relaxation and checking its feasibility status. If it was not feasible and no
+cut could be added either then the wrapper is invoked once more, now with <TT>
+DISP_FINAL_RELAXED_SOLUTION</TT>.
+<P>
+ </DL>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>sym_get_row_sense</TITLE>
+<META NAME="description" CONTENT="sym_get_row_sense">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node139.html">
+<LINK REL="previous" HREF="node137.html">
+<LINK REL="up" HREF="node131.html">
+<LINK REL="next" HREF="node139.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html2445"
+  HREF="node139.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2441"
+  HREF="node131.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2435"
+  HREF="node137.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2443"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2446"
+  HREF="node139.html">sym_get_rhs</A>
+<B>Up:</B> <A NAME="tex2html2442"
+  HREF="node131.html">Data Query Functions</A>
+<B> Previous:</B> <A NAME="tex2html2436"
+  HREF="node137.html">sym_get_col_upper</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00814700000000000000">
+sym_get_row_sense</A>
+</H3>
+<PRE>
+int sym_get_row_sense(sym_environment *env, char *rowsen)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+This routine is used to get the row senses.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>sym_environment *env</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the SYMPHONY environment.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char *rowsen</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to a char type array to be filled by 
+the row senses. Note that, the size of this array has to be at least 
+the number of rows.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_ABNORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Function invoked unsuccessfully.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_NORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Function invoked successfully.</TD>
+</TR>
+</TABLE>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

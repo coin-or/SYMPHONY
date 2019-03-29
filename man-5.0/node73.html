@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using the MSVC++ Workspace</TITLE>
+<META NAME="description" CONTENT="Using the MSVC++ Workspace">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node72.html">
+<LINK REL="up" HREF="node69.html">
+<LINK REL="next" HREF="node74.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1349"
+  HREF="node74.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1345"
+  HREF="node69.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1341"
+  HREF="node72.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1347"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1350"
+  HREF="node74.html">Sample Applications</A>
+<B>Up:</B> <A NAME="tex2html1346"
+  HREF="node69.html">Compiling a Custom Application</A>
+<B> Previous:</B> <A NAME="tex2html1342"
+  HREF="node72.html">Using the NMAKE Utility</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00634000000000000000">
+Using the MSVC++ Workspace</A>
+</H2>
+
+<P>
+
+<UL>
+<LI>In MS Visual C++ 6.0, open the workspace 
+<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">USER<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">user.dsw</TT>.
+Note that there are two projects, one called <TT>symphonyLib</TT> and the other 
+called <TT>user</TT>.The <TT>symphonyLib</TT> project compiles the source code, with the 
+calls to the user-defined callbacks used to customize the solver, to create 
+the callable library: <TT>symphonyLib.lib</TT>. The <TT>user</TT> 
+project compiles those user callbacks together with the main function, links 
+them with the callable library and creates the executable: <TT>user.exe</TT>.
+
+<P>
+</LI>
+<LI>The configuration steps are exactly the same with the MSVC++ section of 
+<TT>SYMPHONY</TT>. The only 
+difference is that, you have the <TT>user</TT> project instead of the
+<TT>symphony</TT> project. Go through the related steps of section 
+<A HREF="node66.html#getting_started_windows">5.2</A> to see how to configure to use 
+<TT>COIN</TT>, <TT>OSI</TT>, <TT>CGL</TT>, <TT>COIN</TT> utilities, 
+<TT>GMPL</TT> input, and to change the lp solver which is by default 
+<TT>CLP</TT>.
+
+<P>
+</LI>
+<LI>Once you have the proper settings for your LP solver, choose <TT>Build
+user.exe</TT> from the <TT>Build</TT> menu. This should successfully 
+build the executable.
+
+<P>
+</LI>
+<LI>To test the executable, right click on the <TT>user</TT> project, go to the
+<TT>Debug</TT> tab and set the program arguments to 
+<TT>-F ..<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">sample.mps</TT>. Note that command-line switches are 
+Unix-style.
+
+<P>
+</LI>
+<LI>Now choose <TT>Execute</TT> from the build menu and you have a working branch
+and bound solver! After successful compilation, you can fill in the user
+callback functions as describe in SectionSYMPHONY-development.
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html1349"
+  HREF="node74.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1345"
+  HREF="node69.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1341"
+  HREF="node72.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1347"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1350"
+  HREF="node74.html">Sample Applications</A>
+<B>Up:</B> <A NAME="tex2html1346"
+  HREF="node69.html">Compiling a Custom Application</A>
+<B> Previous:</B> <A NAME="tex2html1342"
+  HREF="node72.html">Using the NMAKE Utility</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

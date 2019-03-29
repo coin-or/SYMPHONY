@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Developing Applications with SYMPHONY</TITLE>
+<META NAME="description" CONTENT="Developing Applications with SYMPHONY">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node75.html">
+<LINK REL="previous" HREF="node35.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node41.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html734"
+  HREF="node41.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html730"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html724"
+  HREF="node39.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html732"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html735"
+  HREF="node41.html">New in Version 3.0</A>
+<B> Up:</B> <A NAME="tex2html731"
+  HREF="man.html">SYMPHONY 3.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html725"
+  HREF="node39.html">Fault Tolerance</A>
+ &nbsp <B>  <A NAME="tex2html733"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00090000000000000000"></A>
+<A NAME="development"></A>
+<BR>
+Developing Applications with SYMPHONY
+</H1>
+SYMPHONY (Single- or Multi-Process Optimization over Networks) Version 3.0
+is a powerful environment for implementing branch, cut, and price
+algorithms. The subroutines in the SYMPHONY library comprise a
+state-of-the-art solver which is designed to be completely modular and
+easy to port to various problem settings. All library subroutines are
+generic--their implementation does not depend on the the
+problem-setting. To develop a full-scale, parallel branch and cut
+algorithm, the user has only to specify a few problem-specific
+functions such as preprocessing and separation. The vast majority of
+the computation takes place within a ``black box,'' of which the user
+need have no knowledge. SYMPHONY communicates with the user's routines
+through well-defined interfaces and performs all the normal functions
+of branch and cut--tree management, LP solution, cut pool management,
+as well as inter-process or inter-thread communication. Although there
+are default options, the user can also assert control over the
+behavior of SYMPHONY through a myriad of parameters and optional
+subroutines. SYMPHONY can be built in a variety of configurations, ranging
+from fully parallel to completely sequential, depending on the user's
+needs. The library runs serially on almost any platform, and can also
+run in parallel in either a fully distributed environment (network of
+workstations) or shared-memory environment simply by changing a few
+options in the make file. To run in a distributed environment, the
+user must have installed <EM><A NAME="tex2html8"
+  HREF="http://www.ccs.ornl.gov/pvm/">Parallel Virtual
+Machine</A></EM> (PVM) software, available for
+free from Oak Ridge National Laboratories
+. 
+To run in a shared memory environment, the user must have installed an
+OpenMP compliant compiler. A cross-platform compiler called <EM><A NAME="tex2html9"
+  HREF="http://pdplab.trc.rwcp.or.jp/Omni">Omni</A></EM>, which uses 
+<TT>cc</TT> or <TT>gcc</TT> as a back end, is available for free download
+.
+This section of the manual is concerned with the detailed
+specifications needed to develop an application using SYMPHONY. It is
+assumed that the user has already read the first part of the manual, which
+provides a high-level introduction to parallel branch, cut, and price
+and the overall design and use of SYMPHONY. 
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html736"
+  HREF="node41.html">New in Version 3.0</A>
+<LI><A NAME="tex2html737"
+  HREF="node42.html">New in Version 2.8.1</A>
+<LI><A NAME="tex2html738"
+  HREF="node43.html">New in Version 2.8</A>
+<LI><A NAME="tex2html739"
+  HREF="node44.html">Changes to the User API in Version 2.8</A>
+<LI><A NAME="tex2html740"
+  HREF="node45.html">Getting Started</A>
+<UL>
+<LI><A NAME="tex2html741"
+  HREF="node46.html">Compiling the Sample Application with Unix Operating Systems</A>
+<UL>
+<LI><A NAME="tex2html742"
+  HREF="node47.html">Preparing for Sample Compilation.</A>
+<LI><A NAME="tex2html743"
+  HREF="node48.html">Compiling the Sequential Version.</A>
+<LI><A NAME="tex2html744"
+  HREF="node49.html">Compiling the Shared Memory Version.</A>
+<LI><A NAME="tex2html745"
+  HREF="node50.html">Compiling the Distributed Version.</A>
+</UL>
+<LI><A NAME="tex2html746"
+  HREF="node51.html">Compiling the Sample Application with Microsoft Windows</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html747"
+  HREF="node52.html">Orienting Yourself</A>
+<LI><A NAME="tex2html748"
+  HREF="node53.html">Writing the User Functions</A>
+<LI><A NAME="tex2html749"
+  HREF="node54.html">Data Structures</A>
+<UL>
+<LI><A NAME="tex2html750"
+  HREF="node55.html">Internal Data Structures</A>
+<LI><A NAME="tex2html751"
+  HREF="node56.html">User-defined Data Structures</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html752"
+  HREF="node57.html">Inter-process Communication for Distributed Computing</A>
+<LI><A NAME="tex2html753"
+  HREF="node58.html">The LP Engine</A>
+<LI><A NAME="tex2html754"
+  HREF="node59.html">Compiling Your Application</A>
+<UL>
+<LI><A NAME="tex2html755"
+  HREF="node60.html">Unix Operating Systems</A>
+<UL>
+<LI><A NAME="tex2html756"
+  HREF="node61.html">Working with PVM.</A>
+<LI><A NAME="tex2html757"
+  HREF="node62.html">Communication with Shared Memory.</A>
+<LI><A NAME="tex2html758"
+  HREF="node63.html">Configuring the Modules.</A>
+<LI><A NAME="tex2html759"
+  HREF="node64.html">Executable Names.</A>
+</UL>
+<LI><A NAME="tex2html760"
+  HREF="node65.html">Microsoft Windows</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html761"
+  HREF="node66.html">Debugging Your Application</A>
+<UL>
+<LI><A NAME="tex2html762"
+  HREF="node67.html">The First Rule</A>
+<LI><A NAME="tex2html763"
+  HREF="node68.html">Debugging with PVM</A>
+<LI><A NAME="tex2html764"
+  HREF="node69.html">Using <TT>Purify</TT> and <TT>Quantify</TT></A>
+<LI><A NAME="tex2html765"
+  HREF="node70.html">Checking the Validity of Cuts and Tracing the Optimal Path</A>
+<LI><A NAME="tex2html766"
+  HREF="node71.html">Using the <TT>Interactive Graph Drawing</TT> Software</A>
+<LI><A NAME="tex2html767"
+  HREF="node72.html">Other Debugging Techniques</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html768"
+  HREF="node73.html">Controlling Execution and Output</A>
+<LI><A NAME="tex2html769"
+  HREF="node74.html">Other Resources</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html734"
+  HREF="node41.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html730"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html724"
+  HREF="node39.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html732"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html735"
+  HREF="node41.html">New in Version 3.0</A>
+<B> Up:</B> <A NAME="tex2html731"
+  HREF="man.html">SYMPHONY 3.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html725"
+  HREF="node39.html">Fault Tolerance</A>
+ &nbsp <B>  <A NAME="tex2html733"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

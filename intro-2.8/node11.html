@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Algorithm Overview</TITLE>
+<META NAME="description" CONTENT="Algorithm Overview">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node5.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html161"
+ HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html159"
+ HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html155"
+ HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html162"
+ HREF="node12.html">The Design of SYMPHONY</A>
+<B>Up:</B> <A NAME="tex2html160"
+ HREF="node5.html">Parallelizing Branch and Cut</A>
+<B> Previous:</B> <A NAME="tex2html156"
+ HREF="node10.html">The Tree Manager Process</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00036000000000000000">
+Algorithm Overview</A>
+</H2>
+
+<P>
+The algorithm described here is what is known as asynchronous,
+single-pool branch and cut. The term <EM>asynchronous</EM> was discussed
+in Section <A HREF="node5.html#parallelizing">3</A>. The term <EM>single-pool</EM> refers to
+the fact that there is a single central list of candidate subproblems
+to be processed, which is maintained by the tree manager. For a
+description of other types of parallel branch and bound, see
+[<A
+ HREF="node34.html#G&amp;C">10</A>].
+
+<P>
+The master process begins by reading in the parameters and problem
+data. After initial I/O is completed, user-written routines for
+finding an initial upper bound and constructing the root node are
+executed (see Section <A HREF="node20.html#master">5.1</A> for details), the tree manager
+process is spawned, and the data for the root node are sent to it. The
+tree manager in turn spawns the cut pool processes, the linear
+program processes, and the cut generator processes. Each LP process has
+a single cut generator associated with it which serves requests from
+that LP process alone. The root node is placed on the candidate node
+list and the initial upper bound is set equal to the best heuristic
+upper bound found. All LPs are marked as idle. The algorithm is ready
+for execution.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="overview">&#160;</A><A NAME="268">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 4:</STRONG>
+Schematic overview of the parallel branch and cut algorithm</CAPTION>
+<TR><TD><IMG
+ WIDTH="633" HEIGHT="822"
+ SRC="img17.gif"
+ ALT="\begin{figure}\centering
+\psfig{figure=/home/tkr/Papers/pics/pbandc.ps}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+In the steady state, the tree manager controls the execution by
+maintaining the list of candidate subproblems and sending them to the
+LP processes as they become idle. The LP processes receive nodes from
+the tree manager, process them, branch (if required), and send back
+the identity of the chosen branching object to the tree manager, which
+in turn generates the children and places them on the list of
+candidates to be processed. A
+schematic summary of the algorithm is shown in Figure <A HREF="node11.html#overview">4</A>,
+although some of the ideas in this summary have not yet been
+presented.
+The preference ordering for processing nodes is a parameter that can
+be set by the user. The default is to choose the node with the lowest
+lower bound to be processed next, because this is in some sense the
+node that is most likely to be on a path to an optimal solution. The
+concepts of <EM>diving</EM> and <EM>search chains</EM>, introduced in
+Section <A HREF="node26.html#tree-management">5.3.1</A>, extend this basic approach.
+
+<P>
+<HR>
+<A NAME="tex2html161"
+ HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html159"
+ HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html155"
+ HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html162"
+ HREF="node12.html">The Design of SYMPHONY</A>
+<B>Up:</B> <A NAME="tex2html160"
+ HREF="node5.html">Parallelizing Branch and Cut</A>
+<B> Previous:</B> <A NAME="tex2html156"
+ HREF="node10.html">The Tree Manager Process</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

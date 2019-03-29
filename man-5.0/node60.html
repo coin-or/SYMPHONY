@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Installation</TITLE>
+<META NAME="description" CONTENT="Installation">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node75.html">
+<LINK REL="previous" HREF="node23.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node61.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1175"
+  HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1171"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1165"
+  HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1173"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1176"
+  HREF="node61.html">Compiling the Library and</A>
+<B>Up:</B> <A NAME="tex2html1172"
+  HREF="man.html">SYMPHONY 5.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html1166"
+  HREF="node59.html">Fault Tolerance</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00600000000000000000"></A>
+<A NAME="getting_started"></A>
+<BR>
+Installation
+</H1>
+SYMPHONY Version 5.0 is a powerful environment for implementing custom branch,
+cut, and price algorithms. The subroutines in the SYMPHONY library comprise a
+state-of-the-art MILP solver designed to be modular and easy to customize for
+various problem settings. All internal library subroutines are generic--their
+implementation does not depend on the the problem-setting. As from Version 4.0,
+SYMPHONY works out of the box as a generic MILP solver, with the capability to
+read both MPS files and GMPL (a subset of AMPL) files and solve the described
+mixed integer programs. To customize SYMPHONY, various user subroutines can be
+written and parameters set that modify the default behavior of the
+algorithm. The API for these subroutines is described in this manual and files
+containing function stubs are provided. As an example, by replacing the
+default I/O subroutine, one can easily modify the solver so that it reads in
+problem instances in a custom format (such as the TSPLIB format for specifying
+traveling salesman problem instances).
+
+<P>
+The vast majority of the computation takes place within a ``black box,'' of
+which the user need have no knowledge. SYMPHONY performs all the normal functions
+of branch, cut, and price--tree management, LP solution, cut pool management,
+as well as inter-process or inter-thread communication. Solvers can be built
+in a wide variety of configurations, ranging from fully parallel to completely
+sequential, depending on the user's needs. The library runs serially on almost
+any platform, and can also run in parallel in either a fully distributed
+environment (network of workstations) or shared-memory environment simply by
+changing a few options in the makefile. To run in a distributed environment,
+the user must have installed the <EM><A NAME="tex2html12"
+  HREF="http://www.ccs.ornl.gov/pvm/">Parallel Virtual Machine</A></EM>
+(PVM), available for free from Oak Ridge National Laboratories.
+To run in a shared memory environment, the user must have installed an
+OpenMP compliant compiler. A cross-platform compiler called <EM><A NAME="tex2html13"
+  HREF="http://phase.etl.go.jp/Omni/">Omni</A></EM>, which uses 
+<TT>cc</TT> or <TT>gcc</TT> as a back end, is available for free download
+. For other options, visit
+<TT><A NAME="tex2html14"
+  HREF="http://www.openmp.org">http://www.openmp.org</A></TT>.
+
+<P>
+SYMPHONY-5.0 is now a C callable library with an interface whose look and
+feel is similar to other popular solvers, see Sections <A HREF="node101.html#C_Interface">7.1</A> and
+<A HREF="node185.html#C++_Interface">7.2</A> for the library routines. This interface works for
+SYMPHONY's built-in generic MILP solver, as well as any customized algorithm 
+developed by implementing one or more of SYMPHONY's user callback functions. 
+For a summary of what else is new, see Section <A HREF="node3.html#whats-new">1.1</A>.Code written for
+previous versions of SYMPHONY will be broken, but not too badly. Instructions
+for porting from previous version are contained in the file
+<TT>SYMPHONY-5.0/README-5.0</TT>.
+
+<P>
+This section of the manual is concerned with the detailed
+specifications needed to compile the SYMPHONYlibrary, to create the generic 
+MILP solver and to develop an application using SYMPHONY. It is
+assumed that the user has already read the first part of the manual, which
+provides a high-level introduction to parallel branch, cut, and price
+and the overall design and use of SYMPHONY. 
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1177"
+  HREF="node61.html">Compiling the Library and Executable in Unix</A>
+<UL>
+<LI><A NAME="tex2html1178"
+  HREF="node62.html">Preparing for Sample Compilation.</A>
+<LI><A NAME="tex2html1179"
+  HREF="node63.html">Compiling the Sequential Version.</A>
+<LI><A NAME="tex2html1180"
+  HREF="node64.html">Compiling the Shared Memory Version.</A>
+<LI><A NAME="tex2html1181"
+  HREF="node65.html">Compiling the Distributed Version.</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1182"
+  HREF="node66.html">Compiling the Library and Executable in Windows</A>
+<UL>
+<LI><A NAME="tex2html1183"
+  HREF="node67.html">Using the NMAKE Utility</A>
+<LI><A NAME="tex2html1184"
+  HREF="node68.html">Using the MSVC++ Workspace</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1185"
+  HREF="node69.html">Compiling a Custom Application Using Callbacks</A>
+<UL>
+<LI><A NAME="tex2html1186"
+  HREF="node70.html">Unix</A>
+<LI><A NAME="tex2html1187"
+  HREF="node71.html">Microsoft Windows</A>
+<LI><A NAME="tex2html1188"
+  HREF="node72.html">Using the NMAKE Utility</A>
+<LI><A NAME="tex2html1189"
+  HREF="node73.html">Using the MSVC++ Workspace</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1190"
+  HREF="node74.html">Sample Applications</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html1175"
+  HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1171"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1165"
+  HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1173"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1176"
+  HREF="node61.html">Compiling the Library and</A>
+<B>Up:</B> <A NAME="tex2html1172"
+  HREF="man.html">SYMPHONY 5.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html1166"
+  HREF="node59.html">Fault Tolerance</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Linear Programming Module</TITLE>
+<META NAME="description" CONTENT="The Linear Programming Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node18.html">
+<LINK REL="previous" HREF="node16.html">
+<LINK REL="up" HREF="node14.html">
+<LINK REL="next" HREF="node18.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html417"
+ HREF="node18.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html414"
+ HREF="node14.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html408"
+ HREF="node16.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html416"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html418"
+ HREF="node18.html">The Cut Generator Module</A>
+<B>Up:</B> <A NAME="tex2html415"
+ HREF="node14.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html409"
+ HREF="node16.html">The Tree Manager Module</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00063300000000000000">
+The Linear Programming Module</A>
+</H3>
+
+<P>
+The <EM>linear programming</EM> (LP) module is the most complex and
+computationally intensive of the five processes. Its job is to perform
+the bounding and branching operations. These operations
+are, of course, central to the performance of the algorithm. Functions
+performed by the LP module are:
+<UL>
+<LI>Inform the tree manager when a new subproblem is needed.
+<LI>Receive a subproblem and process it in conjunction
+        with the cut generator and the cut pool.
+<LI>Decide which cuts should be sent to the global pool to
+        be made available to other LP modules.
+<LI>If necessary, choose a branching object and send its
+        description back to the tree manager.
+<LI>Perform the fathoming operation, including generating
+        variables. 
+</UL> 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

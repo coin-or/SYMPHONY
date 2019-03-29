@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Search Tree</TITLE>
+<META NAME="description" CONTENT="Search Tree">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node12.html">
+<LINK REL="up" HREF="node10.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html393"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html389"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html385"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html391"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html394"
+  HREF="node14.html">Modular Implementation</A>
+<B> Up:</B> <A NAME="tex2html390"
+  HREF="node10.html">Data Structures and Storage</A>
+<B> Previous:</B> <A NAME="tex2html386"
+  HREF="node12.html">Constraints</A>
+ &nbsp <B>  <A NAME="tex2html392"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00062300000000000000">
+Search Tree</A>
+</H3>
+
+<P>
+Having described the basics of how objects are represented, we now
+describe the representation of search tree nodes. Since the base
+constraints and variables are present in every subproblem, only the
+indices of the extra constraints and variables are stored in each
+node's description. A complete description of the current basis is
+maintained to allow a warm start to the computation in each search
+node. This basis is either inherited from the parent, computed during
+strong branching (see Section <A HREF="node26.html#branching">6.2.3</A>), or comes from earlier
+partial processing of the node itself (see Section <A HREF="node30.html#two-phase">6.3.3</A>).
+Along with the set of active objects, we must also store the identity
+of the object(s) which were branched upon to generate the node. The
+branching operation is described in Section <A HREF="node26.html#branching">6.2.3</A>.
+
+<P>
+Because the set of active objects and the status of the basis do not
+tend to change much from parent to child, all of these data are stored
+as differences with respect to the parent when that description is
+smaller than the explicit one. This method of storing the entire tree
+is highly memory-efficient. The list of nodes that are candidates for
+processing is stored in a heap ordered by a comparison function
+defined by the search strategy (see <A HREF="node27.html#tree-management">6.3</A>). This
+allows efficient generation of the next node to be processed.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html393"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html389"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html385"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html391"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html394"
+  HREF="node14.html">Modular Implementation</A>
+<B> Up:</B> <A NAME="tex2html390"
+  HREF="node10.html">Data Structures and Storage</A>
+<B> Previous:</B> <A NAME="tex2html386"
+  HREF="node12.html">Constraints</A>
+ &nbsp <B>  <A NAME="tex2html392"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

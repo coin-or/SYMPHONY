@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_readparams</TITLE>
+<META NAME="description" CONTENT="user_readparams">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node71.html">
+<LINK REL="previous" HREF="node69.html">
+<LINK REL="up" HREF="node66.html">
+<LINK REL="next" HREF="node71.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html1115"
+ HREF="node71.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1112"
+ HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1106"
+ HREF="node69.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1114"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1116"
+ HREF="node71.html">user_io</A>
+<B>Up:</B> <A NAME="tex2html1113"
+ HREF="node66.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1107"
+ HREF="node69.html">user_free_master</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000101400000000000000">
+user_readparams</A>
+</H3>
+<PRE>
+int user_readparams(void *user, char *filename, int argc, char **argv)
+</PRE>
+<P>
+<DL>
+<DD><P>
+<DT><STRONG>Description:</STRONG>
+<DD>
+
+<P>
+The user reads in parameters from the file named <TT>filename</TT>. The
+file <TT>filename</TT> is a file containing both built-in parameters and
+user parameters. The filename is given as a command line argument when
+starting the application and is then passed to the user. The user must
+open the file for reading, scan the file for lines that contain user
+parameters and then read the parameters in as appropriate. See the
+file <TT>Master/master_io.c</TT> to see how  SYMPHONY does this.
+
+<P>
+Optionally, the user can also parse the command line arguments. All
+capital letters are reserved for user-defined command line switches.
+The switch <TT>-H</TT> is reserved for help and calls the user's usage
+subroutine (see <TT>user_send_lp_data()</TT>).
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=281>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> char *filename</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=281>The name of the parameter file.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error.  SYMPHONY stops.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User parameters were read successfully.</TD>
+</TR>
+</TABLE>
+<P>
+</DL>
+<P>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html1115"
+ HREF="node71.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1112"
+ HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1106"
+ HREF="node69.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1114"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1116"
+ HREF="node71.html">user_io</A>
+<B>Up:</B> <A NAME="tex2html1113"
+ HREF="node66.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1107"
+ HREF="node69.html">user_free_master</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

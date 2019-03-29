@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_free_lp</TITLE>
+<META NAME="description" CONTENT="user_free_lp">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node52.html">
+<LINK REL="previous" HREF="node50.html">
+<LINK REL="up" HREF="node45.html">
+<LINK REL="next" HREF="node52.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html834"
+ HREF="node52.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html831"
+ HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html825"
+ HREF="node50.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html833"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html835"
+ HREF="node52.html">user_create_lp</A>
+<B>Up:</B> <A NAME="tex2html832"
+ HREF="node45.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html826"
+ HREF="node50.html">user_receive_lp_data</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00032300000000000000">
+user_free_lp</A>
+</H3>
+<PRE>
+int user_free_lp(void **user)
+</PRE>
+<P>
+<DL>
+<DD><P>
+<DT><STRONG>Description:</STRONG>
+<DD>
+
+<P>
+The user has to free all the data structures within <TT>*user</TT>, and also free
+<TT>user</TT> itself. The user can use the built-in macro <TT>FREE</TT> that checks
+the existence of a pointer before freeing it. 
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void **user</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the user-defined LP data structure.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error.  SYMPHONY ignores error message.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User freed everything in the user space.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD><TT>lp_close()</TT> at process shutdown.
+
+<P>
+</DL>
+<P>
+<BR>
+<BR>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Working with PVM</TITLE>
+<META NAME="description" CONTENT="Working with PVM">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html187" HREF="node10.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html185" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html179" HREF="node8.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html188" HREF="node10.html">The LP Engine</A>
+<B>Up:</B> <A NAME="tex2html186" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html180" HREF="node8.html">Inter-process Communication</A>
+<BR> <P>
+<H2><A NAME="SECTION00016000000000000000">Working with PVM</A></H2>
+<P>
+<A NAME="PVM">&#160;</A>
+To compile an application, it is necessary to install PVM. Currently,
+this is the case whether or not you plan to run anything in
+parallel. The current version of PVM can be obtained at <TT>
+<A NAME="tex2html5" HREF="http://www.ccs.ornl.gov/pvm/">http://www.ccs.ornl.gov/pvm/</A></TT>. It should compile and install without
+problems. You will have to make a few modifications to your <TT>
+.cshrc</TT> file, such as defining the <TT>PVM_ROOT</TT> environment
+variable, but this is all explained clearly in the PVM documentation.
+Note that all executables (or at least a link to them) must reside in
+the <TT>$PVM_ROOT/bin/$PVM_ARCH</TT> directory in order for parallel
+processes to be spawned correctly. The environment variable <TT>
+PVM_ARCH</TT> is set in your <TT>.cshrc</TT> file and contains a string
+representing the current architecture type. To run a parallel
+application, you must first start up the daemon on each of the
+machines you plan to use in the computation. How to do this is also
+explained in the PVM documentation.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

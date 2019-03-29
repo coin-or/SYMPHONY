@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>C++ Interface/OSI Parameters</TITLE>
+<META NAME="description" CONTENT="C++ Interface/OSI Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node280.html">
+<LINK REL="up" HREF="node273.html">
+<LINK REL="next" HREF="node282.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4378"
+  HREF="node282.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4374"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4370"
+  HREF="node280.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4376"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4379"
+  HREF="node282.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html4375"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4371"
+  HREF="node280.html">Cut Pool Parameters</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00748000000000000000"></A>
+<A NAME="OSI_Parameters"></A>
+<BR>
+C++ Interface/OSI Parameters
+</H2>
+
+<P>
+As the implementation of the whole interface, there exists a matching 
+C interface parameter to each of the C++ Interface/OSI parameter and 
+the parameter setting functions are designed to set the 
+corresponding C interface parameter. Thus, we will just give a table of the 
+parameter names, their C interface complements and the values they can be set 
+to, rather than their detailed descriptions. For each parameter, the user 
+can see the C interface complement for further explanation. 
+<BR>
+<P>
+16cm7cm
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><B>C++ Interface</B></TD>
+<TD ALIGN="LEFT"><B>C Interface</B></TD>
+<TD ALIGN="LEFT"><B>Value</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymVerbosity</TD>
+<TD ALIGN="LEFT">verbosity</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymWarmStart</TD>
+<TD ALIGN="LEFT">warm_start</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymNodeLimit</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiMaxNumIteration</TD>
+<TD ALIGN="LEFT">node_limit</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiMaxNumIterationHotStart</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymFindFirstFeasible</TD>
+<TD ALIGN="LEFT">find_first_feasible</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymSearchStrategy</TD>
+<TD ALIGN="LEFT">node_selection_rule</TD>
+<TD ALIGN="LEFT">LOWEST_LP_FIRST</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">HIGHEST_LP_FIRST</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">BREADTH_FIRST_SEARCH</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">DEPTH_FIRST_SEARCH</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymUsePermanentCutPools</TD>
+<TD ALIGN="LEFT">use_permanent_cut_pools</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglGomoryCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_gomory_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglKnapsackCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_knapsack_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglOddHoleCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_oddhole_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglProbingCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_probing_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglCliqueCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_clique_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglFlowAndCoverCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_flow_and_cover_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglRoundingCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_rounding_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGenerateCglLiftAndProjectCuts</TD>
+<TD ALIGN="LEFT">generate_cgl_lift_and_project_cuts</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymKeepWarmStart</TD>
+<TD ALIGN="LEFT">keep_warm_start</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymTrimWarmTree</TD>
+<TD ALIGN="LEFT">trim_warm_tree * -boolean-</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymDoReducedCostFixing</TD>
+<TD ALIGN="LEFT">do_reduced_cost_fixing</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymMCFindSupportedSolutions</TD>
+<TD ALIGN="LEFT">mc_find_supported_solutions</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymSensitivityAnalysis</TD>
+<TD ALIGN="LEFT">sensitivity_analysis</TD>
+<TD ALIGN="LEFT">-boolean-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymRandomSeed</TD>
+<TD ALIGN="LEFT">random_seed</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymDivingStrategy</TD>
+<TD ALIGN="LEFT">diving_strategy</TD>
+<TD ALIGN="LEFT">BEST_ESTIMATE</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">COMP_BEST_K</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">COMP_BEST_K_GAP</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymDivingK</TD>
+<TD ALIGN="LEFT">diving_k</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymDivingThreshold</TD>
+<TD ALIGN="LEFT">diving_threshold</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGranularity</TD>
+<TD ALIGN="LEFT">granularity</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymTimeLimit</TD>
+<TD ALIGN="LEFT">time_limit</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymGapLimit</TD>
+<TD ALIGN="LEFT">gap_limit</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiObjOffset</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiProbName</TD>
+<TD ALIGN="LEFT">problem_name</TD>
+<TD ALIGN="LEFT">-user defined-</TD>
+</TR>
+</TABLE> 
+<BR>
+<P>
+However, as it is seen, only some of the C interface parameters have their 
+matches. If the other parameters are required to be modified, the user 
+can always set them directly by their C interface names, 
+using the overlapping functions: <TT>setSymParam(string, int), 
+setSymParam(string, double) and setSymParam(string,string)</TT>. For instance, 
+the <TT>
+<FONT COLOR="#000000"> verbosity</FONT></TT> parameter can be set, let's say, to 2 either by 
+setSymParam(OsiSymVerbosity, 2) or by setSymParam(``verbosity'', 2). 
+Note that, this flexibility is also supported for parameter querying 
+functions. 
+
+<P>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html4378"
+  HREF="node282.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4374"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4370"
+  HREF="node280.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4376"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html4379"
+  HREF="node282.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html4375"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4371"
+  HREF="node280.html">Cut Pool Parameters</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2009-07-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

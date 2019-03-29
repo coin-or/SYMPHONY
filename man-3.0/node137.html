@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>SYMPHONY Parameters</TITLE>
+<META NAME="description" CONTENT="SYMPHONY Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node145.html">
+<LINK REL="previous" HREF="node75.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node138.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html2052"
+  HREF="node138.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2048"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2042"
+  HREF="node136.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2050"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html2053"
+  HREF="node138.html">Global parameters</A>
+<B> Up:</B> <A NAME="tex2html2049"
+  HREF="man.html">SYMPHONY 3.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html2043"
+  HREF="node136.html">user_interpret_text</A>
+ &nbsp <B>  <A NAME="tex2html2051"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000110000000000000000"></A>
+<A NAME="params"></A>
+<BR>
+SYMPHONY Parameters
+</H1>
+<A NAME="parameter_file"></A>Parameters can be set in one of two ways. Some commonly-used parameters can be
+set on the command line. To see a list of these, run SYMPHONY with no command-line
+arguments. Other parameters must be set in a parameter file. The name of this
+file is specified on the command line with ``<TT>-f</TT>''.  Each line of the
+parameter file contains either a comment or two words - a keyword and a
+value, separated by white space. If the first word (sequence of
+non-white-space characters) on a line is not a keyword, then the line is
+considered a comment line. Otherwise the parameter corresponding to the
+keyword is set to the listed value. Usually the keyword is the same as the
+parameter name in the source code. Here we list the keywords, the type of
+value that should be given with the keywords and the default value. A
+parameter corresponding to keyword ``K'' in process ``P'' can also be set by
+using the keyword ``P_K''.
+
+<P>
+To make this list shorter, occasionally a comma separated list of parameters
+is given if the meanings of those parameters are strongly
+connected. For clarity, the constant name is sometimes given instead
+of the numerical value for default settings and options. The
+corresponding value is given in curly braces for convenience.
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html2054"
+  HREF="node138.html">Global parameters</A>
+<LI><A NAME="tex2html2055"
+  HREF="node139.html">Master Process parameters</A>
+<LI><A NAME="tex2html2056"
+  HREF="node140.html">Draw Graph parameters</A>
+<LI><A NAME="tex2html2057"
+  HREF="node141.html">Tree Manager parameters</A>
+<LI><A NAME="tex2html2058"
+  HREF="node142.html">LP parameters</A>
+<LI><A NAME="tex2html2059"
+  HREF="node143.html">Cut Generator Parameters</A>
+<LI><A NAME="tex2html2060"
+  HREF="node144.html">Cut Pool Parameters</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html2052"
+  HREF="node138.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2048"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2042"
+  HREF="node136.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2050"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html2053"
+  HREF="node138.html">Global parameters</A>
+<B> Up:</B> <A NAME="tex2html2049"
+  HREF="man.html">SYMPHONY 3.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html2043"
+  HREF="node136.html">user_interpret_text</A>
+ &nbsp <B>  <A NAME="tex2html2051"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

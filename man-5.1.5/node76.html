@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Initial Solve</TITLE>
+<META NAME="description" CONTENT="Initial Solve">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node77.html">
+<LINK REL="previous" HREF="node75.html">
+<LINK REL="up" HREF="node75.html">
+<LINK REL="next" HREF="node77.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1469"
+  HREF="node77.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1465"
+  HREF="node75.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1459"
+  HREF="node75.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1467"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1470"
+  HREF="node77.html">Solve from Warm Start</A>
+<B>Up:</B> <A NAME="tex2html1466"
+  HREF="node75.html">The Master Module</A>
+<B> Previous:</B> <A NAME="tex2html1460"
+  HREF="node75.html">The Master Module</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00541100000000000000"></A><A NAME="initial_solve"></A>
+<BR>
+Initial Solve
+</H3>
+
+<P>
+Calling the initial solve method solves a given MILP from scratch, as
+described above. The first action taken is to create an instance of the tree
+manager module that will control execution of the algorithm. If the algorithm
+is to be executed in parallel on a distributed architecture, the master module
+spawns a separate tree manager process that will autonomously control the
+solution process. The tree manager in turn creates the modules for processing
+the nodes of the search tree, generating cuts, and maintaining cut pools.
+These modules work in concert to execute the solution process. When it makes
+sense, sets of two or more modules, such as a node processing module and a cut
+generation module may be combined to yield a single process in which the
+combined modules work in concert and communicate with each other through
+shared memory instead of across the network. When running as separate process,
+the modules communicate with each other using a standard communications
+protocol. Currently, the only option supported is PVM, but it would be
+relatively easy to add an MPI implementation.
+
+<P>
+The overall flow of the algorithm is similar to other branch and bound
+implementations and is detailed below. A priority queue of candidate
+subproblems available for processing is maintained at all times and the
+candidates are processed in an order determined by the search strategy. The
+algorithm terminates when the queue is empty or when another specified
+condition is satisfied. A new feature in SYMPHONY 5.1.5  is the ability to stop
+the computation based on exceeding a given time limit, exceeding a given limit
+on the number of processed nodes, achieving a target percentage gap between
+the upper and lower bounds, or finding the first feasible solution. After
+halting prematurely, the computation can be restarted after modifying
+parameters or problem data. This enables the implementation of a wide range of
+dynamic and on-line solution algorithms, as we describe next.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1469"
+  HREF="node77.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1465"
+  HREF="node75.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1459"
+  HREF="node75.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1467"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1470"
+  HREF="node77.html">Solve from Warm Start</A>
+<B>Up:</B> <A NAME="tex2html1466"
+  HREF="node75.html">The Master Module</A>
+<B> Previous:</B> <A NAME="tex2html1460"
+  HREF="node75.html">The Master Module</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-10-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

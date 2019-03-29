@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_receive_cg_data</TITLE>
+<META NAME="description" CONTENT="user_receive_cg_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node133.html">
+<LINK REL="previous" HREF="node131.html">
+<LINK REL="up" HREF="node131.html">
+<LINK REL="next" HREF="node133.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html2142"
+  HREF="node133.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2138"
+  HREF="node131.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2132"
+  HREF="node131.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2140"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2143"
+  HREF="node133.html">user_receive_lp_solution_cg</A>
+<B>Up:</B> <A NAME="tex2html2139"
+  HREF="node131.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html2133"
+  HREF="node131.html">User-written functions of the</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00613100000000000000"></A>
+<A NAME="user_receive_cg_data"></A>
+<BR>
+user_receive_cg_data
+</H3>
+<PRE>
+int user_receive_cg_data (void **user)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+This function only has to be filled out for parallel execution and only if the
+TM, LP, and CG modules are all compiled as separate modules. This would not be
+typical. If needed, the user can use this function to receive problem-specific
+data needed for computation in the CG module. The same data must be received
+here that was sent in the <A HREF="node94.html#user_send_cg_data"><TT>user_send_cg_data()</TT></A> function in the
+master module. The user has to allocate space for all the data structures,
+including <TT>user</TT> itself. Note that some or all of this may be done in the
+function <TT><A HREF="node94.html#user_send_cg_data">user_send_cg_data()</A></TT> if the Tree
+Manager, LP, and CG are all compiled together. See that function for more
+information.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void **user</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the user-defined data structure.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. CG exits.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>The user received the data properly.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User did not send any data.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Invoked from:</STRONG></DT>
+<DD><TT>cg_initialize()</TT> at process start.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html2142"
+  HREF="node133.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2138"
+  HREF="node131.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2132"
+  HREF="node131.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2140"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html2143"
+  HREF="node133.html">user_receive_lp_solution_cg</A>
+<B>Up:</B> <A NAME="tex2html2139"
+  HREF="node131.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html2133"
+  HREF="node131.html">User-written functions of the</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

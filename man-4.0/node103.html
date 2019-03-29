@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>MIPdesc</TITLE>
+<META NAME="description" CONTENT="MIPdesc">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node105.html">
+<LINK REL="previous" HREF="node101.html">
+<LINK REL="up" HREF="node100.html">
+<LINK REL="next" HREF="node104.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1794"
+  HREF="node104.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1790"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1784"
+  HREF="node102.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1792"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1795"
+  HREF="node104.html">cut_data</A>
+<B>Up:</B> <A NAME="tex2html1791"
+  HREF="node100.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1785"
+  HREF="node102.html">MIPdesc</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00612200000000000000"></A>
+<A NAME="MIPdesc"></A>
+<BR>
+MIPdesc
+</H3>
+
+<P>
+One of the few internally defined data structures that the user has to deal
+with frequently is the <TT>MIPdesc</TT> data structure, which holds the data
+needed to describe a MILP. This data structure is used by SYMPHONY for two
+purposes. First, it is used to store the description of a generic MILP that is
+either read in from an MPS or AMPL file. More importantly, it is the data
+structure the user must use to pass the subproblem descriptions back to
+SYMPHONY at the time a new search tree node is created in the function
+<A HREF="node112.html#user_create_subproblem"><TT>user_create_subproblem()</TT></A>. The structure has 14 fields (listed
+below) that must be filled out to describe a subproblem (some fields are
+optional). 
+<BR>
+<BR>
+A subproblem is a mixed-integer program defined by a matrix of constraints, an
+objective function, bounds on both the right hand side values of the
+constraints and the variables, an array indicating which variables are
+integer, and (optionally) an array of column names that allows SYMPHONY to
+report the solution back in terms of column names instead of user indices. If
+the subproblem has <TT>n</TT> variables and <TT>m</TT> constraints, the
+constraints are given by a constraint coefficient matrix of size <TT>m</TT>
+<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$\times$"> <TT>n</TT> (described in the next paragraph). The sense of each
+constraint, the right hand side values and bounds on the right hand side
+(called <EM>range</EM>) are vectors are of size <TT>m</TT>. The objective
+function coefficients and the lower and upper bounds on the variables are
+vectors of length <TT>n</TT>. The sense of each constraint can be either 'L'
+(<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img27.png"
+ ALT="$\leq$">), 'E' (<IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="$=$">), 'G' (<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img29.png"
+ ALT="$\geq$">) or 'R' (ranged). For non-ranged rows the
+range value is <TT>0</TT>, for a ranged row the range value must be non-negative
+and the constraint means that the row activity level has to be between the
+right hand side value and the right hand side increased by the range value. 
+<BR>
+<BR>
+Since the coefficient matrix is very often sparse, only the nonzero entries
+are stored. Each entry of the matrix has a column index, a row index and a
+coefficient value associated with it. A matrix is specified in the form of the
+three arrays <TT>matval</TT>, <TT>matind</TT>, and <TT>matbeg</TT>. The array
+<TT>matval</TT> contains the values of the nonzero entries of the matrix in
+<I>column order</I>; that is, all the entries for the <IMG
+ WIDTH="29" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img30.png"
+ ALT="$0^th$"> column come first,
+then the entries for the <IMG
+ WIDTH="26" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img31.png"
+ ALT="$1^st$"> column, etc. The row index corresponding to
+each entry of <TT>matval</TT> is listed in <TT>matind</TT> (both of them are
+of length <TT>nz</TT>, the number of nonzero entries in the matrix).  Finally,
+<TT>matbeg</TT> contains the starting positions of each of the columns in 
+<TT>matval</TT> and <TT>matind</TT>. Thus, <TT>matbeg[i]</TT> is the position
+of the first entry of column <TT>i</TT> in both <TT>matval</TT> and
+<TT>matind</TT>). By convention <TT>matbeg</TT> is allocated to be of length
+<TT>n+1</TT>, with <TT>matbeg[n]</TT> containing the position after the very
+last entry in <TT>matval</TT> and <TT>matind</TT> (so it is very conveniently
+equal to <TT>nz</TT>). This representation of a matrix is known as a <EM>column ordered</EM> or <EM>column major</EM> representation. Below are listed the
+fields that must be filled out to describe a subproblem.
+<BR>
+<BR>
+<P>
+<DL>
+<DT><STRONG><TT>int n</TT> -</STRONG></DT>
+<DD>The number of columns.
+</DD>
+<DT><STRONG><TT>int m</TT> -</STRONG></DT>
+<DD>The number of rows.
+</DD>
+<DT><STRONG><TT>int nz</TT> -</STRONG></DT>
+<DD>The number of nonzeros.
+</DD>
+<DT><STRONG><TT>double obj_offset</TT> -</STRONG></DT>
+<DD>Constant to be added to the objective
+function value when printed.
+</DD>
+<DT><STRONG><TT>char obj_sense</TT> -</STRONG></DT>
+<DD>Objective sense (set to <TT>MAXIMIZE</TT>
+or <TT>MINIMIZE</TT>).
+</DD>
+<DT><STRONG><TT>char *is_int</TT> -</STRONG></DT>
+<DD>Indicates which variables are required to be 
+integer.
+</DD>
+<DT><STRONG><TT>int *matbeg</TT> - </STRONG></DT>
+<DD>The array containing the starting positions
+for each column.  
+</DD>
+<DT><STRONG><TT>int *matind</TT> -</STRONG></DT>
+<DD>The array containing the indices for each
+column. 
+</DD>
+<DT><STRONG><TT>double *matval</TT> -</STRONG></DT>
+<DD>The array containing the matrix values for
+each column.
+</DD>
+<DT><STRONG><TT>double *obj</TT> -</STRONG></DT>
+<DD>The objective function coefficients.
+</DD>
+<DT><STRONG><TT>double *rhs</TT> -</STRONG></DT>
+<DD>The right hand side values for the
+constraints. 
+</DD>
+<DT><STRONG><TT>double *rngval</TT> -</STRONG></DT>
+<DD>The range values for the constraints
+(optional). 
+</DD>
+<DT><STRONG><TT>char *sense</TT> -</STRONG></DT>
+<DD>The senses of the constraints. 
+</DD>
+<DT><STRONG><TT>double *lb</TT> -</STRONG></DT>
+<DD>The lower bounds of the variables.
+</DD>
+<DT><STRONG><TT>double *ub</TT> -</STRONG></DT>
+<DD>The upper bounds of the variables.
+</DD>
+<DT><STRONG><TT>char **colname</TT> -</STRONG></DT>
+<DD>The column names.
+</DD>
+</DL>
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1796"
+  HREF="node104.html">cut_data</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html1794"
+  HREF="node104.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1790"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1784"
+  HREF="node102.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1792"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1795"
+  HREF="node104.html">cut_data</A>
+<B>Up:</B> <A NAME="tex2html1791"
+  HREF="node100.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1785"
+  HREF="node102.html">MIPdesc</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

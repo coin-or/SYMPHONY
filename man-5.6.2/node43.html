@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using SYMPHONY from the Command Line</TITLE>
+<META NAME="description" CONTENT="Using SYMPHONY from the Command Line">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node44.html">
+<LINK REL="previous" HREF="node36.html">
+<LINK REL="up" HREF="node35.html">
+<LINK REL="next" HREF="node44.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html981"
+  HREF="node44.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html977"
+  HREF="node35.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html971"
+  HREF="node42.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html979"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html982"
+  HREF="node44.html">Using the Callable Library</A>
+<B>Up:</B> <A NAME="tex2html978"
+  HREF="node35.html">Using SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html972"
+  HREF="node42.html">Sub Menu Browsing</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00420000000000000000">
+Using SYMPHONY from the Command Line</A>
+</H1>
+
+<P>
+For batch processing and scripting, SYMPHONY can also be called from the
+command line from a terminal in any operating system (note that in the Windows
+terminal, the path separator is 
+<FONT COLOR="#a52a2a"><TT>
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="\bgroup\color{Brown}$ \backslash$\egroup"></SPAN></FONT></TT></FONT> rather than 
+<FONT COLOR="#a52a2a"><TT>/</TT></FONT>).
+When called from the command line, a number of command-line switches can be
+invoked to specify the file to be read and solved, as well as set parameters.
+Note that the switches are Unix-style, even in Windows). At a minimum, one must
+specify the name of the file to be read and solved. The following is the
+calling sequence to load in an instance file in MPS format and 
+solve it.
+
+<PRE>
+ ./symphony -F sample.mps
+</PRE> 
+To read and solve a model in LP format, the command would be
+
+<PRE>
+ ./symphony -L sample.lp
+</PRE> 
+To read and solve a GMPL model and associated data file, the command would be
+
+<PRE>
+ ./symphony -F sample.mod -D sample.dat
+</PRE> 
+In addition to specifying the name of the instance file, most of the common
+parameters can also be set on the command line by adding various switches.
+Calling SYMPHONY with just the argument 
+<FONT COLOR="#a52a2a"><TT>-h</TT></FONT> will list all the options. To
+set parameters that cannot be set on the command line or to save parameter
+setting, it is possible to use a parameter file in which a group of parameters
+can be set. To invoke SYMPHONY with a parameter file, type 
+<FONT COLOR="#a52a2a"><TT>./symphony -f
+filename</TT></FONT>, where 
+<FONT COLOR="#a52a2a"><TT>filename</TT></FONT> is the name of the parameter file. The format
+of the file and a list of all parameters is given in Section
+<A HREF="node271.html#parameter_file">6.4</A>.
+
+<P>
+The output level can be controlled through the use of the verbosity parameter,
+which can be invoked Setting this parameter at different levels will cause
+different progress messages to be printed out. Level 0 only prints out the
+introductory and solution summary messages, along with status messages every
+10 minutes. Level 1 prints out a message every time a new node is created.
+Level 3 prints out messages describing each iteration of the solution process.
+Levels beyond 3 print out even more detailed information. To get no output at
+all, the verbosity level must be set to -2.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html981"
+  HREF="node44.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html977"
+  HREF="node35.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html971"
+  HREF="node42.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html979"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html982"
+  HREF="node44.html">Using the Callable Library</A>
+<B>Up:</B> <A NAME="tex2html978"
+  HREF="node35.html">Using SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html972"
+  HREF="node42.html">Sub Menu Browsing</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2014-10-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

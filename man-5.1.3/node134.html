@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>sym_close_environment</TITLE>
+<META NAME="description" CONTENT="sym_close_environment">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node133.html">
+<LINK REL="up" HREF="node119.html">
+<LINK REL="next" HREF="node135.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html2450"
+  HREF="node135.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2446"
+  HREF="node119.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2442"
+  HREF="node133.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2448"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2451"
+  HREF="node135.html">Parameter Query and Modification</A>
+<B>Up:</B> <A NAME="tex2html2447"
+  HREF="node119.html">Primary Interface Functions</A>
+<B> Previous:</B> <A NAME="tex2html2443"
+  HREF="node133.html">sym_get_user_data</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007111500000000000000">
+sym_close_environment</A>
+</H3><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+[f]sym_close_environment
+</FONT></FONT><PRE>
+int sym_close_environment(sym_environment *env)
+</PRE><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT><DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This routine closes the environment and returns the allocated memory.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>sym_environment *env</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the SYMPHONY environment.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>ERROR__USER</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=271>Error. User error detected in <TT>user_free_master()</TT> 
+function.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_ABNORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=271>Function invoked unsuccessfully.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_NORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=271>Function invoked successfully.</TD>
+</TR>
+</TABLE>
+</DD>
+</DL><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+<BR>
+<BR>
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

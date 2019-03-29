@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_free_cp</TITLE>
+<META NAME="description" CONTENT="user_free_cp">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node266.html">
+<LINK REL="up" HREF="node261.html">
+<LINK REL="next" HREF="node268.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4207"
+  HREF="node268.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4203"
+  HREF="node261.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4199"
+  HREF="node266.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4205"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4208"
+  HREF="node268.html">Draw graph module callbacks</A>
+<B>Up:</B> <A NAME="tex2html4204"
+  HREF="node261.html">Cut pool module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html4200"
+  HREF="node266.html">user_finished_checking_cuts</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00734600000000000000">
+user_free_cp</A>
+</H3>
+[cf]user_free_cp
+<PRE>
+int user_free_cp(void **user)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+The user has to free all the data structures within <TT>user</TT>, and also free
+<TT>user</TT> itself. The user can use the built-in macro <TT>FREE</TT> that checks
+the existence of a pointer before freeing it. 
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void **user</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=281>Pointer to the user-defined data structure
+(should be <TT>NULL</TT> on exit).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Ignored.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>The user freed all data structures.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>There is nothing to be freed.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Invoked from:</STRONG></DT>
+<DD>cp_close() at module shutdown.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<P>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2015-03-10</I>
+</ADDRESS>
+</BODY>
+</HTML>

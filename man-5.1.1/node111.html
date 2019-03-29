@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The First Rule</TITLE>
+<META NAME="description" CONTENT="The First Rule">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node112.html">
+<LINK REL="previous" HREF="node110.html">
+<LINK REL="up" HREF="node110.html">
+<LINK REL="next" HREF="node112.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1914"
+  HREF="node112.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1910"
+  HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1904"
+  HREF="node110.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1912"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1915"
+  HREF="node112.html">Debugging with PVM</A>
+<B>Up:</B> <A NAME="tex2html1911"
+  HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1905"
+  HREF="node110.html">Debugging Your Application</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00661000000000000000">
+The First Rule</A>
+</H2>
+
+<P>
+SYMPHONY has many built-in options to make debugging easier. The most
+important one, however, is the following rule. <B>It is easier to
+debug the fully sequential version than the fully distributed
+version</B>. Debugging parallel code is not terrible, but it is more
+difficult to understand what is going on when you have to look at the
+interaction of several different modules running as separate
+processes. This means multiple debugging windows which have to be
+closed and restarted each time the application is re-run. For this
+reason, it is highly recommended to develop code that can be compiled
+serially even if you eventually intend to run in a fully distributed
+environment. This does make the coding marginally more complex, but
+believe me, it's worth the effort. The vast majority of your code will
+be the same for either case. Make sure to use the configuration flag to
+
+<FONT COLOR="#a52a2a"><TT>-enable-debug</TT></FONT> while configuring (see Section <A HREF="node21.html#configuring">2.2.2.2</A>). 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-04</I>
+</ADDRESS>
+</BODY>
+</HTML>

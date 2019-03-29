@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Managing the Search Tree</TITLE>
+<META NAME="description" CONTENT="Managing the Search Tree">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node27.html">
+<LINK REL="previous" HREF="node25.html">
+<LINK REL="up" HREF="node25.html">
+<LINK REL="next" HREF="node27.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html333"
+ HREF="node27.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html331"
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html325"
+ HREF="node25.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html334"
+ HREF="node27.html">The Two-Phase Algorithm</A>
+<B>Up:</B> <A NAME="tex2html332"
+ HREF="node25.html">The Tree Manager Process</A>
+<B> Previous:</B> <A NAME="tex2html326"
+ HREF="node25.html">The Tree Manager Process</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00053100000000000000">&#160;</A>
+<A NAME="tree-management">&#160;</A>
+<BR>
+Managing the Search Tree
+</H3>
+
+<P>
+The tree manager's primary job is to control the execution of the
+algorithm by deciding which candidate node should be chosen as the
+next to be processed. This is done using one of the several built-in
+rules such as selecting the node with the lowest lower bound. Because
+it is expensive to construct a search node from scratch, the tree
+manager will often allow an LP process to retain one of the children
+resulting from branching in order to avoid the set-up costs associated
+with redistributing that node at a later time. This is called <EM>diving</EM> and the resulting chain of nodes is called a <EM>search
+chain</EM>. There are various rules available for deciding when an LP
+process should be allowed to dive. One such rule is to look at the
+number of variables in the current LP solution that are fractional.
+When this number is low, there is a good chance of finding a feasible
+solution quickly by diving. We also dive if one of the children is
+``close'' to being the best node, where ``close'' is defined by a
+chosen parameter. In addition to the time saved by avoiding
+reconstruction of the LP in the child, diving has the apparent
+advantage of leading to the discovery of feasible solutions quickly.
+Since every feasible solution lies at the end of a search chain, it
+seems reasonable to dive periodically. Therefore, random diving takes
+place according to a specified parameter.
+
+<P>
+<HR>
+<A NAME="tex2html333"
+ HREF="node27.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html331"
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html325"
+ HREF="node25.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html334"
+ HREF="node27.html">The Two-Phase Algorithm</A>
+<B>Up:</B> <A NAME="tex2html332"
+ HREF="node25.html">The Tree Manager Process</A>
+<B> Previous:</B> <A NAME="tex2html326"
+ HREF="node25.html">The Tree Manager Process</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

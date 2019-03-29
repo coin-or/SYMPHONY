@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>The Cut Generator Process</TITLE>
+<META NAME="description" CONTENT="The Cut Generator Process">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html361" HREF="node30.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html359" HREF="node19.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html353" HREF="node28.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html362" HREF="node30.html">The Cut Pool Process</A>
+<B>Up:</B> <A NAME="tex2html360" HREF="node19.html">Implementation of the Modules</A>
+<B> Previous:</B> <A NAME="tex2html354" HREF="node28.html">Fault Tolerance</A>
+<BR> <P>
+<H2><A NAME="SECTION00054000000000000000">The Cut Generator Process</A></H2>
+<P>
+To implement the cut generator process, the user must provide a
+function that accepts an LP solution and returns cuts violated by that
+solution. Each cut is immediately returned to the requesting LP
+process, rather than being passed as a group once the function
+exits. This allows the LP to begin adding cuts and solving the current
+relaxation before the cut generator is finished if desired. Parameters
+controlling if and when the LP should begin solving the relaxation
+before the cut generator is finished can be set by the user.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 14:31:17 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

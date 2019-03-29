@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>C++ Interface/OSI Parameters</TITLE>
+<META NAME="description" CONTENT="C++ Interface/OSI Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node280.html">
+<LINK REL="up" HREF="node273.html">
+<LINK REL="next" HREF="node282.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4378"
+  HREF="node282.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4374"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4370"
+  HREF="node280.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4376"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4379"
+  HREF="node282.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html4375"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4371"
+  HREF="node280.html">Cut Pool Parameters</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00748000000000000000"></A>
+<A NAME="OSI_Parameters"></A>
+<BR>
+C++ Interface/OSI Parameters
+</H2><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">As the implementation of the whole interface, there exists a matching 
+C interface parameter to each of the C++ Interface/OSI parameter and 
+the parameter setting functions are designed to set the 
+corresponding C interface parameter. Thus, we will just give a table of the 
+parameter names, their C interface complements and the values they can be set 
+to, rather than their detailed descriptions. For each parameter, the user 
+can see the C interface complement for further explanation. 
+<BR></FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">16cm7cm
+</FONT></FONT><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT><FONT COLOR="#a52a2a"><B>C++ Interface</B><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT><FONT COLOR="#a52a2a"><B>C Interface</B><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT><FONT COLOR="#a52a2a"><B>Value</B></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+OsiSymVerbosity </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> verbosity </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymWarmStart </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> warm_start </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymNodeLimit </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">  </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+OsiMaxNumIteration </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> node_limit </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined-</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+OsiMaxNumIterationHotStart </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymFindFirstFeasible </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> find_first_feasible </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymSearchStrategy </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> node_selection_rule </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> LOWEST_LP_FIRST </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> HIGHEST_LP_FIRST </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> BREADTH_FIRST_SEARCH </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> DEPTH_FIRST_SEARCH </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymUsePermanentCutPools </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> use_permanent_cut_pools </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglGomoryCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_gomory_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglKnapsackCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_knapsack_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglOddHoleCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_oddhole_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglProbingCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_probing_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglCliqueCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_clique_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglFlowAndCoverCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_flow_and_cover_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglRoundingCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_rounding_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGenerateCglLiftAndProjectCuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> generate_cgl_lift_and_project_cuts </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymKeepWarmStart </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> keep_warm_start </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymTrimWarmTree </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> trim_warm_tree * -boolean- </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymDoReducedCostFixing </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> do_reduced_cost_fixing </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymMCFindSupportedSolutions </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+mc_find_supported_solutions </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymSensitivityAnalysis </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sensitivity_analysis </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -boolean- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymRandomSeed </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> random_seed </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined-</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymDivingStrategy </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> diving_strategy </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> BEST_ESTIMATE </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> COMP_BEST_K </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> COMP_BEST_K_GAP </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymDivingK </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> diving_k </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymDivingThreshold </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> diving_threshold </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymGranularity </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> granularity </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiSymTimeLimit </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> time_limit </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+    
+OsiSymGapLimit </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> gap_limit </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiObjOffset </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+ 
+OsiProbName </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> problem_name </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> -user defined- </FONT></FONT></TD>
+</TR>
+</TABLE><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+<BR></FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">However, as it is seen, only some of the C interface parameters have their 
+matches. If the other parameters are required to be modified, the user 
+can always set them directly by their C interface names, 
+using the overlapping functions: <TT>setSymParam(string, int), 
+setSymParam(string, double) and setSymParam(string,string)</TT>. For instance, 
+the <TT>
+<FONT COLOR="#000000"> verbosity</FONT></TT> parameter can be set, let's say, to 2 either by 
+setSymParam(OsiSymVerbosity, 2) or by setSymParam(``verbosity'', 2). 
+Note that, this flexibility is also supported for parameter querying 
+functions. 
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html4378"
+  HREF="node282.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4374"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4370"
+  HREF="node280.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4376"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html4379"
+  HREF="node282.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html4375"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4371"
+  HREF="node280.html">Cut Pool Parameters</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

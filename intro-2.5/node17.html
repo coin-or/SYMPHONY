@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Constraints</TITLE>
+<META NAME="description" CONTENT="Constraints">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html224" HREF="node18.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html222" HREF="node15.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html216" HREF="node16.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html225" HREF="node18.html">Search Tree</A>
+<B>Up:</B> <A NAME="tex2html223" HREF="node15.html">Data Structures and Storage</A>
+<B> Previous:</B> <A NAME="tex2html217" HREF="node16.html">Variables</A>
+<BR> <P>
+<H3><A NAME="SECTION00043200000000000000">Constraints</A></H3>
+<P>
+<A NAME="constraints">&#160;</A>
+<P>
+Just as with variables, the constraints are divided into <EM>base
+constraints</EM> and <EM>extra constraints</EM>. The base constraints are
+those that are included in every LP relaxation, whereas the extra
+constraints are generated dynamically and are free to enter and leave
+the relaxation. Typically, the base constraints are some subset of the
+constraints in the integer programming formulation of the problem.
+For example, in the Traveling Salesman Problem, the set of base
+constraints could simply consist of the degree constraints. Obviously,
+the set of base constraints must be known explicitly. Extra
+constraints, on the other hand, are generated dynamically by the cut
+generator as they are violated. As with variables, the constraints in
+the current relaxation are called the <EM>active constraints</EM>.
+<P>
+Since SYMPHONY has no knowledge of the structure of the cuts being
+generated, it is up to the user, if desired, to designate a packed
+form for each class of cut and to implement cut packing and unpacking
+subroutines. For instance, suppose that the set of nonzero variables
+in a particular class of cuts corresponds to the set of edges across a
+cut in a graph. Instead of storing the indices of each variable
+explicitly, it is more efficient to simply store the set of nodes on
+one side of the cut as a bit array. The cut can then be constructed
+easily for the particular set of active variables (edges) in the
+problem at the time.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:11 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

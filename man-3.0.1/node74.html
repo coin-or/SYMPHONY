@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The User API Specification</TITLE>
+<META NAME="description" CONTENT="The User API Specification">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node136.html">
+<LINK REL="previous" HREF="node50.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node75.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1180"
+  HREF="node75.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1176"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1170"
+  HREF="node73.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1178"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1181"
+  HREF="node75.html">User-written functions of the</A>
+<B>Up:</B> <A NAME="tex2html1177"
+  HREF="man.html">SYMPHONY 3.0.1 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html1171"
+  HREF="node73.html">Other Resources</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000110000000000000000"></A>
+<A NAME="API"></A>
+<BR>
+The User API Specification
+</H1>
+
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1182"
+  HREF="node75.html">User-written functions of the Master process</A>
+<UL>
+<LI><A NAME="tex2html1183"
+  HREF="node76.html">user_usage</A>
+<LI><A NAME="tex2html1184"
+  HREF="node77.html">user_initialize</A>
+<LI><A NAME="tex2html1185"
+  HREF="node78.html">user_free_master</A>
+<LI><A NAME="tex2html1186"
+  HREF="node79.html">user_readparams</A>
+<LI><A NAME="tex2html1187"
+  HREF="node80.html">user_io</A>
+<LI><A NAME="tex2html1188"
+  HREF="node81.html">user_init_draw_graph</A>
+<LI><A NAME="tex2html1189"
+  HREF="node82.html">user_start_heurs</A>
+<LI><A NAME="tex2html1190"
+  HREF="node83.html">user_set_base</A>
+<LI><A NAME="tex2html1191"
+  HREF="node84.html">user_create_root</A>
+<LI><A NAME="tex2html1192"
+  HREF="node85.html">user_receive_feasible_solution</A>
+<LI><A NAME="tex2html1193"
+  HREF="node86.html">user_send_lp_data</A>
+<LI><A NAME="tex2html1194"
+  HREF="node87.html">user_send_cg_data</A>
+<LI><A NAME="tex2html1195"
+  HREF="node88.html">user_send_cp_data</A>
+<LI><A NAME="tex2html1196"
+  HREF="node89.html">user_display_solution</A>
+<LI><A NAME="tex2html1197"
+  HREF="node90.html">user_send_feas_sol</A>
+<LI><A NAME="tex2html1198"
+  HREF="node91.html">user_process_own_messages</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1199"
+  HREF="node92.html">User-written functions of the LP process</A>
+<UL>
+<LI><A NAME="tex2html1200"
+  HREF="node93.html">Data Structures</A>
+<UL>
+<LI><A NAME="tex2html1201"
+  HREF="node94.html">cut_data</A>
+<LI><A NAME="tex2html1202"
+  HREF="node95.html">waiting_row</A>
+<LI><A NAME="tex2html1203"
+  HREF="node96.html">var_desc</A>
+</UL>
+<LI><A NAME="tex2html1204"
+  HREF="node97.html">user_receive_lp_data</A>
+<LI><A NAME="tex2html1205"
+  HREF="node98.html">user_free_lp</A>
+<LI><A NAME="tex2html1206"
+  HREF="node99.html">user_create_lp</A>
+<LI><A NAME="tex2html1207"
+  HREF="node100.html">user_get_upper_bounds</A>
+<LI><A NAME="tex2html1208"
+  HREF="node101.html">user_is_feasible</A>
+<LI><A NAME="tex2html1209"
+  HREF="node102.html">user_send_feasible_solution</A>
+<LI><A NAME="tex2html1210"
+  HREF="node103.html">user_display_solution</A>
+<LI><A NAME="tex2html1211"
+  HREF="node104.html">user_shall_we_branch</A>
+<LI><A NAME="tex2html1212"
+  HREF="node105.html">user_select_candidates</A>
+<LI><A NAME="tex2html1213"
+  HREF="node106.html">user_compare_candidates</A>
+<LI><A NAME="tex2html1214"
+  HREF="node107.html">user_select_child</A>
+<LI><A NAME="tex2html1215"
+  HREF="node108.html">user_print_branch_stat</A>
+<LI><A NAME="tex2html1216"
+  HREF="node109.html">user_add_to_desc</A>
+<LI><A NAME="tex2html1217"
+  HREF="node110.html">user_same_cuts</A>
+<LI><A NAME="tex2html1218"
+  HREF="node111.html">user_unpack_cuts</A>
+<LI><A NAME="tex2html1219"
+  HREF="node112.html">user_send_lp_solution</A>
+<LI><A NAME="tex2html1220"
+  HREF="node113.html">user_logical_fixing</A>
+<LI><A NAME="tex2html1221"
+  HREF="node114.html">user_generate_column</A>
+<LI><A NAME="tex2html1222"
+  HREF="node115.html">user_generate_cuts_in_lp</A>
+<LI><A NAME="tex2html1223"
+  HREF="node116.html">user_print_stat_on_cuts_added</A>
+<LI><A NAME="tex2html1224"
+  HREF="node117.html">user_purge_waiting_rows</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1225"
+  HREF="node118.html">User-written functions of the CG process</A>
+<UL>
+<LI><A NAME="tex2html1226"
+  HREF="node119.html">user_receive_cg_data</A>
+<LI><A NAME="tex2html1227"
+  HREF="node120.html">user_receive_lp_solution_cg</A>
+<LI><A NAME="tex2html1228"
+  HREF="node121.html">user_free_cg</A>
+<LI><A NAME="tex2html1229"
+  HREF="node122.html">user_find_cuts</A>
+<LI><A NAME="tex2html1230"
+  HREF="node123.html">user_check_validity_of_cut</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1231"
+  HREF="node124.html">User-written functions of the CP process</A>
+<UL>
+<LI><A NAME="tex2html1232"
+  HREF="node125.html">user_receive_cp_data</A>
+<LI><A NAME="tex2html1233"
+  HREF="node126.html">user_free_cp</A>
+<LI><A NAME="tex2html1234"
+  HREF="node127.html">user_receive_lp_solution_cp</A>
+<LI><A NAME="tex2html1235"
+  HREF="node128.html">user_prepare_to_check_cuts</A>
+<LI><A NAME="tex2html1236"
+  HREF="node129.html">user_check_cut</A>
+<LI><A NAME="tex2html1237"
+  HREF="node130.html">user_finished_checking_cuts</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1238"
+  HREF="node131.html">User-written functions of the Draw Graph process</A>
+<UL>
+<LI><A NAME="tex2html1239"
+  HREF="node132.html">user_dg_process_message</A>
+<LI><A NAME="tex2html1240"
+  HREF="node133.html">user_dg_init_window</A>
+<LI><A NAME="tex2html1241"
+  HREF="node134.html">user_dg_free_window</A>
+<LI><A NAME="tex2html1242"
+  HREF="node135.html">user_interpret_text</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

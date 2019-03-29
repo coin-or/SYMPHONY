@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_interpret_text</TITLE>
+<META NAME="description" CONTENT="user_interpret_text">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node271.html">
+<LINK REL="up" HREF="node268.html">
+<LINK REL="next" HREF="node273.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4266"
+  HREF="node273.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4262"
+  HREF="node268.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4258"
+  HREF="node271.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4264"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4267"
+  HREF="node273.html">Run-time Parameters</A>
+<B>Up:</B> <A NAME="tex2html4263"
+  HREF="node268.html">Draw graph module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html4259"
+  HREF="node271.html">user_dg_free_window</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00735400000000000000">
+user_interpret_text</A>
+</H3><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+[cf]user_interpret_text
+</FONT></FONT><PRE>
+void user_interpret_text(void *user, int text_length,
+			 char *text, int owner_tid)
+</PRE><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT><DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The user can interpret text input from the window.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int text_length</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>The length of <TT>text</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char *text</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int owner_tid</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>The tid of the process that initiated this window.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. Ignored.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>The user successfully interpreted the text.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+<BR>
+<BR>
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"></FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

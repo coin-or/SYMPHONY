@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Data Structures</TITLE>
+<META NAME="description" CONTENT="Data Structures">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node105.html">
+<LINK REL="previous" HREF="node103.html">
+<LINK REL="up" HREF="node96.html">
+<LINK REL="next" HREF="node105.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1820"
+  HREF="node105.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1816"
+  HREF="node96.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1810"
+  HREF="node103.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1818"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1821"
+  HREF="node105.html">Parallel Implementation</A>
+<B>Up:</B> <A NAME="tex2html1817"
+  HREF="node96.html">Developing Custom Applications</A>
+<B> Previous:</B> <A NAME="tex2html1811"
+  HREF="node103.html">Writing the Callbacks</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00640000000000000000">
+Data Structures</A>
+</H1>
+
+<P>
+The user can define her own data structure for each module to maintain problem
+data and any other information the user needs access to in order to implement
+functions to customize the solver. A pointer to this data structure is
+maintained by SYMPHONY and is passed to the user as an argument to each user
+function. The pointer must be initially passed using the
+<TT>
+<FONT COLOR="#000000"> sym_set_user_data()</FONT></TT> command. Since SYMPHONY knows nothing about this data
+structure, it is up to the user to allocate it and maintain it. The user must
+also implement a function to free it. The functions for freeing the user data
+structures in each module are called 
+<FONT COLOR="#a52a2a"><TT>user_free_*</TT></FONT>, where 
+<FONT COLOR="#a52a2a"><TT>*</TT></FONT> is
+the module. These functions are called by SYMPHONY at the time when other data
+structures for the modules are being freed and the module is being closed. By
+default, for sequential computation, there is one common user data structure
+for all modules and the pointer to that data structure is passed to all user
+functions, regardless of the module. This setup should work fine for most
+sequential applications. In parallel, however, pointers cannot be shared
+between modules and data must be explicitly passed. In this case, it is
+sometimes more efficient to maintain in each module only the data necessary to
+perform the functions of that module.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1820"
+  HREF="node105.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1816"
+  HREF="node96.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1810"
+  HREF="node103.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1818"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1821"
+  HREF="node105.html">Parallel Implementation</A>
+<B>Up:</B> <A NAME="tex2html1817"
+  HREF="node96.html">Developing Custom Applications</A>
+<B> Previous:</B> <A NAME="tex2html1811"
+  HREF="node103.html">Writing the Callbacks</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2016-02-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

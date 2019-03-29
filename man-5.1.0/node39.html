@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Main Menu</TITLE>
+<META NAME="description" CONTENT="Main Menu">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node40.html">
+<LINK REL="previous" HREF="node38.html">
+<LINK REL="up" HREF="node36.html">
+<LINK REL="next" HREF="node40.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html928"
+  HREF="node40.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html924"
+  HREF="node36.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html918"
+  HREF="node38.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html926"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html929"
+  HREF="node40.html">Set Menu</A>
+<B>Up:</B> <A NAME="tex2html925"
+  HREF="node36.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A NAME="tex2html919"
+  HREF="node38.html">Microsoft Windows</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00413000000000000000">
+Main Menu</A>
+</H2>
+
+<P>
+Below is the main menu displayed at the beginning of a new session:
+
+<P>
+
+<PRE>
+ *******************************************************
+ *   This is SYMPHONY Version 5.1.0                    *
+ *   Copyright 2000-2006 Ted Ralphs                    *
+ *   All Rights Reserved.                              *
+ *   Distributed under the Common Public License 1.0   *
+ *******************************************************
+
+ ***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******
+
+ Please type 'help'/'?' to see the main commands!
+
+ SYMPHONY:
+</PRE>
+When you type 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT> or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT>, a list of main commands is displayed:
+
+<PRE>
+ SYMPHONY: help
+
+ List of main commands:
+
+ load      : read a problem in mps or ampl format
+ solve     : solve the problem
+ lpsolve   : solve the lp relaxation of the problem
+ set       : set a parameter
+ display   : display optimization results and stats
+ reset     : restart the optimizer
+ help      : show the available commands/params/options
+
+ quit/exit : leave the optimizer
+
+ SYMPHONY:
+</PRE>
+Following is an illustration of a session to read in a sample instance:
+
+<PRE>
+ SYMPHONY: load 
+ Name of the file: sample.mps
+ Coin0001I At line 1 NAME SAMPLE
+ Coin0001I At line 2 ROWS
+ Coin0001I At line 6 COLUMNS
+ Coin0001I At line 25 RHS
+ Coin0001I At line 28 BOUNDS
+ Coin0001I At line 34 ENDATA
+ Coin0002I Problem SAMPLE has 2 rows, 6 columns and 10 elements
+ SYMPHONY:
+</PRE>
+The format of the input file is recognized from the file extension. If there is
+none, you will be prompted to define the input format: 
+
+<PRE>
+ SYMPHONY: load 
+ Name of the file: sample
+ Type of the file ('mps'/'ampl'/'gmpl'): mps 
+ Coin0001I At line 1 NAME SAMPLE
+ Coin0001I At line 2 ROWS
+ Coin0001I At line 6 COLUMNS
+ Coin0001I At line 25 RHS
+ Coin0001I At line 28 BOUNDS
+ Coin0001I At line 34 ENDATA
+ Coin0002I Problem SAMPLE has 2 rows, 6 columns and 10 elements
+ SYMPHONY:
+</PRE> 
+If the input is in AMPL/GMPL format, you will also be prompted to read in a
+data file (note again that in order to enable GMPL/AMPL reader, you have to
+install GLPK and configure SYMPHONY appropriately--see Section
+<A HREF="node22.html#building">2.2.2.3</A>)): 
+
+<PRE>
+ SYMPHONY: load 
+ Name of the file: sample.mod
+ Name of the data file: sample.dat
+ Reading model section from sample.mod...
+ 32 lines were read
+ Reading data section from sample.dat...
+ 68 lines were read
+ Generating nb...
+ Generating cost...
+ Model has been successfully generated
+ SYMPHONY:
+</PRE>
+After loading the instance, type 
+<FONT COLOR="#a52a2a"><TT>solve</TT></FONT> to solve the 
+corresponding integer program or 
+<FONT COLOR="#a52a2a"><TT>lpsolve</TT></FONT> to solve its linear
+relaxation:
+
+<PRE>
+ SYMPHONY: solve
+
+ ****** Found Better Feasible Solution !
+ ****** Cost: -40.000000
+
+
+ ****************************************************
+ * Optimal Solution Found                           *
+ ****************************************************
+
+ SYMPHONY: lpsolve
+
+ ****** Found Better Feasible Solution !
+ ****** Cost: -43.000000
+
+
+ ****************************************************
+ * Optimal Solution Found                           *
+ ****************************************************
+
+ SYMPHONY:
+</PRE>
+As above, only the objective values of the feasible solutions found so far and 
+the termination code of the solution process will be displayed (see Section 
+<A HREF="node40.html#set_menu">3.1.4</A> for displaying more output).
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html928"
+  HREF="node40.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html924"
+  HREF="node36.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html918"
+  HREF="node38.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html926"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html929"
+  HREF="node40.html">Set Menu</A>
+<B>Up:</B> <A NAME="tex2html925"
+  HREF="node36.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A NAME="tex2html919"
+  HREF="node38.html">Microsoft Windows</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-11-07</I>
+</ADDRESS>
+</BODY>
+</HTML>

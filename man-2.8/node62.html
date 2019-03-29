@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_add_to_desc</TITLE>
+<META NAME="description" CONTENT="user_add_to_desc">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node63.html">
+<LINK REL="previous" HREF="node61.html">
+<LINK REL="up" HREF="node45.html">
+<LINK REL="next" HREF="node63.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html955"
+ HREF="node63.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html952"
+ HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html946"
+ HREF="node61.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html954"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html956"
+ HREF="node63.html">user_same_cuts</A>
+<B>Up:</B> <A NAME="tex2html953"
+ HREF="node45.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html947"
+ HREF="node61.html">user_print_branch_stat</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000321400000000000000">
+user_add_to_desc</A>
+</H3>
+<PRE>
+int user_add_to_desc(void *user, int *desc_size, char **desc)
+</PRE>
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+Before a node description is sent to the TM, the user can provide a
+pointer to a data structure that will be appended to the description
+for later use by the user in reconstruction of the node. This
+information must be placed into <TT>*desc</TT>. Its size should be
+returned in <TT>*desc_size</TT>.
+<BR>
+<BR>
+There is only one default option: the description to be added is considered to
+be of zero length, i.e., there is no additional description.
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int *desc_size</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>The size of the additional information, the
+length of <TT> *desc</TT> in bytes.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> char **desc</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Pointer to the additional information (space must be
+allocated by the user).</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. <TT> DEFAULT</TT> is used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User filled out <TT> *desc_size</TT> and <TT> *desc</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>No description is appended.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD><TT>create_explicit_node_desc()</TT> before a
+node is sent to the tree manager.
+
+<P>
+</DL>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html955"
+ HREF="node63.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html952"
+ HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html946"
+ HREF="node61.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html954"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html956"
+ HREF="node63.html">user_same_cuts</A>
+<B>Up:</B> <A NAME="tex2html953"
+ HREF="node45.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html947"
+ HREF="node61.html">user_print_branch_stat</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

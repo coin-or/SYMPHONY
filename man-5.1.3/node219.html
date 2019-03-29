@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_send_cp_data</TITLE>
+<META NAME="description" CONTENT="user_send_cp_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node220.html">
+<LINK REL="previous" HREF="node218.html">
+<LINK REL="up" HREF="node208.html">
+<LINK REL="next" HREF="node220.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3601"
+  HREF="node220.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3597"
+  HREF="node208.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3591"
+  HREF="node218.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3599"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3602"
+  HREF="node220.html">user_display_solution</A>
+<B>Up:</B> <A NAME="tex2html3598"
+  HREF="node208.html">Master module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3592"
+  HREF="node218.html">user_send_cg_data</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007311100000000000000"></A>
+<A NAME="user_send_cp_data"></A>
+<BR>
+user_send_cp_data
+</H3><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+[cf]user_send_cp_data
+</FONT></FONT><PRE>
+int user_pack_cp_data(void *user, void **user_cp)
+</PRE><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT><DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+If the user wishes to employ parallelism and wants to use the cut pool to
+store user-defined cuts, this function can be used to send all
+problem-specific data that will be needed by the cut pool module. This could
+include instance data, as well as user parameter settings (see Section
+<A HREF="node108.html#communication">5.5.1</A> for a discussion of this). This is one of the few places
+where the user may need to worry about the configuration of the modules. If
+either the tree manager or the LP are running as a separate process (either
+<TT>COMPILE_IN_LP</TT> or <TT>COMPILE_IN_TM</TT> are <TT>FALSE</TT> in the <TT>make</TT> file), then the data will be sent and received through message-passing.
+See <A HREF="node262.html#user_receive_cp_data"><TT>user_receive_cp_data</TT></A> for more discussion. Otherwise, it can be
+copied through shared memory. The easiest solution, which is set up by default
+is to simply copy over a pointer to a single user data structure where
+instance data is stored. The code for the two cases is put in the same source
+file by use of <TT>#ifdef</TT> statements. See the comments in the code stub for
+this function for more details. 
+<BR>
+<BR>
+Note that there is support for cuts generated and stored as explicit matrix
+rows. The cut pool module is already configured to deal with such cuts, so no
+user implementation is required. Only the use of user-defined cuts requires
+customization of the Cut Pool module. 
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>void **user_cp</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Pointer to the user-defined data
+structure for the cut pool module.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. SYMPHONY stops.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Packing is done.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>No data to send to the cut pool (no user-defined cut
+classes or cut pool not used).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+<BR>
+<BR>
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3601"
+  HREF="node220.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3597"
+  HREF="node208.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3591"
+  HREF="node218.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3599"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3602"
+  HREF="node220.html">user_display_solution</A>
+<B>Up:</B> <A NAME="tex2html3598"
+  HREF="node208.html">Master module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3592"
+  HREF="node218.html">user_send_cg_data</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

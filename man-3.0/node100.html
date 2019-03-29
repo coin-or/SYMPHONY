@@ -1,0 +1,366 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_create_lp</TITLE>
+<META NAME="description" CONTENT="user_create_lp">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node101.html">
+<LINK REL="previous" HREF="node99.html">
+<LINK REL="up" HREF="node93.html">
+<LINK REL="next" HREF="node101.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1603"
+  HREF="node101.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1599"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1593"
+  HREF="node99.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1601"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1604"
+  HREF="node101.html">user_get_upper_bounds</A>
+<B> Up:</B> <A NAME="tex2html1600"
+  HREF="node93.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1594"
+  HREF="node99.html">user_free_lp</A>
+ &nbsp <B>  <A NAME="tex2html1602"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000102400000000000000">
+user_create_lp</A>
+</H3>
+<PRE>
+int user_create_lp(void *user, int varnum, var_desc **vars, int
+                   numrows, int cutnum, cut_data **cuts, int *nz,
+                   int **matbeg, int **matind, double **matval, 
+                   double **obj, double **rhs, char **sense, 
+                   double **rngval, int *maxn, int *maxm, 
+                   int *maxnz, int *allocn, int *allocm, int *allocnz)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+Based on the instance data contained in the user data structure and
+the list of cuts and variables that are active in the
+current subproblem, the user has to create the initial LP relaxation
+for the search node. The matrix of the LP problem must contain the
+variables whose user indices are listed in <TT>vars</TT> (in the same
+order) and at least the base constraints. 
+<BR>
+<BR>
+An LP is defined by a matrix of constraints, an objective function,
+and bounds on both the right hand side values of the constraints and
+on the variables. If the problem has <IMG
+ WIDTH="15" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img5.png"
+ ALT="$n$"> variables and <IMG
+ WIDTH="20" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img30.png"
+ ALT="$m$">
+constraints, the constraints are given by a constraint coefficient
+matrix of size <IMG
+ WIDTH="40" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img31.png"
+ ALT="$m x n$"> (described in the next paragraph). The sense of
+each constraint, the right hand side values and bounds on the right
+hand side (called <EM>range</EM>) are vectors are of size <IMG
+ WIDTH="20" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img30.png"
+ ALT="$m$">. The
+objective function coefficients and the lower and upper bounds on the
+variables are vectors of length <IMG
+ WIDTH="15" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img5.png"
+ ALT="$n$">. The sense of each constraint can
+be either 'L' (<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img27.png"
+ ALT="$\leq$">), 'E' (<IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="$=$">), 'G' (<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img29.png"
+ ALT="$\geq$">) or 'R' (ranged). For
+non-ranged rows the range value is <TT>0</TT>, for a ranged row the range
+value must be non-negative and the constraint means that the row
+activity level has to be between the right hand side value and the
+right hand side increased by the range value. 
+<BR>
+<BR>
+Since the coefficient matrix is very often sparse, only the nonzero
+entries are stored. Each entry of the matrix has a column index, a row
+index and a coefficient value associated with it. An LP matrix is
+specified in the form of the three arrays <TT>*matval</TT>, <TT>*matind</TT>, and <TT>*matbeg</TT>. The array <TT>*matval</TT> contains the
+values of the nonzero entries of the matrix in <EM>column order</EM>;
+that is, all the entries for the <IMG
+ WIDTH="29" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img32.png"
+ ALT="$0^th$"> column come first, then the
+entries for the <IMG
+ WIDTH="26" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img33.png"
+ ALT="$1^st$"> column, etc. The row index corresponding to
+each entry of <TT>*matval</TT> is listed in <TT>*matind</TT> (both of them
+are of length <IMG
+ WIDTH="24" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img34.png"
+ ALT="$nz$">, the number of nonzero entries in the matrix).
+Finally, <TT>*matbeg</TT> contains the starting positions of each of the
+columns in <TT>*matval</TT> and <TT>*matind</TT>. Thus, <TT>(*matbeg)[i]</TT>
+is the position of the first entry of column <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$i$"> in both <TT>*matval</TT>
+and <TT>*matind</TT>). By convention <TT>*matbeg</TT> is allocated to be of
+length <IMG
+ WIDTH="45" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img35.png"
+ ALT="$n+1$">, with <TT>(*matbeg)[n]</TT> containing the position after
+the very last entry in <TT>*matval</TT> and <TT>*matind</TT> (so it is very
+conveniently equal to <IMG
+ WIDTH="24" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img34.png"
+ ALT="$nz$">). This representation of a matrix is known
+as a <EM>column ordered</EM> or <EM>column major</EM> representation.
+<BR>
+<BR>
+The arrays that are passed in can be overwritten and have already been
+previously allocated for the lengths indicated (see the description of
+arguments below). Therefore, if they are big enough, the user need not
+reallocate them. If the max lengths are not big enough then she has to
+free the corresponding arrays and allocate them again. In this case
+she <EM>must</EM> return the allocated size of the array to avoid further
+reallocation. If the user plans to utilize dynamic column and/or cut
+generation, arrays should be allocated large enough to allow for
+reasonable growth of the matrix or unnecessary reallocations will
+result. In order to accommodate <TT>*maxn</TT> variables, arrays must be
+allocated to size <TT>*allocn = *maxn + *maxm +1</TT> and <TT>*allocnz =
+*maxnz + *maxm</TT> because of the extra space required by the LP solver
+for slack and artificial variables.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Number of variables in the relaxation (base
+and extra).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>var_desc **vars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>An array of length <TT>n</TT> containing the user
+indices of the active variables (base and extra).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int rownum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Number of constraints in the relaxation (base
+and extra).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int cutnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Number of extra constraints.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data **cuts</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Packed description of extra constraints.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *nz</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Pointer to the number of nonzeros in the LP.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int **matbeg</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Pointers to the arrays that describe the LP
+problem (see description above.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int **matind</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double **matval</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double **obj</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double **rhs</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char **sense</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double **rngval</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *maxn</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>The maximum number of variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *maxm</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>The maximum number of constraints.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *maxnz</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>The maximum number of nonzeros.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *allocn</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>The length of the <TT>*matbeg</TT> and <TT>*obj</TT>
+arrays (should be <TT>*maxm + *maxn +1</TT>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *allocm</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>The length of the <TT>*rhs</TT>, <TT>*sense</TT>
+and <TT>*rngval</TT> arrays.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *allocnz</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>The length of the <TT>*matval</TT> and <TT>*matind</TT> arrays (should be <TT>*maxnz + *maxm</TT>.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>Error. The LP process is aborted.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_AND_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>Post-processing will be skipped, the user added the
+constraints corresponding to the cuts.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>User created the matrix with only the base constraints.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+The extra constraints are added to the matrix by calling the 
+<TT><A HREF="node112.html#user_unpack_cuts">user_unpack_cuts()</A></TT> subroutine and 
+then adding the corresponding rows to the matrix. This is easier for
+the user to implement, but less efficient than adding the cuts at the
+time the original matrix was being constructed.
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>process_chain()</TT> which is
+invoked when setting up a the initial search node in a chain.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1603"
+  HREF="node101.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1599"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1593"
+  HREF="node99.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1601"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1604"
+  HREF="node101.html">user_get_upper_bounds</A>
+<B> Up:</B> <A NAME="tex2html1600"
+  HREF="node93.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1594"
+  HREF="node99.html">user_free_lp</A>
+ &nbsp <B>  <A NAME="tex2html1602"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

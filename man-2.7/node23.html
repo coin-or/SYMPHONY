@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Controlling Execution and Output</TITLE>
+<META NAME="description" CONTENT="Controlling Execution and Output">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html480" HREF="node24.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html478" HREF="node2.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html472" HREF="node22.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html482" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html481" HREF="node24.html">Other Resources</A>
+<B>Up:</B> <A NAME="tex2html479" HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html473" HREF="node22.html">Other Debugging Techniques</A>
+<BR> <P>
+<H2><A NAME="SECTION000213000000000000000">Controlling Execution and Output</A></H2>
+<P>
+<A NAME="output">&#160;</A>
+Calling SYMPHONY with no arguments simply lists all command-line options.
+Most of the common parameters can be set on the command line. Usually
+it is easier to use a parameter file. To invoke SYMPHONY with a parameter
+file type ``<TT>master -f filename ...</TT>'' where filename is the name
+of the parameter file. The format of the file is explained in Section
+<A HREF="node87.html#parameter_file">3</A>.
+<P>
+The output level can be controlled through the use of the verbosity
+parameter. Setting this parameter at different levels will cause
+different progress messages to be printed out. Level 0 only prints out
+the introductory and solution summary messages, along with status
+messages every 10 minutes. Level 1 prints out a message every time a
+new node is created. Level 3 prints out messages describing each
+iteration of the solution process. Levels beyond 3 print out even more
+detailed information.
+<P>
+There are also two possible graphical interfaces. For graph-based
+problems, the Interactive Graph Drawing Software allows visual display
+of fractional solutions, as well as feasible and optimal solutions
+discovered during the solution process. For all types of problems,
+VBCTOOL creates a visual picture of the branch and cut tree, either
+in real time as the solution process evolves or as an emulation from a
+file created by
+SYMPHONY. See Section <A HREF="node91.html#tm_params">3.4</A> for information on how to use VBCTOOL
+with SYMPHONY. Binaries for VBCTOOL can be obtained at <BR> 
+<TT><A NAME="tex2html9" HREF="http://www.informatik.uni-koeln.de/ls_juenger/projects/vbctool.html">http://www.informatik.uni-koeln.de/ls_juenger/projects/vbctool.html</A></TT>.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

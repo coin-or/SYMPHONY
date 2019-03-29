@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Future Enhancements</TITLE>
+<META NAME="description" CONTENT="Future Enhancements">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node34.html">
+<LINK REL="previous" HREF="node19.html">
+<LINK REL="up" HREF="symphony.html">
+<LINK REL="next" HREF="node34.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html399"
+ HREF="node34.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html397"
+ HREF="symphony.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html391"
+ HREF="node32.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html400"
+ HREF="node34.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html398"
+ HREF="symphony.html">SYMPHONY: A Parallel Framework </SUP></A>
+<B> Previous:</B> <A NAME="tex2html392"
+ HREF="node32.html">Using Multiple Pools</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00060000000000000000">
+Future Enhancements</A>
+</H1>
+
+<P>
+Although SYMPHONY is a mature software library and already contains
+the advanced features required for most uses, some future enhancements
+are planned. Currently, there is another version of SYMPHONY,
+code-named BCP, under development at IBM. BCP implements SYMPHONY in
+C++ with several enhancements, such as the ability to generate
+arbitrary variables (making the handling of cuts and variables
+completely symmetrical), better fault tolerance and virtual machine
+handling, better cut pool scanning, and a more generalized branching
+scheme.
+
+<P>
+The current version of SYMPHONY will continue to be enhanced as well.
+One of the biggest changes planned is to make the implementation more
+scalable. Currently, the single tree manager can become a
+communication bottleneck when large numbers of processors are
+utilized. There are a number of approaches to solving this problem,
+all of which involve some degree of decentralization of the tree
+management. Of course, this decentralization can in return have other
+undesirable effects, such as difficulty in load balacing. 
+
+<P>
+Other areas in which SYMPHONY will be improved include better
+management of the cut pool, better search strategies for the tree
+manager, and more efficient column generation. This last one is
+paricularly important for solving large scale paroblems. The current
+implementation of column generation is somewhat inefficient. We would
+also like to add dynamic allocation of cut generators as an option.
+Rather than requiring each LP to have its own dedicated cut generator,
+cut generators will be allocated as needed to LP processes so that
+more cut generation can be devoted to areas of the tree that are
+``difficult'' and less to areas that are ``easy.'' This idea was
+investigated for Set Partitioning in [<A
+ HREF="node34.html#Marta">6</A>] and found to be
+effective. Refined tree search algorithms, optimized for parallelism,
+should also allow better load-balancing.
+
+<P>
+<HR>
+<A NAME="tex2html399"
+ HREF="node34.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html397"
+ HREF="symphony.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html391"
+ HREF="node32.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html400"
+ HREF="node34.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html398"
+ HREF="symphony.html">SYMPHONY: A Parallel Framework </SUP></A>
+<B> Previous:</B> <A NAME="tex2html392"
+ HREF="node32.html">Using Multiple Pools</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

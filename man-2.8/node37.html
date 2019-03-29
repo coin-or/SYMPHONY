@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_create_root</TITLE>
+<META NAME="description" CONTENT="user_create_root">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node38.html">
+<LINK REL="previous" HREF="node36.html">
+<LINK REL="up" HREF="node28.html">
+<LINK REL="next" HREF="node38.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html656"
+ HREF="node38.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html653"
+ HREF="node28.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html647"
+ HREF="node36.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html655"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html657"
+ HREF="node38.html">user_receive_feasible_solution</A>
+<B>Up:</B> <A NAME="tex2html654"
+ HREF="node28.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html648"
+ HREF="node36.html">user_set_base</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00031900000000000000">
+user_create_root</A>
+</H3>
+<PRE>
+int user_create_root(void *user, int *extravarnum, int **extravars)
+</PRE>
+<P>
+<DL>
+<DD><P>
+<DT><STRONG>Description:</STRONG>
+<DD>
+
+<P>
+The user must specify which extra variables are to be active in the root
+node in addition to the base variables.
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int *extravarnum</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>Pointer to the number of extra active
+variables in the root.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int *extravars</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=266>Pointer to an array containing a list of
+user indices of the extra variables to be active in the root.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error.  SYMPHONY stops.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>All required data  filled out, but no
+post-processing done.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_AND_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>All required post-processing done.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Post-processing:</STRONG>
+<DD>
+
+<P>
+The array of extra indices is sorted if the user has not already done so.
+
+<P>
+</DL>
+<P>
+<BR>
+<BR>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

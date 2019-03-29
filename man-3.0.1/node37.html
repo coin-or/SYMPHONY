@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Parallel Configurations</TITLE>
+<META NAME="description" CONTENT="Parallel Configurations">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node38.html">
+<LINK REL="previous" HREF="node36.html">
+<LINK REL="up" HREF="node36.html">
+<LINK REL="next" HREF="node38.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html698"
+  HREF="node38.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html694"
+  HREF="node36.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html688"
+  HREF="node36.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html696"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html699"
+  HREF="node38.html">Inter-process Communication</A>
+<B>Up:</B> <A NAME="tex2html695"
+  HREF="node36.html">Details of the Parallel</A>
+<B> Previous:</B> <A NAME="tex2html689"
+  HREF="node36.html">Details of the Parallel</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00081100000000000000">
+Parallel Configurations</A>
+</H3>
+
+<P>
+SYMPHONY supports numerous configurations, ranging from completely
+sequential to fully parallel, allowing efficient execution in many
+different computational settings. As described in the previous
+section, there are five modules in the standard distributed
+configuration. Various subsets of these modules can be
+combined to form separate executables capable of communicating
+with each other across a network. When two or more modules are combined,
+they simply communicate through shared-memory instead of through
+message-passing. However, they are also forced to run in sequential
+fashion in this case, unless the user chooses to enable threading
+using an OpenMP compliant compiler (see next section). 
+
+<P>
+As an example, the default distributed configuration includes a
+separate executable for each module type, allowing full parallelism.
+However, if cut generation is fast and not memory-intensive,
+it may not be worthwhile to have the LP solver and its associated cut
+generator work independently, as this increases communication
+overhead without much potential benefit. In this case, the cut
+generator functions can be called directly from the LP solver,
+creating a single, more efficient executable.
+
+<P>
+<HR>
+<A NAME="tex2html698"
+  HREF="node38.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html694"
+  HREF="node36.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html688"
+  HREF="node36.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html696"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html699"
+  HREF="node38.html">Inter-process Communication</A>
+<B>Up:</B> <A NAME="tex2html695"
+  HREF="node36.html">Details of the Parallel</A>
+<B> Previous:</B> <A NAME="tex2html689"
+  HREF="node36.html">Details of the Parallel</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

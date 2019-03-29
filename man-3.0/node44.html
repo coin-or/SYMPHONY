@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Changes to the User API in Version 2.8</TITLE>
+<META NAME="description" CONTENT="Changes to the User API in Version 2.8">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node45.html">
+<LINK REL="previous" HREF="node43.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node45.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html816"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html812"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html806"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html814"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html817"
+  HREF="node45.html">Getting Started</A>
+<B> Up:</B> <A NAME="tex2html813"
+  HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html807"
+  HREF="node43.html">New in Version 2.8</A>
+ &nbsp <B>  <A NAME="tex2html815"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00094000000000000000">
+Changes to the User API in Version 2.8</A>
+</H2>
+
+<P>
+There are some minor changes to the user interface in order to allow
+the use of the new features. If you have code written for an older
+version, you will have to make some very minor modifications before
+compiling with version 2.8.
+
+<P>
+
+<UL>
+<LI><A HREF="node83.html#user_start_heurs"><TT><B>user_start_heurs()</B></TT></A> now
+        includes as an optional return value a user-calculated
+        estimate of the optimal upper bound. This estimate is used to
+        control diving. See the description of the new
+        <A HREF="node141.html#diving">diving rules</A>
+        for more information. Since this return value is optional, you
+        need only add the extra argument to your function definition to
+        upgrade to the 2.8 interface. No changes to your code are
+        required. 
+
+<P>
+</LI>
+<LI><A HREF="node130.html#user_check_cuts"><TT><B>user_check_cut()</B></TT></A> now
+        includes as an optional return value a user-defined assessment
+        of the current quality of the cut. Since this return value is
+        optional, you need only add the extra argument to your
+        function definition to upgrade to the 2.8 interface. No
+        changes to your code are required.
+
+<P>
+</LI>
+<LI><A HREF="node106.html#user_select_candidates"><TT><B>user_select_candidates()</B></TT></A> now passes in the value of the
+        current level in the tree in case the user wants to use this
+        information to make branching decisions. Again, the new
+        argument just needs to be added to the function definition. No
+        changes to your code are required.
+
+<P>
+</LI>
+</UL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html816"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html812"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html806"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html814"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html817"
+  HREF="node45.html">Getting Started</A>
+<B> Up:</B> <A NAME="tex2html813"
+  HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html807"
+  HREF="node43.html">New in Version 2.8</A>
+ &nbsp <B>  <A NAME="tex2html815"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

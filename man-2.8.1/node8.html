@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Design of SYMPHONY</TITLE>
+<META NAME="description" CONTENT="Design of SYMPHONY">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node21.html">
+<LINK REL="previous" HREF="node5.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node9.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html300"
+ HREF="node9.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html297"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html291"
+ HREF="node7.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html299"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html301"
+ HREF="node9.html">An Object-oriented Approach</A>
+<B>Up:</B> <A NAME="tex2html298"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html292"
+ HREF="node7.html">Branch, Cut, and Price</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00060000000000000000">&#160;</A>
+<A NAME="design">&#160;</A>
+<BR>
+Design of  SYMPHONY
+</H1>
+
+<P>
+SYMPHONY was designed with two major goals in mind--portability and
+ease of use. With respect to ease of use, we aimed for a ``black box''
+design, whereby the user would not be required to know anything about
+the implementation of the library, but only about the user interface.
+With respect to portability, we aimed not only for it to be <EM>possible</EM> to use the framework in a wide variety of settings and on a
+wide variety of hardware, but also for it to perform <EM>effectively</EM> in all
+these settings. Our primary measure of effectiveness was
+how well the framework would perform in comparison to a problem-specific
+(or hardware-specific) implementation written ``from scratch.''
+
+<P>
+It is important to point out that achieving such design goals involves
+a number of very difficult tradeoffs. For instance, ease of use is quite
+often at odds with efficiency. In several instances, we had to give up
+some efficiency to make the code easy to work with and to maintain a
+true black box implementation. Maintaining portability across a wide
+variety of hardware, both sequential and parallel, also required some
+difficult choices. For example, solving large-scale problems on
+sequential platforms requires extremely memory-efficient data
+structures in order to maintain the very large search trees that can
+be generated. These storage schemes, however, are highly centralized
+and do not scale well to large numbers of processors. 
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html302"
+ HREF="node9.html">An Object-oriented Approach</A>
+<LI><A NAME="tex2html303"
+ HREF="node10.html">Data Structures and Storage</A>
+<UL>
+<LI><A NAME="tex2html304"
+ HREF="node11.html">Variables</A>
+<LI><A NAME="tex2html305"
+ HREF="node12.html">Constraints</A>
+<LI><A NAME="tex2html306"
+ HREF="node13.html">Search Tree</A>
+</UL>
+<LI><A NAME="tex2html307"
+ HREF="node14.html">Modular Implementation</A>
+<UL>
+<LI><A NAME="tex2html308"
+ HREF="node15.html">The Master Module</A>
+<LI><A NAME="tex2html309"
+ HREF="node16.html">The Tree Manager Module</A>
+<LI><A NAME="tex2html310"
+ HREF="node17.html">The Linear Programming Module</A>
+<LI><A NAME="tex2html311"
+ HREF="node18.html">The Cut Generator Module</A>
+<LI><A NAME="tex2html312"
+ HREF="node19.html">The Cut Pool Module</A>
+</UL>
+<LI><A NAME="tex2html313"
+ HREF="node20.html">SYMPHONY Overview</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html300"
+ HREF="node9.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html297"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html291"
+ HREF="node7.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html299"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html301"
+ HREF="node9.html">An Object-oriented Approach</A>
+<B>Up:</B> <A NAME="tex2html298"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html292"
+ HREF="node7.html">Branch, Cut, and Price</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

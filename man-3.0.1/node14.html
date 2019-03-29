@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Modular Implementation</TITLE>
+<META NAME="description" CONTENT="Modular Implementation">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node20.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node15.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html403"
+  HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html399"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html393"
+  HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html401"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html404"
+  HREF="node15.html">The Master Module</A>
+<B>Up:</B> <A NAME="tex2html400"
+  HREF="node8.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html394"
+  HREF="node13.html">Search Tree</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00063000000000000000">
+Modular Implementation</A>
+</H2>
+
+<P>
+SYMPHONY's functions are grouped into five independent computational
+modules. This modular implementation not only facilitates code
+maintenance, but also allows easy and highly configurable
+parallelization. Depending on the computational setting, the modules
+can be compiled as either (1) a single sequential code, (2) a
+multi-threaded shared-memory parallel code, or (3) separate processes
+running in distributed fashion over a network. The modules pass data
+to each other either through shared memory (in the case of sequential
+computation or shared-memory parallelism) or through a message-passing
+protocol defined in a separate communications API (in the case of
+distributed execution). an schematic overview of the modules is
+presented in Figure <A HREF="node14.html#overview">4</A>. In the remainder of the section,
+we describe the modularization scheme and the implementation of each
+module in a sequential environment. 
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="overview"></A><A NAME="484"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 4:</STRONG>
+Schematic overview of the branch, cut, and price algorithm</CAPTION>
+<TR><TD><IMG
+ WIDTH="671" HEIGHT="861" BORDER="0"
+ SRC="img22.png"
+ ALT="\begin{figure}\centering\psfig{figure=/home/tkr/Papers/pics/pbandc.eps}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html405"
+  HREF="node15.html">The Master Module</A>
+<LI><A NAME="tex2html406"
+  HREF="node16.html">The Tree Manager Module</A>
+<LI><A NAME="tex2html407"
+  HREF="node17.html">The Linear Programming Module</A>
+<LI><A NAME="tex2html408"
+  HREF="node18.html">The Cut Generator Module</A>
+<LI><A NAME="tex2html409"
+  HREF="node19.html">The Cut Pool Module</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

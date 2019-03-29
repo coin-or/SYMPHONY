@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_unpack_cuts</TITLE>
+<META NAME="description" CONTENT="user_unpack_cuts">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node246.html">
+<LINK REL="previous" HREF="node244.html">
+<LINK REL="up" HREF="node222.html">
+<LINK REL="next" HREF="node246.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3930"
+  HREF="node246.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3926"
+  HREF="node222.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3920"
+  HREF="node244.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3928"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3931"
+  HREF="node246.html">user_send_lp_solution</A>
+<B>Up:</B> <A NAME="tex2html3927"
+  HREF="node222.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3921"
+  HREF="node244.html">user_same_cuts</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007321900000000000000"></A>
+<A NAME="user_unpack_cuts"></A>
+<BR>
+user_unpack_cuts
+</H3>
+[cf]user_unpack_cuts
+<PRE>
+int user_unpack_cuts(void *user, int from, int type, int varnum, 
+                     var_desc **vars, int cutnum, cut_data **cuts,
+                     int *new_row_num, waiting_row ***new_rows)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+If the user has defined application-specific cut classes, these cuts must be
+interpreted as constraints for the current LP relaxation, i.e., the user must
+decode the compact representation of the cuts (see the <TT><A HREF="node227.html#cut_data">cut_data</A></TT> structure) into rows for the matrix. A pointer
+to the array of generated rows must be returned in <TT>***new_rows</TT> (the
+user has to allocate this array) and their number in <TT>*new_row_num</TT>. 
+<BR>
+<BR>
+Note that SYMPHONY has built-in support for cuts generated explicitly as
+matrix rows with no user-defined packed form, i.e., cuts whose indices and
+coefficients are given explicitly (see the function
+<A HREF="node256.html#user_find_cuts"><TT>user_find_cuts()</TT></A>. These cuts can be constructed and added using the helper
+function
+<A HREF="node256.html#user_find_cuts"><TT>cg_add_explicit_cut()</TT></A>
+and are packed and unpacked automatically, so the user does not need to
+implement this function. In post processing, SYMPHONY unpacks explicitly
+defined cuts and internally generated generic cuts.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int from</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>See below in ``Notes''.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int type</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226><TT>UNPACK_CUTS_SINGLE</TT> or <TT>UNPACK_CUTS_MULTIPLE</TT> (see notes below).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>The number of variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>var_desc **vars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>The variables currently in the problem.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int cutnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>The number of cuts to be decoded.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data **cuts</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>Cuts that need to be converted to rows
+for the current LP. See ``Warning'' below.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *new_row_num</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>Pointer to the number of rows in
+<TT>**new_rows</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>waiting_row ***new_rows</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>Pointer to the array of
+pointers to the new rows.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. The cuts are discarded.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User unpacked the cuts.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>There are no user cut types defined. In this case,
+SYMPHONY deals with only explicit cuts and internally generated cuts.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD>Wherever a cut needs to be unpacked
+(multiple places).
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+Explicit row cuts are processed, as well as SYMPHONY's internally generated
+cuts. Also, the pointers to each cut are transferred to the
+<TT>waiting_rows</TT> data structure (in previous version, this was done by
+the user).   
+
+<P>
+
+</DD>
+<DT><STRONG>Notes:</STRONG></DT>
+<DD>
+
+<P>
+
+<UL>
+<LI>When decoding the cuts, the expanded constraints have to be adjusted to
+the current LP, i.e., coefficients corresponding to variables currently not in
+the LP have to be left out.
+
+<P>
+</LI>
+<LI>If the <TT>one_row_only</TT> flag is set to <TT>UNPACK_CUTS_MULTIPLE</TT>, then the user can generate as many
+constraints (even zero!) from a cut as she wants (this way she can
+lift the cuts, thus adjusting them for the current LP).
+However, if the flag is set to <TT>UNPACK_CUTS_SINGLE</TT>, then for
+each cut the user must generate a unique row, the same one that had
+been generated from the cut before. (The flag is set to this value
+only when regenerating a search tree node.)
+
+<P>
+</LI>
+<LI>The <TT>from</TT> argument can take on six different values:
+<TT>CUT_FROM_CG</TT>, <TT>CUT_FROM_CP</TT>, <TT>CUT_FROM_TM</TT>, <TT>CUT_LEFTOVER</TT> (these are cuts from a previous LP relaxation that are
+still in the local pool), <TT>CUT_NOT_IN_MATRIX_SLACK</TT> and <TT>CUT_VIOLATED_SLACK</TT> indicating where the cut came from. This might
+be useful in deciding whether to lift the cut or not.
+
+<P>
+</LI>
+<LI>The <TT>matind</TT> fields of the rows must be filled with indices with
+respect to the position of the variables in <TT>**vars</TT>.
+
+<P>
+</LI>
+<LI><B>Warning:</B> For each row, the user must make sure that the
+cut the row was generated from (and can be uniquely regenerated from
+if needed later) is safely stored in the <TT><A HREF="node229.html#waiting_row">waiting_row</A></TT> structure. SYMPHONY will free the entries in
+<TT>cuts</TT> after this function returns. If a row is generated from a
+cut in <TT>cuts</TT> (and not from a lifted cut), the user has the option
+of physically copying the cut into the corresponding part of the
+<TT><A HREF="node229.html#waiting_row">waiting_row</A></TT> structure, or copying the
+pointer to the cut into the <TT><A HREF="node229.html#waiting_row">waiting_row</A></TT>
+structure and erasing the pointer in <TT>cuts</TT>. If a row is generated
+from a lifted cut, the user should store a copy of the lifted cut in
+the corresponding part of <TT><A HREF="node229.html#waiting_row">waiting_row</A></TT>.
+
+<P>
+</LI>
+</UL>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3930"
+  HREF="node246.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3926"
+  HREF="node222.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3920"
+  HREF="node244.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3928"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3931"
+  HREF="node246.html">user_send_lp_solution</A>
+<B>Up:</B> <A NAME="tex2html3927"
+  HREF="node222.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3921"
+  HREF="node244.html">user_same_cuts</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2014-10-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

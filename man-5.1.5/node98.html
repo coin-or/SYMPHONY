@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Navigating the Source Code</TITLE>
+<META NAME="description" CONTENT="Navigating the Source Code">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node99.html">
+<LINK REL="previous" HREF="node97.html">
+<LINK REL="up" HREF="node97.html">
+<LINK REL="next" HREF="node99.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1749"
+  HREF="node99.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1745"
+  HREF="node97.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1739"
+  HREF="node97.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1747"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1750"
+  HREF="node99.html">Building an Application</A>
+<B>Up:</B> <A NAME="tex2html1746"
+  HREF="node97.html">Developing Custom Applications</A>
+<B> Previous:</B> <A NAME="tex2html1740"
+  HREF="node97.html">Developing Custom Applications</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00610000000000000000">
+Navigating the Source Code</A>
+</H1>
+
+<P>
+To develop an application with SYMPHONY, you need to first understand how the
+source files are organized. Note that in this chapter, all path names are
+given Unix-style. When you unpack the SYMPHONY source distribution, you will
+notice at the root level a number of files associated with the automatic
+configuration system, as well as a number of subdirectories, each of which
+corresponds to a library used by SYMPHONY for some specific functionality. The
+files associated with SYMPHONY itself are located in the 
+<FONT COLOR="#a52a2a"><TT>SYMPHONY</TT></FONT>
+subdirectory. Within the SYMPHONY subdirectory are a number of other
+subdirectories, including one called 
+<FONT COLOR="#a52a2a"><TT>src</TT></FONT> containing the source files
+for SYMPHONY itself. 
+
+<P>
+Also in the main 
+<FONT COLOR="#a52a2a"><TT>SYMPHONY/</TT></FONT> subdirectory, there is a subdirectory called
+
+<FONT COLOR="#a52a2a"><TT>Applications/</TT></FONT> (see Sections&nbsp;<A HREF="node26.html#build_appl_unix">2.2.2.5</A> and
+<A HREF="node32.html#build_appl_msvc">2.2.4</A>) for instructions on building the applications). The
+
+<FONT COLOR="#a52a2a"><TT>Applications/</TT></FONT> subdirectory contains the source code for a number of
+sample applications developed with SYMPHONY, as well as function stubs for
+developing a custom application using SYMPHONY's callbacks. The subdirectory
+
+<FONT COLOR="#a52a2a"><TT>SYMPHONY/Applications/USER</TT></FONT> contains the files needed for implementing
+the callbacks and is a template for developing an application. In this
+directory and its subdirectories, which mirror the subdirectories of SYMPHONY
+itself, each file contains function stubs that can be filled in to create a
+new custom application. There is a separate subdirectory for each
+module--master (
+<FONT COLOR="#a52a2a"><TT>Master/</TT></FONT>), tree management (
+<FONT COLOR="#a52a2a"><TT>TreeManager/</TT></FONT>), cut
+generation (
+<FONT COLOR="#a52a2a"><TT>CutGen/</TT></FONT>), cut management (
+<FONT COLOR="#a52a2a"><TT>CutPool/</TT></FONT>), and node
+processing (
+<FONT COLOR="#a52a2a"><TT>LP/</TT></FONT>). Within each subdirectory, there is a file, initially
+called 
+<FONT COLOR="#a52a2a"><TT>USER/*/user_*.c</TT></FONT>, where 
+<FONT COLOR="#a52a2a"><TT>*</TT></FONT> is the name of the module. The
+primary thing that you, as the user, need to understand to build a custom
+application is how to fill in these stubs. That is what the second part of
+this chapter is about. Before describing that, however, we will discuss how to
+build your application. 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1749"
+  HREF="node99.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1745"
+  HREF="node97.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1739"
+  HREF="node97.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1747"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1750"
+  HREF="node99.html">Building an Application</A>
+<B>Up:</B> <A NAME="tex2html1746"
+  HREF="node97.html">Developing Custom Applications</A>
+<B> Previous:</B> <A NAME="tex2html1740"
+  HREF="node97.html">Developing Custom Applications</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-10-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

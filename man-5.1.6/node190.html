@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>sym_add_col</TITLE>
+<META NAME="description" CONTENT="sym_add_col">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node191.html">
+<LINK REL="previous" HREF="node189.html">
+<LINK REL="up" HREF="node176.html">
+<LINK REL="next" HREF="node191.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3170"
+  HREF="node191.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3166"
+  HREF="node176.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3160"
+  HREF="node189.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3168"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3171"
+  HREF="node191.html">sym_add_row</A>
+<B>Up:</B> <A NAME="tex2html3167"
+  HREF="node176.html">Data Modification Functions</A>
+<B> Previous:</B> <A NAME="tex2html3161"
+  HREF="node189.html">sym_set_col_names</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007151400000000000000">
+sym_add_col</A>
+</H3>
+[f]sym_add_col
+<PRE>
+int sym_add_col(sym_environment *env, int numelems, int *indices, 
+                double *elements, double collb, double colub,
+                double obj, char *name)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This routine is used to add a new column to the original problem description.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>sym_environment *env</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the SYMPHONY environment.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int numelems</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>An integer indicating the non zero elements of
+the column.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to an integer type array indicating the row 
+indices of the non zero elements of the column and having a size of at least
+<TT>numelems</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *elements</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pinter to a double type array indicating the 
+values of the non zero elements of the column and having a size of at least 
+<TT>numelems</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double collb</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>A double indicating the lower bound of the column.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double colub</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>A double indicating the upper bound of the column.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double obj</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>A double indicating the objective coefficient value
+of the column.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char *name</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to a string of the name of the column.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_NORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Function invoked successfully.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_ABNORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Function invoked unsuccessfully.</TD>
+</TR>
+</TABLE>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3170"
+  HREF="node191.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3166"
+  HREF="node176.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3160"
+  HREF="node189.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3168"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3171"
+  HREF="node191.html">sym_add_row</A>
+<B>Up:</B> <A NAME="tex2html3167"
+  HREF="node176.html">Data Modification Functions</A>
+<B> Previous:</B> <A NAME="tex2html3161"
+  HREF="node189.html">sym_set_col_names</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-12-12</I>
+</ADDRESS>
+</BODY>
+</HTML>

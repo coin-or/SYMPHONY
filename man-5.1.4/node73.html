@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Algorithm Summary</TITLE>
+<META NAME="description" CONTENT="Algorithm Summary">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node67.html">
+<LINK REL="up" HREF="node61.html">
+<LINK REL="next" HREF="node74.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1410"
+  HREF="node74.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1406"
+  HREF="node61.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1402"
+  HREF="node72.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1408"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1411"
+  HREF="node74.html">Details of the Implementation</A>
+<B>Up:</B> <A NAME="tex2html1407"
+  HREF="node61.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html1403"
+  HREF="node72.html">The Cut Management Module</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00534000000000000000"></A>
+<A NAME="symphony"></A>
+<BR>
+Algorithm Summary
+</H2>
+
+<P>
+Currently, SYMPHONY is what is known as a single-pool BCP algorithm.
+The term <EM>single-pool</EM> refers to the fact that there is a single
+central list of candidate subproblems to be processed, which is
+maintained by the tree manager. Most sequential implementations use
+such a single-pool scheme. However, other schemes may be used in
+parallel implementations. For a description of various types of
+parallel branch and bound, see [<A
+ HREF="node282.html#gend:paral">16</A>].
+
+<P>
+The user begins by initializing the SYMPHONY environment and can then invoke
+subroutines for reading in parameters and problem data, finding an initial
+upper bound, and designating the initial set of active cuts and variables in
+the root node. Once the user invokes a solve routine, a tree manager is
+created to manage the solution process. The tree manager module in turn sets
+up the cut pool module(s), the linear programming module(s), and the cut
+generator module(s). Currently, there are three solve calls supported by the
+API. The first call is the <SPAN  CLASS="textit">initial solve</SPAN> (see Section
+<A HREF="node76.html#initial_solve">4.4.1.1</A>), which solves the problem from scratch without using warm
+start information. The second type of solve call is a <SPAN  CLASS="textit">warm solve</SPAN>, which
+solves the problem using previously computed warm start information (see
+Section <A HREF="node77.html#warm_solve">4.4.1.2</A>). Finally, there is a <SPAN  CLASS="textit">multicriteria solve</SPAN> call
+which is used to enumerate efficient solutions to a given multicriteria MILP
+(see Section <A HREF="node80.html#mc_solve">4.4.1.3</A>).
+
+<P>
+During the solution process, the tree manager functions control the execution
+by maintaining the list of candidate subproblems and sending them to the NP
+modules as they become idle. The NP modules receive nodes from the tree
+manager, process them, branch (if required), and send back the identity of the
+chosen branching object to the tree manager, which in turn generates the
+children and places them on the list of candidates to be processed (see
+Section <A HREF="node84.html#branching">4.4.2.3</A> for a description of the branching operation). A
+schematic summary of the algorithm is shown in Figure <A HREF="node67.html#overview">4.4</A>. The
+preference ordering for processing nodes is a run-time parameter. Typically,
+the node with the smallest lower bound is chosen to be processed next since
+this strategy minimizes the overall size of the search tree. However, at
+times, it is advantageous to <EM>dive</EM> down in the tree. The concepts of <EM>diving</EM> and <EM>search chains</EM>, introduced in Section <A HREF="node85.html#tree-management">4.4.3</A>,
+extend the basic ``best-first'' approach.
+
+<P>
+We mentioned earlier that cuts and variables can be treated in a
+somewhat symmetric fashion. However, it should be clear by now
+that our current implementation favors the implementation of
+branch and cut algorithms, where the computational effort spent
+generating cuts dominates that of generating variables. Our methods of
+representation also clearly favor such problems. In a future version
+of the software, we plan to erase this bias by adding additional
+functionality for handling variable generation and storage. This is
+the approach already taken by of COIN/BCP [<A
+ HREF="node282.html#coin-or">24</A>]. For more
+discussion of the reasons for this bias and the differences between
+the treatment of cuts and variables, see Section <A HREF="node83.html#lp-relaxation">4.4.2.2</A>.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1410"
+  HREF="node74.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1406"
+  HREF="node61.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1402"
+  HREF="node72.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1408"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1411"
+  HREF="node74.html">Details of the Implementation</A>
+<B>Up:</B> <A NAME="tex2html1407"
+  HREF="node61.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html1403"
+  HREF="node72.html">The Cut Management Module</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-06-12</I>
+</ADDRESS>
+</BODY>
+</HTML>

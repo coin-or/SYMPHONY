@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Configuring</TITLE>
+<META NAME="description" CONTENT="Configuring">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node22.html">
+<LINK REL="previous" HREF="node20.html">
+<LINK REL="up" HREF="node19.html">
+<LINK REL="next" HREF="node22.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html689"
+  HREF="node22.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html685"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html679"
+  HREF="node20.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html687"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html690"
+  HREF="node22.html">Building</A>
+<B>Up:</B> <A NAME="tex2html686"
+  HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A NAME="tex2html680"
+  HREF="node20.html">Downloading</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00322200000000000000"></A><A NAME="configuring"></A>
+<BR>
+Configuring
+</H3>
+
+<P>
+The first step is to run a configuration script that will allow the
+compilation process to be customized for your environment. to perform this
+step, switch into the root directory of the distribution and type
+
+<PRE>
+ ./configure
+</PRE> This will set up the default configuration files. If you want to override
+the default settings, you can either run the configuration script with
+command-line options or else modify the options in the file
+
+<FONT COLOR="#a52a2a"><TT>share/config.site</TT></FONT>. A complete list of options with
+brief explanations can be seen both in the file
+
+<FONT COLOR="#a52a2a"><TT>share/config.site</TT></FONT> and by typing 
+
+<PRE>
+ ./configure --help=recursive
+</PRE>
+See Figure <A HREF="#conf_opts">2.1</A> for a list of options the user may want to set. 
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="conf_opts"></A><A NAME="879"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 2.1:</STRONG>
+A list of useful configuration options</CAPTION>
+<TR><TD><IMG
+ WIDTH="928" HEIGHT="713" BORDER="0"
+ SRC="img1.png"
+ ALT="\begin{figure}\begin{tabular}{ll}
+\hline
+\texttt{-enable-debug} &amp; compile all p...
+...t{-without-tm} &amp; compile without tree manager module
+\end{tabular}
+\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+In order to enable or disable an option, either modify the file
+
+<FONT COLOR="#a52a2a"><TT>share/config.site</TT></FONT> or add the option as an argument to configuration
+script. For instance, running 
+
+<PRE>
+ ./configure --enable-debug
+</PRE>
+will compile the source files with the debugging flag.
+
+<P>
+It is possible to use compilers oter than the default (which is 
+<FONT COLOR="#a52a2a"><TT>g++</TT></FONT>).
+For example, to perform at automated build of SYMPHONY using the MSVC++
+compiler 
+<FONT COLOR="#a52a2a"><TT>cl</TT></FONT> with GNU autotools in the CYGWIN environment configure with
+
+<PRE>
+ ./configure --enable-doscompile=msvc
+</PRE>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html689"
+  HREF="node22.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html685"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html679"
+  HREF="node20.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html687"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html690"
+  HREF="node22.html">Building</A>
+<B>Up:</B> <A NAME="tex2html686"
+  HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A NAME="tex2html680"
+  HREF="node20.html">Downloading</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-07-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

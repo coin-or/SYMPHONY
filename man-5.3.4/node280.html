@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Cut Pool Parameters</TITLE>
+<META NAME="description" CONTENT="Cut Pool Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node281.html">
+<LINK REL="previous" HREF="node279.html">
+<LINK REL="up" HREF="node273.html">
+<LINK REL="next" HREF="node281.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4368"
+  HREF="node281.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4364"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4358"
+  HREF="node279.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4366"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4369"
+  HREF="node281.html">C++ Interface/OSI Parameters</A>
+<B>Up:</B> <A NAME="tex2html4365"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4359"
+  HREF="node279.html">Cut Generator Parameters</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00747000000000000000"></A>
+<A NAME="cut_pool_params"></A>
+<BR>
+Cut Pool Parameters
+</H2>
+<DL>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> CP_verbosity</FONT></TT> - integer (0).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!CP_verbosity
+Verbosity of the cut pool module.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> cp_logging</FONT></TT> - boolean (0).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!cp_logging
+Determines whether the logging option is enabled. In this case, the
+entire contents of the cut pool are written out periodically to disk
+(at the same interval as the tree manager log files are written). If
+this option is set, then the line following must start with the
+keyword <TT>
+<FONT COLOR="#000000"> cp_log_file_name</FONT></TT> and include the appropriate
+file name as the value.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> cp_warm_start</FONT></TT> - boolean (0).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!cp_warm_start
+Used to allow the cut pool to make a warm start by reading in a
+previously written log file. If
+this option is set, then the line following must start with the
+keyword <TT>
+<FONT COLOR="#000000"> cp_warm_start_file_name</FONT></TT> and include the appropriate
+file name as the value.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> block_size</FONT></TT> - integer (5000).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!block_size
+Indicates the size of the blocks to allocate when more space is needed
+in the cut list.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_size</FONT></TT> - integer (2000000).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!max_size
+Indicates the maximum size of the cut pool in bytes. This is the total
+memory taken up by the cut list, including all data structures and the
+array of pointers itself.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_number_of_cuts</FONT></TT> - integer (10000).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!max_number_of_cuts
+Indicates the maximum number of cuts allowed to be stored. When this
+max is reached, cuts are forcibly purged, starting with duplicates
+and then those indicated by the parameter <A HREF="#delete_which"><TT>delete_which</TT></A> (see below), until the list is below the allowable size.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> min_to_delete</FONT></TT> - integer (1000).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!min_to_delete
+Indicates the number of cuts required to be deleted when the pool reaches
+it's maximum size.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> touches_until_deletion</FONT></TT> - integer (10).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!touches_until_deletion
+When using the number of touches a cut has as a measure of its
+quality, this parameter indicates the number of touches a cut can have
+before being deleted from the pool. The number of touches is the
+number of times in a row that a cut has been checked without being
+found to be violated. It is a measure of a cut's relevance or
+effectiveness.
+
+<P>
+<A NAME="delete_which"></A></DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> delete_which</FONT></TT> - integer 
+(<TT>DELETE_BY_TOUCHES</TT>{2}).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!delete_which
+Indicates which cuts to delete when
+purging the pool. <TT>DELETE_BY_TOUCHES</TT> indicates that cuts whose
+number of touches is above the threshold (see <TT>touches_until_deletion</TT> above) should be purged if the pool gets too
+large. <TT>DELETE_BY_QUALITY</TT>{1} indicates that a user-defined
+measure of quality should be used (see the function <A HREF="node265.html#user_check_cuts"><TT>user_check_cuts()</TT></A>).
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> check_which</FONT></TT> - integer (<TT>CHECK_ALL_CUTS</TT>{0}).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!check_which
+Indicates which cuts should be checked for violation. The choices are
+to check all cuts (<TT>CHECK_ALL_CUTS</TT>{0}); only those that have
+number of touches below the threshold (<TT>CHECK_TOUCHES</TT>{2}); only
+those that were generated at a level higher in the tree than the
+current one (<TT>CHECK_LEVEL</TT>{1}); or both (<TT>CHECK_LEVEL_AND_TOUCHES</TT>{3}). Note that with <TT>CHECK_ALL_CUTS</TT> set, SYMPHONY will still only check the first
+<A HREF="#cuts_to_check"><TT>cuts_to_check</TT></A> cuts in the list ordered
+by quality (see the function <A HREF="node265.html#user_check_cuts"><TT>user_check_cut</TT></A>).
+
+<P>
+<A NAME="cuts_to_check"></A></DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> cuts_to_check</FONT></TT> - integer (1000).</STRONG></DT>
+<DD>[p]Cut Pool Parameters!cuts_to_check
+Indicates how many cuts in the pool to actually check. The list is
+ordered by quality and the first <TT>
+<FONT COLOR="#000000"> cuts_to_check</FONT></TT> cuts are
+checked for violation.
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html4368"
+  HREF="node281.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4364"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4358"
+  HREF="node279.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4366"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html4369"
+  HREF="node281.html">C++ Interface/OSI Parameters</A>
+<B>Up:</B> <A NAME="tex2html4365"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4359"
+  HREF="node279.html">Cut Generator Parameters</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-05-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

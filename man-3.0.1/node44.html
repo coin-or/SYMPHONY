@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Compiling the Shared Memory Version.</TITLE>
+<META NAME="description" CONTENT="Compiling the Shared Memory Version.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node45.html">
+<LINK REL="previous" HREF="node43.html">
+<LINK REL="up" HREF="node41.html">
+<LINK REL="next" HREF="node45.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html793"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html789"
+  HREF="node41.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html783"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html791"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html794"
+  HREF="node45.html">Compiling the Distributed Version.</A>
+<B>Up:</B> <A NAME="tex2html790"
+  HREF="node41.html">Compiling the Sample Application</A>
+<B> Previous:</B> <A NAME="tex2html784"
+  HREF="node43.html">Compiling the Sequential Version.</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00091300000000000000">
+Compiling the Shared Memory Version.</A>
+</H3>
+
+<P>
+
+<UL>
+<LI>To compile a shared memory version, obtain an OpenMP
+        compliant compiler, such as <A NAME="tex2html12"
+  HREF="http://phase.etl.go.jp/Omni/">Omni</A>
+. 
+        Other options are listed at <A NAME="tex2html13"
+  HREF="http://www.openmp.org">the OpenMP Web
+        site</A>
+.
+
+<P>
+</LI>
+<LI>Follow the instructions above for configuring the makefile. Set
+the variable <TT>CC</TT> to the compiler name in the makefile and compile as
+above. Note that if you have previously compiled the sequential version, then
+you should first type <TT>make clean_all</TT>, as this version uses the same
+directories.  With one thread allowed, it should run exactly the same as the
+sequential version so there is no need to compile both versions.
+
+<P>
+</LI>
+<LI>Voila, you have a shared memory parallel solver. As above, to
+test the sample program, a sample data file is included with the
+distribution. Type <TT>Vrp/bin.$(ARCH)/master_tm_lp_cg_cp -F sample.vrp
+-N 5 -u 522</TT> in the <TT>SYMPHONY-3.0.1/</TT> directory. The -N argument gives the number
+of routes, which must be specified in advance. The -u argument supplies an
+initial upper bound which is used until a better feasible solution is
+found. TSP instances can also be solved by adding the option -T TSP. In the
+case of the TSP, the number of routes does not need to be specified. You can
+get additional problem data files from from <A NAME="tex2html14"
+  HREF="http://branchandcut.org/VRP/data/"><TT>http://branchandcut.org/VRP/data/</TT></A>
+or the
+
+<BR><A NAME="tex2html15"
+  HREF="http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/">TSPLIB</A>
+. 
+<BR>
+The file format is described on the TSPLIB Web site.
+
+<P>
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html793"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html789"
+  HREF="node41.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html783"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html791"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html794"
+  HREF="node45.html">Compiling the Distributed Version.</A>
+<B>Up:</B> <A NAME="tex2html790"
+  HREF="node41.html">Compiling the Sample Application</A>
+<B> Previous:</B> <A NAME="tex2html784"
+  HREF="node43.html">Compiling the Sequential Version.</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Maintaining and Scanning the Pool</TITLE>
+<META NAME="description" CONTENT="Maintaining and Scanning the Pool">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html381" HREF="node32.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html379" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html373" HREF="node30.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html382" HREF="node32.html">Using Multiple Pools</A>
+<B>Up:</B> <A NAME="tex2html380" HREF="node30.html">The Cut Pool Process</A>
+<B> Previous:</B> <A NAME="tex2html374" HREF="node30.html">The Cut Pool Process</A>
+<BR> <P>
+<H3><A NAME="SECTION00055100000000000000">Maintaining and Scanning the Pool</A></H3>
+<P>
+The cut pool's primary job is to receive a fractional solution from an
+LP process and return cuts from the pool that are violated by it. The
+cuts are stored along with two pieces of information--the level of
+the tree on which the cut was generated, known simply as the <EM>
+level</EM> of the cut, and the number of times it has been checked for
+violation since the last time it was actually found to be violated,
+known as the number of <EM>touches</EM>. The number of touches a cut has
+is used as a simplistic measure of its effectiveness. Since the pool
+can get quite large, the user can choose to scan only cuts whose
+number of touches is below a specified threshold and/or cuts that were
+generated on a level at or above the current one in the tree. The idea
+behind this second criteria is to try to avoid checking cuts that were
+not generated ``nearby'' in the tree, as they are less likely to be
+effective. Any cut that was generated at a level in the tree that is
+below the level of the current node must have been generated in a
+different part of the tree. This is admittedly a naive method. All
+duplicate cuts, as well as all cuts whose number of touches has
+exceeded a pre-specified threshold are periodically purged from the
+pool to keep it as small as possible.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 14:31:17 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Distributed-memory Architectures</TITLE>
+<META NAME="description" CONTENT="Distributed-memory Architectures">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node109.html">
+<LINK REL="previous" HREF="node107.html">
+<LINK REL="up" HREF="node107.html">
+<LINK REL="next" HREF="node109.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1875"
+  HREF="node109.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1871"
+  HREF="node107.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1865"
+  HREF="node107.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1873"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1876"
+  HREF="node109.html">Shared-memory Architectures</A>
+<B>Up:</B> <A NAME="tex2html1872"
+  HREF="node107.html">Parallel Implementation</A>
+<B> Previous:</B> <A NAME="tex2html1866"
+  HREF="node107.html">Parallel Implementation</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00651000000000000000"></A>
+<A NAME="communication"></A>
+<BR>
+Distributed-memory Architectures
+</H2>
+
+<P>
+While the implementation of SYMPHONY strives to shield the user from having to
+know anything about communications protocols or the specifics of inter-process
+communication, it may be necessary for the user to pass information from one
+module to another in order to implement a parallel application. For instance,
+the user may want to pass data describing the problem instance to the LP
+process after reading them in from a file in the master process. For the
+purpose of passing user data from the master process to other processes, a
+customization function called
+
+<FONT COLOR="#a52a2a"><TT>user_send_*_data()</TT></FONT> is provided in the master module, along with a
+corresponding function called 
+<FONT COLOR="#a52a2a"><TT>user_receive_*_data()</TT></FONT> in the module
+
+<FONT COLOR="#a52a2a"><TT>*</TT></FONT>. These two functions work in tandem to transport the user's data
+from the maser, where it can be read in from a file, to the proper module for
+processing. There are also a number of other tandem pairs of <SPAN  CLASS="textit">send</SPAN> and
+<SPAN  CLASS="textit">receive</SPAN> functions that are used to transport user data from place to
+place.
+
+<P>
+All data are sent in the form of arrays of either type 
+<FONT COLOR="#a52a2a"><TT>char</TT></FONT>, 
+<FONT COLOR="#a52a2a"><TT>int</TT></FONT>,
+or 
+<FONT COLOR="#a52a2a"><TT>double</TT></FONT>, or as strings. To send an array, the user has simply to
+invoke the function 
+<FONT COLOR="#a52a2a"><TT>send_XXX_array(XXX *array, int length)</TT></FONT> where
+
+<FONT COLOR="#a52a2a"><TT>XXX</TT></FONT> is one of the previously listed types. To receive that array,
+there is a corresponding function called 
+<FONT COLOR="#a52a2a"><TT>receive_?_array(?  *array, int
+length)</TT></FONT>. When receiving an array, the user must first allocate the
+appropriate amount of memory. In cases where variable length arrays need to be
+passed, the user must first pass the length of the array (as a separate array
+of length one) and then the array itself. In the receive function, this allows
+the length to be received first so that the proper amount of space can be
+allocated before receiving the array itself. Note that data must be received
+in exactly the same order as it was passed, as data is read linearly into and
+out of the message buffer. The easiest way to ensure this is done properly is
+to simply copy the send statements into the receive function and change the
+function names. It may then be necessary to add some allocation statements in
+between the receive function calls.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1875"
+  HREF="node109.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1871"
+  HREF="node107.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1865"
+  HREF="node107.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1873"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1876"
+  HREF="node109.html">Shared-memory Architectures</A>
+<B>Up:</B> <A NAME="tex2html1872"
+  HREF="node107.html">Parallel Implementation</A>
+<B> Previous:</B> <A NAME="tex2html1866"
+  HREF="node107.html">Parallel Implementation</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-04</I>
+</ADDRESS>
+</BODY>
+</HTML>

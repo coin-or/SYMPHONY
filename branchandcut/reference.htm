@@ -1,0 +1,412 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>Branch Cut and Price References</title>
+<base target="_self">
+</head>
+
+<body bgcolor="#0033CC" text="#FFFFFF" link="#FFFFFF"
+vlink="#FFFFFF" alink="#FFFFFF" topmargin="0" leftmargin="15">
+
+<p><font size="5" face="Arial Black">Branch Cut and Price References</font></p>
+
+<table border="0" cellpadding="0" width="100%">
+    <tr>
+        <td width="100%"><table border="0" cellpadding="2"
+        width="100%">
+            <tr>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/index.htm"
+                style="text-decoration:none;"><font
+                color="#FFFFFF" size="3">Home</font></a> </td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/software.htm"
+                style="text-decoration:none;"><font size="3">Software</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/applications.htm"
+                style="text-decoration:none;"><font size="3">Applications</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/faq.htm"
+                style="text-decoration:none;"><font size="3">FAQ</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/reference.htm"
+                style="text-decoration:none;"><font size="3">Reference</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/links.htm"
+                style="text-decoration:none;"><font size="3">Links</font></a></td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+    <tr>
+        <td width="100%"><table border="0" cellpadding="0"
+        width="100%">
+            <tr>
+                <td width="100%"><hr color="#FFFFFF">
+                </td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+</table>
+
+Here is a brief list of relevant references. Someday, it will be expanded with
+associated BibTeX entries. For now, I hope it's useful as a starting point.
+The topical areas are
+
+<ul>
+<li><a href="#computation">General Computation</a></li>
+<li><a href="#IP">General IP</a></li>
+<li><a href="#BCP">General BCP</a></li>
+<li><a href="#implementations">Implementations</a></li>
+<li><a href="#parallel">Parallel Branch and Bound</a></li>
+</ul>
+
+<hr>
+
+<p><a name="computation"><font size ="5">General Computation</font></a></p>
+
+<ul>
+<li><p><a STYLE="font-variant:small-caps">A.V. Aho, J.E. Hopcroft, and J.D. Ullman</a>, <em>The Design and Analysis of 
+Computer Algorithms</em>, Addison-Wesley Publishing Company (1974).</p>
+
+<li><p><a STYLE="font-variant:small-caps">M.R. Garey and D.S. Johnson</a>, <em>Computers and Intractability: A Guide to the 
+Theory of <a STYLE="font-family:lucida calligraphy">NP</a>-completeness</em>, W.H. Freeman and Co., San Francisco (1979).
+</p>
+
+<li><p><a STYLE="font-variant:small-caps">G.H. Golub and C.F. Van Loan</a>, <em>Matrix Computations</em>, The Johns Hopkins 
+University Press, Baltimore (1989).</p>
+
+<li><p><a STYLE="font-variant:small-caps">D.E. Knuth</a>, <em>The Art of Computer Programming</em>, Volumes 1-?, 
+Addison-Wesley Publishing Company.</p>
+
+<li><p><a STYLE="font-variant:small-caps">D.C. Kozen</a>, <em>The Design and Analysis of Algorithms</em>, Springer-Verlag, 
+New York (1992).</p>
+</ul>
+
+<hr>
+
+<p><a name="IP"><font size ="5">General IP references</font></a></p>
+
+<ul>
+<li><p><a STYLE="font-variant:small-caps">R.S. Garfinkel and G.L. Nemhauser</a>, <em>Integer Programming</em>, Wiley, New 
+York (1972).</p>
+
+<li><p><a STYLE="font-variant:small-caps">G.L. Nemhauser and L.A. Wolsey</a>, <em>Integer and Combinatorial 
+Optimization</em>, John Wiley & Sons, Inc. (1988).</p>
+
+<li><p><a STYLE="font-variant:small-caps">A. Schrijver</a>, <em>Theory of Linear and Integer Programming</em>, John Wiley & 
+Sons (1986).</p>
+</ul>
+
+<hr>
+
+<p><a name="BCP"><font size ="5">General Branch, Cut, and Price References</font></a></p>
+
+<ul>
+
+<li> <p><a STYLE="font-variant:small-caps"> K. Aardal and C. van Hoesel</a>,
+<em> Polyhedral Techniques in Combinatorial Optimization I: Theory</em>,
+Statistica Neerlandica <b>50</b> (1996), 3. </p>
+
+<li> <p><a STYLE="font-variant:small-caps"> K. Aardal and C. van Hoesel</a>, 
+<em> Polyhedral Techniques in Combinatorial Optimization II: Applications and 
+Computations</em>, Statistica Neerlandica <b>50</b> (1996), 3. </p>
+
+<li><p><a STYLE="font-variant:small-caps">E. Balas</a>, <em>An Additive
+Algorithm for Solving Linear Programs with Zero-One Variables</em>, Operations
+Research
+<b>13</b> (1965), 517.</p>
+
+<li><p><a STYLE="font-variant:small-caps">E. Balas, S. Ceria and G.
+Cornu&eacute;jols</a>, <em>Mixed 0-1 Programming by Lift-and-Project in a
+Branch-and-cut Framework</em>, Management Science <b>42</b> (1996), 9.</p>
+
+<li><p><a STYLE="font-variant:small-caps">E. Balas, S. Ceria, G. Cornuéjols,
+     and N. Natraj </a>, <em>Gomory Cuts Revisited </em>. Operations Research
+     Letters <b>19</b>, 1. </p>
+ 
+<li><p><a STYLE="font-variant:small-caps">E. Balas and P. Toth</a>, <em>Branch
+and Bound Methods</em>, in E.L. Lawler, J.K. Lenstra, A.H.G. Rinnooy Kan and
+D.B. Shmoys, eds., The Traveling Salesman Problem: A Guided Tour of
+Combinatorial Optimization, Wiley, New York (1985), 361.</p>
+
+<li><p><a STYLE="font-variant:small-caps">C. Barnhart, E.L. Johnson, G.L.
+Nemhauser, M.W.P. Savelsbergh, P.H. Vance</a>, <em>Branch-and-Price: Column
+Generation for Huge Integer Programs</em>, Operations Research <b>46</b>
+(1998), 316-329.</p>
+
+<li><p><a STYLE="font-variant:small-caps">E. Beale</a>, <em>Branch and Bound
+Methods for Mathematical Programming Systems</em>, Annals of Discrete
+Mathematics <b>5</b> (1979), 201.</p>
+
+<li><p><a STYLE="font-variant:small-caps">A. Caprara and M. Fishetti</a>,
+<em>Branch-and-cut Algorithms</em>, in M. Dell'Amico, F. Maffioli, and S.
+Martello, editors, Annotated Bibliographies in Combinatorial Optimization
+(1997).</p>
+
+<li><p><a STYLE="font-variant:small-caps">C. Cordier, H. Marchand, R. Laundy, L.A. Wolsey</a>, <em>bc-opt: A Branch-and-Cut 
+Code for Mixed Integer Programs</em>, Mathematical Programming <b>86</b> (1999), 335.</p>
+
+<li><p><a STYLE="font-variant:small-caps">R. Dakin</a>, <em>A Tree-Search
+Algorithm for Mixed Integer Programming Problems</em>, The Computer Journal
+<b>8</b> (1964), 250.</p>
+
+<li><p><a STYLE="font-variant:small-caps">R. Gomory</a>, <em>Outline of an
+Algorithm for Integer Solutions to Linear Programs</em>, Bulletin of the
+American Mathematical Society <b>64</b> (1958), 275.</p>
+
+<li><p><a STYLE="font-variant:small-caps">M. Grötschel, L. Lovász, and A.
+Schrijver</a>, <em>The Ellipsoid Method and its Consequences in Combinatorial
+Optimization</em>, Combinatorica
+<b>1</b> (1981), 169.</p>
+
+<li><p><a STYLE="font-variant:small-caps"> M. Grötschel, L. Lovász, and A.
+Schrijver</a>, <em>Corrigendum to our Paper "The Ellipsoid Method and its
+Consequences in Combinatorial Optimization"</em>, Combinatorica <b>4</b>
+(1984), 291.</p>
+
+<li><p><a STYLE="font-variant:small-caps">K. Hoffman and M. Padberg</a>,
+<em>LP-Based Combinatorial Problem Solving</em>, Annals of Operations Research
+<b>4</b> (1985/86), 145.</p>
+
+<li><p><a STYLE="font-variant:small-caps">J&uuml;nger and S. Thienel</a>,
+<em>The ABACUS System for Branch and Cut and Price Algorithms in Integer
+Programming and Combinatorial Optimization</em>, Technical Report No. 98.322
+(1998), Universit&auml;t K&ouml;ln.</p>
+
+<li><p><a STYLE="font-variant:small-caps">M. J&uuml;nger, G. Reinelt, and S.
+Thienel</a>, <em>Practical Problem Solving with Cutting Plane Algorithms in
+Combinatorial Optimization</em>, DIMACS Series in Discrete Mathematics and
+Theoretical Computer Science, American Mathematical Society (1995), 111.</p>
+
+<li><p><a STYLE="font-variant:small-caps"> L. Ladányi, T.K. Ralphs, and L.E.
+    Trotter Jr. </a>, <em> Branch, Cut, and Price: Sequential and Parallel
+    </em>, in Computational Combinatorial Optimization, D. Naddef and M.
+    Juenger, eds., Springer, Berlin (2001), 223. </p>
+
+<li><p><a STYLE="font-variant:small-caps"> A. Land and A. Doig </a>, <em>An
+Automatic Method of Solving Discrete Programming Problems</em>, Econometrica
+<b>28</b> (1960), 497.</p>
+
+<li><p><a STYLE="font-variant:small-caps"> J. Linderoth, M.W.P. Savelsbergh
+</a>. <em> Computational Study of Search Strategies for Mixed Integer
+Programming </em>. INFORMS Journal on Computing <b>11</b> (1999),
+173-187.</p>
+
+<li><p><a STYLE="font-variant:small-caps">A. Martin</a>, <em> General Mixed
+        Integer Programming: Computational Issues for Branch-and-Cut
+        Algorithms </em>, in Computational Combinatorial Optimization, D.
+        Naddef and M. Juenger, eds., Springer, Berlin (2001), 1. </p>
+
+<li> <p><a STYLE="font-variant:small-caps">H. Marchand, A. Martin, R.
+Wesimantel, and L. Wolsey</a>, <em> Cutting planes in integer and mixed
+integer programming</em>, CORE Discussion paper 9953 (1999). </p>
+
+<li><p><a STYLE="font-variant:small-caps">G.L. Nemhauser, M.W.P. Savelsbergh,
+G.S. Sigismondi</a>, <em>MINTO, a Mixed INTeger Optimizer</em>, Operations
+Research Letters <b>15</b> (1994), 47-58.</p>
+
+<li><p><a STYLE="font-variant:small-caps">T.K. Ralphs</a>, <em>SYMPHONY
+Version 2.8 User's Guide</em>, available at
+<TT>www.branchandcut.org/SYMPHONY</TT>.</p>
+
+<li><p><a STYLE="font-variant:small-caps">M. Savelsbergh</a>,
+ <em>Preprocessing and Probing Techniques for Mixed Integer
+Programming Problems</em>, ORSA Journal on Computing <b>6</b> (1994), 445.</p>
+
+</ul>
+
+<hr>
+
+<p><a name="implementations"><font size ="5">Implementations</font></a></p>
+
+<ul>
+<li><p><a STYLE="font-variant:small-caps">D. Applegate, R. Bixby, V.
+Chv&aacute;tal, W. Cook</a>, <em>On the solution of traveling salesman
+problems</em>, Documenta Mathematica Journal der Deutschen
+Mathematiker-Vereinigung, International Congress of Mathematicians (1998),
+645-656.</p>
+
+<li><p><a STYLE="font-variant:small-caps">D. Applegate, R. Bixby, V.
+Chv&aacute;tal, and W. Cook</a>, <em>CONCORDE TSP Solver</em>, available at
+<TT>www.keck.caam.rice.edu/concorde.html</TT>.</p>
+
+<li><p><a STYLE="font-variant:small-caps">D. Applegate, R. Bixby, V.
+Chv&aacute;tal, and W. Cook</a>, <em>Finding Cuts in the TSP</em>, DIMACS
+Technical Report 95-05 (1995).</p>
+
+<li><p><a STYLE="font-variant:small-caps">P. Augerat, J.M. Belenguer, E.
+Benavent, A. Corber&aacute;n, D. Naddef, G. Rinaldi </a>, <em>Computational
+Results with a Branch and Cut Code for the Capacitated Vehicle Routing
+Problem</em>, Research Report 949-M, Universite Joseph Fourier, Grenoble,
+France.</p>
+
+<li><p><a STYLE="font-variant:small-caps">U. Blasum and W.
+Hochst&auml;ttler</a>, <em>Application of the Branch and Cut Method to the
+Vehicle Routing Problem</em>, Zentrum f&uuml;r Angewandte Informatik K&ouml;ln
+Technical Report zpr2000-386 (2000).</p>
+
+<li><p><a STYLE="font-variant:small-caps">G. Dantzig, R. Fulkerson, and S.
+Johnson</a>, <i>Solution of a Large-Scale Traveling-Salesman Problem</i>,
+Operations Research <b>2</b> (1954), 393.</p>
+
+<li><p><a STYLE="font-variant:small-caps">M. Gr&ouml;tschel, M. J&uuml;nger,
+ and G. Reinelt</a>, </em>A Cutting Plane Algorithm for the Linear Ordering
+ Problem, Operations Research <b>32</b> (1984), 1155.</p>
+
+<li><p><a STYLE="font-variant:small-caps">L. Hall</a>, <em>Experience with a
+Cutting Plane Algorithm for the Capacitated Spanning Tree Problem</em>,
+INFORMS Journal on Computing <b>3</b> (1996), 219.</p>
+
+<li><p><a STYLE="font-variant:small-caps">J. Little, K. Murty, D. Sweeney, and
+C. Karel</a>, <em>An Algorithm for the Traveling Salesman Problem</em>,
+Operations Research <b>11</b> (1963), 972.</p>
+
+<li><p><a STYLE="font-variant:small-caps">D. Naddef and G. Rinaldi</a>,
+<em>Branch and Cut</em>, in P. Toth and D. Vigo, eds., Vehicle Routing, SIAM
+(2000).</p>
+
+<li><p><a STYLE="font-variant:small-caps">M. Padberg and G. Rinaldi</a>, <em>A
+Branch-and-Cut Algorithm for the Resolution of Large-Scale Traveling Salesman
+Problems</em>, SIAM Review <b>33</b> (1991), 60.</p>
+
+<li><p><a STYLE="font-variant:small-caps">T.K. Ralphs, L. Kopman, W.R.
+Pulleyblank, and L.E. Trotter Jr.</a>, <em>On the Capacitated Vehicle Routing
+Problem</em>, Mathematical Programming, to appear.</p>
+
+<li><p><a STYLE="font-variant:small-caps">M.W.P. Savelsbergh</a>, <em>A
+Branch-and-Price Algorithm for the Generalized Assignment Problem</em>,
+Operations Research <b>45</b> (1997), 831-841.</p> </ul>
+
+<hr>
+
+<p><a name="parallel"><font size ="5">Parallel Branch and Bound</font></a></p>
+
+<ul>
+<li><p><a STYLE="font-variant:small-caps">G.M. Amdahl</a>, <em>Validity of the
+Single-processor Approach to Achieving Large-scale Computing
+Capabilities</em>, In <em>AFIPS Conference Proceedings</em> <b>30</b>
+(Atlantic City, N.J., April 18-20), AFIPS Press (1967).</p>
+
+<li><p><a STYLE="font-variant:small-caps">M. Benchouche, V.-D. Cung, S.
+Dowaji, B. Le Cun, T. Mautor, and C. Roucairol</a>, <em>Building a Parallel
+Branch and Bound Library</em>, in Solving Combinatorial Optimization Problems
+in Parallel, Lecture Notes in Computer Science <b>1054</b>, Springer, Berlin
+(1996), 201.</p>
+
+<li><p><a STYLE="font-variant:small-caps">R.L. Boehning R.M. Butler and B.E.
+Gillet</a>, <em>A Parallel Integer Linear Programming Algorithm</em>, European
+Journal of Operations Research <b>34</b> (1988).</p>
+
+<li><p><a STYLE="font-variant:small-caps">V.-D. Cung, S. Dowaji, B. Le Cun, T.
+Mauthor and C. Roucairol</a>, <em>Concurrent Data Structures and Load
+Balancing Strategies for Parallel Branch and Bound/A* Algorithms</em>, DIMACS
+Series in Discrete Optimization and Theoretical Computer Science <b>30</b>
+(1997).</p>
+
+<li><p><a STYLE="font-variant:small-caps">J. Eckstein</a>, <em>Parallel Branch
+and Bound Algorithms for General Mixed Integer Programming on the CM-5</em>,
+SIAM Journal on Optimization <b>4</b> (1994).</p>
+
+<li><p><a STYLE="font-variant:small-caps">J. Eckstein</a>, <em>How Much
+Communication Does Parallel Branch and Bound Need?</em>, INFORMS Journal on
+Computing <b>9</b> (1997).</p>
+
+<li><p><a STYLE="font-variant:small-caps">J. Eckstein, C.A. Phillips and W.E.
+Hart</a>, <em>PICO: An Object-Oriented Framework for Parallel Branch and
+Bound</em>, RUTCOR Research Report 40-2000.</p>
+
+<li><p><a STYLE="font-variant:small-caps">A. Geist et al.</a>, <em>PVM:
+Parallel Virtual Machine, A User's Guide and Tutorial for Networked Parallel
+Computing</em>, MIT Press, Cambridge, MA (1994).</p>
+
+<li><p><a STYLE="font-variant:small-caps">B. Gendron and T.G. Crainic</a>,
+<em>Parallel Branch and Bound Algorithms: Survey and Synthesis</em>,
+Operations Research <b>42</b> (1994), 1042.</p>
+
+<li><p><a STYLE="font-variant:small-caps">A. Grama and V. Kumar</a>,
+<em>Parallel Search Algorithms for Discrete Optimization Problems</em>, ORSA
+Journal on Computing <b>7</b> (1995).</p>
+
+<li><p><a STYLE="font-variant:small-caps">J.L. Gustafson</a>, <em>Reevaluating
+Amdahl's Law</em>, Communications of the ACM {\bf 31} (1988).</p>
+
+<li><p><a STYLE="font-variant:small-caps">V. Kumar and V.N. Rao</a>, <em>Parallel Depth-first Search. Part II. 
+Analysis.</em>, International Journal of Parallel Programming <b>16</b> (1987).</p>
+
+<li><p><a STYLE="font-variant:small-caps">V. Kumar and A. Gupta</a>,
+<em>Analyzing Scalability of Parallel Algorithms and Architectures</em>,
+Journal of Parallel and Distributed Computing <b>22</b> (1994).</p>
+
+<li><p><a STYLE="font-variant:small-caps">L. Ladányi, T.K.Ralphs, and M.J.
+Saltzman</a>, <em>Implementing Scalable Parallel Search Algorithms for
+Data-intensive Applications</em>, The Proceedings of the International
+Conference on Computational Science (2002). </p>
+
+<li><p><a STYLE="font-variant:small-caps">P. Laursen</a>, <em>Can Parallel
+Branch and Bound without Communication Be Effective?</em>, <b>4</b>
+(1994).</p>
+
+<li><p><a STYLE="font-variant:small-caps">J. Linderoth</a>, <em>Topics in
+Parallel Integer Optimization</em>, Ph.D. Dissertation, School of Industrial
+and Systems Engineering, Georgia Institute of Technology, Atlanta, GA
+(1998).</p>
+
+<li><p><a STYLE="font-variant:small-caps">T.K.Ralphs, L. Ladányi, and M.J.
+Saltzman, <em>Parallel Branch and Bound for Large-scale Discrete
+Optimization</em>, in review, available from <a
+href="http://www.lehigh.edu/~tkr/pubs.html">http://www.lehigh.edu/~tkr/pubs.html
+</a>.</p>
+
+<li><p><a STYLE="font-variant:small-caps">T.K. Ralphs</a>, <em>Parallel Branch
+and Cut for Vehicle Routing</em>, in review, available from <a
+href="http://www.lehigh.edu/~tkr/pubs.html">http://www.lehigh.edu/~tkr/pubs.html</a>.</p>
+
+<li><p><a STYLE="font-variant:small-caps">T.K. Ralphs</a>, <em>SYMPHONY
+Version 2.8 User's Guide</em>, available at
+<TT>www.branchandcut.org/SYMPHONY</TT>.</p>
+
+<li><p><a STYLE="font-variant:small-caps">V.N. Rao and V. Kumar</a>,
+<em>Parallel Depth-first Search. Part I. Implementation.</em>, International
+Journal of Parallel Programming <b>16</b> (1987).</p>
+
+<li><p><a STYLE="font-variant:small-caps">R. Rushmeier and G. Nemhauser</a>,
+<em>Experiments with Parallel Branch and Bound Algorithms for the Set Covering
+Problem</em>, Operations Research Letters <b>13</b> (1993).</p>
+
+<li><p><a STYLE="font-variant:small-caps">Y. Shinano, M. Higaki, and R.
+Hirabayashi</a>, <em>Generalized Utility for Parallel Branch and Bound
+Algorithms</em>, Proceedings of the 1995 Seventh Symposium on Parallel and
+Distributed Processing, IEEE Computer Society Press, Los Alamitos, CA (1995),
+392.</p>
+
+<li><p><a STYLE="font-variant:small-caps">Y. Shinano, K. Harada, and R.
+Hirabayashi</a>, <em>Control Schemes in a Generalized Utility for Parallel
+Branch and Bound</em>, Proceedings of the 1997 Eleventh International Parallel
+Processing Symposium, IEEE Computer Society Press, Los Alamitos, CA (1997),
+621.</p>
+
+<li><p><a STYLE="font-variant:small-caps">S. Tsch&ouml;ke and T. Polzer</a>,
+<em>Portable Parallel Branch and Bound Library User Manual, Library Version
+2.0</em>, Department of Computer Science, University of Paderborn.</p> </ul>
+
+<hr>
+
+<p>This page maintained by Ted Ralphs (<a
+href="mailto:ted@branchandcut.org">ted@branchandcut.org</a>)</p>
+
+<p>Last updated August 1, 2002</p>
+
+<p>&nbsp;</p>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1452273-2";
+urchinTracker();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_shall_we_branch</TITLE>
+<META NAME="description" CONTENT="user_shall_we_branch">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html931" HREF="node56.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html929" HREF="node43.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html923" HREF="node54.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html933" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html932" HREF="node56.html">user_select_candidates</A>
+<B>Up:</B> <A NAME="tex2html930" HREF="node43.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html924" HREF="node54.html">user_display_solution</A>
+<BR> <P>
+<H3><A NAME="SECTION00032900000000000000">user_shall_we_branch</A></H3>
+<P>
+<A NAME="user_shall_we_branch">&#160;</A>
+<P>
+<PRE>int user_shall_we_branch(void *user, double lpetol, int cutnum, 
+                         int slacks_in_matrix_num,
+                         cut_data **slacks_in_matrix,
+                         int slack_cut_num, cut_data **slack_cuts,
+                         int varnum, var_desc **vars, double *x, 
+                         char *status, int *cand_num, 
+                         branch_obj ***candidates, int *action)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+There are two user-written functions invoked from <TT>
+select_candidates_u</TT>. The first one
+(<TT><A HREF="node55.html#user_shall_we_branch">user_shall_we_branch()</A></TT>) decides
+whether to branch at all, the second one (<TT>
+<A HREF="node56.html#user_select_candidates">user_select_candidates()</A></TT>) chooses
+the branching objects. The argument lists of the two functions are the
+same, and if branching occurs (see discussion below) then the contents
+of <TT>*cand_num</TT> and <TT>*candidates</TT> will not change between the
+calls to the two functions.<BR> 
+<BR> 
+The first of these two functions is invoked in each iteration
+after solving the LP relaxation and (possibly) generating cuts.
+Therefore, by the time it is called, some violated cuts might be known.
+Still, the user might decide to branch anyway. The second function is
+invoked only when branching is decided on.<BR> 
+<BR> 
+Given (1) the number of known violated cuts that can be added to the
+problem when this function is invoked, (2) the constraints that are
+slack in the LP relaxation, (3) the slack cuts not in the matrix that
+could be branched on (more on this later), and (4) the solution to the
+current LP relaxation, the user must decide whether to branch or not.
+Branching can be done either on variables or slack cuts. A pool of
+slack cuts which has been removed from the problem and kept for
+possible branching is passed to the user. If any of these happen to
+actually be violated (it is up to the user to determine this), they
+can be passed back as branching candidate type <TT>VIOLATED_SLACK</TT>
+and will be added into the current relaxation. In this case, branching
+does not have to occur (the structure of the <TT>*candidates</TT> array
+is described below in <TT><A HREF="node56.html#user_select_candidates">user_select_candidates()</A></TT>). <BR> 
+<BR> 
+This function has two outputs. The first output is <TT>*action</TT> which
+can take four values: <TT>USER__DO_BRANCH</TT> if the user wants to
+branch, <TT>USER__DO_NOT_BRANCH</TT> if he doesn't want to branch,
+<TT>USER__BRANCH_IF_MUST</TT> if he wants to branch only if there are
+no known violated cuts, or finally <TT>USER__BRANCH_IF_TAILOFF</TT> if he
+wants to branch in case tailing off is detected. The second output is the
+number of candidates and their description. In this function the only
+sensible ``candidates'' are <TT>VIOLATED_SLACK</TT>s. <BR> 
+<BR> 
+There is no post processing, but in case branching is
+selected, the <TT>col_gen_before_branch()</TT> function is invoked
+before the branching would take place. If that function finds dual
+infeasible variables then (instead of branching) they are added to the
+LP relaxation and the problem is resolved. (Note that the behavior of
+the <TT>col_gen_before_branch()</TT> is governed by the <TT>
+colgen_strat[]</TT> TM parameters.)
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=643 HEIGHT=704 ALIGN=BOTTOM ALT="tabular1576" SRC="img50.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=646 HEIGHT=81 ALIGN=BOTTOM ALT="tabular1578" SRC="img51.gif"  > <P>
+<P>
+<DT><STRONG>Notes:</STRONG>
+<DD> 
+<UL><LI> The user has to allocate the pointer array for the
+	candidates and place the pointer for the array into <TT>
+	***candidates</TT> (if candidates are returned).<LI> Candidates of type <TT>VIOLATED_SLACK</TT> are always
+	added to the LP relaxation regardless of what <TT>action</TT> is
+	chosen and whether branching will be carried out or not.<LI> Also note that the user can change his mind in 
+	<TT><A HREF="node56.html#user_select_candidates">user_select_candidates()</A></TT> and not branch after all, even if
+	she chose to branch in this function. A possible scenario:
+	<TT>cut_num</TT> is zero when this function is invoked and the
+	user asks for <TT>USER__BRANCH_IF_MUST</TT> without checking
+	the slack constraints and slack cuts. Afterwards no columns
+	are generated (no dual infeasible variables found) and thus
+	SYMPHONY decides branching is called for and invokes 
+	<TT><A HREF="node56.html#user_select_candidates">user_select_candidates()</A></TT>. 
+	However, in that function the
+	user checks the slack cuts, finds that some are violated,
+	cancels the branching request and adds the violated cuts to
+	the relaxation instead.
+</UL>
+<P>
+<DT><STRONG><B>Warning:</STRONG>
+<DD>
+<P>
+The cuts the user unpacks and wants to be added to the
+problem (either because they are of type <TT>VIOLATED_SLACK</TT> or type
+<TT>CANDIDATE_CUT_NOT_IN_MATRIX</TT>) will be deleted from the list
+of slack cuts after this routine returns. Therefore the same
+warning applies here as in the function <TT>
+<A HREF="node62.html#user_unpack_cuts">user_unpack_cuts()</A></TT>.
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>select_branching_object()</TT>.
+<P>
+ </DL></B><HR><A NAME="tex2html931" HREF="node56.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html929" HREF="node43.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html923" HREF="node54.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html933" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html932" HREF="node56.html">user_select_candidates</A>
+<B>Up:</B> <A NAME="tex2html930" HREF="node43.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html924" HREF="node54.html">user_display_solution</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

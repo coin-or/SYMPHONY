@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Design Overview</TITLE>
+<META NAME="description" CONTENT="Design Overview">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node60.html">
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node24.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html661"
+  HREF="node24.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html657"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html651"
+  HREF="node22.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html659"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html662"
+  HREF="node24.html">Design Approach</A>
+<B>Up:</B> <A NAME="tex2html658"
+  HREF="man.html">SYMPHONY 5.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html652"
+  HREF="node22.html">User Callback Functions</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00500000000000000000"></A>
+<A NAME="SYMPHONY-design"></A>
+<BR>
+Design Overview
+</H1>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html663"
+  HREF="node24.html">Design Approach</A>
+<UL>
+<LI><A NAME="tex2html664"
+  HREF="node25.html">An Object-oriented Approach</A>
+<LI><A NAME="tex2html665"
+  HREF="node26.html">Data Structures and Storage</A>
+<UL>
+<LI><A NAME="tex2html666"
+  HREF="node27.html">Variables</A>
+<LI><A NAME="tex2html667"
+  HREF="node28.html">Constraints</A>
+<LI><A NAME="tex2html668"
+  HREF="node29.html">Search Tree</A>
+</UL>
+<LI><A NAME="tex2html669"
+  HREF="node30.html">Modular Implementation</A>
+<UL>
+<LI><A NAME="tex2html670"
+  HREF="node31.html">The Master Module</A>
+<LI><A NAME="tex2html671"
+  HREF="node32.html">The Tree Manager Module</A>
+<LI><A NAME="tex2html672"
+  HREF="node33.html">The Linear Programming Module</A>
+<LI><A NAME="tex2html673"
+  HREF="node34.html">The Cut Generator Module</A>
+<LI><A NAME="tex2html674"
+  HREF="node35.html">The Cut Pool Module</A>
+</UL>
+<LI><A NAME="tex2html675"
+  HREF="node36.html">Algorithm Summary</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html676"
+  HREF="node37.html">Details of the Implementation</A>
+<UL>
+<LI><A NAME="tex2html677"
+  HREF="node38.html">The Master Module</A>
+<UL>
+<LI><A NAME="tex2html678"
+  HREF="node39.html">Initial Solve</A>
+<LI><A NAME="tex2html679"
+  HREF="node40.html">Solve from Warm Start</A>
+<UL>
+<LI><A NAME="tex2html680"
+  HREF="node41.html">Modifying Parameters.</A>
+<LI><A NAME="tex2html681"
+  HREF="node42.html">Modifying Problem Data.</A>
+</UL>
+<LI><A NAME="tex2html682"
+  HREF="node43.html">Bicriteria Solve</A>
+</UL>
+<LI><A NAME="tex2html683"
+  HREF="node44.html">The Linear Programming  Module</A>
+<UL>
+<LI><A NAME="tex2html684"
+  HREF="node45.html">The LP Engine</A>
+<LI><A NAME="tex2html685"
+  HREF="node46.html">Managing the LP Relaxation</A>
+<LI><A NAME="tex2html686"
+  HREF="node47.html">Branching</A>
+</UL>
+<LI><A NAME="tex2html687"
+  HREF="node48.html">The Tree Manager Module</A>
+<UL>
+<LI><A NAME="tex2html688"
+  HREF="node49.html">Managing the Search Tree</A>
+<LI><A NAME="tex2html689"
+  HREF="node50.html">Search Chains and Diving</A>
+<LI><A NAME="tex2html690"
+  HREF="node51.html">The Two-Phase Algorithm</A>
+</UL>
+<LI><A NAME="tex2html691"
+  HREF="node52.html">The Cut Generator Module</A>
+<LI><A NAME="tex2html692"
+  HREF="node53.html">The Cut Pool Module</A>
+<UL>
+<LI><A NAME="tex2html693"
+  HREF="node54.html">Maintaining and Scanning the Pool</A>
+<LI><A NAME="tex2html694"
+  HREF="node55.html">Using Multiple Pools</A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html695"
+  HREF="node56.html">Parallelizing BCP</A>
+<UL>
+<LI><A NAME="tex2html696"
+  HREF="node57.html">Parallel Configurations</A>
+<LI><A NAME="tex2html697"
+  HREF="node58.html">Inter-process Communication</A>
+<LI><A NAME="tex2html698"
+  HREF="node59.html">Fault Tolerance</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

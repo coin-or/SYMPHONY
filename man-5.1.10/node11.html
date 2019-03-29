@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Installation in Unix-like environments</TITLE>
+<META NAME="description" CONTENT="Installation in Unix-like environments">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node12.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node10.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html549"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html545"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html539"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html547"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html550"
+  HREF="node12.html">Installation for Use With</A>
+<B>Up:</B> <A NAME="tex2html546"
+  HREF="node10.html">Installing the Binary Distribution</A>
+<B> Previous:</B> <A NAME="tex2html540"
+  HREF="node10.html">Installing the Binary Distribution</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00311000000000000000"></A>
+<A NAME="building-unix"></A>
+<BR>
+Installation in Unix-like environments
+</H2>
+
+<P>
+
+<UL>
+<LI>Unpack the distribution with
+
+<PRE>
+ tar xzvf symphony-\VER-XXX-bin.tgz
+</PRE>
+where 
+<FONT COLOR="#a52a2a"><TT>XXX</TT></FONT> indicates the platform and the version of 
+compiler used to build the distribution. 
+Switch into the root directory of the unpacked distribution. 
+
+<P>
+</LI>
+<LI>First, test the executable by going to the 
+<FONT COLOR="#a52a2a"><TT>bin</TT></FONT> directory and
+typing 
+
+<PRE>
+ ./symphony -F ../examples/sample.mps
+</PRE>
+</LI>
+<LI>To test the callable library, the distribution
+includes sample files in 
+<FONT COLOR="#a52a2a"><TT>examples</TT></FONT> directory:  
+<BR>
+<BR>
+<FONT COLOR="#a52a2a"><TT>milp.c</TT></FONT>: This sample code is an implementation of a basic MILP
+solver using SYMPHONY's C callable functions with user defined input (see
+Section
+<A HREF="node45.html#callable_library">3.3</A>). To test the code, go to the 
+<FONT COLOR="#a52a2a"><TT>examples</TT></FONT> directory 
+and type 
+
+<PRE>
+ make milp 
+ milp
+</PRE>
+
+<FONT COLOR="#a52a2a"><TT>milpOsi.c</TT></FONT>: This sample code is an implementation of a basic MILP 
+solver using SYMPHONY's C++ callable functions (through OsiSym interface)
+with user defined input (see Section <A HREF="node55.html#OSI">3.3.2</A>). To test the code, 
+go to 
+<FONT COLOR="#a52a2a"><TT>examples</TT></FONT> directory and type, 
+
+<PRE>
+ make milpOsi
+ milpOsi
+</PRE>
+</LI>
+</UL>
+
+<P>
+If everything is working properly, the libraries, executables and header files
+can be installed in appropriate system directories if desired. This must be
+done by hand. This step will be done automatically if building from source
+using the automatic scripts provided (see below).
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html549"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html545"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html539"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html547"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html550"
+  HREF="node12.html">Installation for Use With</A>
+<B>Up:</B> <A NAME="tex2html546"
+  HREF="node10.html">Installing the Binary Distribution</A>
+<B> Previous:</B> <A NAME="tex2html540"
+  HREF="node10.html">Installing the Binary Distribution</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-10-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

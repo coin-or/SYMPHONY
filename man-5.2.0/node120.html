@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>sym_open_environment</TITLE>
+<META NAME="description" CONTENT="sym_open_environment">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node121.html">
+<LINK REL="previous" HREF="node119.html">
+<LINK REL="up" HREF="node119.html">
+<LINK REL="next" HREF="node121.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html2284"
+  HREF="node121.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2280"
+  HREF="node119.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2274"
+  HREF="node119.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2282"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2285"
+  HREF="node121.html">sym_create_copy_environment</A>
+<B>Up:</B> <A NAME="tex2html2281"
+  HREF="node119.html">Primary Interface Functions</A>
+<B> Previous:</B> <A NAME="tex2html2275"
+  HREF="node119.html">Primary Interface Functions</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00711100000000000000">
+sym_open_environment</A>
+</H3>
+[f]sym_open_environmet
+<PRE>
+sym_environment *sym_open_environment()
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This routine is used to get a new SYMPHONY environment to be passed as an 
+argument to all other API subroutines. This routine also invokes the callback
+function <A HREF="node210.html#user_initialize"><TT>user_initialize()</TT></A>.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>NULL</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Error. Environment could not be initialized. None of the 
+other API subroutines can be called after this point.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>sym_environment *</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Pointer to a successfully opened environment</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2009-07-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

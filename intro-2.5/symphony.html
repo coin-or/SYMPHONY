@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>SYMPHONY: A Parallel Framework for Branch, Cut, and Price</TITLE>
+<META NAME="description" CONTENT="SYMPHONY: A Parallel Framework for Branch, Cut, and Price">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html8" HREF="node1.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif_gr.gif"> <IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif_gr.gif">   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html9" HREF="node1.html">Introduction</A>
+<BR> <P>
+<P>
+<H1 ALIGN=CENTER><B>SYMPHONY: A Parallel Framework for Branch, Cut, and Price</B></H1>
+<P ALIGN=CENTER><STRONG>T.K. Ralphs<A NAME="tex2html2" HREF="footnode.html#27"><IMG  ALIGN=BOTTOM ALT="gif" SRC="http://cbl.leeds.ac.uk/nikos/figs/foot_motif.gif"></A> 
+        and L. Ladanyi<A NAME="tex2html3" HREF="footnode.html#28"><IMG  ALIGN=BOTTOM ALT="gif" SRC="http://cbl.leeds.ac.uk/nikos/figs/foot_motif.gif"></A></STRONG></P><P>
+<P ALIGN=CENTER><STRONG>December 31, 1999</STRONG></P><P>
+<P>
+ <P ALIGN="CENTER"> <STRONG> <FONT SIZE="3">
+Postscript version available <A
+HREF="ftp://branchandcut.org/pub/reference/symphony.ps">here</A>
+</FONT></STRONG></P>
+<P>
+<H3 CLASS=ABSTRACT>Abstract:</H3>
+<P CLASS=ABSTRACT>This white paper introduces SYMPHONY (Single- or
+Multi-Process Optimization over Networks), a powerful environment for
+implementing branch, cut, and price algorithms. SYMPHONY is a
+state-of-the-art solver which is designed to be completely modular and
+is easy to port to various problem settings. All library subroutines
+are generic--their implementation does not depend on the the
+problem-setting. To develop a full-scale, parallel branch, cut, and
+price algorithm, the user has only to specify a few problem-specific
+functions such as preprocessing and separation. The vast majority of
+the computation takes place within a ``black box,'' of which the user
+need have no knowledge. SYMPHONY communicates with the user's routines
+through well-defined interfaces and performs all the normal functions
+of branch and cut--tree management, LP solution, cut pool management,
+as well as inter-process communication. Although there are default
+options, the user can also assert control over the behavior of
+SYMPHONY through a myriad of parameters and optional subroutines.
+SYMPHONY can be built in a variety of configurations, ranging from
+fully parallel to completely sequential, depending on the user's
+needs. The library runs serially on almost any platform, and can run
+in parallel in any environment supported by the PVM message-passing
+protocol.
+<P>
+</P><P>
+<P>
+<BR> <HR>
+<UL> 
+<LI> <A NAME="tex2html10" HREF="node1.html#SECTION00010000000000000000">Introduction</A>
+<LI> <A NAME="tex2html11" HREF="node2.html#SECTION00020000000000000000">Branch and Cut Algorithms</A>
+<UL> 
+<LI> <A NAME="tex2html12" HREF="node3.html#SECTION00021000000000000000">Branch and Bound</A>
+<LI> <A NAME="tex2html13" HREF="node4.html#SECTION00022000000000000000">Branch and Cut</A>
+</UL> 
+<LI> <A NAME="tex2html14" HREF="node5.html#SECTION00030000000000000000">Parallelizing Branch and Cut</A>
+<UL> 
+<LI> <A NAME="tex2html15" HREF="node6.html#SECTION00031000000000000000">The Master Process</A>
+<LI> <A NAME="tex2html16" HREF="node7.html#SECTION00032000000000000000">The Cut Pool Process</A>
+<LI> <A NAME="tex2html17" HREF="node8.html#SECTION00033000000000000000">The Cut Generator Process</A>
+<LI> <A NAME="tex2html18" HREF="node9.html#SECTION00034000000000000000">The Linear Programming Process</A>
+<LI> <A NAME="tex2html19" HREF="node10.html#SECTION00035000000000000000">The Tree Manager Process</A>
+<LI> <A NAME="tex2html20" HREF="node11.html#SECTION00036000000000000000">Algorithm Overview</A>
+</UL> 
+<LI> <A NAME="tex2html21" HREF="node12.html#SECTION00040000000000000000">The Design of SYMPHONY</A>
+<UL> 
+<LI> <A NAME="tex2html22" HREF="node13.html#SECTION00041000000000000000">Computing Environment</A>
+<LI> <A NAME="tex2html23" HREF="node14.html#SECTION00042000000000000000">Configuration of the Modules</A>
+<LI> <A NAME="tex2html24" HREF="node15.html#SECTION00043000000000000000">Data Structures and Storage</A>
+<UL> 
+<LI> <A NAME="tex2html25" HREF="node16.html#SECTION00043100000000000000">Variables</A>
+<LI> <A NAME="tex2html26" HREF="node17.html#SECTION00043200000000000000">Constraints</A>
+<LI> <A NAME="tex2html27" HREF="node18.html#SECTION00043300000000000000">Search Tree</A>
+</UL> 
+</UL> 
+<LI> <A NAME="tex2html28" HREF="node19.html#SECTION00050000000000000000">Implementation of the Modules</A>
+<UL> 
+<LI> <A NAME="tex2html29" HREF="node20.html#SECTION00051000000000000000">The Master Process</A>
+<LI> <A NAME="tex2html30" HREF="node21.html#SECTION00052000000000000000">The LP Process</A>
+<UL> 
+<LI> <A NAME="tex2html31" HREF="node22.html#SECTION00052100000000000000">The LP Engine</A>
+<LI> <A NAME="tex2html32" HREF="node23.html#SECTION00052200000000000000">Managing the LP Relaxation</A>
+<LI> <A NAME="tex2html33" HREF="node24.html#SECTION00052300000000000000">Branching</A>
+</UL> 
+<LI> <A NAME="tex2html34" HREF="node25.html#SECTION00053000000000000000">The Tree Manager Process</A>
+<UL> 
+<LI> <A NAME="tex2html35" HREF="node26.html#SECTION00053100000000000000">Managing the Search Tree</A>
+<LI> <A NAME="tex2html36" HREF="node27.html#SECTION00053200000000000000">The Two-Phase Algorithm</A>
+<LI> <A NAME="tex2html37" HREF="node28.html#SECTION00053300000000000000">Fault Tolerance</A>
+</UL> 
+<LI> <A NAME="tex2html38" HREF="node29.html#SECTION00054000000000000000">The Cut Generator Process</A>
+<LI> <A NAME="tex2html39" HREF="node30.html#SECTION00055000000000000000">The Cut Pool Process</A>
+<UL> 
+<LI> <A NAME="tex2html40" HREF="node31.html#SECTION00055100000000000000">Maintaining and Scanning the Pool</A>
+<LI> <A NAME="tex2html41" HREF="node32.html#SECTION00055200000000000000">Using Multiple Pools</A>
+</UL> 
+</UL> 
+<LI> <A NAME="tex2html42" HREF="node33.html#SECTION00060000000000000000">Future Enhancements</A>
+<LI> <A NAME="tex2html43" HREF="node34.html#SECTION00070000000000000000">References</A>
+<LI> <A NAME="tex2html44" HREF="node35.html#SECTION00080000000000000000">  About this document ... </A>
+</UL>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:11 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

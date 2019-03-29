@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Configuring the Modules</TITLE>
+<META NAME="description" CONTENT="Configuring the Modules">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html217" HREF="node13.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html215" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html209" HREF="node11.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html218" HREF="node13.html">Other Resources</A>
+<B>Up:</B> <A NAME="tex2html216" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html210" HREF="node11.html">Developing an Application</A>
+<BR> <P>
+<H2><A NAME="SECTION00019000000000000000">Configuring the Modules</A></H2>
+<P>
+<A NAME="configuration">&#160;</A>
+Once you have compiled the fully parallel version of the executables,
+you can try other configurations. In the <TT>make</TT> file, there are
+four variables that control which modules run as separate executables
+and which are called directly in serial fashion. The variables are as
+follows:
+<DL ><DT><STRONG>COMPILE_IN_CG:</STRONG>
+<DD> If set to <TT>TRUE</TT>, then the cut generator
+	function will be called directly from the LP in serial
+	fashion, instead of running as a separate executable. This is
+	desirable if cut generation is quick and running it in
+	parallel is not worth the price of the communication overhead.
+	<DT><STRONG>COMPILE_IN_CP:</STRONG>
+<DD> If set to <TT>TRUE</TT>, then the cut
+	pool will be maintained as a data structure auxiliary to the
+	LP process. Note that this implies that each LP will have its
+	own cut pool. This option is only recommended if running with
+	a single LP process. 
+	<DT><STRONG>COMPILE_IN_LP:</STRONG>
+<DD> If set to <TT>TRUE</TT>, then the LP
+	functions will be called directly from the tree manager. This
+	necessarily implies that there will only be one active
+	subproblem at a time, and hence the code will essentially be
+	running serially.
+	<DT><STRONG>COMPILE_IN_TM:</STRONG>
+<DD> If set to <TT>TRUE</TT>, then the tree
+	will be managed directly from the master process. This is only
+	recommended if a single executable is desired (i.e.&nbsp;the three
+	other variables are also set to true). A single executable is
+	extremely useful for debugging purposes.
+<P>
+ </DL>
+These variables can be set in virtually any combination, though some
+don't really make much sense. Note that in a few user functions that
+involve process communication, there will be different versions for
+serial and parallel computation. This is accomplished through the use
+of <TT>#ifdef</TT> statements in the source code. This is well documented
+in the function descriptions and the in the source files containing
+the function stubs.
+<P>
+<HR><A NAME="tex2html217" HREF="node13.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html215" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html209" HREF="node11.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html218" HREF="node13.html">Other Resources</A>
+<B>Up:</B> <A NAME="tex2html216" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html210" HREF="node11.html">Developing an Application</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

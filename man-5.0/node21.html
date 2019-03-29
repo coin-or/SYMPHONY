@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The OSI Interface</TITLE>
+<META NAME="description" CONTENT="The OSI Interface">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node22.html">
+<LINK REL="previous" HREF="node12.html">
+<LINK REL="up" HREF="node11.html">
+<LINK REL="next" HREF="node22.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html639"
+  HREF="node22.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html635"
+  HREF="node11.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html629"
+  HREF="node20.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html637"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html640"
+  HREF="node22.html">User Callback Functions</A>
+<B>Up:</B> <A NAME="tex2html636"
+  HREF="node11.html">API Overview</A>
+<B> Previous:</B> <A NAME="tex2html630"
+  HREF="node20.html">sym_close_environment()</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00420000000000000000"></A><A NAME="OSI"></A>
+<BR>
+The OSI Interface
+</H1>
+
+<P>
+The Open Solver Interface (OSI) is a C++ class that provides a standard API
+for accessing a variety of solvers for mathematical programs. It is provided
+as part of the COIN-OR repository [<A
+ HREF="node261.html#coin-or">26</A>], along with a collection of
+solver-specific derived classes that translate OSI call into calls to the
+underlying libraries of the solvers. A code implemented using calls to the
+methods in the OSI base class can easily be linked with any solver for which
+there is an OSI interface. This allows development of solver-independent codes
+and eliminates many portability issues. The current incarnation of OSI
+supports only solvers for linear and mixed-integer linear programs, although a
+new version supporting a wider variety of solvers is currently under
+development.
+
+<P>
+We have implemented an OSI interface for SYMPHONY 5.0 that allows any solver
+built with SYMPHONY to be accessed through the OSI, including customized
+solvers and those configured to run on parallel architectures. To ease code
+maintenance, for each method in the OSI base class, there is a corresponding
+method in the callable library. The OSI methods are implemented simply as
+wrapped calls to the SYMPHONY callable library. When an instance of the OSI
+interface class is constructed, a call is made to
+<TT>sym_open_environment()</TT> and a pointer to the environment is stored
+in the class. Most subsequent calls within the class can then be made without
+any arguments. When the OSI object is destroyed,
+<TT>sym_close_environment</TT> is called and the environment is destroyed.
+
+<P>
+To fully support SYMPHONY's capabilities, we have extended the OSI interface to
+include some methods not in the base class. For example, we added calls
+equivalent to our <TT>sym_parse_command_line()</TT> and
+<TT>sym_find_initial_bounds()</TT>. Figure <A HREF="node21.html#OSI_main">3.5</A> shows the
+program of Figure <A HREF="node20.html#default_main">3.1</A> implemented using the OSI interface.
+
+<DIV ALIGN="CENTER"><A NAME="OSI_main"></A><A NAME="892"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.5:</STRONG>
+Implementation of a generic MILP solver with the SYMPHONY
+OSI interface.</CAPTION>
+<TR><TD><IMG
+ WIDTH="316" HEIGHT="145" BORDER="0"
+ SRC="img27.png"
+ ALT="\begin{figure}\begin{Verbatim}[frame=lines]
+int main(int argc, char **argv)
+{
+O...
+...rgc, argv);
+si.loadProblem();
+si.branchAndBound();
+}\end{Verbatim}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+Note that the code would be exactly the same for accessing any customized
+SYMPHONY solver, sequential or parallel.
+
+<P>
+Although we are using the OSI to access a MILP solver, the current version of
+the OSI is geared primarily toward support of solvers for linear programming
+(LP) problems. This is because LP solvers employing some version of the
+simplex algorithm support much richer functionality and a wider range of
+interface functions, due to their support of warm starting from previously
+saved checkpoints. This functionality is difficult to provide for MILP
+solvers.  In SYMPHONY 5.0, we have implemented for MILPs some of the same
+functionality that has long been available for LP solvers. As such, our OSI
+interface supports warm starting and sensitivity analysis. The implementations
+of this functionality is straightforward at the moment, but will be improved
+in future versions.
+
+<P>
+<HR>
+<A NAME="tex2html639"
+  HREF="node22.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html635"
+  HREF="node11.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html629"
+  HREF="node20.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html637"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html640"
+  HREF="node22.html">User Callback Functions</A>
+<B>Up:</B> <A NAME="tex2html636"
+  HREF="node11.html">API Overview</A>
+<B> Previous:</B> <A NAME="tex2html630"
+  HREF="node20.html">sym_close_environment()</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

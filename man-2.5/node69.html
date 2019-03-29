@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Global parameters</TITLE>
+<META NAME="description" CONTENT="Global parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html884" HREF="node70.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html882" HREF="node68.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html876" HREF="node68.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html885" HREF="node70.html">Master Process parameters</A>
+<B>Up:</B> <A NAME="tex2html883" HREF="node68.html">Parameter file</A>
+<B> Previous:</B> <A NAME="tex2html877" HREF="node68.html">Parameter file</A>
+<BR> <P>
+<H2><A NAME="SECTION00031000000000000000">Global parameters</A></H2>
+<P>
+<DL ><DT><STRONG><TT>verbosity</TT> - integer (0).</STRONG>
+<DD>
+Sets the verbosity of all processes to the given value. In general,
+the greater this number the more verbose each process is. Experiment
+to find out what this means.
+<P>
+<DT><STRONG><TT>random_seed</TT> - integer (17).</STRONG>
+<DD>
+A random seed.
+<P>
+<DT><STRONG><TT>granularity</TT> - double (1e-6).</STRONG>
+<DD>
+should be set to ``the minimum difference between two distinct
+objective function values'' less the epsilon tolerance. E.g., if every
+variable is integral and the objective coefficients are integral then
+for any feasible solution the objective value is integer, so <TT>
+granularity</TT> could be correctly set to .99999.
+<P>
+<DT><STRONG><TT>upper_bound</TT> - double (none)</STRONG>
+<DD>.
+The value of the best known upper bound.
+<P>
+ </DL><BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

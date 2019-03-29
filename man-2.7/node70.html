@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_receive_cg_data</TITLE>
+<META NAME="description" CONTENT="user_receive_cg_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html1099" HREF="node71.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html1097" HREF="node69.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html1091" HREF="node69.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html1101" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html1100" HREF="node71.html">user_receive_lp_solution_cg</A>
+<B>Up:</B> <A NAME="tex2html1098" HREF="node69.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html1092" HREF="node69.html">User-written functions of the </A>
+<BR> <P>
+<H3><A NAME="SECTION00033100000000000000">user_receive_cg_data</A></H3>
+<P>
+<A NAME="user_receive_cg_data">&#160;</A>
+<PRE>int user_receive_cg_data (void **user)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user has to receive here all problem-specific information that is
+known to the master and will be needed for computation in the CG
+process later on. The same data must be received here that was sent in
+the <A HREF="node38.html#user_send_cg_data"><TT>user_send_cg_data()</TT></A> function
+in the master process. The user has to allocate space for all the data
+structures, including <TT>user</TT> itself. Note that some or all of this
+may be done in the function <TT>
+<A HREF="node38.html#user_send_cg_data">user_send_cg_data()</A></TT> if the Tree Manager, LP,
+and CG are all compiled together. See that function for more
+information.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=519 HEIGHT=13 ALIGN=BOTTOM ALT="tabular1783" SRC="img88.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=381 HEIGHT=38 ALIGN=BOTTOM ALT="tabular1785" SRC="img79.gif"  > <P>
+<P>
+<DT><STRONG>Invoked from:</STRONG>
+<DD> <TT>cg_initialize()</TT> at process start.
+<P>
+ </DL>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

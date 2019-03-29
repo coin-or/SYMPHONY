@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Two-Phase Algorithm</TITLE>
+<META NAME="description" CONTENT="The Two-Phase Algorithm">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node87.html">
+<LINK REL="up" HREF="node85.html">
+<LINK REL="next" HREF="node89.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1612"
+  HREF="node89.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1608"
+  HREF="node85.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1604"
+  HREF="node87.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1610"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1613"
+  HREF="node89.html">The Cut Generation Module</A>
+<B>Up:</B> <A NAME="tex2html1609"
+  HREF="node85.html">The Tree Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1605"
+  HREF="node87.html">Search Chains and Diving</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00543300000000000000"></A>
+<A NAME="two-phase"></A>
+<BR>
+The Two-Phase Algorithm
+</H3>
+
+<P>
+If no heuristic subroutine is available for generating feasible
+solutions quickly, then a unique two-phase algorithm can also be
+invoked. In the two-phase method, the algorithm is first run to
+completion on a specified set of core variables. Any node that would
+have been pruned in the first phase is instead sent to a pool of
+candidates for the second phase. If the set of core variables is
+small, but well-chosen, this first phase should be finished quickly
+and should result in a near-optimal solution. In addition, the first
+phase will produce a list of useful cuts. Using the upper bound and
+the list of cuts from the first phase, the root node is <EM>repriced</EM>--that is, it is reprocessed with the full set of variables
+and cuts. The hope is that most or all of the variables not included
+in the first phase will be priced out of the problem in the new root
+node. Any variable thus priced out can be eliminated from the problem
+globally. If we are successful at pricing out all of the inactive
+variables, we have shown that the solution from the first phase was,
+in fact, optimal. If not, we must go back and price out the (reduced)
+set of extra variables in each leaf of the search tree produced during
+the first phase. We then continue processing any node in which we fail
+to price out all the variables.
+
+<P>
+In order to avoid pricing variables in every leaf of the tree, we can
+<EM>trim the tree</EM> before the start of the second phase. Trimming the
+tree consists of eliminating the children of any node for which
+each child has lower bound above the current upper
+bound. We then reprocess the parent node itself. This is typically
+more efficient, since there is a high probability that, given the new
+upper bound and cuts, we will be able to prune the parent node and
+avoid the task of processing each child individually.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1612"
+  HREF="node89.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1608"
+  HREF="node85.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1604"
+  HREF="node87.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1610"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1613"
+  HREF="node89.html">The Cut Generation Module</A>
+<B>Up:</B> <A NAME="tex2html1609"
+  HREF="node85.html">The Tree Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1605"
+  HREF="node87.html">Search Chains and Diving</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-12-12</I>
+</ADDRESS>
+</BODY>
+</HTML>

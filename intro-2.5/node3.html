@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Branch and Bound</TITLE>
+<META NAME="description" CONTENT="Branch and Bound">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html75" HREF="node4.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html73" HREF="node2.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html67" HREF="node2.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html76" HREF="node4.html">Branch and Cut</A>
+<B>Up:</B> <A NAME="tex2html74" HREF="node2.html">Branch and Cut Algorithms</A>
+<B> Previous:</B> <A NAME="tex2html68" HREF="node2.html">Branch and Cut Algorithms</A>
+<BR> <P>
+<H2><A NAME="SECTION00021000000000000000">Branch and Bound</A></H2>
+<P>
+<EM>Branch and bound</EM> is the broad class of algorithms from which
+branch, cut, and price is descended. Branch and bound algorithms use a
+divide and conquer strategy to partition the solution space into <EM>
+subproblems</EM> and then optimizes individually over each of them. For
+instance, let <I>S</I> be the set of solutions to a given problem, and let
+ <IMG WIDTH=51 HEIGHT=33 ALIGN=MIDDLE ALT="tex2html_wrap_inline775" SRC="img1.gif"  >  be a vector of costs associated with members of S.
+Suppose we wish to determine a least cost member of S and we are given
+ <IMG WIDTH=39 HEIGHT=25 ALIGN=MIDDLE ALT="tex2html_wrap_inline777" SRC="img2.gif"  > , a ``good'' solution determined heuristically. Using
+branch and bound, we initially examine the entire solution space <I>S</I>.
+In the <EM>processing</EM> or <EM>bounding</EM> phase, we relax the problem
+in some fashion. In so doing, we admit solutions that are not in the
+feasible set <I>S</I>. Solving this relaxation yields a lower bound on the
+value of an optimal solution. If the solution to this relaxation is a
+member of <I>S</I> or has cost equal to  <IMG WIDTH=7 HEIGHT=12 ALIGN=BOTTOM ALT="tex2html_wrap_inline785" SRC="img3.gif"  > , then we are
+done--either the new solution or  <IMG WIDTH=7 HEIGHT=12 ALIGN=BOTTOM ALT="tex2html_wrap_inline785" SRC="img3.gif"  > , respectively, is optimal.
+Otherwise, we identify <I>n</I> subsets of <I>S</I>,  <IMG WIDTH=75 HEIGHT=25 ALIGN=MIDDLE ALT="tex2html_wrap_inline793" SRC="img4.gif"  > , such
+that  <IMG WIDTH=83 HEIGHT=24 ALIGN=MIDDLE ALT="tex2html_wrap_inline795" SRC="img5.gif"  > . Each of these subsets is called a <EM>
+subproblem</EM>;  <IMG WIDTH=75 HEIGHT=25 ALIGN=MIDDLE ALT="tex2html_wrap_inline793" SRC="img4.gif"  >  are also sometimes called the <EM>
+children</EM> of <I>S</I>. We add the children of <I>S</I> to the list of <EM>
+candidate subproblems</EM> (those which need processing). This is called
+the <EM>branching phase</EM>.
+<P>
+To continue the algorithm, we select one of the candidate subproblems
+and process it. There are four possible results. If we find a feasible
+solution better than  <IMG WIDTH=7 HEIGHT=12 ALIGN=BOTTOM ALT="tex2html_wrap_inline785" SRC="img3.gif"  > , then we replace  <IMG WIDTH=7 HEIGHT=12 ALIGN=BOTTOM ALT="tex2html_wrap_inline785" SRC="img3.gif"  >  with the new
+solution and continue. We may also find that the subproblem has no
+solutions, in which case we discard, or <EM>prune</EM> it. Otherwise, we
+compare the lower bound to our global upper bound. If it is greater
+than or equal to our current upper bound, then we may again prune the
+subproblem. Finally, if all else fails, we are forced to branch and
+add the children of this subproblem to the list of active candidates.
+We continue in this way until the list of active subproblems is empty,
+at which point our current best solution is the optimal one.
+<P>
+<HR><A NAME="tex2html75" HREF="node4.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html73" HREF="node2.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html67" HREF="node2.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html76" HREF="node4.html">Branch and Cut</A>
+<B>Up:</B> <A NAME="tex2html74" HREF="node2.html">Branch and Cut Algorithms</A>
+<B> Previous:</B> <A NAME="tex2html68" HREF="node2.html">Branch and Cut Algorithms</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:11 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

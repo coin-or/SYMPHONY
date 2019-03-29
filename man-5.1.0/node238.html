@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_display_lp_solution</TITLE>
+<META NAME="description" CONTENT="user_display_lp_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node239.html">
+<LINK REL="previous" HREF="node237.html">
+<LINK REL="up" HREF="node223.html">
+<LINK REL="next" HREF="node239.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3842"
+  HREF="node239.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3838"
+  HREF="node223.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3832"
+  HREF="node237.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3840"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3843"
+  HREF="node239.html">user_shall_we_branch</A>
+<B>Up:</B> <A NAME="tex2html3839"
+  HREF="node223.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3833"
+  HREF="node237.html">user_send_feasible_solution</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007321100000000000000">
+user_display_lp_solution</A>
+</H3>
+[cf]user_display_lp_solution
+<PRE>
+int user_display_lp_solution(void *user, int which_sol,
+                          int varnum, int *indices, double *values)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Given a solution to an LP relaxation (the indices and values of the nonzero
+variables) the user can (graphically) display it. The <TT>which_sol</TT>
+argument shows what kind of solution is passed to the function: <TT>DISP_FEAS_SOLUTION</TT> indicates a solution feasible to the original IP
+problem, <TT>DISP_RELAXED_SOLUTION</TT> indicates the solution to any LP
+relaxation and <TT>DISP_FINAL_RELAXED_SOLUTION</TT> indicates the solution to
+an LP relaxation when no cut has been found. There is no post-processing.
+Default options print out user indices and values of nonzero or fractional
+variables on the standard output.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int which_sol</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The type of solution passed on to the
+displaying function. Possible values are <TT>DISP_FEAS_SOLUTION</TT>,
+<TT>DISP_RELAXED_SOLUTION</TT> and <TT>DISP_FINAL_RELAXED_SOLUTION</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The number of variables in the current
+solution at nonzero level (the length of the <TT>indices</TT> and <TT>values</TT> arrays).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>User indices of variables at
+nonzero level in the current solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *values</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Values of the nonzero variables.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Error. SYMPHONY ignores error message.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>User displayed whatever she wanted to.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Regulated by the parameter <TT>display_solution_default</TT>, but set to <TT>DISP_NZ_INT</TT> unless overridden
+by the user.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>DISP_NOTHING</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Display nothing.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>DISP_NZ_INT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Display user indices (as integers) and values of
+nonzero variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>DISP_NZ_HEXA</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Display user indices (as hexadecimals) and
+values of nonzero variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>DISP_FRAC_INT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Display user indices (as integers) and values
+of variables not at their lower or upper bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>DISP_FRAC_HEXA</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=318>Display user indices (as hexadecimals) and
+values of variables not at their lower and upper bounds.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>fathom_branch()</TT> with <TT>DISP_FEAS_SOLUTION</TT> or <TT>DISP_RELAXED_SOLUTION</TT> after solving an LP
+relaxation and checking its feasibility status. If it was not feasible and no
+cut could be added either then the wrapper is invoked once more, now with <TT>DISP_FINAL_RELAXED_SOLUTION</TT>. 
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3842"
+  HREF="node239.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3838"
+  HREF="node223.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3832"
+  HREF="node237.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3840"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3843"
+  HREF="node239.html">user_shall_we_branch</A>
+<B>Up:</B> <A NAME="tex2html3839"
+  HREF="node223.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3833"
+  HREF="node237.html">user_send_feasible_solution</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-11-07</I>
+</ADDRESS>
+</BODY>
+</HTML>

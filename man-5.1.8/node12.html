@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Installation for Use With Microsoft Visual C++</TITLE>
+<META NAME="description" CONTENT="Installation for Use With Microsoft Visual C++">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="node10.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html559"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html555"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html551"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html557"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html560"
+  HREF="node13.html">Building From Source</A>
+<B>Up:</B> <A NAME="tex2html556"
+  HREF="node10.html">Installing the Binary Distribution</A>
+<B> Previous:</B> <A NAME="tex2html552"
+  HREF="node11.html">Installation in Unix-like environments</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00312000000000000000">
+Installation for Use With Microsoft Visual C++</A>
+</H2>
+
+<P>
+These instructions are for use with Microsoft Visual Studio 8. The procedure
+for other version of Visual Studio should be similar. Download and unpack the
+archive 
+<FONT COLOR="#a52a2a"><TT>symphony-5.1.8-win32-msvc6.zip</TT></FONT>
+
+<UL>
+<LI>First, test the executable by opening Windows Explorer and double-click
+on 
+<FONT COLOR="#a52a2a"><TT>symphony.exe</TT></FONT> in the 
+<FONT COLOR="#a52a2a"><TT>bin</TT></FONT>
+directory in the folder in which the distribution was unpacked. This should
+open a Window in which the interactive solver will appear. Type 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT>
+or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT> to see a list of available commands or see Chapter
+<A HREF="node36.html#API-overview">3</A> for instructions on using the interactive solver.
+
+<P>
+</LI>
+<LI>To test the callable library, the distribution includes sample codes
+along with associated project files in the 
+<FONT COLOR="#a52a2a"><TT>examples</TT></FONT> directory. 
+<BR>
+<BR>
+<FONT COLOR="#a52a2a"><TT>milp.c</TT></FONT>: This sample code is an implementation of a basic MILP
+solver using SYMPHONY's C callable functions with user defined input (see
+Section <A HREF="node45.html#callable_library">3.3</A>). To test the code, either
+
+<P>
+
+<UL>
+<LI>open the solution file 
+<FONT COLOR="#a52a2a"><TT>milp.sln</TT></FONT>, choose 
+<FONT COLOR="#a52a2a"><TT>Build milp.exe</TT></FONT>
+and then choose 
+<FONT COLOR="#a52a2a"><TT>Execute</TT></FONT> from the 
+<FONT COLOR="#a52a2a"><TT>Build</TT></FONT> menu, 
+</LI>
+</UL>
+or
+
+<UL>
+<LI>open a command terminal (choose 
+<FONT COLOR="#a52a2a"><TT>Run</TT></FONT> on the Start menu and type
+
+<FONT COLOR="#a52a2a"><TT>cmd</TT></FONT> in the dialogue box) and type 
+
+<PRE>
+ devenv milp.sln /make "all - debug"
+ Debug/milp.exe
+</PRE>
+</LI>
+</UL>
+
+<FONT COLOR="#a52a2a"><TT>milpOsi.c</TT></FONT>: This sample code is an implementation of a basic MILP 
+solver using SYMPHONY's C++ callable functions (through OsiSym interface)
+with user defined input (see Section <A HREF="node55.html#OSI">3.3.2</A>). To test the code, either 
+
+<UL>
+<LI>open the solution file 
+<FONT COLOR="#a52a2a"><TT>milpOsi.sln</TT></FONT>, 
+choose 
+<FONT COLOR="#a52a2a"><TT>Build milpOsi.exe</TT></FONT> and then 
+
+<FONT COLOR="#a52a2a"><TT>Execute</TT></FONT> commands from the 
+<FONT COLOR="#a52a2a"><TT>Build</TT></FONT> menu, 
+</LI>
+</UL>
+or
+
+<UL>
+<LI>open a command terminal (choose 
+<FONT COLOR="#a52a2a"><TT>Run</TT></FONT> on the Start menu and type
+
+<FONT COLOR="#a52a2a"><TT>cmd</TT></FONT> in the dialogue box) and type 
+
+<PRE>
+ devenv milpOsi.slb /make "all - debug"
+ Debug/milpOsi.exe
+</PRE>
+</LI>
+</UL>
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html559"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html555"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html551"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html557"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html560"
+  HREF="node13.html">Building From Source</A>
+<B>Up:</B> <A NAME="tex2html556"
+  HREF="node10.html">Installing the Binary Distribution</A>
+<B> Previous:</B> <A NAME="tex2html552"
+  HREF="node11.html">Installation in Unix-like environments</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-05-20</I>
+</ADDRESS>
+</BODY>
+</HTML>

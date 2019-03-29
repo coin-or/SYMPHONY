@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Configuration of the Modules</TITLE>
+<META NAME="description" CONTENT="Configuration of the Modules">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html197" HREF="node15.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html195" HREF="node12.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html189" HREF="node13.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html198" HREF="node15.html">Data Structures and Storage</A>
+<B>Up:</B> <A NAME="tex2html196" HREF="node12.html">The Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html190" HREF="node13.html">Computing Environment</A>
+<BR> <P>
+<H2><A NAME="SECTION00042000000000000000">Configuration of the Modules</A></H2>
+<P>
+Although SYMPHONY was originally designed as a parallel code, it can
+be built in a variety of configurations ranging from completely
+sequential to fully parallel using the same source code. As described
+in the previous section, there are five modules in the standard
+distributed configuration. However, various combinations of these
+modules can be linked together into ``combined'' modules depending on
+the user's needs. For instance, if cut generation is fast and not
+memory-intensive, it may not be worthwhile to have the LP solver and
+its associated cut generator working independently since this
+increases communication overhead. In this case, the separation
+function can be called directly from the LP solver, creating a single,
+more efficient executable. For debugging purposes, it is often
+convenient to have the entire framework run as a single executable.
+This may also be more efficient if only one LP process is to be used.
+These and other configurations can be specified at compile time. When
+compiling for shared memory, several subproblems can be processed in
+parallel by using threading or some similar technique, depending on
+the architecture and compiler used.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 14:31:17 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

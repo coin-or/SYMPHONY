@@ -1,0 +1,81 @@
+\batchmode
+\documentclass[11pt]{article}
+\makeatletter
+
+\setlength{\evensidemargin}{.25in}
+\setlength{\oddsidemargin}{.25in}
+\setlength{\textwidth}{6.0in}
+\setlength{\parindent}{0.25in}
+\setlength{\topmargin}{-.5in}
+\setlength{\textheight}{8.5in}
+
+
+
+
+
+\usepackage{epsfig, html}
+
+\htmladdtonavigation{\htmladdnormallink 
+	{\htmladdimg{contents_motif.gif}}{man.html}}
+
+
+\newtheorem {theorem}{Theorem}
+
+\newtheorem {proposition}{Proposition}
+
+\newtheorem {lemma}{Lemma}
+
+\newtheorem {corollary}{Corollary}
+
+\makeatother
+\newenvironment{tex2html_wrap}{}{}
+\newwrite\lthtmlwrite
+\def\lthtmltypeout#1{{\let\protect\string\immediate\write\lthtmlwrite{#1}}}%
+\newbox\sizebox
+\begin{document}
+\pagestyle{empty}
+\setcounter{page}{2}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage
+\clearpage
+\samepage \begin{equation}\label{the-polyhedron}
+{\cal P} = \{x \in {\bf R}^n: ax \leq \beta\;\;\forall (a, \beta) \in 
+{\cal L}\}.
+\end{equation}
+}
+
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{section}
+\stepcounter{section}
+
+\end{document}

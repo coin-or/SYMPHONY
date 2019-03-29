@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Building with the MSVC++ Graphical Interface</TITLE>
+<META NAME="description" CONTENT="Building with the MSVC++ Graphical Interface">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node29.html">
+<LINK REL="previous" HREF="node27.html">
+<LINK REL="up" HREF="node27.html">
+<LINK REL="next" HREF="node29.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html777"
+  HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html773"
+  HREF="node27.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html767"
+  HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html775"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html778"
+  HREF="node29.html">Building in a Windows</A>
+<B>Up:</B> <A NAME="tex2html774"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A NAME="tex2html768"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00323100000000000000"></A>
+<A NAME="using_msvc"></A>
+<BR>
+Building with the MSVC++ Graphical Interface
+</H3>
+
+<P>
+These instructions are for MSVC++ Version 8. Instructions for other versions
+should be similar.
+
+<P>
+
+<UL>
+<LI>Go to 
+<FONT COLOR="#a52a2a"><TT>MSVisualStudio
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="\bgroup\color{Brown}$ \backslash$\egroup"></SPAN></FONT>v8</TT></FONT> directory and open the solution file
+
+<FONT COLOR="#a52a2a"><TT>symphony.sln</TT></FONT>. 
+
+<P>
+</LI>
+<LI>Note that there are a number of additional preprocessor definitions that
+control the functionality of SYMPHONY. These definitions are described in
+
+<FONT COLOR="#a52a2a"><TT>sym.mak</TT></FONT>, a Unix-style makefile included in the distribution. To 
+enable the functionality associated with a particular definition, simply add 
+it to the list of definitions of 
+<FONT COLOR="#a52a2a"><TT>libSymphony</TT></FONT> project together with 
+the required libraries and paths. For instance, if you 
+want to enable GMPL reader option, you need to
+
+<UL>
+<LI>add the directory of the header files of GLPK to the include 
+files path
+</LI>
+<LI>add 
+<FONT COLOR="#a52a2a"><TT>USE_GLPMPL</TT></FONT> to the defines
+</LI>
+<LI>add the GLPK library to the solution
+</LI>
+</UL>
+</LI>
+<LI>Make sure that the project 
+<FONT COLOR="#a52a2a"><TT>symphony</TT></FONT> is set as the startup project
+by choosing 
+<FONT COLOR="#a52a2a"><TT>Set as Startup Project</TT></FONT> from the 
+<FONT COLOR="#a52a2a"><TT>Project</TT></FONT> menu after
+selecting the 
+<FONT COLOR="#a52a2a"><TT>symphony</TT></FONT> project in the Solution Explorer. Choose
+
+<FONT COLOR="#a52a2a"><TT>Build Solution</TT></FONT> from the Build menu. This should successfully build
+the SYMPHONY library and the corresponding executable.
+
+<P>
+</LI>
+<LI>To test the executable, go to the 
+<FONT COLOR="#a52a2a"><TT>Debug</TT></FONT> tab and choose
+
+<FONT COLOR="#a52a2a"><TT>Start Without Debugging</TT></FONT>. This should open a Window in which the
+interactive solver will appear. Type 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT> or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT> to see a list of
+available commands or see Chapter <A HREF="node35.html#API-overview">3</A> for instructions on using
+the interactive solver.
+
+<P>
+</LI>
+</UL>
+
+<P>
+Note that there is some functionality missing from the Windows version. Most
+prominently, the timing functions do not work. In addition, the Windows
+version will only run in sequential mode for a variety of reasons. However, it
+should be relatively easy to get it running in parallel if you can get PVM
+working under Windows. 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html777"
+  HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html773"
+  HREF="node27.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html767"
+  HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html775"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html778"
+  HREF="node29.html">Building in a Windows</A>
+<B>Up:</B> <A NAME="tex2html774"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A NAME="tex2html768"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2014-10-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

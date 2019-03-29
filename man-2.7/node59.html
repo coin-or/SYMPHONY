@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_print_branch_stat</TITLE>
+<META NAME="description" CONTENT="user_print_branch_stat">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html975" HREF="node60.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html973" HREF="node43.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html967" HREF="node58.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html977" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html976" HREF="node60.html">user_add_to_desc</A>
+<B>Up:</B> <A NAME="tex2html974" HREF="node43.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html968" HREF="node58.html">user_select_child</A>
+<BR> <P>
+<H3><A NAME="SECTION000321300000000000000">user_print_branch_stat</A></H3>
+<P>
+<PRE>int user_print_branch_stat(void *user, branch_obj *can, cut_data *cut,
+                           char *action)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+Print out information about branching candidate <TT>can</TT>, such as a
+more explicit problem-specific description than SYMPHONY can provide (for
+instance, end points of an edge). If <TT>verbosity</TT> is set
+high enough, the identity of the branching object and the children
+(with objective values and termination codes for the pre-solved LPs) is
+printed out to the standard output by SYMPHONY.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=636 HEIGHT=103 ALIGN=BOTTOM ALT="tabular1608" SRC="img57.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=453 HEIGHT=39 ALIGN=BOTTOM ALT="tabular1610" SRC="img58.gif"  > <P>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>branch()</TT> after the best candidate has been
+selected, pre-solved, and the action is decided on for the children.
+<P>
+ </DL>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Master Module</TITLE>
+<META NAME="description" CONTENT="The Master Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node23.html">
+<LINK REL="previous" HREF="node21.html">
+<LINK REL="up" HREF="node21.html">
+<LINK REL="next" HREF="node23.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html513"
+  HREF="node23.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html509"
+  HREF="node21.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html503"
+  HREF="node21.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html511"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html514"
+  HREF="node23.html">The Linear Programming Module</A>
+<B>Up:</B> <A NAME="tex2html510"
+  HREF="node21.html">Details of the Implementation</A>
+<B> Previous:</B> <A NAME="tex2html504"
+  HREF="node21.html">Details of the Implementation</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00071000000000000000"></A>
+<A NAME="master"></A>
+<BR>
+The Master Module
+</H2>
+
+<P>
+The primary functions performed by the master module were listed in
+Section <A HREF="node15.html#master-process">5.3.1</A>. If needed, the user must provide a
+routine to read problem-specific parameters in from the parameter
+file. She must also provide a subroutine for upper bounding if
+desired, though upper bounds can also be provided explicitly. A good
+initial upper bound can dramatically decrease the solution time by
+allowing more variable-fixing and earlier pruning of search tree
+nodes. If no upper bounding subroutine is available, then the
+two-phase algorithm, in which a good upper bound is found quickly in
+the first phase using a reduced set of variables can be advantageous.
+See Section <A HREF="node30.html#two-phase">6.3.3</A> for details. The user's only unavoidable
+obligation during pre-processing is to specify the list of base
+variables and, if desired, the list of extra variables that are to be
+active in the root node. Again, we point out that selecting a good set
+of base variables can make a marked difference in solution speed,
+especially using the two-phase algorithm.
+
+<P>
+<HR>
+<A NAME="tex2html513"
+  HREF="node23.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html509"
+  HREF="node21.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html503"
+  HREF="node21.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html511"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html514"
+  HREF="node23.html">The Linear Programming Module</A>
+<B>Up:</B> <A NAME="tex2html510"
+  HREF="node21.html">Details of the Implementation</A>
+<B> Previous:</B> <A NAME="tex2html504"
+  HREF="node21.html">Details of the Implementation</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

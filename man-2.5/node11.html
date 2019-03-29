@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Developing an Application</TITLE>
+<META NAME="description" CONTENT="Developing an Application">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html207" HREF="node12.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html205" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html199" HREF="node10.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html208" HREF="node12.html">Configuring the Modules</A>
+<B>Up:</B> <A NAME="tex2html206" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html200" HREF="node10.html">The LP Engine</A>
+<BR> <P>
+<H2><A NAME="SECTION00018000000000000000">Developing an Application</A></H2>
+<P>
+Once the user functions are filled in and PVM is installed, all that
+remains is to compile the application. The distribution comes with two
+<TT>make</TT> files that facilitate this process. The primary <TT>make</TT>
+file resides in the root directory. The user <TT>make</TT> file resides
+in the user's subdirectory, initally called <TT>User/</TT>. There are a
+number of variables that must be set in the primary <TT>make</TT> file.
+Read the comments in the file <TT>Makefile</TT> to ensure that everything
+is set properly. The user <TT>make</TT> file shouldn't require much
+modification unless you add source files other than the ones included
+in the distribution or change their names.
+<P>
+When you are ready, type ``<TT>make all</TT>'' to make the executables.
+SYMPHONY will create three subdirectories--<TT>User/obj.*</TT> and <TT>
+User/bin.*</TT>, where * is a number corresponding the current
+architecture (determined by the <TT>PVM_ARCH</TT> environment variable)
+containing the object and binary files, and a directory called <TT>
+dependencies</TT>. If this operation is not successful, your architecture
+may not be listed in the <TT>make</TT> file. Edit it by following the
+example set by the architectures already included. Make sure to set
+the corresponding path variables properly. Be sure to set the proper
+links from the <TT>$PVM_ROOT/bin/$PVM_ARCH</TT> as explained in the
+previous section after compiling.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

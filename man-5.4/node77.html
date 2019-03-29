@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Modifying Parameters.</TITLE>
+<META NAME="description" CONTENT="Modifying Parameters.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node78.html">
+<LINK REL="previous" HREF="node76.html">
+<LINK REL="up" HREF="node76.html">
+<LINK REL="next" HREF="node78.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1478"
+  HREF="node78.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1474"
+  HREF="node76.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1468"
+  HREF="node76.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1476"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1479"
+  HREF="node78.html">Modifying Problem Data.</A>
+<B>Up:</B> <A NAME="tex2html1475"
+  HREF="node76.html">Solve from Warm Start</A>
+<B> Previous:</B> <A NAME="tex2html1469"
+  HREF="node76.html">Solve from Warm Start</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00541210000000000000">
+Modifying Parameters.</A>
+</H4>
+
+<P>
+The most straightforward use of the warm start class is to restart the solver
+after modifying problem parameters. To start the computation from a given warm
+start when the problem data has not been modified, the tree manager simply
+traverses the tree and adds those nodes marked as candidates for processing to
+the node queue. Once the queue has been reformed, the algorithm is then able
+to pick up exactly where it left off. Code for using the resolve command was
+shown in Figure <A HREF="node53.html#dynamic">3.2</A>. The situation is more challenging if the user
+modifies problem data in between calls to the solver. We address this
+situation next.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-07-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

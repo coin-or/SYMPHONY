@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_send_lp_solution</TITLE>
+<META NAME="description" CONTENT="user_send_lp_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html686" HREF="node51.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html684" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html678" HREF="node49.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html687" HREF="node51.html">user_logical_fixing</A>
+<B>Up:</B> <A NAME="tex2html685" HREF="node30.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html679" HREF="node49.html">user_unpack_cuts</A>
+<BR> <P>
+<H3><A NAME="SECTION000221700000000000000">user_send_lp_solution</A></H3>
+<P>
+<A NAME="user_send_lp_solution">&#160;</A>
+<PRE>int user_send_lp_solution(void *user, int varnum, var_desc **vars, 
+                          double *x, int where)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user has the option to send the LP solution to either the cut pool
+or the cut generator in some user-defined form if desired. There are
+two default options--sending the indices and values for all nonzero
+variables (<TT>SEND_NONZEROS</TT>) and sending the indices and values
+for all fractional variables (<TT>SEND_FRACTIONS</TT>).
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=665 HEIGHT=163 ALIGN=BOTTOM ALT="tabular1438" SRC="img64.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=700 HEIGHT=121 ALIGN=BOTTOM ALT="tabular1440" SRC="img65.gif"  > <P>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>fathom_branch()</TT> after an LP relaxation has
+been solved. The message is always sent to the cut generator (if there is
+one). The message is sent to the cut pool if a search tree node at the top of
+a chain is being processed (except at the root in the first phase), or if a
+given number (<TT>cut_pool_check_freq</TT>) of LP relaxations have
+been solved since the last check.
+<P>
+<DT><STRONG>Note:</STRONG>
+<DD>
+<P>
+The wrapper automatically packs the level, index, and iteration number
+corresponding to the current LP solution within the current search
+tree node, as well as the objective value and upper bound in case the
+solution is sent to a cut generator. This data will be unpacked by
+SYMPHONY on the receiving end, the user will have to unpack there exactly
+what he has packed here.
+<P>
+ </DL>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

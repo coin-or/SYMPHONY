@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Search Chains and Diving</TITLE>
+<META NAME="description" CONTENT="Search Chains and Diving">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node87.html">
+<LINK REL="previous" HREF="node85.html">
+<LINK REL="up" HREF="node84.html">
+<LINK REL="next" HREF="node87.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1580"
+  HREF="node87.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1576"
+  HREF="node84.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1570"
+  HREF="node85.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1578"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1581"
+  HREF="node87.html">The Two-Phase Algorithm</A>
+<B>Up:</B> <A NAME="tex2html1577"
+  HREF="node84.html">The Tree Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1571"
+  HREF="node85.html">Managing the Search Tree</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00543200000000000000">
+Search Chains and Diving</A>
+</H3>
+
+<P>
+One reason for not strictly enforcing the search order is because it
+is somewhat expensive to construct a search node, send it to an NP
+module, and set it up for processing. If, after branching, we choose
+to continue processing one of the children of the current subproblem,
+we avoid the set-up cost, as well as the cost of communicating the
+node description of the retained child subproblem back to the tree
+manager. This is called <EM>diving</EM> and the resulting chain of nodes
+is called a <EM>search chain</EM>. There are a number of rules for
+deciding when an NP module should be allowed to dive. One such rule is
+to look at the number of variables in the current LP solution that
+have fractional values. When this number is low, there may be a good
+chance of finding a feasible integer solution quickly by diving. This
+rule has the advantage of not requiring any global information. We
+also dive if one of the children is ``close'' to being the best node,
+where ``close'' is defined by a chosen parameter.
+
+<P>
+In addition to the time saved by avoiding reconstruction of the LP in
+the child, diving has the advantage of often leading quickly to the
+discovery of feasible solutions, as discussed above. Good upper bounds
+not only allow earlier pruning of unpromising search chains, but also
+should decrease the time needed to process each search tree node by
+allowing variables to be fixed by reduced cost.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1580"
+  HREF="node87.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1576"
+  HREF="node84.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1570"
+  HREF="node85.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1578"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1581"
+  HREF="node87.html">The Two-Phase Algorithm</A>
+<B>Up:</B> <A NAME="tex2html1577"
+  HREF="node84.html">The Tree Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1571"
+  HREF="node85.html">Managing the Search Tree</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-11-07</I>
+</ADDRESS>
+</BODY>
+</HTML>

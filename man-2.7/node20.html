@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Checking the Validity of Cuts and Tracing the Optimal Path</TITLE>
+<META NAME="description" CONTENT="Checking the Validity of Cuts and Tracing the Optimal Path">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html449" HREF="node21.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html447" HREF="node16.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html441" HREF="node19.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html451" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html450" HREF="node21.html">Using the Interactive Graph </A>
+<B>Up:</B> <A NAME="tex2html448" HREF="node16.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html442" HREF="node19.html">Using Purify and Quantify</A>
+<BR> <P>
+<H3><A NAME="SECTION000212400000000000000">Checking the Validity of Cuts and Tracing the Optimal Path</A></H3>
+<P>
+<A NAME="debugging">&#160;</A>
+Sometimes the only evidence of a bug is the fact that the optimal
+solution to a particular problem is never found. This is usually
+caused by either (1) adding an invalid cut, or (2) performing an
+invalid branching. There are two options available for discovering
+such errors. The first is for checking the validity of added cuts.
+This checking must, of course, be done by the user, but SYMPHONY can
+facilitate such checking. To do this, the user must fill in the
+function <A HREF="node73.html#user_check_validity_of_cut"><TT>user_check_validity_of_cut()</TT></A>. This function is called every time a
+cut is passed from the cut generator to the LP and can function as an
+independent verifier. To do this, the user must pass (through her own
+data structures) a known feasible solution. Then for each cut passed
+into the function, the user can check whether the cut is satisfied
+by the feasible solution. If not, then there is a problem! Of course,
+the problem could also be with the checking routine. To see how this is
+done, check out the sample application file <TT>Vrp/cg_user.c</TT>.
+After filling in this function, the user must recompile everything
+(including the libraries) after uncommenting the line in the make file
+that contains ``<TT>BB_DEFINES += -DCHECK_CUT_VALIDITY</TT>.'' Type
+``<TT>make clean_all</TT>'' and then ``<TT>make</TT>.''
+<P>
+Tracing the optimal path can alert the user when the subproblem which
+admits a particular known feasible solution (at least
+according to the branching restrictions that have been imposed so far)
+is pruned. This could be due to an invalid branching. Note that this
+option currently only works for branching on binary variables. To use
+this facility, the user must fill in the function <A HREF="node41.html#user_send_feas_sol"><TT>
+user_send_feas_sol()</TT></A>. All that is required is to pass out an array
+of user indices that are in the feasible solution that you want to
+trace. Each time the subproblem which admits this feasible solution is
+branched on, the branch that continues to admit the solution is
+marked. When one of these marked subproblems is pruned, the user is
+notified.
+<P>
+<HR><A NAME="tex2html449" HREF="node21.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html447" HREF="node16.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html441" HREF="node19.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html451" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html450" HREF="node21.html">Using the Interactive Graph </A>
+<B>Up:</B> <A NAME="tex2html448" HREF="node16.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html442" HREF="node19.html">Using Purify and Quantify</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

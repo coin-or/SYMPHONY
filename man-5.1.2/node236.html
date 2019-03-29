@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_create_subproblem</TITLE>
+<META NAME="description" CONTENT="user_create_subproblem">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node237.html">
+<LINK REL="previous" HREF="node235.html">
+<LINK REL="up" HREF="node224.html">
+<LINK REL="next" HREF="node237.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3829"
+  HREF="node237.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3825"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3819"
+  HREF="node235.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3827"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3830"
+  HREF="node237.html">user_is_feasible</A>
+<B>Up:</B> <A NAME="tex2html3826"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3820"
+  HREF="node235.html">user_receive_lp_data</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00732800000000000000"></A>
+<A NAME="user_create_subproblem"></A>
+<BR>
+user_create_subproblem
+</H3>
+[cf]user_create_subproblem
+<PRE>
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
+                           int *maxn, int *maxm, int *maxnz)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Based on the instance data contained in the user data structure and the list
+of base and extra variables that are active in the current subproblem, the
+user has to create the subproblem for the search node. The matrix describing
+the subproblem must contain those variables whose user indices are listed in
+the array <TT>indices</TT> (in the same order) and the base constraints. The
+extra (dynamically generated) constraints are added automatically by SYMPHONY
+after the initial subproblem description is created. 
+<BR>
+<BR>
+In this function, the user is required to construct a description of the
+subproblem in column-ordered format and pass it back to SYMPHONY by filling
+out the <TT>MIPdesc</TT> data structure, described <A HREF="node227.html#MIPdesc">here</A>. The user is not responsible for allocating extra memory to allow
+for the addition of dynamically generated cuts and variables. The arrays
+allocated in <TT>
+<FONT COLOR="#000000"> user_create_subproblem()</FONT></TT> are owned by SYMPHONY after
+allocation and are freed as soon as the relaxation is loaded into the
+solver. However, if the user has an idea as to the maximum number of variables
+and constraints that are likely to be generated during processing of the
+subproblem, this information can be passed to SYMPHONY in the variables
+<TT>*maxn</TT>, <TT>*maxm</TT>, and <TT>*maxnz</TT>. These numbers are only
+estimates that SYMPHONY can use to perform memory allocation. They do not have
+to be exact numbers. In fact, these estimates need not be provided at all. The
+<TT>obj_sense</TT> and <TT>obj_offset</TT> fields are set globally in the
+function <A HREF="node215.html#user_initialize_root_node"><TT>user_initialize_root_node()</TT></A>. Setting them here will have no
+effect.
+<BR>
+<BR>
+Note that, the user should return ``USER_DEFAULT'' if an MPS or GMPL/AMPL 
+file was read in to describe the original MILP. SYMPHONY will allocate the 
+corresponding arrays and specify the constraint matrix automatically in this 
+case.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>The list of the active variables (base and extra).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>MIPdesc *mip</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Pointer to the MIPdesc data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *maxn</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Estimated maximum number of variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *maxm</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Estimated maximum number of constraints.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *maxnz</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=258>Estimated maximum number of nonzeros.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>Error. The LP module is aborted.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>User created the constraint matrix with the base
+constraints.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>This return code is used when the default routines for
+reading in an MPS or AMPL file were used and the user wants to let SYMPHONY
+set up the subproblem automatically. This return will cause an error if the
+default I/O routines were not used.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+The extra constraints are added to the matrix by calling the 
+<TT><A HREF="node247.html#user_unpack_cuts">user_unpack_cuts()</A></TT> subroutine and 
+then adding the corresponding rows to the matrix. This is easier for
+the user to implement, but less efficient than adding the cuts at the
+time the original matrix was being constructed.
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>process_chain()</TT> which is
+invoked when setting up a the initial search node in a chain.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3829"
+  HREF="node237.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3825"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3819"
+  HREF="node235.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3827"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3830"
+  HREF="node237.html">user_is_feasible</A>
+<B>Up:</B> <A NAME="tex2html3826"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3820"
+  HREF="node235.html">user_receive_lp_data</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

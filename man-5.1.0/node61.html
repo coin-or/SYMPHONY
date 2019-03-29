@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>An Object-oriented Approach</TITLE>
+<META NAME="description" CONTENT="An Object-oriented Approach">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node62.html">
+<LINK REL="previous" HREF="node60.html">
+<LINK REL="up" HREF="node60.html">
+<LINK REL="next" HREF="node62.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1253"
+  HREF="node62.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1249"
+  HREF="node60.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1243"
+  HREF="node60.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1251"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1254"
+  HREF="node62.html">Data Structures and Storage</A>
+<B>Up:</B> <A NAME="tex2html1250"
+  HREF="node60.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html1244"
+  HREF="node60.html">Design of SYMPHONY</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00531000000000000000">
+An Object-oriented Approach</A>
+</H2>
+
+<P>
+As we have already alluded to, applying BCP to large-scale problems
+presents several difficult challenges. First and foremost is designing
+methods and data structures capable of handling the potentially huge
+numbers of cuts and variables that need to be accounted for during the
+solution process. The dynamic nature of the algorithm requires that we
+must also be able to efficiently move cuts and variables in and out of
+the <EM>active set</EM> of each search node at any time. A second,
+closely-related challenge is that of effectively dealing with the very
+large search trees that can be generated for difficult problem
+instances. This involves not only the important question of how to
+store the data, but also how to move it between modules during
+parallel execution. A final challenge in developing a generic
+framework, such as SYMPHONY, is to deal with these issues using a
+problem-independent approach.
+
+<P>
+Describing a node in the search tree consists of, among other things,
+specifying which cuts and variables are initially <EM>active</EM> in the
+subproblem. In fact, the vast majority of the methods in BCP that
+depend on the model are related to generating, manipulating, and
+storing the cuts and variables. Hence, SYMPHONY can be considered an
+object-oriented framework with the central ``objects'' being the cuts
+and variables. From the user's perspective, implementing a BCP
+algorithm using SYMPHONY consists primarily of specifying various
+properties of objects, such as how they are generated, how they are
+represented, and how they should be realized within the context of a
+particular subproblem.
+
+<P>
+With this approach, we achieved the ``black box'' structure by
+separating these problem-specific functions from the rest of the
+implementation. The internal library interfaces with the user's
+subroutines through a well-defined Application Program Interface (API) (see
+Section <A HREF="node206.html#API">6.3</A>)
+and independently performs all the normal functions of BCP--tree
+management, LP solution, and cut pool management, as well as inter-process
+communication (when parallelism is employed). Although there are
+default options for many of the operations, the user can also assert
+control over the behavior of the algorithm by overriding the default
+methods or by parameter setting.
+
+<P>
+Although we have described our approach as being ``object-oriented,''
+we would like to point out that SYMPHONY is implemented in C, not C++.
+To avoid inefficiencies and enhance the modularity of the code
+(allowing for easy parallelization), we used a more
+``function-oriented'' approach for the implementation of certain
+aspects of the framework. For instance, methods used for communicating
+data between modules are not naturally ``object-oriented'' because the
+type of data being communicated is usually not known by the
+message-passing interface. It is also common that efficiency
+considerations require that a particular method be performed on a
+whole set of objects at once rather than on just a single object.
+Simply invoking the same method sequentially on each of the members of
+the set can be extremely inefficient. In these cases, it is far better
+to define a method which operates on the whole set at once. In order
+to overcome these problems, we have also defined a set of <EM>interface functions</EM>, which are associated with the computational
+modules. These function is described in detail in Section <A HREF="node206.html#API">6.3</A>.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1253"
+  HREF="node62.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1249"
+  HREF="node60.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1243"
+  HREF="node60.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1251"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1254"
+  HREF="node62.html">Data Structures and Storage</A>
+<B>Up:</B> <A NAME="tex2html1250"
+  HREF="node60.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html1244"
+  HREF="node60.html">Design of SYMPHONY</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-11-07</I>
+</ADDRESS>
+</BODY>
+</HTML>

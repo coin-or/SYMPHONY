@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Orienting Yourself</TITLE>
+<META NAME="description" CONTENT="Orienting Yourself">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node52.html">
+<LINK REL="previous" HREF="node50.html">
+<LINK REL="up" HREF="node50.html">
+<LINK REL="next" HREF="node52.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html896"
+  HREF="node52.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html892"
+  HREF="node50.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html886"
+  HREF="node50.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html894"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html897"
+  HREF="node52.html">Writing the User Functions</A>
+<B>Up:</B> <A NAME="tex2html893"
+  HREF="node50.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html887"
+  HREF="node50.html">Advanced Development</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000101000000000000000">
+Orienting Yourself</A>
+</H2>
+
+<P>
+The easiest way to get oriented is to examine the organization of the source
+files (note that file names will be given Unix-style). When you unpack the
+SYMPHONY distribution, you will notice that the source files are organized along
+the lines of the modules.  There is a separate directory for each
+module--master (<TT>Master</TT>), tree manager (<TT>TreeManager</TT>), cut
+generator (<TT>CutGen</TT>), cut pool (<TT>CutPool</TT>), and LP solver (<TT>LP</TT>). In addition, there is a directory called <TT>DrawGraph</TT> and a directory
+called <TT>Common</TT> that also contain source files. The <TT>DrawGraph</TT>
+directory provides an interface from SYMPHONY to the <EM>Interactive Graph
+Drawing</EM> software package developed by Marta Es&#246;. This is an excellent
+utility for graphical display and debugging. The <TT>Common</TT> directory
+contains source code for functions used by multiple modules.
+
+<P>
+Within each module's directory, there is a primary source file
+containing the function <TT>main()</TT> (named <TT>*.c</TT> where * is the
+module name), a source file containing functions related to
+inter-process communication (named <TT>*_proccomm.c</TT>) and a file
+containing general subroutines used by the module (named <TT>*_func.c</TT>). The master is the exception and is organized slightly
+differently. The LP process source code is further subdivided due to
+the sheer number of functions.
+
+<P>
+The <TT>include</TT> directory contains the header files. Corresponding
+to each module, there are three header files, one containing internal
+data structures and function prototypes associated with the module
+(named <TT>*.h</TT> where * is the module name), one containing the data
+structures for storing the parameters (these are also used by the
+master process), and the third containing the function prototypes for
+the user functions (name <TT>*_u.h</TT>). By looking at the header files, you
+should get a general idea of how things are laid out.
+
+<P>
+In addition to the subdirectories corresponding to each module, there are
+subdirectories corresponding to applications. The sample application is
+contained in the directory <TT>Vrp/</TT>. The files containing function stubs
+that can be filled in to create a new application are contained in the
+directory <TT>SYMPHONY-3.0.1/Template/</TT>. There is one file for each module,
+initially called <TT>Template/*/*_user.c</TT>. The primary thing that you, as
+the user, need to understand to build an application is how to fill in these
+stubs. That is what the second section of this manual is about.
+
+<P>
+<HR>
+<A NAME="tex2html896"
+  HREF="node52.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html892"
+  HREF="node50.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html886"
+  HREF="node50.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html894"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html897"
+  HREF="node52.html">Writing the User Functions</A>
+<B>Up:</B> <A NAME="tex2html893"
+  HREF="node50.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html887"
+  HREF="node50.html">Advanced Development</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

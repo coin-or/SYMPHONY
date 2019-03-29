@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Introduction</TITLE>
+<META NAME="description" CONTENT="Introduction">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html95" HREF="node2.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html93" HREF="man.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html87" HREF="man.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html96" HREF="node2.html">Getting Started</A>
+<B>Up:</B> <A NAME="tex2html94" HREF="man.html">SYMPHONY Tutorial</A>
+<B> Previous:</B> <A NAME="tex2html88" HREF="man.html">SYMPHONY Tutorial</A>
+<BR> <P>
+<H1><A NAME="SECTION00010000000000000000">Introduction</A></H1>
+<P>
+SYMPHONY (Single- or Multi-Process Optimization over Networks) is a
+powerful environment for implementing branch, cut, and price
+algorithms. The subroutines in the SYMPHONY library comprise a
+state-of-the-art solver which is designed to be completely modular and
+easy to port to various problem settings. All library subroutines are
+generic--their implementation does not depend on the the
+problem-setting. To develop a full-scale, parallel branch and cut
+algorithm, the user has only to specify a few problem-specific
+functions such as preprocessing and separation. The vast majority of
+the computation takes place within a ``black box,'' of which the user
+need have no knowledge. SYMPHONY communicates with the user's routines
+through well-defined interfaces and performs all the normal functions
+of branch and cut--tree management, LP solution, cut pool management,
+as well as inter-process communication. Although there are default
+options, the user can also assert control over the behavior of SYMPHONY\
+through a myriad of parameters and optional subroutines. SYMPHONY can be
+built in a variety of configurations, ranging from fully parallel to
+completely sequential, depending on the user's needs. The library runs
+serially on almost any platform, and can run in parallel in any
+environment supported by the PVM message-passing protocol.
+<P>
+This manual is concerned with the detailed specifications needed to
+develop an application using SYMPHONY. It is assumed that the user has
+already read the white paper <EM><A NAME="tex2html2" HREF="http://branchandcut.org/SYMPHONY/intro/symphony.html">SYMPHONY: A
+Parallel Framework for Branch, Cut, and
+Price</A></EM>, which
+provides a high-level introduction to parallel branch, cut, and price
+and the overall design and use of SYMPHONY. Reading and understanding this
+white paper is necessary before continuing.
+<P>
+<BR> <HR>
+<UL> 
+<LI> <A NAME="tex2html97" HREF="node2.html#SECTION00011000000000000000">Getting Started</A>
+<LI> <A NAME="tex2html98" HREF="node3.html#SECTION00012000000000000000">Source Files</A>
+<LI> <A NAME="tex2html99" HREF="node4.html#SECTION00013000000000000000">User-written Functions</A>
+<LI> <A NAME="tex2html100" HREF="node5.html#SECTION00014000000000000000">Data Structures</A>
+<UL> 
+<LI> <A NAME="tex2html101" HREF="node6.html#SECTION00014100000000000000">Internal Data Structures</A>
+<LI> <A NAME="tex2html102" HREF="node7.html#SECTION00014200000000000000">User-defined Data Structures</A>
+</UL> 
+<LI> <A NAME="tex2html103" HREF="node8.html#SECTION00015000000000000000">Inter-process Communication</A>
+<LI> <A NAME="tex2html104" HREF="node9.html#SECTION00016000000000000000">Working with PVM</A>
+<LI> <A NAME="tex2html105" HREF="node10.html#SECTION00017000000000000000">The LP Engine</A>
+<LI> <A NAME="tex2html106" HREF="node11.html#SECTION00018000000000000000">Developing an Application</A>
+<LI> <A NAME="tex2html107" HREF="node12.html#SECTION00019000000000000000">Configuring the Modules</A>
+<LI> <A NAME="tex2html108" HREF="node13.html#SECTION000110000000000000000">Other Resources</A>
+</UL>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

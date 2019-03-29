@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Compiling the Sequential Version.</TITLE>
+<META NAME="description" CONTENT="Compiling the Sequential Version.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node48.html">
+<LINK REL="previous" HREF="node46.html">
+<LINK REL="up" HREF="node45.html">
+<LINK REL="next" HREF="node48.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html915"
+  HREF="node48.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html911"
+  HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html905"
+  HREF="node46.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html913"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html916"
+  HREF="node48.html">Compiling the Shared Memory</A>
+<B>Up:</B> <A NAME="tex2html912"
+  HREF="node45.html">Compiling the Sample Application</A>
+<B> Previous:</B> <A NAME="tex2html906"
+  HREF="node46.html">Preparing for Sample Compilation.</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00511200000000000000">
+Compiling the Sequential Version.</A>
+</H3>
+
+<P>
+
+<UL>
+<LI>Change to the <TT>SYMPHONY-4.0/USER</TT> directory and type
+<TT> make</TT>. This will first make the
+SYMPHONY library (sequential version). After making the SYMPHONY library, make will
+compile the user customization library and link the executable. The name of
+the executable is specified in the file <TT>SYMPHONY-4.0/USER/Makefile</TT>
+and is <TT>mip</TT> by default. The executable is installed in the directory
+<TT>SYMPHONY-4.0/USER/bin.$(ARCH)/$(LP_SOLVER)</TT>, where <TT>ARCH</TT> is 
+the current architecture and <TT>LP_SOLVER</TT> is the current LP solver, as 
+specified in the makefile. The makefile can be modified to enable parallel 
+execution of the code (see below).
+
+<P>
+</LI>
+<LI>After the SYMPHONY library is compiled, you are free to type <TT>make
+        clean</TT> if you want to save disk space. You should only have to
+        remake the library if you change something in SYMPHONY's internal files. To
+        clean the user files, type <TT>make clean_user</TT>.
+
+<P>
+</LI>
+<LI>To test SYMPHONY, a sample MPS file called <TT>sample.mps</TT> is included 
+with the distribution. To specify the file name, use the <TT>-F</TT> command-line
+option, i.e., type <TT>bin.$(ARCH)/$(LP_SOLVER)/mip -F sample.mps</TT> in the
+<TT>SYMPHONY-4.0/USER</TT> directory. To obtain more MPS data files for further
+testing, download the MIPLIB library.
+
+<P>
+</LI>
+<LI>That's it! Now you are ready to develop your own application by modifying
+the files in the <TT>SYMPHONY-4.0/USER</TT> directory and it's
+subdirectories. See Section <A HREF="node57.html#development">4.2</A> for more information.
+
+<P>
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html915"
+  HREF="node48.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html911"
+  HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html905"
+  HREF="node46.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html913"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html916"
+  HREF="node48.html">Compiling the Shared Memory</A>
+<B>Up:</B> <A NAME="tex2html912"
+  HREF="node45.html">Compiling the Sample Application</A>
+<B> Previous:</B> <A NAME="tex2html906"
+  HREF="node46.html">Preparing for Sample Compilation.</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

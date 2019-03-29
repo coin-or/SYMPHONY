@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_receive_feasible_solution</TITLE>
+<META NAME="description" CONTENT="user_receive_feasible_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node77.html">
+<LINK REL="previous" HREF="node75.html">
+<LINK REL="up" HREF="node66.html">
+<LINK REL="next" HREF="node77.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html1181"
+ HREF="node77.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1178"
+ HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1172"
+ HREF="node75.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1180"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1182"
+ HREF="node77.html">user_send_lp_data</A>
+<B>Up:</B> <A NAME="tex2html1179"
+ HREF="node66.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1173"
+ HREF="node75.html">user_create_root</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION0001011000000000000000">&#160;</A>
+<A NAME="user_receive_feasible_solution">&#160;</A>
+<BR>
+user_receive_feasible_solution
+</H3>
+<PRE>
+int user_receive_feasible_solution(void *user, int msgtag, double cost, 
+                                   int numvars, int *indices, double *values)
+</PRE>
+<P>
+<DL>
+<DD><P>
+<DT><STRONG>Description:</STRONG>
+<DD>
+
+<P>
+Feasible solutions can be sent and/or stored in a user-defined packed
+form if desired. For instance, the TSP, a tour can be specified simply
+as a permutation, rather than as a list of variable indices. In the LP
+process, a feasible solution is packed either by the user or by a
+default packing routine. If the default packing routine was used, the
+<TT>msgtag</TT> will be <TT>FEASIBLE_SOLUTION_NONZEROS</TT>. In this case,
+<TT>cost</TT>, <TT>numvars</TT>, <TT>indices</TT> and <TT>values</TT> will contain
+the solution value, the number of nonzeros in the feasible solution,
+and their user indices and values. The user has only to interpret and
+store the solution. Otherwise, when <TT>msgtag</TT> is <TT>FEASIBLE_SOLUTION_USER</TT>,  SYMPHONY will send and receive the solution
+value only and the user has to unpack exactly what she has packed in
+the LP process. In this case the contents of the last three arguments
+are undefined.
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int msgtag</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291><TT> FEASIBLE_SOLUTION_NONZEROS</TT> or <TT> FEASIBLE_SOLUTION_USER</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> double cost</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The cost of the feasible solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int numvars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The number of variables whose user indices and
+values were sent (length of <TT> indices</TT> and <TT> values</TT>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The user indices of the nonzero variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> double *values</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The corresponding values.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Ignored. This is probably not a fatal error.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>The solution has been unpacked and stored.</TD>
+</TR>
+</TABLE>
+<P>
+</DL>
+<P>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html1181"
+ HREF="node77.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1178"
+ HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1172"
+ HREF="node75.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1180"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1182"
+ HREF="node77.html">user_send_lp_data</A>
+<B>Up:</B> <A NAME="tex2html1179"
+ HREF="node66.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1173"
+ HREF="node75.html">user_create_root</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

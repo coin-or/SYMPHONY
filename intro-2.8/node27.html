@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Two-Phase Algorithm</TITLE>
+<META NAME="description" CONTENT="The Two-Phase Algorithm">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node28.html">
+<LINK REL="previous" HREF="node26.html">
+<LINK REL="up" HREF="node25.html">
+<LINK REL="next" HREF="node28.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html343"
+ HREF="node28.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html341"
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html335"
+ HREF="node26.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html344"
+ HREF="node28.html">Fault Tolerance</A>
+<B>Up:</B> <A NAME="tex2html342"
+ HREF="node25.html">The Tree Manager Process</A>
+<B> Previous:</B> <A NAME="tex2html336"
+ HREF="node26.html">Managing the Search Tree</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00053200000000000000">&#160;</A>
+<A NAME="two-phase">&#160;</A>
+<BR>
+The Two-Phase Algorithm
+</H3>
+
+<P>
+In the two-phase method, we first run the algorithm to completion on
+the specified set of base variables. Any node that would have been
+pruned in the first phase is sent to a pool of candidates for the
+second phase instead. If the set of base variables is
+small, but well-chosen, this first phase should be quick and should
+result in a near-optimal solution, and hence a good upper bound. In
+addition, the first phase will produce a list of useful cuts. Using
+the upper bound and the list of cuts from the first phase, the root
+node is <EM>repriced</EM>--that is, it is reprocessed with the full
+set of variables and cuts, the hope being that most or all of the
+variables not included in the first phase will be priced out of the
+problem in the new root node. Any variable so priced out can be
+eliminated from the problem globally. If we are successful at pricing
+out all the inactive variables, we have shown that the solution from
+the first phase was, in fact, optimal. If not, we must go back and
+price out the (reduced) set of extra variables in each one of the
+leaves of the search tree produced during the first phase. We then
+continue processing any node in which variables are consequently added
+to the relaxation.
+
+<P>
+In order to avoid pricing variables in every leaf of the tree, we can
+<EM>trim the tree</EM> before the start of the second phase. Trimming the
+tree consists of eliminating from the tree the children of any node
+whose aforementioned children all have lower bounds above the current
+upper bound. We then reprocess the parent node itself. This is
+typically more efficient since there is a high probability that, given
+the new upper bound and cuts, we will be able to prune the parent node
+and save the work of processing each child individually.
+
+<P>
+<HR>
+<A NAME="tex2html343"
+ HREF="node28.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html341"
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html335"
+ HREF="node26.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html344"
+ HREF="node28.html">Fault Tolerance</A>
+<B>Up:</B> <A NAME="tex2html342"
+ HREF="node25.html">The Tree Manager Process</A>
+<B> Previous:</B> <A NAME="tex2html336"
+ HREF="node26.html">Managing the Search Tree</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

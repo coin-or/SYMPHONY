@@ -1,0 +1,214 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>BranchAndCut.org FAQ</title>
+<base target="_self">
+</head>
+
+<body bgcolor="#0033CC" text="#FFFFFF" link="#FFFFFF"
+vlink="#FFFFFF" alink="#FFFFFF" topmargin="0" leftmargin="15">
+
+<p><font size="5" face="Arial Black">BranchAndCut.org FAQ</font></p>
+
+<table border="0" cellpadding="0" width="100%">
+    <tr>
+        <td width="100%"><table border="0" cellpadding="2"
+        width="100%">
+            <tr>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/index.htm"
+                style="text-decoration:none;"><font
+                color="#FFFFFF" size="3">Home</font></a> </td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/software.htm"
+                style="text-decoration:none;"><font size="3">Software</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/applications.htm"
+                style="text-decoration:none;"><font size="3">Applications</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/faq.htm"
+                style="text-decoration:none;"><font size="3">FAQ</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/reference.htm"
+                style="text-decoration:none;"><font size="3">Reference</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/links.htm"
+                style="text-decoration:none;"><font size="3">Links</font></a></td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+    <tr>
+        <td width="100%"><table border="0" cellpadding="0"
+        width="100%">
+            <tr>
+                <td width="100%"><hr color="#FFFFFF">
+                </td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+</table>
+
+<font size="4">
+
+BranchAndCut.org Frequently Asked Questions
+
+<ul>
+    <li> <a href="#2">What is branch, cut, and price</a>? </li>
+    <li> <a href="#3">What does a branch, cut, and price framework do</a>? </li>
+    <li> <a href="#1">What software is available for branch, cut, and price</a>? 
+    </li>
+    <li> <a href="#4">What makes branch, cut, and price different from
+    branch and bound</a>? </li>
+    <li> <a href="#5">Should I just use a generic MILP solver</a>? </li>
+    <li> <a href="#8">What is SYMPHONY</a>? </li>
+    <li> <a href="#9">What applications are available</a>? </li>
+    <li> <a href="#6">What is open source software</a>? </li>
+    <li> <a href="#7">What is COIN-OR</a>? </li>
+</ul>
+
+<hr color="#FFFFFF">
+
+<br>
+
+<a NAME="2">What is branch, cut, and price?</a>
+<br>
+<blockquote>
+Branch, cut, and price (BCP) is an LP-based branch and bound technique
+for solving mixed integer linear programs (MILPs). In BCP, both cuts
+and variables are generated dynamically throughout the search tree,
+allowing the solution of large-scale instances.
+</blockquote>
+
+<hr>
+
+<a NAME="1">What software is available for branch, cut, and price?</a>
+<br>
+<blockquote> <p>Because branch, cut, and price depends inherently on
+problem-specific techniques, many implementations are customized for a
+particular problem setting. Numerous such specialized codes have been 
+developed, for instance <a
+href="http://http://www.tsp.gatech.edu/">CONCORDE</a>, a TSP solver.</p>
+
+<p>Frameworks, on the other hand, implement just the generic parts of the
+algorithm, leaving hooks for the user to insert customized
+application-specific methods where needed. This allows quick development of
+customized code without wasted effort.</p>
+
+<p><a href="http://www.coin-or.org/SYMPHONY/">SYMPHONY</a> is a framework for implementing branch and
+cut algorithms in both sequential and parallel environments (distributed- or
+shared-memory). There are also a numbner of other branch, cut, and price (BCP)
+frameworks available. For a short list of other BCP software, click <a
+href="software.htm">here</a></p> </blockquote>
+
+<hr>
+
+<a NAME="3">What does a branch, cut, and price framework do?</a>
+<br>
+<blockquote>
+<p>A BCP framework implements just the generic parts of the BCP algorithm,
+leaving hooks for the user to insert customized application-specific methods
+where desired. This allows quick development of customized code without
+wasted effort.</p>
+</blockquote>
+
+<hr>
+
+<a NAME="4">What makes branch, cut, and price different from
+branch and bound?</a>
+<br>
+<blockquote>
+Branch, cut, and price is an implementation of branch and bound in which
+linear programming is used to derive valid bounds during construction
+of the search tree. Problem-specific cutting planes are used to
+strengthen the linear programming relaxations used for bounding. This
+makes it a much more powerful method than branch and bound alone. 
+</blockquote>
+
+<hr>
+
+<a NAME="5">Should I just use a generic MILP solver?</a>
+<br>
+<blockquote>
+Although many excellent generic MILP solvers employing a version of the branch
+and cut algorithm are now available, most are not as flexible as framework
+like SYMPHONY, which is designed to allow the user to insert specialized
+methods that take advantage of problem structure. It is not possible to solve
+many of the toughest discrete optimization problems without problem-specific
+modifications to the generic algorithm. In recent versions of commercial MILP
+solvers such as CPLEX, it has become possible to add problem-specific cuts and
+customize certain features, but frameworks such as <a
+href="http://www.coin-or.org/SYMPHONY/">SYMPHONY</a> are more flexible and support a much wider range
+of options. If you do not need to develop a custom code, then you are
+probably better off with a commercial MILP solver. Of course, having access to
+the full source code is also a big advantage of SYMPHONY and other
+open-source alternatives.
+</blockquote>
+
+<hr>
+
+<a NAME="8">What is SYMPHONY?</a>
+<br>
+<blockquote>
+Please click <a href="http://www.coin-or.org/SYMPHONY/">here</a> to go to the home page for SYMPHONY.
+</blockquote>
+
+<hr>
+
+<a NAME="9">What applications are available?</a>
+<br>
+<blockquote>
+Please click <a href="applications.htm">here</a> to see a list of branch, cut, and price applications built with SYMPHONY.
+</blockquote>
+
+<hr>
+
+<a NAME="6">What is open source software?</a>
+<br>
+<blockquote>
+Open-source software is software that is distributed under an open-source
+license. Open source license allow the user of the software certain rights,
+such as access to the source code and the ability to redistribute the software
+under certain conditions. The big advantage of open-source software is that
+the user has access to the inner workings and can participate directly in
+development efforts. This also allows development of highly specialized
+versions of the original code. For more information, visit the <a
+href="http://www.opensource.org">Open Source Initiative</a>. 
+</blockquote>
+
+<hr>
+
+<a NAME="7">What is COIN-OR?</a> <br> <blockquote> <a
+href="http://www.coin-or.org">COIN-OR</a> is the Computational Infrastructure
+for Operations Research project and is a consortium of researchers and
+practitioners from both academia and industry who support the development og
+open-source software tools for operations research. The project is run by the
+non-profit <a href="http://www.coin-or.org/foundation.html">COIN-OR
+Foundation</a>. The software available on this site is part of the <a
+href="http://www.coin-or.org">COIN-OR</a> software repository. All software
+available at this site uses <a href="http://www.coin-or.org">COIN-OR</a>'s
+open-source license, called the <a
+href="http://www-106.ibm.com/developerworks/library/os-cplfaq.html"> Common
+Public License</a>. </blockquote>
+
+</font>
+
+<hr>
+
+<p>This page maintained by Ted Ralphs (<a
+href="mailto:ted@branchandcut.org">ted@branchandcut.org</a>)</p>
+
+<p>Last updated November 19, 2006</p>
+
+<p>&nbsp;</p>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1452273-2";
+urchinTracker();
+</script>
+</body>
+</html>

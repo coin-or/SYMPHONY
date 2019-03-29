@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Debugging with PVM</TITLE>
+<META NAME="description" CONTENT="Debugging with PVM">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node113.html">
+<LINK REL="previous" HREF="node111.html">
+<LINK REL="up" HREF="node110.html">
+<LINK REL="next" HREF="node113.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1926"
+  HREF="node113.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1922"
+  HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1916"
+  HREF="node111.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1924"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1927"
+  HREF="node113.html">Checking the Validity of</A>
+<B>Up:</B> <A NAME="tex2html1923"
+  HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1917"
+  HREF="node111.html">The First Rule</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00662000000000000000"></A>
+<A NAME="debugging-PVM"></A>
+<BR>
+Debugging with PVM
+</H2>
+If you wish to venture into debugging your distributed application, then you
+simply need to set the parameter 
+<FONT COLOR="#a52a2a"><TT>*_debug</TT></FONT>, where * is the name of the
+module you wish to debug, to ``1'' in the parameter file. This will tell PVM
+to spawn the particular process or processes in question under a debugger.
+What PVM actually does in this case is to launch the script
+
+<FONT COLOR="#a52a2a"><TT>$PVM_ROOT/lib/debugger</TT></FONT>. You will undoubtedly want to modify this
+script to launch your preferred debugger in the manner you deem fit. If you
+have trouble with this, please send e-mail to the list serve (see Section
+<A HREF="node8.html#resources">1.6</A>).
+
+<P>
+It's a little tricky to debug interacting parallel processes. The main
+difficulty is in that the order of operations is difficult to control. Random
+interactions can occur when processes run in parallel due to varying system
+loads, process priorities, etc. Therefore, it may not always be possible to
+duplicate errors. To force runs that you should be able to reproduce, make
+sure the parameter <TT>
+<FONT COLOR="#000000"> no_cut_timeout</FONT></TT> appears in the parameter file or
+start SYMPHONY with the 
+<FONT COLOR="#a52a2a"><TT>-a</TT></FONT> option. This will keep the cut generator from
+timing out, a major source of randomness. Furthermore, run with only one
+active node allowed at a time (set <TT>
+<FONT COLOR="#000000">  max_active_nodes</FONT></TT> to ``1''). This
+will keep the tree search from becoming random. These two steps should allow
+runs to be reproduced. You still have to be careful, but this should make
+things easier.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1926"
+  HREF="node113.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1922"
+  HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1916"
+  HREF="node111.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1924"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1927"
+  HREF="node113.html">Checking the Validity of</A>
+<B>Up:</B> <A NAME="tex2html1923"
+  HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1917"
+  HREF="node111.html">The First Rule</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

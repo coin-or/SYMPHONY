@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_receive_feasible_solution</TITLE>
+<META NAME="description" CONTENT="user_receive_feasible_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node196.html">
+<LINK REL="previous" HREF="node194.html">
+<LINK REL="up" HREF="node187.html">
+<LINK REL="next" HREF="node196.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html3226"
+  HREF="node196.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html3222"
+  HREF="node187.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html3216"
+  HREF="node194.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html3224"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3227"
+  HREF="node196.html">user_send_lp_data</A>
+<B>Up:</B> <A NAME="tex2html3223"
+  HREF="node187.html">Master module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3217"
+  HREF="node194.html">user_initialize_root_node</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00831800000000000000"></A>
+<A NAME="user_receive_feasible_solution"></A>
+<BR>
+user_receive_feasible_solution
+</H3>
+<PRE>
+int user_receive_feasible_solution(void *user, int msgtag, double cost, 
+                                   int numvars, int *indices, double *values)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+This function is only used for parallel execution. Feasible solutions can be
+sent and/or stored in a user-defined packed form if desired. For instance, the
+TSP, a tour can be specified simply as a permutation, rather than as a list of
+variable indices. In the LP module, a feasible solution is packed either by
+the user or by a default packing routine. If the default packing routine was
+used, the <TT>msgtag</TT> will be <TT>FEASIBLE_SOLUTION_NONZEROS</TT>. In this
+case, <TT>cost</TT>, <TT>numvars</TT>, <TT>indices</TT> and <TT>values</TT> will contain
+the solution value, the number of nonzeros in the feasible solution, and their
+user indices and values. The user has only to interpret and store the
+solution. Otherwise, when <TT>msgtag</TT> is <TT>FEASIBLE_SOLUTION_USER</TT>, SYMPHONY will send and receive the solution value only and the user has to unpack
+exactly what she has packed in the LP module. In this case the contents of
+the last three arguments are undefined. 
+<BR>
+<BR>
+In most cases, SYMPHONY's default routines for sending and receiving feasible
+solutions, as well as displaying them, will suffice. These routines simply
+display all nonzeros by either index or name, depending on whether the user
+set the column names. See
+<A HREF="node217.html#user_send_feasible_solution"><TT>user_send_feasible_solution()</TT></A> for
+more discussion.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int msgtag</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291><TT>FEASIBLE_SOLUTION_NONZEROS</TT> or <TT>FEASIBLE_SOLUTION_USER</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double cost</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The cost of the feasible solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int numvars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The number of variables whose user indices and
+values were sent (length of <TT>indices</TT> and <TT>values</TT>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The user indices of the nonzero variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *values</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The corresponding values.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Ignored. This is probably not a fatal error.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>The solution has been unpacked and stored.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Store the nonzeros in the solutions for later display.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html3226"
+  HREF="node196.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html3222"
+  HREF="node187.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html3216"
+  HREF="node194.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html3224"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3227"
+  HREF="node196.html">user_send_lp_data</A>
+<B>Up:</B> <A NAME="tex2html3223"
+  HREF="node187.html">Master module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3217"
+  HREF="node194.html">user_initialize_root_node</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

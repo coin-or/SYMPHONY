@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Communication with Shared Memory</TITLE>
+<META NAME="description" CONTENT="Communication with Shared Memory">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node14.html">
+<LINK REL="previous" HREF="node12.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html313"
+ HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html310"
+ HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html304"
+ HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html312"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html314"
+ HREF="node14.html">The LP Engine</A>
+<B>Up:</B> <A NAME="tex2html311"
+ HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html305"
+ HREF="node12.html">Working with PVM</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00029000000000000000">&#160;</A>
+<A NAME="shared">&#160;</A>
+<BR>
+Communication with Shared Memory
+</H2>
+In the shared memory configuration, it is not necessary to use
+message passing to move information from one module to another since
+memory is globally accessible. In the few cases where the user would
+ordinarily have to pass information using message passing, it is
+easiest and most efficient to simply copy the information to the new
+location. This copying gets done in the <EM>send</EM> function and hence
+the <EM>receive</EM> function is never actually called. This means that
+the user must perform all necessary initialization, etc. in the send
+function. This makes it a little confusing to write source code which
+will work for all configurations. However, the confusion should be
+cleared up by looking at the sample application, especially the file
+<TT>Vrp/Master/vrp.c</TT>.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

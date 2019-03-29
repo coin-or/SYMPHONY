@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Using the Interactive Graph Drawing Software</TITLE>
+<META NAME="description" CONTENT="Using the Interactive Graph Drawing Software">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html460" HREF="node22.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html458" HREF="node16.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html452" HREF="node20.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html462" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html461" HREF="node22.html">Other Debugging Techniques</A>
+<B>Up:</B> <A NAME="tex2html459" HREF="node16.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html453" HREF="node20.html">Checking the Validity of </A>
+<BR> <P>
+<H3><A NAME="SECTION000212500000000000000">Using the <TT>Interactive Graph Drawing</TT> Software</A></H3>
+<P>
+<A NAME="IGD">&#160;</A>
+The Interactive Graph Drawing (IGD) software package is included with
+SYMPHONY and SYMPHONY facilitates its use through interfaces with the
+package. The package, which is a Tcl/Tk application, is extremely
+useful for developing and debugging applications involving graph-based
+problems. Given display coordinates for each node in the graph, IGD
+can display support graphs corresponding to fractional solutions with or
+without edge weights and node labels and weights, as well as other
+information. Furthermore, the user can interactively modify the graph
+by, for instance, moving the nodes apart to ``disentangle'' the
+edges. The user can also interactively enter violated cuts through the
+IGD interface.
+<P>
+To use IGD, you must have installed PVM since the drawing window runs
+as a separate application and communicates with the user's routines
+through message passing. To compile the graph drawing application,
+type ``<TT>make dglib dg</TT>'' in the SYMPHONY root directory. The user
+routines in the file <TT>dg_user.c</TT> can be filled in, but it is not
+necessary to fill anything in for basic applications.
+<P>
+After compiling <TT>dg</TT>, the user must write some subroutines that
+communicate with <TT>dg</TT> and cause the graph to be drawn.
+Regrettably, this is currently a little more complicated than it needs
+to be and is not well documented. However, by looking at the sample
+application, it is relatively easy to see how it should be done. To
+enable graph drawing, put the line <TT>do_draw_graph 1</TT> into the
+parameter file or use the <TT>-d</TT> command line option.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Executable Names.</TITLE>
+<META NAME="description" CONTENT="Executable Names.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node63.html">
+<LINK REL="up" HREF="node60.html">
+<LINK REL="next" HREF="node65.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1070"
+  HREF="node65.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1066"
+  HREF="node60.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1062"
+  HREF="node63.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1068"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1071"
+  HREF="node65.html">Microsoft Windows</A>
+<B> Up:</B> <A NAME="tex2html1067"
+  HREF="node60.html">Unix Operating Systems</A>
+<B> Previous:</B> <A NAME="tex2html1063"
+  HREF="node63.html">Configuring the Modules.</A>
+ &nbsp <B>  <A NAME="tex2html1069"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION000911140000000000000"></A>
+<A NAME="exe_names"></A>
+<BR>
+Executable Names.
+</H4>
+In order to keep track of the various possible configurations,
+executable and their corresponding libraries are named as follows. For
+the fully distributed version, the names are <TT>master</TT>, <TT>tm</TT>,
+<TT>lp</TT>, <TT>cg</TT>, and <TT>cp</TT>. For other configurations, the
+executable name is a combination of all the modules that were compiled
+together joined by underscores. In other words, if the LP and the cut
+generator modules were compiled together (i.e.&nbsp;<TT>COMPILE_IN_CG</TT>
+set to <TT>TRUE</TT>), then the executable name would be ``<TT>lp_cg</TT>''
+and the corresponding library file would be called ``<TT>liblp_cg.a</TT>.'' You can rename the executables as you like. However, if
+you are using PVM to spawn the modules, as in the fully distributed
+version, you must set the parameters <TT>*_exe</TT> in the parameter
+file to the new executable names. See Section <A HREF="node141.html#tm_params">10.4</A> for
+information on setting parameters in the parameter file.
+
+<P>
+<BR><HR>
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

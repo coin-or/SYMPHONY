@@ -1,0 +1,393 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Branch, Cut, and Price</TITLE>
+<META NAME="description" CONTENT="Branch, Cut, and Price">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html490"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html486"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html482"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html488"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html491"
+  HREF="node11.html">API Overview</A>
+<B>Up:</B> <A NAME="tex2html487"
+  HREF="node8.html">Introduction to Branch, Cut,</A>
+<B> Previous:</B> <A NAME="tex2html483"
+  HREF="node9.html">Branch and Bound</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00332000000000000000"></A>
+<A NAME="branchandcut"></A>
+<BR>
+Branch, Cut, and Price
+</H2>
+
+<P>
+In many applications, the bounding operation is accomplished using the
+tools of linear programming (LP), a technique first described in full
+generality by Hoffman and Padberg [<A
+ HREF="node261.html#hoff:LP">21</A>]. This general class of
+algorithms is known as <EM>LP-based branch and bound</EM>. Typically, the
+integrality constraints of an integer programming formulation of the
+problem are relaxed to obtain a <EM>LP relaxation</EM>, which is then
+solved to obtain a lower bound for the problem. In [<A
+ HREF="node261.html#padb:branc">31</A>],
+Padberg and Rinaldi improved on this basic idea by describing a method
+of using globally valid inequalities (i.e., inequalities valid for the
+convex hull of integer solutions) to strengthen the LP relaxation.
+They called this technique <EM>branch and cut</EM>. Since then, many
+implementations (including ours) have been fashioned around the
+framework they described for solving the Traveling Salesman Problem.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="proc-bound"></A><A NAME="418"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 2.1:</STRONG>
+Bounding in the branch and cut algorithm</CAPTION>
+<TR><TD><!-- MATH
+ $\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Bounding Operation}\\
+\underbar{Input:} A subproblem ${\cal S}$, described in
+terms of a ``small'' set of inequalities ${\cal L'}$\  such that ${\cal
+S} = \{x^s : s \in {\cal F}\;\hbox{\rm and}\;ax^s \leq \beta\;\forall
+\;(a,\beta) \in {\cal L'}\}$\  and $\alpha$, an upper bound on the global
+optimal value. \\
+\underbar{Output:} Either (1) an optimal solution $s^* \in {\cal S}$\  to
+the subproblem, (2) a lower bound on the optimal value of the 
+subproblem, or (3) a message {\tt pruned} indicating that the
+subproblem should not be considered further. \\
+{\bf Step 1.} Set ${\cal C} \leftarrow {\cal L'}$. \\
+{\bf Step 2.} Solve the LP $\min\{cx : ax \leq \beta\;\forall\;(a, \beta) 
+\in {\cal C}\}$. \\
+{\bf Step 3.} If the LP has a feasible solution $\hat{x}$, then go to
+Step 4. Otherwise, STOP and output {\tt pruned}. This subproblem has no 
+feasible solutions. \\
+{\bf Step 4.} If $c\hat{x} < \alpha$, then go to Step
+5. Otherwise, STOP and output {\tt pruned}. This subproblem
+cannot produce a solution of value better than $\alpha$. \\
+{\bf Step 5.} If $\hat{x}$\  is the incidence vector of some $\hat{s}
+\in {\cal S}$, then $\hat{s}$\  is the optimal solution to this
+subproblem. STOP and output $\hat{s}$\  as $s^*$. Otherwise, apply
+separation algorithms and heuristics to $\hat{x}$\  to get a set of
+violated inequalities ${\cal C'}$. If ${\cal C'} = \emptyset$, then
+$c\hat{x}$\  is a lower bound on the value of an optimal element of
+${\cal S}$.  STOP and return $\hat{x}$\  and the lower bound
+$c\hat{x}$. Otherwise, set ${\cal C} \leftarrow {\cal C} \cup {\cal
+C'}$\  and go to Step 2.}
+\end{minipage}
+}$
+ -->
+<IMG
+ WIDTH="751" HEIGHT="423" ALIGN="MIDDLE" BORDER="0"
+ SRC="img8.png"
+ ALT="\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Bounding Operati...
+...{\cal C} \leftarrow {\cal C} \cup {\cal
+C'}$ and go to Step 2.}
+\end{minipage}}"></TD></TR>
+</TABLE>
+</DIV>
+As an example, let a combinatorial optimization problem <!-- MATH
+ $\hbox{\em CP} =
+(E, {\cal F})$
+ -->
+<IMG
+ WIDTH="101" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img9.png"
+ ALT="$ \hbox{\em CP} =
+(E, {\cal F})$"> with <EM>ground set</EM> <IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img10.png"
+ ALT="$ E$"> and <EM>feasible set</EM> <!-- MATH
+ ${\cal F}
+\subseteq 2^E$
+ -->
+<IMG
+ WIDTH="62" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="img11.png"
+ ALT="$ {\cal F}
+\subseteq 2^E$"> be given along with a cost function <!-- MATH
+ $c \in {\bf R}^E$
+ -->
+<IMG
+ WIDTH="60" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ c \in {\bf R}^E$">.
+The incidence vectors corresponding to the members of <IMG
+ WIDTH="19" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img13.png"
+ ALT="$ {\cal F}$"> are
+sometimes specified as the the set of all incidence vectors obeying a
+(relatively) small set of inequalities. These inequalities are
+typically the ones used in the initial LP relaxation. Now let <IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img14.png"
+ ALT="$ {\cal
+P}$"> be the convex hull of incidence vectors of members of <IMG
+ WIDTH="19" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img13.png"
+ ALT="$ {\cal F}$">. Then we know by Weyl's Theorem (see [<A
+ HREF="node261.html#nemwol88">30</A>]) that there exists
+a finite set <IMG
+ WIDTH="16" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img15.png"
+ ALT="$ {\cal L}$"> of inequalities valid for <IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img14.png"
+ ALT="$ {\cal
+P}$"> such that
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="the-polyhedron"></A><!-- MATH
+ \begin{equation}
+{\cal P} = \{x \in {\bf R}^n: ax \leq \beta\;\;\forall\;(a, \beta) \in
+{\cal L}\}.
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="285" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img16.png"
+ ALT="$\displaystyle {\cal P} = \{x \in {\bf R}^n: ax \leq \beta\;\;\forall\;(a, \beta) \in {\cal L}\}.$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(2.1)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+The inequalities in <IMG
+ WIDTH="16" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img15.png"
+ ALT="$ {\cal L}$"> are the potential cutting planes to be
+added to the relaxation as needed. Unfortunately, it is usually
+difficult, if not impossible, to enumerate all of inequalities in
+<IMG
+ WIDTH="16" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img15.png"
+ ALT="$ {\cal L}$"> or we could simply solve the problem using linear
+programming. Instead, they are defined implicitly and we use
+separation algorithms and heuristics to generate these inequalities
+when they are violated. In Figure <A HREF="node10.html#proc-bound">2.1</A>, we describe more
+precisely how the bounding operation is carried out in branch and cut.
+
+<DIV ALIGN="CENTER"><A NAME="branching-fig"></A><A NAME="468"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 2.2:</STRONG>
+Branching in the branch and cut algorithm</CAPTION>
+<TR><TD><!-- MATH
+ $\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Branching Operation} \\
+\underbar{Input:} A subproblem ${\cal S}$\  and $\hat{x}$, the LP solution
+yielding the lower bound. \\
+\underbar{Output:} $S_1, \ldots, S_p$\  such that ${\cal S} = \cup_{i = 1}^p
+S_i$. \\
+{\bf Step 1.} Determine sets ${\cal L}_1, \ldots, {\cal L}_p$\  of
+inequalities such that ${\cal S} = \cup_{i = 1}^n \{x \in {\cal S}: ax \leq
+\beta\;\forall\;(a, \beta) \in {\cal L}_i\}$\  and $\hat{x} \notin
+\cup_{i = 1}^n S_i$. \\
+{\bf Step 2.} Set $S_i = \{x \in {\cal S}: ax \leq
+\beta\;\;\forall\;(a, \beta) \in {\cal L}_i \cup {\cal L}'\}$\  where
+${\cal L'}$\  is the set of inequalities used to describe ${\cal S}$.}
+\end{minipage}
+}$
+ -->
+<IMG
+ WIDTH="751" HEIGHT="181" ALIGN="MIDDLE" BORDER="0"
+ SRC="img17.png"
+ ALT="\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Branching Operat...
+...l L'}$ is the set of inequalities used to describe ${\cal S}$.}
+\end{minipage}}"></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+Once we have failed to either prune the current subproblem or separate
+the current fractional solution from <IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img14.png"
+ ALT="$ {\cal
+P}$">, we are forced to
+branch. The branching operation is accomplished by specifying a set of
+hyperplanes which divide the current subproblem in such a way that the
+current solution is not feasible for the LP relaxation of any of the
+new subproblems. For example, in a combinatorial optimization problem,
+branching could be accomplished simply by fixing a variable whose
+current value is fractional to 0 in one branch and 1
+in the other. The procedure is described more formally in Figure
+<A HREF="node10.html#branching-fig">2.2</A>. Figure <A HREF="node10.html#gb_SPMamp_c">2.3</A> gives a high level description
+of the generic branch and cut algorithm.
+
+<DIV ALIGN="CENTER"><A NAME="gb_SPMamp_c"></A><A NAME="502"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 2.3:</STRONG>
+Description of the generic branch and cut algorithm</CAPTION>
+<TR><TD><!-- MATH
+ $\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Generic Branch and Cut Algorithm}\\
+\underbar{Input:} A data array specifying the problem instance.\\
+\underbar{Output:} The global optimal solution $s^*$\  to the problem
+instance. \\
+{\bf Step 1.} Generate a ``good'' feasible solution ${\hat s}$\  using
+heuristics. Set $\alpha \leftarrow c(\hat{s})$. \\
+{\bf Step 2.} Generate the first subproblem ${\cal S}^I$\  by constructing a
+small set ${\cal L'}$\  of inequalities valid for ${\cal P}$. Set $A
+\leftarrow \{{\cal S}^I\}$. \\
+{\bf Step 3.} If $A = \emptyset$, STOP and output $\hat{s}$\  as the
+global optimum $s^*$. Otherwise, choose some ${\cal S} \in A$. Set $A
+\leftarrow A \setminus \{{\cal S}\}$. Process ${\cal S}$. \\
+{\bf Step 4.} If the result of Step 3 is a feasible solution
+$\overline{s}$, then $c\overline{s} < c\hat{s}$.
+Set $\hat{s} \leftarrow \overline{s}$\  and $\alpha \leftarrow 
+c(\overline{s})$\  and go to Step 3. If the subproblem was pruned, go to
+Step 3. Otherwise, go to Step 5. \\
+{\bf Step 5.} Perform the branching operation. Add the set of
+subproblems generated to $A$\  and go to Step 3.}
+\end{minipage}
+}$
+ -->
+<IMG
+ WIDTH="751" HEIGHT="293" ALIGN="MIDDLE" BORDER="0"
+ SRC="img18.png"
+ ALT="\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Generic Branch a...
+... Add the set of
+subproblems generated to $A$ and go to Step 3.}
+\end{minipage}}"></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+As with cutting planes, the columns of <IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img19.png"
+ ALT="$ A$"> can also be defined
+implicitly if <IMG
+ WIDTH="15" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img5.png"
+ ALT="$ n$"> is large. If column <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$ i$"> is not present in the
+current matrix, then variable <IMG
+ WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$ x_i$"> is implicitly taken to have value
+zero. The process of dynamically generating variables is called <EM>pricing</EM> in the jargon of linear programming, but can also be viewed
+as that of generating cutting planes for the dual of the current
+LP relaxation. Hence, LP-based branch and bound algorithms in which
+the variables are generated dynamically when needed are known as <EM>branch and price</EM> algorithms. In [<A
+ HREF="node261.html#barn:branc">4</A>], Barnhart,
+et al. provide a thorough review of these methods. 
+
+<P>
+When both variables and cutting planes are generated dynamically
+during LP-based branch and bound, the technique becomes known as <EM>branch, cut, and price</EM> (BCP). In such a scheme, there is a pleasing
+symmetry between the treatment of cuts and that of variables. We
+further examine this symmetry later in the manual. For
+now, however, it is important to note that while branch, cut, and
+price does combine ideas from both branch and cut and branch and price
+(which are very similar to each other anyway), combining the two
+techniques requires much more sophisticated methods than either one
+requires on its own. This is an important idea that is at the core of
+our design.
+
+<P>
+In the remainder of the manual, we often use the term <EM>search
+tree</EM>. This term derives from the common representation of the list of
+subproblems as the nodes of a graph in which each subproblem is
+connected only to its parent and its children. Storing the subproblems
+in such a form is an important aspect of our global data structures.
+Since the subproblems correspond to the nodes of this graph, they are
+sometimes be referred to as <EM>nodes in the search tree</EM> or simply
+as <EM>nodes</EM>. The <EM>root node</EM> or <EM>root</EM> of the tree is the
+node representing the initial subproblem.
+
+<P>
+<HR>
+<A NAME="tex2html490"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html486"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html482"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html488"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html491"
+  HREF="node11.html">API Overview</A>
+<B>Up:</B> <A NAME="tex2html487"
+  HREF="node8.html">Introduction to Branch, Cut,</A>
+<B> Previous:</B> <A NAME="tex2html483"
+  HREF="node9.html">Branch and Bound</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Solve from Warm Start</TITLE>
+<META NAME="description" CONTENT="Solve from Warm Start">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node43.html">
+<LINK REL="previous" HREF="node39.html">
+<LINK REL="up" HREF="node38.html">
+<LINK REL="next" HREF="node41.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html938"
+  HREF="node41.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html934"
+  HREF="node38.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html928"
+  HREF="node39.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html936"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html939"
+  HREF="node41.html">Modifying Parameters.</A>
+<B>Up:</B> <A NAME="tex2html935"
+  HREF="node38.html">The Master Module</A>
+<B> Previous:</B> <A NAME="tex2html929"
+  HREF="node39.html">Initial Solve</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00521200000000000000"></A> <A NAME="warm_solve"></A>
+<BR>
+Solve from Warm Start
+</H3>
+
+<P>
+Among the utility classes in the COIN-OR repository is a base class for
+describing the data needed to warm start the solution process for a particular
+solver or class of solvers. To support this option for SYMPHONY, we have
+implemented such a warm start class for MILPs. The main content of the class
+is a compact description of the search tree at the time the computation was
+halted. This description contains complete information about the subproblem
+corresponding to each node in the search tree, including the branching
+decisions that lead to the creation of the node, the list of active variables
+and constraints, and warm start information for the subproblem itself (which
+is a linear program). All information is stored compactly using SYMPHONY's
+native data structures, which store only the differences between a child and
+its parent, rather than an explicit description of every node. This approach
+reduces the tree's description to a fraction of the size it would otherwise
+be. In addition to the tree itself, other relevant information regarding the
+status of the computation is recorded, such as the current bounds and best
+feasible solution found so far. Using the warm start class, the user can save
+a warm start to disk, read one from disk, or restart the computation at any
+point after modifying parameters or the problem data itself. This allows
+the user to easily implement periodic checkpointing, to design dynamic
+algorithms in which the parameters are modified after the gap reaches a
+certain threshold, or to modify problem data during the solution process if
+needed.
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html940"
+  HREF="node41.html">Modifying Parameters.</A>
+<LI><A NAME="tex2html941"
+  HREF="node42.html">Modifying Problem Data.</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html938"
+  HREF="node41.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html934"
+  HREF="node38.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html928"
+  HREF="node39.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html936"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html939"
+  HREF="node41.html">Modifying Parameters.</A>
+<B>Up:</B> <A NAME="tex2html935"
+  HREF="node38.html">The Master Module</A>
+<B> Previous:</B> <A NAME="tex2html929"
+  HREF="node39.html">Initial Solve</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

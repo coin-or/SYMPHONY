@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_send_feas_sol</TITLE>
+<META NAME="description" CONTENT="user_send_feas_sol">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node44.html">
+<LINK REL="previous" HREF="node42.html">
+<LINK REL="up" HREF="node28.html">
+<LINK REL="next" HREF="node44.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html722"
+ HREF="node44.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html719"
+ HREF="node28.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html713"
+ HREF="node42.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html721"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html723"
+ HREF="node44.html">user_process_own_messages</A>
+<B>Up:</B> <A NAME="tex2html720"
+ HREF="node28.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html714"
+ HREF="node42.html">user_display_solution</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000311500000000000000">&#160;</A>
+<A NAME="user_send_feas_sol">&#160;</A>
+<BR>
+user_send_feas_sol
+</H3>
+<PRE>
+int user_process_own_messages(void *user, int *feas_sol_size, int **feas_sol)
+</PRE>
+<P>
+<DL>
+<DD><P>
+<DT><STRONG>Description:</STRONG>
+<DD>
+
+<P>
+This function is useful for debugging purposes. It passes a known
+feasible solution to the tree manager. The tree manager then tracks
+which current subproblem admits this feasible solution and notifies
+the user when it gets pruned. It is useful for finding out why a known
+optimal solution never gets discovered. Usually, this is due to either
+an invalid cut of an invalid branching. Note that this feature only
+works when branching on binary variables. See Section <A HREF="node22.html#debugging">1.14.4</A>
+for more on how to use this feature.
+
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int *feas_sol_size</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>Pointer to size of the feasible
+solution passed by the user.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int **feas_sol</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>Pointer to the array of user indices
+containing the feasible solution. This array is simply copied by the tree
+manager and must be freed by the user.</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Solution tracing is not enabled.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Tracing of the given solution is enabled.</TD>
+</TR>
+</TABLE>
+<P>
+</DL>
+<P>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html722"
+ HREF="node44.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html719"
+ HREF="node28.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html713"
+ HREF="node42.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html721"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html723"
+ HREF="node44.html">user_process_own_messages</A>
+<B>Up:</B> <A NAME="tex2html720"
+ HREF="node28.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html714"
+ HREF="node42.html">user_display_solution</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

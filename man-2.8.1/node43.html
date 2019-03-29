@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Getting Started</TITLE>
+<META NAME="description" CONTENT="Getting Started">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node44.html">
+<LINK REL="previous" HREF="node42.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node44.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html739"
+ HREF="node44.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html736"
+ HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html730"
+ HREF="node42.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html738"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html740"
+ HREF="node44.html">Source Files</A>
+<B>Up:</B> <A NAME="tex2html737"
+ HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html731"
+ HREF="node42.html">Changes to the User</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00093000000000000000">&#160;</A>
+<A NAME="getting_started">&#160;</A>
+<BR>
+Getting Started
+</H2>
+Here is a sketch outline of how to get started with  SYMPHONY. This is
+basically the same information contained in the README file that comes
+with the distribution. 
+
+<P>
+Because  SYMPHONY is inherently intended to be compiled and run on
+multiple architectures and in multiple configurations, I have chosen
+not to use the automatic configuration scripts provided by GNU. With
+the make files provided, compilation for multiple architectures and
+configurations can be done in a single directory without reconfiguring
+or ``cleaning''. This is very convenient, but it means that there is
+some hand configuring to do and you might need to know a little about
+your computing environment in order to make SYMPHONY compile. For the
+most part, this is limited to editing the make file and providing some
+path names. Also, for this reason, you may have to live with some
+complaints from the compiler because of missing function prototypes, etc.
+
+<P>
+Note that if you choose not to install PVM, you will need to edit the
+make file and provide an environment variable which makes it possible
+for ``make'' to determine the current architecture. This environment
+variable also allows the path to the binaries for each architecture to
+be set appropriately. This should all be done automatically if PVM is
+installed correctly.
+
+<P>
+<B>Preparing for compilation</B>
+
+<P>
+<UL>
+<LI>First unpack the distribution by typing ``<TT>tar -xzf
+        SYMPHONY-2.8.tgz</TT>''.
+<LI>Edit the various path variables in the make file (<TT>        SYPHONY-2.8/Makefile</TT>) to match where you installed the source
+        code and where the LP libraries and header files reside for
+        each architecture on your network. Other
+        architecture-dependent variables should also be set as
+        required. Be sure to read the comments in the make file to
+        understand what variables have to be set.
+</UL>        
+<B>Compiling the sequential version</B>
+
+<P>
+<UL>
+<LI>Type ``<TT>make</TT>'' in the  SYMPHONY root directory. This
+        will first make the  SYMPHONY library (sequential version).
+        After this step is completed, you are free to type ``<TT>make
+        clean</TT>'' and/or delete the <TT>$ROOT/obj.*</TT> and <TT>        $ROOT/dep.*</TT> directories if you want to save disk space. You
+        should only have to remake the library if you change something
+        in  SYMPHONY's internal files.
+
+<P>
+<LI>After making the libraries,  SYMPHONY will compile the
+        user code and then make the executable for the sample
+        application, a vehicle routing and traveling salesman problem
+        solver. The name of the executable will be ``<TT>        master_tm_lp_cg_cp</TT>'', indicating that all modules are
+        contained in a single executable.
+
+<P>
+<LI>To test the sample program, you can get some problem
+        files from <A NAME="tex2html10"
+ HREF="http://branchandcut.org/VRP/data/"><TT>http://branchandcut.org/VRP/data/</TT></A>
+or the <A NAME="tex2html11"
+ HREF="http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/">TSPLIB</A>
+.
+        The file format is that specified for the TSPLIB. There is
+        also one sample file included with the distribution. Make sure
+        the executable directory is in your path and type
+        ``master_tm_lp_cg_cp -F sample.vrp -N 5'', where sample.vrp
+        is the sample problem file. The -N argument gives the number
+        of routes, which must be specified in advance. TSP instances
+        can also be solved, but in this case, the number of routes does
+        not need to be specified.
+</UL>
+<P>
+<B>Compiling for shared memory</B>
+
+<P>
+<UL>
+<LI>To compile a shared memory version, obtain an OpenMP
+        compliant compiler, such as <A NAME="tex2html12"
+ HREF="http://pdplab.trc.rwcp.or.jp/Omni/">Omni</A>
+. 
+        Other options are listed at <A NAME="tex2html13"
+ HREF="http://www.openmp.org">the OpenMP Web
+        site</A>
+.
+
+<P>
+<LI>Set the variable <TT>CC</TT> to the compiler name in the
+        make file and compile as above.
+
+<P>
+<LI>Voila, you have a shared memory parallel solver.
+
+<P>
+<LI>Note that if you have previously compiled the sequential
+        version, then you should first type ``<TT>make clean_all</TT>'',
+        as this version uses the same compilation directories as the
+        sequential version. With one active subproblem allowed, it
+        should run exactly the same as the sequential version so there
+        is no need to compile both.
+</UL>
+<P>
+<B>Compiling for distributed networks</B>
+
+<P>
+<UL>
+<LI>You must first obtain and install the <EM>        <A NAME="tex2html9"
+ HREF="http://www.ccs.ornl.gov/pvm/">Parallel Virtual
+        Machine</A></EM> (PVM) software,
+        available for free from Oak Ridge National
+        Laboratories
+. 
+        See Section <A HREF="node50.html#PVM">8.8</A> for more notes on using PVM.
+<LI>In the Makefile, be sure to set the <TT>COMM_PROTOCOL</TT>
+        to <TT>PVM</TT>. Also, change one or more of <TT>        COMPILE_IN_TM</TT>, <TT>COMPILE_IN_LP</TT>, <TT>        COMPILE_IN_CG</TT>, and <TT>COMPILE_IN_CP</TT>, to <TT>FALSE</TT>,
+        or you will end up with the sequential version. Various
+        combinations of these variables will give you different
+        configurations and different executables. See Section
+        <A HREF="node54.html#configuration">8.12</A> for more info on setting them. Also, be
+        sure to set the path variables in the make file appropriately
+        so that make can find the PVM library.
+
+<P>
+<LI>Type ``<TT>make</TT>'' in the  SYMPHONY root directory to
+        make the distributed libraries. As in Step 1 of the sequential
+        version, you may type ``<TT>make clean</TT>'' after making the
+        library. It should not have to remade again unless you modify
+         SYMPHONY's internal files.
+
+<P>
+<LI>After the libraries, all executables requested will be made.
+
+<P>
+<LI>Make sure there are links from your
+        $PVM_ROOT/bin/$PVM_ARCH/ directory to each of the
+        executables in the Vrp/bin.$REV directory. This is required
+        by PVM.
+
+<P>
+<LI>Start the PVM daemon by typing ``<TT>pvm</TT>'' on the command line
+        and then typing ``<TT>quit</TT>''.
+
+<P>
+<LI>To test the sample program, you can get some problem
+        files from <A NAME="tex2html14"
+ HREF="http://branchandcut.org/VRP/data/"><TT>http://branchandcut.org/VRP/data/</TT></A>
+or the <A NAME="tex2html15"
+ HREF="http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/">TSPLIB</A>
+. 
+        The file format is that specified for the TSPLIB. There is
+        also one sample file included with the distribution. Make sure
+        the executable directory is in your path and type ``master -F
+        sample.vrp -N 5'', where sample.vrp is the sample problem file.
+        The -N argument gives the number of routes, which must be
+        specified in advance. TSP instances can also be solved, but in
+        this case, the number of routes does not need to be specified.
+        Note that the actual executable name may not be ``<TT>        master</TT>'' if <TT>COMPILE_IN_TM</TT> is set to <TT>TRUE</TT> in the
+        make file. See Section <A HREF="node54.html#configuration">8.12</A> for more
+        information on executable names.
+
+<P>
+</UL>
+<P>
+This should result in the successful compilation of the sample
+application. Once you have accomplished this much, you are well on
+your way to having an application of your own. Don't be daunted by the
+seemingly endless list of user function that you are about to
+encounter. Most of them are optional or have default options. If you
+get lost, consult the source code for the sample application to see
+how it's done.
+
+<P>
+<HR>
+<A NAME="tex2html739"
+ HREF="node44.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html736"
+ HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html730"
+ HREF="node42.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html738"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html740"
+ HREF="node44.html">Source Files</A>
+<B>Up:</B> <A NAME="tex2html737"
+ HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html731"
+ HREF="node42.html">Changes to the User</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

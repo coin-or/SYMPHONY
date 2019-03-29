@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Controlling Execution and Output</TITLE>
+<META NAME="description" CONTENT="Controlling Execution and Output">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node81.html">
+<LINK REL="previous" HREF="node73.html">
+<LINK REL="up" HREF="node57.html">
+<LINK REL="next" HREF="node81.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1339"
+  HREF="node81.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1335"
+  HREF="node57.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1329"
+  HREF="node79.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1337"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1340"
+  HREF="node81.html">Other Resources</A>
+<B>Up:</B> <A NAME="tex2html1336"
+  HREF="node57.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html1330"
+  HREF="node79.html">Other Debugging Techniques</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00529000000000000000"></A>
+<A NAME="output"></A>
+<BR>
+Controlling Execution and Output
+</H2>
+Calling SYMPHONY with no arguments simply lists all command-line options.  Most of
+the common parameters can be set on the command line. Sometimes, however, it
+may be easier to use a parameter file. To invoke SYMPHONY with a parameter file
+type ``<TT>master -f filename ...</TT>'' where filename is the name of the
+parameter file. The format of the file is explained in Section
+<A HREF="node149.html#parameter_file">5.2</A>. 
+
+<P>
+The output level can be controlled through the use of the verbosity
+parameter. Setting this parameter at different levels will cause
+different progress messages to be printed out. Level 0 only prints out
+the introductory and solution summary messages, along with status
+messages every 10 minutes. Level 1 prints out a message every time a
+new node is created. Level 3 prints out messages describing each
+iteration of the solution process. Levels beyond 3 print out even more
+detailed information.
+
+<P>
+There are also two possible graphical interfaces. For graph-based
+problems, the Interactive Graph Drawing Software allows visual display
+of fractional solutions, as well as feasible and optimal solutions
+discovered during the solution process. For all types of problems,
+VBCTOOL creates a visual picture of the branch and cut tree, either
+in real time as the solution process evolves or as an emulation from a
+file created by
+SYMPHONY. See Section <A HREF="node153.html#tm_params">5.2.4</A> for information on how to use VBCTOOL
+with SYMPHONY. Binaries for VBCTOOL can be obtained at 
+<BR><TT><A NAME="tex2html24"
+  HREF="http://www.informatik.uni-koeln.de/ls_juenger/projects/vbctool.html">http://www.informatik.uni-koeln.de/ls_juenger/projects/vbctool.html</A></TT>.
+
+<P>
+<HR>
+<A NAME="tex2html1339"
+  HREF="node81.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1335"
+  HREF="node57.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1329"
+  HREF="node79.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1337"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1340"
+  HREF="node81.html">Other Resources</A>
+<B>Up:</B> <A NAME="tex2html1336"
+  HREF="node57.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html1330"
+  HREF="node79.html">Other Debugging Techniques</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

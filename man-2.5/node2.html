@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Getting Started</TITLE>
+<META NAME="description" CONTENT="Getting Started">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html117" HREF="node3.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html115" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html109" HREF="node1.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html118" HREF="node3.html">Source Files</A>
+<B>Up:</B> <A NAME="tex2html116" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html110" HREF="node1.html">Introduction</A>
+<BR> <P>
+<H2><A NAME="SECTION00011000000000000000">Getting Started</A></H2>
+<P>
+Here is a sketch outline of how to get started with SYMPHONY. 
+<UL><LI> First, if you haven't already done so, unpack the
+	distribution using the <TT>tar</TT> command.<LI> You must
+	obtain and install the <EM><A NAME="tex2html3" HREF="http://www.ccs.ornl.gov/pvm/">Parallel
+	Virtual Machine</A></EM> (PVM)
+	software, available for free from Oak Ridge National
+	Laboratories. See
+	Section <A HREF="node9.html#PVM">1.6</A> for more notes on using PVM.<LI> Edit the
+	various path variables in the <TT>Makefile</TT> to match where
+	you installed the distribution and where the PVM and LP
+	libraries and header files reside for each architecture on
+	your network. Other architecture-dependent variables should
+	also be set as required.<LI> Type ``<TT>make all</TT>'' in the
+	SYMPHONY root directory. This should make all of the
+	executables for the sample application, a vehicle routing
+	problem solver.<LI> Make sure there are links from your
+	$PVM_ROOT/bin/$PVM_ARCH/ directory to each of the
+	executables in the User/bin.$REV directory. This is
+	required by PVM.<LI> Start the PVM daemon by typing &quot;pvm&quot; on
+	the command line.<LI> Run the sample application by typing
+	``<TT>master User/par/sample.par</TT>''.
+</UL>
+This should result in the solution of a small vehicle routing problem.
+Check out <TT><A NAME="tex2html4" HREF="http://branchandcut.org/VRP/">http://branchandcut.org/VRP/</A></TT> if you want to solve more vehicle
+routing problems. Once you have accomplished this much, you are well
+on your way to having an application of your own. Don't be daunted by
+the seemingly endless list of user function that you are about to
+encounter. Most of them are optional or have default options. If you
+get lost, consult the source code for the sample application to see
+how it's done.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

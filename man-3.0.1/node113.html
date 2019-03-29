@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_logical_fixing</TITLE>
+<META NAME="description" CONTENT="user_logical_fixing">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node114.html">
+<LINK REL="previous" HREF="node112.html">
+<LINK REL="up" HREF="node92.html">
+<LINK REL="next" HREF="node114.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1749"
+  HREF="node114.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1745"
+  HREF="node92.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1739"
+  HREF="node112.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1747"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1750"
+  HREF="node114.html">user_generate_column</A>
+<B>Up:</B> <A NAME="tex2html1746"
+  HREF="node92.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1740"
+  HREF="node112.html">user_send_lp_solution</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION0001121800000000000000">
+user_logical_fixing</A>
+</H3>
+<PRE>
+int user_logical_fixing(void *user, int varnum, var_desc **vars, 
+                        double *x, char *status)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+Logical fixing is modifying the stati of variables based on logical
+implications derived from problem-specific information. In this
+function the user can modify the status of any variable. Valid stati
+are: <TT>NOT_FIXED</TT>, <TT>TEMP_FIXED_TO_LB</TT>, <TT>PERM_FIXED_TO_LB</TT>, <TT>TEMP_FIXED_TO_UB</TT> and <TT>PERM_FIXED_TO_UB</TT>. Be forewarned that fallaciously fixing a
+variable in this function can cause the algorithm to terminate
+improperly. Generally, a variable can only be fixed permanently if the
+matrix is <EM>full</EM> at the time of the fixing (i.e. all variables
+that are not fixed are in the matrix). There are no default options.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>The number of variables currently in the LP
+relaxation. (The length of the <TT>*vars</TT> and <TT>x</TT> arrays.)</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>var_desc **vars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>The variables currently in the LP relaxation.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *x</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Values of the above variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char *status</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Stati of variables currently in the LP
+relaxation.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. Ignored by SYMPHONY.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User changed the stati of the variables she
+wanted.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>fix_variables()</TT> after doing reduced cost
+fixing, but only when a specified number of variables have been fixed
+by reduced cost (see LP parameter settings).
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html1749"
+  HREF="node114.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1745"
+  HREF="node92.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1739"
+  HREF="node112.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1747"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1750"
+  HREF="node114.html">user_generate_column</A>
+<B>Up:</B> <A NAME="tex2html1746"
+  HREF="node92.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1740"
+  HREF="node112.html">user_send_lp_solution</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Computing Environment</TITLE>
+<META NAME="description" CONTENT="Computing Environment">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node14.html">
+<LINK REL="previous" HREF="node12.html">
+<LINK REL="up" HREF="node12.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html187"
+ HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html185"
+ HREF="node12.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html179"
+ HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html188"
+ HREF="node14.html">Configuration of the Modules</A>
+<B>Up:</B> <A NAME="tex2html186"
+ HREF="node12.html">The Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html180"
+ HREF="node12.html">The Design of SYMPHONY</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00041000000000000000">
+Computing Environment</A>
+</H2>
+
+<P>
+SYMPHONY is written in C and has been ported to various Unix
+platforms. It should also be possible to port it to non-Unix
+environments, such as Windows NT, without difficulty. The distributed
+version of SYMPHONY requires the <EM><A NAME="tex2html11"
+ HREF="http://www.ccs.ornl.gov/pvm/">Parallel
+Virtual Machine</A></EM> (PVM) message-passing
+library, which is available free for most platforms from Oak Ridge
+National Laboratories [<A
+ HREF="node34.html#pvm">9</A>]. Compiling the code for shared memory
+architectures requires an OpenMP compliant compiler. Of course, PVM
+can also be utilized in shared memory environments, but it will not be as
+efficient. 
+
+<P>
+The processing speed and memory required to run SYMPHONY
+vary with the size and difficulty of problems being solved. It can be
+run using as little as a few Megabytes of memory to as much as several
+Gigabytes for large, long-running problems. The disk space required
+depends on the level of output chosen, as well whether data logging is
+utilized. The logging option can produce files of several hundred
+Megabytes or even several Gigabytes.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

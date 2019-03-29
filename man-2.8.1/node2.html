@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>A Brief History</TITLE>
+<META NAME="description" CONTENT="A Brief History">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node3.html">
+<LINK REL="previous" HREF="node1.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node3.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html234"
+ HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html231"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html225"
+ HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html233"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html235"
+ HREF="node3.html">Related Work</A>
+<B>Up:</B> <A NAME="tex2html232"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html226"
+ HREF="node1.html">Contents</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00020000000000000000">
+A Brief History</A>
+</H1>
+
+<P>
+Since the inception of optimization as a recognized field of study in
+mathematics, researchers have been both intrigued and stymied by the
+difficulty of solving many of the most interesting classes of discrete
+optimization problems. Even combinatorial problems, though
+conceptually easy to model as integer programs, have long remained
+challenging to solve in practice. The last two decades have seen
+tremendous progress in our ability to solve large-scale discrete
+optimization problems. These advances have culminated in the approach
+that we now call <I>branch and cut</I>, a technique (see [<A
+ HREF="node136.html#GJ&amp;R">15</A>,<A
+ HREF="node136.html#P&amp;R">27</A>,<A
+ HREF="node136.html#H&amp;P">17</A>]) which brings the computational tools of branch and bound
+algorithms together with the theoretical tools of polyhedral
+combinatorics. Indeed, in 1998, Applegate, Bixby, Chv&#225;tal, and Cook
+used this technique to solve a <EM>Traveling Salesman Problem</EM>
+instance with 13,509 cities, a full order of magnitude larger than
+what had been possible just a decade earlier [<A
+ HREF="node136.html#concorde">1</A>] and two
+orders of magnitude larger than the largest problem that had been
+solved up until 1978. This feat becomes even more impressive when one
+realizes that the number of variables in the standard formulation for
+this problem is approximately the <EM>square</EM> of the number of
+cities. Hence, we are talking about solving a problem with roughly
+<EM>100 million variables</EM>.
+
+<P>
+There are several reasons for this impressive progress. Perhaps the
+most important is the dramatic increase in available computing power
+over the last decade, both in terms of processor speed and memory.
+This increase in the power of hardware has subsequently facilitated
+the development of increasingly sophisticated software for
+optimization, built on a wealth of theoretical results. As software
+development has become a central theme of optimization research
+efforts, many theoretical results have been ``re-discovered'' in light
+of their new-found computational importance. Finally, the use of
+parallel computing has allowed researchers to further leverage their
+gains.
+
+<P>
+Because of the rapidly increasing sophistication of computational
+techniques, one of the main difficulties faced by researchers who wish
+to apply these techniques is the level of effort required to develop
+an efficient implementation. The inherent need for incorporating
+problem-dependent methods (most notably for dynamic generation of
+variables and cutting planes) has typically required the
+time-consuming development of custom implementations. Around 1993,
+this led to the development by two independent research groups of
+software libraries aimed at providing a generic framework that users
+could easily customize for use in a particular problem setting. One of
+these groups, headed by J&#252;nger and Thienel, eventually produced
+ABACUS (A Branch And CUt System) [<A
+ HREF="node136.html#abacus1">18</A>], while the other,
+headed by the authors, produced what was then known as COMPSys
+(Combinatorial Optimization Multi-processing System). After several
+revisions to enable more broad functionality, COMPSys became SYMPHONY
+(Single- or Multi-Process Optimization over Networks). 
+A version of SYMPHONY written in C++, which we call
+COIN/BCP has also been produced at IBM under the COIN-OR project
+[<A
+ HREF="node136.html#coin-or">8</A>]. The COIN/BCP package takes substantially the same
+approach and has the same functionality as SYMPHONY, but has extended
+SYMPHONY's capabilities in some areas.
+
+<P>
+<HR>
+<A NAME="tex2html234"
+ HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html231"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html225"
+ HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html233"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html235"
+ HREF="node3.html">Related Work</A>
+<B>Up:</B> <A NAME="tex2html232"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html226"
+ HREF="node1.html">Contents</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,225 @@
+\begin{thebibliography}{10}
+
+\bibitem{concorde2}
+D.~Applegate, R.~Bixby, V.~Chv\'atal, and W.~Cook.
+\newblock {CONCORDE} {TSP} solver.
+\newblock http://www.tsp.gatech.edu/concorde.html.
+
+\bibitem{concorde}
+D.~Applegate, R.~Bixby, V.~Chv\'atal, and W.~Cook.
+\newblock On the solution of traveling salesman problems.
+\newblock {\em Documenta Mathematica}, Extra Volume Proceedings ICM III
+  (1998):645--656, 1998.
+
+\bibitem{MIPO}
+E.~Balas, S.~Ceria, and G.~Cornu\'ejols.
+\newblock Mixed 0-1 programming by lift-and-project in a branch-and-cut
+  framework.
+\newblock {\em Management Science}, 42:1229--1246, 1996.
+
+\bibitem{barn:branc}
+C.~Barnhart, E.~L. Johnson, G.~L. Nemhauser, M.~W.~P. Savelsbergh, and P.~H.
+  Vance.
+\newblock Branch and price: Column generation for solving huge integer
+  programs.
+\newblock {\em Operations Research}, 46:316--329, 1998.
+
+\bibitem{BoB}
+M.~Benchouche, V.-D. Cung, S.~Dowaji, B.~Le Cun, T.~Mautor, and C.~Roucairol.
+\newblock Building a parallel branch and bound library.
+\newblock In {\em in Solving Combinatorial Optimization Problems in Parallel,
+  Lecture Notes in Computer Science {\bf 1054}}, page 201. Springer, Berlin,
+  1996.
+
+\bibitem{bowman76}
+V.~J. Bowman.
+\newblock On the relationship of the {T}chebycheff norm and the efficient
+  frontier of multiple-criteria objectives.
+\newblock In H.~Thieriez, editor, {\em Multiple Criteria Decision Making},
+  pages 248--258. Springer, Berlin, 1976.
+
+\bibitem{chen:fatcop2}
+Q.~Chen, M.~C. Ferris, and J.~T. Linderoth.
+\newblock Fatcop 2.0: Advanced features in an opportunistic mixed integer
+  programming solver.
+\newblock {\em Annals of Operations Research}, 103:17--32, 2001.
+
+\bibitem{climaco97}
+J.~Climaco, C.~Ferreira, and M.E. Captivo.
+\newblock Multicriteria integer programming: an overview of different
+  algorithmic approaches.
+\newblock In J.~Climaco, editor, {\em Multicriteria Analysis}, pages 248--258.
+  Springer, Berlin, 1997.
+
+\bibitem{bc-opt}
+C.~Cordier, H.~Marchand, R.~Laundy, and L.A. Wolsey.
+\newblock bc-opt: A branch-and-cut code for mixed integer programs.
+\newblock {\em Mathematical Programming}, 86:335--353, 1999.
+
+\bibitem{cplex}
+ILOG~CPLEX Division.
+\newblock \texttt{http://www.cplex.com}.
+
+\bibitem{PICO}
+J.~Eckstein, C.A. Phillips, and W.E. Hart.
+\newblock {PICO}: An object-oriented framework for parallel branch and bound.
+\newblock Technical Report RRR 40-2000, Rutgers University, 2000.
+
+\bibitem{ehrgott00}
+M.~Ehrgott and X.~Gandibleux.
+\newblock A survey and annotated bibliography of multiobjective combinatorial
+  optimization.
+\newblock {\em OR Spektrum}, 22:425--460, 2000.
+
+\bibitem{ehrgott02}
+M.~Ehrgott and X.~Gandibleux.
+\newblock Multiobjective combinatorial optimization---theory, methodology and
+  applications.
+\newblock In M.~Ehrgott and X.~Gandibleux, editors, {\em Multiple Criteria
+  Optimization---State of the Art Annotated Bibliographic Surveys}, pages
+  369--444. Kluwer Academic Publishers, Boston, MA, 2002.
+
+\bibitem{ehrgott04}
+M.~Ehrgott and M.M. Wiecek.
+\newblock Multiobjective programming.
+\newblock In M.~Ehrgott, J.~Figueira, and S.~Greco, editors, {\em State of the
+  Art of Multiple Criteria Decision Analysis}, Boston, MA, 2004. Kluwer
+  Academic Publishers.
+
+\bibitem{eswaran89}
+P.~K. Eswaran, A.~Ravindran, and H.~Moskowitz.
+\newblock Algorithms for nonlinear integer bicriterion problems.
+\newblock {\em Journal of Optimization Theory and Applications},
+  63(2):261--279, 1989.
+
+\bibitem{PVMbook}
+A.~Geist, A.~Beguelin, J.~Dongarra, W.~Jiang, R.~Manchek, and V.~Sunderam.
+\newblock {\em {PVM}: Parallel Virtual Machine}.
+\newblock The {MIT} Press, Cambridge, MA, 1994.
+
+\bibitem{gend:paral}
+B.~Gendron and T.~G. Crainic.
+\newblock Parallel branch and bound algorithms: Survey and synthesis.
+\newblock {\em Operations Research}, 42:1042--1066, 1994.
+
+\bibitem{geoff68}
+A.~M. Geoffrion.
+\newblock Proper efficiency and the theory of vector maximization.
+\newblock {\em Journal of Mathematical Analysis and Applications}, 22:618--630,
+  1968.
+
+\bibitem{GraKum99}
+A.Y. Grama and V.~Kumar.
+\newblock State of the art in parallel search techniques for discrete
+  optimization problems.
+\newblock {\em IEEE Transactions on Knowledge and Data Engineering}, 11:1--8,
+  1999.
+
+\bibitem{Grotschel84cut}
+M.~Gr\"otschel, M.~J\"unger, and G.~Reinelt.
+\newblock A cutting plane algorithm for the linear ordering problem.
+\newblock {\em Operations Research}, 32(6):1195--1220, 1984.
+
+\bibitem{hoff:LP}
+K.~Hoffman and M.~Padberg.
+\newblock {LP}-based combinatorial problem solving.
+\newblock {\em Annals of Operations Research}, 4:145--194, 1985.
+
+\bibitem{flopc++}
+T.H. Hultberg.
+\newblock {FlopC++}, 2004.
+\newblock Available from http://www.mat.ua.pt/thh/flopc/.
+
+\bibitem{abacus1}
+M.~J\"unger and S.~Thienel.
+\newblock The {ABACUS} system for branch and cut and price algorithms in
+  integer programming and combinatorial optimization.
+\newblock {\em Software Practice and Experience}, 30:1325--1352, 2001.
+
+\bibitem{kuma:para3}
+V.~Kumar and V.~N. Rao.
+\newblock Parallel depth-first search, part {II}: {A}nalysis.
+\newblock {\em International Journal of Parallel Programming}, 16:501--519,
+  1987.
+
+\bibitem{PARINO}
+J.~Linderoth.
+\newblock {\em Topics in Parallel Integer Optimization}.
+\newblock PhD thesis, School of Industrial and Systems Engineering, Georgia
+  Institute of Technology, Atlanta, GA, 1998.
+
+\bibitem{coin-or}
+R.~Lougee-Heimer.
+\newblock {The Common Optimization INterface for Operations Research}.
+\newblock {\em IBM Journal of Research and Development}, 47:57--66, 2003.
+
+\bibitem{GLPK}
+A.~Makhorin.
+\newblock Introduction to {GLPK}, 2004.
+\newblock Available from \\ http://www.gnu.org/software/glpk/glpk.html.
+
+\bibitem{SIP}
+A.~Martin.
+\newblock Integer programs with block structure.
+\newblock Habilitation Thesis, Technical University of Berlin, Berlin, Germany,
+  1998.
+
+\bibitem{MINTO}
+G.L. Nemhauser, M.W.P. Savelsbergh, and G.S. Sigismondi.
+\newblock {MINTO}, a {M}ixed {INT}eger {O}ptimizer.
+\newblock {\em Operations Research Letters}, 15:47--58, 1994.
+
+\bibitem{nemwol88}
+G.L. Nemhauser and L.A. Wolsey.
+\newblock {\em {Integer and Combinatorial Optimization}}.
+\newblock Wiley, New York, 1988.
+
+\bibitem{padb:branc}
+M.~W. Padberg and G.~Rinaldi.
+\newblock A branch and cut algorithm for the solution of large scale traveling
+  salesman problems.
+\newblock {\em {SIAM} Review}, 33:60--100, 1991.
+
+\bibitem{symphony1}
+T.K. Ralphs and L.~Lad\'anyi.
+\newblock {\em SYMPHONY Version 4.0 User's Manual}, 2004.
+\newblock \texttt{http://www.brandandcut.org}.
+
+\bibitem{WCN}
+T.K. Ralphs, M.J. Saltzman, and M.M. Wiecek.
+\newblock An improved algorithm for biobjective integer programming and its
+  application to network routing problems.
+\newblock To appear in Annals of Operations Research, 2004.
+
+\bibitem{kuma:para4}
+V.~N. Rao and V.~Kumar.
+\newblock Parallel depth-first search, part {I}: {I}mplementation.
+\newblock {\em International Journal of Parallel Programming}, 16:479--499,
+  1987.
+
+\bibitem{PUBB}
+Y.~Shinano, K.~Harada, and R.~Hirabayashi.
+\newblock A generalized utility for parallel branch and bound algorithms.
+\newblock In {\em Proceedings of the 1995 Seventh Symposium on Parallel and
+  Distributed Processing}, pages 392--401, Los Alamitos, CA, 1995. IEEE
+  Computer Society Press.
+
+\bibitem{solanki91}
+R.~Solanki.
+\newblock Generating the noninferior set in mixed integer biobjective linear
+  programs: an application to a location problem.
+\newblock {\em Computers and Operations Research}, 18:1--15, 1991.
+
+\bibitem{PPBB-Lib}
+S.~Tschoke and T.~Polzer.
+\newblock {\em Portable Parallel Branch and Bound Library User Manual: Library
+  Version 2.0}.
+\newblock Department of Computer Science, University of Paderborn.
+
+\bibitem{ALPS2}
+Y.~Xu, T.K. Ralphs, L.~Lad\'anyi, and M.J. Saltzman.
+\newblock {ALPS}: A framework for implementing parallel search algorithms.
+\newblock to appear in the Proceedings of the Ninth Conference of the INFORMS
+  Computing Society, 2004.
+
+\end{thebibliography}

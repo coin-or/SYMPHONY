@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Parameter file</TITLE>
+<META NAME="description" CONTENT="Parameter file">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html1288" HREF="node88.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html1286" HREF="man.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html1280" HREF="node86.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html1290" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html1289" HREF="node88.html">Global parameters</A>
+<B>Up:</B> <A NAME="tex2html1287" HREF="man.html">SYMPHONY Tutorial</A>
+<B> Previous:</B> <A NAME="tex2html1281" HREF="node86.html">user_interpret_text</A>
+<BR> <P>
+<H1><A NAME="SECTION00040000000000000000">Parameter file</A></H1>
+<P>
+<A NAME="parameter_file">&#160;</A>
+The parameter file name is passed to SYMPHONY as the only command line
+argument to the master process which is started by the user. Each line
+of the parameter file contains either a comment or two words - a
+keyword and a value, separated by white space. If the first word
+(sequence of non-white-space characters) on a line is not a keyword,
+then the line is considered a comment line. Otherwise the parameter
+corresponding to the keyword is set to the listed value. Usually the
+keyword is the same as the parameter name in the source code. Here we
+list the keywords, the type of value that should be given with the
+keywords and the default value. A parameter corresponding to keyword
+``K'' in process ``P'' can also be set by using the keyword ``P_K''.
+<P>
+To make this list shorter, occasionally a comma separated list of parameters
+is given if the meanings of those parameters are strongly
+connected. For clarity, the constant name is sometimes given instead
+of the numerical value for default settings and options. The
+corresponding value is given in curly braces for convenience.
+<P>
+<BR> <HR>
+<UL> 
+<LI> <A NAME="tex2html1291" HREF="node88.html#SECTION00041000000000000000">Global parameters</A>
+<LI> <A NAME="tex2html1292" HREF="node89.html#SECTION00042000000000000000">Master Process parameters</A>
+<LI> <A NAME="tex2html1293" HREF="node90.html#SECTION00043000000000000000">Draw Graph parameters</A>
+<LI> <A NAME="tex2html1294" HREF="node91.html#SECTION00044000000000000000">Tree Manager parameters</A>
+<LI> <A NAME="tex2html1295" HREF="node92.html#SECTION00045000000000000000">LP parameters</A>
+<LI> <A NAME="tex2html1296" HREF="node93.html#SECTION00046000000000000000">Cut Generator Parameters</A>
+<LI> <A NAME="tex2html1297" HREF="node94.html#SECTION00047000000000000000">Cut Pool Parameters</A>
+</UL>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

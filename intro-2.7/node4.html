@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Branch and Cut</TITLE>
+<META NAME="description" CONTENT="Branch and Cut">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html87" HREF="node5.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html85" HREF="node2.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html81" HREF="node3.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html88" HREF="node5.html">Parallelizing Branch and Cut</A>
+<B>Up:</B> <A NAME="tex2html86" HREF="node2.html">Branch and Cut Algorithms</A>
+<B> Previous:</B> <A NAME="tex2html82" HREF="node3.html">Branch and Bound</A>
+<BR> <P>
+<H2><A NAME="SECTION00022000000000000000">Branch and Cut</A></H2>
+<P>
+<EM>Branch and cut</EM> is a specific implementation of branch and bound
+that was first suggested in the seminal work on the subject by Padberg
+and Rinaldi [<A HREF="node34.html#PSPMampR">19</A>] for solving the well-known <EM>Traveling
+Salesman Problem</EM>. Since then, many implementations (including ours)
+have been fashioned after their ideas. In branch and cut, the bounding
+operation is accomplished using the tools of linear programming.
+Typically, the integrality constraints of an integer programming
+formulation of the problem are relaxed to obtain a <EM>
+linear programming (LP) relaxation</EM> and then this
+formulation is strengthened by adding <EM>cutting planes</EM>, i.e.
+inequalities valid for the convex hull of solutions to the original
+problem.
+<P>
+<P><A NAME="119">&#160;</A><A NAME="procbound">&#160;</A> <IMG WIDTH=661 HEIGHT=406 ALIGN=BOTTOM ALT="figure70" SRC="img6.gif"  > <BR>
+<STRONG>Figure 1:</STRONG> Bounding in the branch and cut algorithm<BR>
+<P>
+For example, let a combinatorial optimization problem  <IMG WIDTH=94 HEIGHT=27 ALIGN=MIDDLE ALT="tex2html_wrap_inline853" SRC="img7.gif"  >  with <EM>ground set</EM> <I>E</I> and feasible set  <IMG WIDTH=56 HEIGHT=33 ALIGN=MIDDLE ALT="tex2html_wrap_inline857" SRC="img8.gif"  >  be given along with a cost function  <IMG WIDTH=52 HEIGHT=31 ALIGN=MIDDLE ALT="tex2html_wrap_inline859" SRC="img9.gif"  > .
+The incidence vectors corresponding to the members of  <IMG WIDTH=14 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline861" SRC="img10.gif"  >  are
+usually specified as the the set of all incidence vectors obeying a
+(relatively) small set of inequalities. These inequalities are
+typically the ones used in the initial LP relaxation. Now let  <IMG WIDTH=12 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline863" SRC="img11.gif"  >  be the convex hull of incidence vectors of members of  <IMG WIDTH=14 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline861" SRC="img10.gif"  > . Then we know by Weyl's Theorem (see [<A HREF="node34.html#NSPMampW">18</A>]) that there exists
+a finite set  <IMG WIDTH=11 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline867" SRC="img12.gif"  >  of inequalities valid for  <IMG WIDTH=12 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline863" SRC="img11.gif"  >  such that
+<P><A NAME="thepolyhedron">&#160;</A> <IMG WIDTH=500 HEIGHT=19 ALIGN=BOTTOM ALT="equation133" SRC="img13.gif"  > <P>
+The inequalities in  <IMG WIDTH=11 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline867" SRC="img12.gif"  >  are the potential cutting planes to be
+added to the relaxation as needed. Unfortunately, it is usually
+difficult, if not impossible, to enumerate all of inequalities in
+ <IMG WIDTH=11 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline867" SRC="img12.gif"  >  or we could simply solve the problem using linear
+programming. Instead, we use separation algorithms and heuristics to
+generate these inequalities when they are violated. In Figure
+<A HREF="node4.html#procbound">1</A>, we describe more precisely how the bounding
+operation is carried out in branch and cut. <BR> 
+<P><A NAME="168">&#160;</A><A NAME="branchingfig">&#160;</A> <IMG WIDTH=661 HEIGHT=168 ALIGN=BOTTOM ALT="figure135" SRC="img14.gif"  > <BR>
+<STRONG>Figure 2:</STRONG> Branching in the branch and cut algorithm<BR>
+<P>
+Once we have failed to either prune the current subproblem or separate
+the current fractional solution from  <IMG WIDTH=12 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline863" SRC="img11.gif"  > , we are forced to
+branch. The branching operation is accomplished by specifying a set of
+hyperplanes which divide the current subproblem in such a way that the
+current solution is not feasible for the LP relaxation of any of the
+new subproblems. For example, in a combinatorial optimization problem,
+branching could be accomplished simply by fixing a variable whose
+current value is fractional to 0 in one branch and 1
+in the other. The procedure is described more formally in Figure
+<A HREF="node4.html#branchingfig">2</A>. Figure <A HREF="node4.html#gbSPMampc">3</A> gives a high level description
+of the entire generic branch and cut algorithm.
+<P><A NAME="202">&#160;</A><A NAME="gbSPMampc">&#160;</A> <IMG WIDTH=661 HEIGHT=298 ALIGN=BOTTOM ALT="figure167" SRC="img15.gif"  > <BR>
+<STRONG>Figure 3:</STRONG> Description of the generic branch and cut algorithm<BR>
+<P>
+<P>
+In the remainder of the paper, we will sometimes refer to the <EM>
+search tree</EM>. This term is derived from the useful practice of viewing
+the list of subproblems processed during the algorithm as the nodes of
+a graph in which each subproblem is connected to its parent. This
+graph is known as the <EM>search tree</EM>. Since the subproblems
+correspond to the nodes of this graph, they will sometimes be referred
+to as <EM>nodes in the search tree</EM> or simply as <EM>nodes</EM>. The
+<EM>root node</EM> or <EM>root</EM> of the tree is the first node from which
+all others descend.
+<P>
+<HR><A NAME="tex2html87" HREF="node5.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html85" HREF="node2.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html81" HREF="node3.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html88" HREF="node5.html">Parallelizing Branch and Cut</A>
+<B>Up:</B> <A NAME="tex2html86" HREF="node2.html">Branch and Cut Algorithms</A>
+<B> Previous:</B> <A NAME="tex2html82" HREF="node3.html">Branch and Bound</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 14:31:17 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

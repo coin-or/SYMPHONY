@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Inter-process Communication</TITLE>
+<META NAME="description" CONTENT="Inter-process Communication">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node96.html">
+<LINK REL="previous" HREF="node94.html">
+<LINK REL="up" HREF="node93.html">
+<LINK REL="next" HREF="node96.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1696"
+  HREF="node96.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1692"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1686"
+  HREF="node94.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1694"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1697"
+  HREF="node96.html">Fault Tolerance</A>
+<B>Up:</B> <A NAME="tex2html1693"
+  HREF="node93.html">Parallelizing BCP</A>
+<B> Previous:</B> <A NAME="tex2html1687"
+  HREF="node94.html">Parallel Configurations</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00552000000000000000">
+Inter-process Communication</A>
+</H2>
+
+<P>
+SYMPHONY can utilize any third-party communication protocol supporting basic
+message-passing functions. All communication subroutines interface with
+SYMPHONY through a separate communications API. Currently, PVM [<A
+ HREF="node282.html#PVMbook">15</A>]
+is the only message-passing protocol supported, but interfacing with another
+protocol is a straightforward exercise.
+
+<P>
+Additionally, it is possible to configure the code to run in parallel using
+threading to process multiple search tree nodes simultaneously. Currently,
+this is implemented using OpenMP compiler directives to specify the parallel
+regions of the code and perform memory locking functions. Compiling the code
+with an OpenMP compliant compiler will result in a shared-memory parallel
+executable. For a list of OpenMP compliant compilers and other resources,
+visit 
+<FONT COLOR="#a52a2a"><TT><TT><A NAME="tex2html27"
+  HREF="http://www.openmp.org">http://www.openmp.org</A></TT></TT></FONT>.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2009-07-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

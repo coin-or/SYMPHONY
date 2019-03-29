@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Building From Source</TITLE>
+<META NAME="description" CONTENT="Building From Source">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html569"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html565"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html561"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html567"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html570"
+  HREF="node14.html">External Dependencies</A>
+<B>Up:</B> <A NAME="tex2html566"
+  HREF="node9.html">Installing SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html562"
+  HREF="node12.html">Installation for Use With</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00320000000000000000"></A> 
+<A NAME="building_from_source"></A>
+<BR>
+Building From Source
+</H1>
+
+<P>
+SYMPHONY can now use the COIN-OR build system and the GNU autotools to
+automate the build process. The build process should therefore be identical in
+all Unix-like environments. It is even possible to use this system to build
+COIN in Windows using the Microsoft Visual C++ compiler if you have MinGW
+(<TT><A NAME="tex2html7"
+  HREF="http://www.mingw.org">http://www.mingw.org</A></TT>) installed (you need the GNU 
+<FONT COLOR="#a52a2a"><TT>make</TT></FONT> command).
+The instructions below will lead you through the steps required to compile
+SYMPHONY as a generic MILP solver. This process will create (1) a generic
+callable library that allows SYMPHONY to be called from a C or C++ code and
+(2) an executable that can be used as a stand-alone application to solve MILPs
+written in either MPS or GMPL file format. SYMPHONY can be further customized
+by implementing one of more than 50 callback functions that change SYMPHONY's
+default behavior. For information on customizing SYMPHONY using callbacks, a
+quick start guide is provided below. More detailed information is provided in
+Chapter&nbsp;<A HREF="node97.html#SYMPHONY-development">5</A>.
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html571"
+  HREF="node14.html">External Dependencies</A>
+<UL>
+<LI><A NAME="tex2html572"
+  HREF="node15.html">The LP Engine</A>
+<LI><A NAME="tex2html573"
+  HREF="node16.html">GMPL Parser</A>
+<LI><A NAME="tex2html574"
+  HREF="node17.html">COIN Libraries</A>
+<LI><A NAME="tex2html575"
+  HREF="node18.html">GNU Libraries</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html576"
+  HREF="node19.html">Building in Unix-like environments</A>
+<UL>
+<LI><A NAME="tex2html577"
+  HREF="node20.html">Downloading</A>
+<LI><A NAME="tex2html578"
+  HREF="node21.html">Configuring</A>
+<LI><A NAME="tex2html579"
+  HREF="node22.html">Building</A>
+<LI><A NAME="tex2html580"
+  HREF="node23.html">Building for parallel architectures</A>
+<UL>
+<LI><A NAME="tex2html581"
+  HREF="node24.html">Shared-memory architectures.</A>
+<LI><A NAME="tex2html582"
+  HREF="node25.html">Distributed-memory architectures</A>
+</UL>
+<LI><A NAME="tex2html583"
+  HREF="node26.html">Building SYMPHONY Applications</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html584"
+  HREF="node27.html">Building Using Microsoft Visual C++</A>
+<UL>
+<LI><A NAME="tex2html585"
+  HREF="node28.html">Building with the MSVC++ Graphical Interface</A>
+<LI><A NAME="tex2html586"
+  HREF="node29.html">Building in a Windows Terminal</A>
+<LI><A NAME="tex2html587"
+  HREF="node30.html">Building with the MSVC++ compiler in CYGWIN</A>
+<LI><A NAME="tex2html588"
+  HREF="node31.html">Building with the NMAKE Utility</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html589"
+  HREF="node32.html">Building SYMPHONY Applications</A>
+<UL>
+<LI><A NAME="tex2html590"
+  HREF="node33.html">Building With the MSVC++ IDE</A>
+<LI><A NAME="tex2html591"
+  HREF="node34.html">Building in a Windows Terminal</A>
+<LI><A NAME="tex2html592"
+  HREF="node35.html">Using the NMAKE Utility</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-10-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

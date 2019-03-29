@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>User-written Functions</TITLE>
+<META NAME="description" CONTENT="User-written Functions">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html137" HREF="node5.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html135" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html129" HREF="node3.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html138" HREF="node5.html">Data Structures</A>
+<B>Up:</B> <A NAME="tex2html136" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html130" HREF="node3.html">Source Files</A>
+<BR> <P>
+<H2><A NAME="SECTION00013000000000000000">User-written Functions</A></H2>
+<P>
+The majority of the user functions are called from either the master
+process or the LP process. For these two modules, user functions are
+invoked from so-called <EM>wrapper functions</EM> that provide the
+interface. Each wrapper function is named <TT>*_u()</TT> , where <TT>*</TT>
+is the name of the corresponding user function, and is defined in a
+file called <TT>*_wrapper.c</TT>. The wrapper function first collects
+the necessary data and hands it to the user by calling the user
+function. Based on the return value from the user, the wrapper then
+performs any necessary post-processing. Most user functions are
+designed so that the user can do as little or as much as she likes.
+Where it is feasible, there are default options that allow the user to
+do nothing if the default behavior is acceptable. This is not possible
+in all cases and the user must provide certain functions, such as
+separation.
+<P>
+In the next section, the user functions will be described in detail.
+The name of every user written function starts with <TT>user_</TT>.
+There are three kinds of arguments:
+<DL ><DT><STRONG>IN:</STRONG>
+<DD> An argument containing information that the user might need
+to perform the function.
+<DT><STRONG>OUT:</STRONG>
+<DD> A pointer to an argument in which the user should
+return a result (requested data, decision, etc.) of the function. 
+<DT><STRONG>INOUT:</STRONG>
+<DD> An argument which contains information the user might need,
+but also for which the user can change the value.
+<P>
+ </DL>
+The return values from each function are as follows:
+<DL ><DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=704 HEIGHT=254 ALIGN=BOTTOM ALT="tabular168" SRC="img2.gif"  > <P>
+<P>
+<DT><STRONG>Notes:</STRONG>
+<DD> 
+<UL><LI> Sometimes an output is optional. This will always be noted in the
+function descriptions.<LI> If an array has to be returned (i.e., the argument is <TT>type
+**array</TT>) then (unless otherwise noted) the user has to allocate space
+for the array itself and set <TT>*array</TT> to be the array allocated.
+If an output array is optional then the user <EM>must not</EM> set <TT>
+*array</TT> for the array she is not going to fill up because this is how
+SYMPHONY decides which optional arrays are filled up.<LI> Some built-in options are implemented so that the user can invoke them
+directly from the user function. This might be useful if, for example,
+the user wants to use different built-in options at different stages
+of the algorithm, or if he wants to do the post-processing himself but
+does not want to implement the option itself.
+</UL> 
+ </DL><HR><A NAME="tex2html137" HREF="node5.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html135" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html129" HREF="node3.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html138" HREF="node5.html">Data Structures</A>
+<B>Up:</B> <A NAME="tex2html136" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html130" HREF="node3.html">Source Files</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

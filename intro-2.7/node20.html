@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>The Master Process</TITLE>
+<META NAME="description" CONTENT="The Master Process">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html269" HREF="node21.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html267" HREF="node19.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html261" HREF="node19.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html270" HREF="node21.html">The LP Process</A>
+<B>Up:</B> <A NAME="tex2html268" HREF="node19.html">Implementation of the Modules</A>
+<B> Previous:</B> <A NAME="tex2html262" HREF="node19.html">Implementation of the Modules</A>
+<BR> <P>
+<H2><A NAME="SECTION00051000000000000000">The Master Process</A></H2>
+<P>
+<A NAME="master">&#160;</A>
+<P>
+The primary functions performed by the master process were listed in
+Section <A HREF="node6.html#masterprocess">3.1</A>. If needed, the user must provide a
+routine to read problem-specific parameters in from the parameter
+file. She must also provide a subroutine for upper bounding if
+that is desired. A good initial upper bound can dramatically decrease
+the solution time by allowing more variable-fixing and earlier
+pruning of search tree nodes. If no upper bounding subroutine is
+available, then the two-phase algorithm, in which a good upper bound
+is found quickly in the first phase using a reduced set of variables,
+is recommended. See Section <A HREF="node27.html#twophase">5.3.2</A> for details. The user's
+only unavoidable obligation during pre-processing is to specify the
+list of base variables and, if desired, the list of extra
+variables that are to be active in the root node. Again, the selection
+of a good set of base variables can make a marked difference in
+solution speed, especially in the two-phase algorithm.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 14:31:17 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

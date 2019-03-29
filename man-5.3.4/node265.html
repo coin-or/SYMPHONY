@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_check_cut</TITLE>
+<META NAME="description" CONTENT="user_check_cut">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node266.html">
+<LINK REL="previous" HREF="node264.html">
+<LINK REL="up" HREF="node261.html">
+<LINK REL="next" HREF="node266.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4184"
+  HREF="node266.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4180"
+  HREF="node261.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4174"
+  HREF="node264.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4182"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4185"
+  HREF="node266.html">user_finished_checking_cuts</A>
+<B>Up:</B> <A NAME="tex2html4181"
+  HREF="node261.html">Cut pool module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html4175"
+  HREF="node264.html">user_prepare_to_check_cuts</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00734400000000000000"></A>
+<A NAME="user_check_cuts"></A>
+<BR>
+user_check_cut
+</H3>
+[cf]user_check_cut
+<PRE>
+int user_check_cut(void *user, double lpetol, int varnum, 
+                   int *indices, double *values, cut_data *cut,
+                   int *is_violated, double *quality)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+The user has to determine whether a given cut is violated by the given
+LP solution (see Section <A HREF="node224.html#user-written-lp">6.3.2</A> for a description of
+the <TT><A HREF="node229.html#cut_data">cut_data data</A></TT> data structure). Also,
+the user can assign a number to the cut called the <EM>quality</EM>. This
+number is used in deciding which cuts to check and purge. See the
+section on <A HREF="node280.html#cut_pool_params">Cut Pool Parameters</A> for more
+information.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>The user defined part of p.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double lpetol</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>The <SPAN CLASS="MATH"><IMG
+ WIDTH="11" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img55.png"
+ ALT="$ \epsilon$"></SPAN> tolerance in the LP module.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>Same as the previous function.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>Same as the previous function.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *values</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>Same as the previous function.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data *cut</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>Pointer to the cut to be tested.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *is_violated</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>TRUE/FALSE based on whether the cut is violated
+or not.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *quality</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=256>a number representing the relative
+strength of the cut.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Cut is not sent to the LP, regardless of the value of
+<TT>*is_violated</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>The user function exited properly.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Same as error.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Invoked from:</STRONG></DT>
+<DD>Whenever a cut needs to be checked.
+
+<P>
+</DD>
+<DT><STRONG>Note:</STRONG></DT>
+<DD>
+
+<P>
+The same note applies to <TT>number</TT>, <TT>indices</TT> and <TT>values</TT> as in
+the previous function.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html4184"
+  HREF="node266.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4180"
+  HREF="node261.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4174"
+  HREF="node264.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4182"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html4185"
+  HREF="node266.html">user_finished_checking_cuts</A>
+<B>Up:</B> <A NAME="tex2html4181"
+  HREF="node261.html">Cut pool module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html4175"
+  HREF="node264.html">user_prepare_to_check_cuts</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-05-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

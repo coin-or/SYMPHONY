@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Master Module</TITLE>
+<META NAME="description" CONTENT="The Master Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node14.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html422"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html418"
+  HREF="node14.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html412"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html420"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html423"
+  HREF="node16.html">The Tree Manager Module</A>
+<B> Up:</B> <A NAME="tex2html419"
+  HREF="node14.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html413"
+  HREF="node14.html">Modular Implementation</A>
+ &nbsp <B>  <A NAME="tex2html421"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00063100000000000000"></A>
+<A NAME="master-process"></A>
+<BR>
+The Master Module
+</H3>
+
+<P>
+The <EM>master module</EM> includes functions that perform problem
+initialization and I/O. These functions implement the
+following tasks:
+
+<UL>
+<LI>Read in the parameters from a data file.
+</LI>
+<LI>Read in the data for the problem instance.
+</LI>
+<LI>Compute an initial upper bound using heuristics.
+</LI>
+<LI>Perform problem preprocessing.
+</LI>
+<LI>Initialize the BCP algorithm by sending data
+        for the root node to the <EM>tree manager</EM>.
+</LI>
+<LI>Initialize output devices and act as a central
+        repository for output.
+</LI>
+<LI>Process requests for problem data.
+</LI>
+<LI>Receive new solutions and store the best one.
+</LI>
+<LI>Receive the message that the algorithm is finished and
+        print out data.
+</LI>
+<LI>Ensure that all modules are still functioning.
+</LI>
+</UL>
+
+<P>
+<BR><HR>
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_send_lp_data</TITLE>
+<META NAME="description" CONTENT="user_send_lp_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node40.html">
+<LINK REL="previous" HREF="node38.html">
+<LINK REL="up" HREF="node28.html">
+<LINK REL="next" HREF="node40.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html678"
+ HREF="node40.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html675"
+ HREF="node28.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html669"
+ HREF="node38.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html677"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html679"
+ HREF="node40.html">user_send_cg_data</A>
+<B>Up:</B> <A NAME="tex2html676"
+ HREF="node28.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html670"
+ HREF="node38.html">user_receive_feasible_solution</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000311100000000000000">&#160;</A>
+<A NAME="user_send_lp_data">&#160;</A>
+<BR>
+user_send_lp_data
+</H3>
+<PRE>
+int user_send_lp_data(void *user, void **user_lp)
+</PRE>
+<P>
+<DL>
+<DD><P>
+<DT><STRONG>Description:</STRONG>
+<DD>
+
+<P>
+The user has to send all problem-specific data that will be needed in
+the LP process to set up the initial LP relaxation and perform later
+computations. This could include instance data, as well as user
+parameter settings. This is one of the few places where the user will
+need to worry about the configuration of the modules. If either the
+tree manager or the LP are running as a separate process (either <TT>COMPILE_IN_LP</TT> or <TT>COMPILE_IN_TM</TT> are <TT>FALSE</TT> in the <TT>make</TT> file), then the data will be sent and received through
+message-passing. See <A HREF="node50.html#user_receive_lp_data"><TT>user_receive_lp_data()</TT></A> for more
+discussion. Otherwise, it can be copied over directly to the
+user-defined data structure for the LP. In the latter case, <TT>*user_lp</TT> is a pointer to the user-defined data structure for the LP
+that must be allocated and initialized. For a discussion of
+message-passing in  SYMPHONY, see Section <A HREF="node11.html#communication">1.7</A>. The code
+for the two cases is put in the same source file by use of <TT>#ifdef</TT> statements. See the comments in the code stub for this
+function for more details.
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> void **user_lp</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Pointer to the user-defined data
+structure for the LP process.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error.  SYMPHONY stops.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Packing is done.</TD>
+</TR>
+</TABLE>
+<P>
+</DL>
+<P>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html678"
+ HREF="node40.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html675"
+ HREF="node28.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html669"
+ HREF="node38.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html677"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html679"
+ HREF="node40.html">user_send_cg_data</A>
+<B>Up:</B> <A NAME="tex2html676"
+ HREF="node28.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html670"
+ HREF="node38.html">user_receive_feasible_solution</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

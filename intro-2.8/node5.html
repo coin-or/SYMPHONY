@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Parallelizing Branch and Cut</TITLE>
+<META NAME="description" CONTENT="Parallelizing Branch and Cut">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node12.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="symphony.html">
+<LINK REL="next" HREF="node6.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html97"
+ HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html95"
+ HREF="symphony.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html89"
+ HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html98"
+ HREF="node6.html">The Master Process</A>
+<B>Up:</B> <A NAME="tex2html96"
+ HREF="symphony.html">SYMPHONY: A Parallel Framework </SUP></A>
+<B> Previous:</B> <A NAME="tex2html90"
+ HREF="node4.html">Branch and Cut</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00030000000000000000">&#160;</A>
+<A NAME="parallelizing">&#160;</A>
+<BR>
+Parallelizing Branch and Cut
+</H1>
+
+<P>
+Because of the clear partitioning of work that occurs when the
+branching operation generates new subproblems, branch and bound
+algorithms lend themselves particularly well to parallelization. As a
+result, there is already a significant body of research on performing
+branch and bound in parallel environments. For a survey of parallel
+branch and bound algorithms, see the article by Gendron and Crainic
+[<A
+ HREF="node34.html#G&amp;C">10</A>].
+
+<P>
+We first define some terms. A <EM>processor</EM>, or <EM>serial
+processor</EM>, refers to a single serial computing device. A <EM>parallel processor</EM> or <EM>parallel machine</EM> consists of multiple
+serial processors which are connected by efficient communication
+pathways. There are two types of parallel processors, <EM>synchronous</EM> and <EM>asynchronous</EM>. In a synchronous model of
+computation, the individual processors use a common central clock and
+hence can synchronize easily. We consider an asynchronous model, in
+which the individual processors run independently and can only
+synchronize with each other through explicit communication. The memory
+of the parallel machine can be either <EM>shared</EM> or <EM>distributed</EM>. In shared memory, all processors read from and write to
+a common memory space. We will use a distributed memory model in which
+each processor only has access to its own memory space. A <EM>process</EM> will refer to a single computer program executing commands
+serially on a single processor. A process can be started directly by
+the user or by another process. In the second case, we say the first
+process <EM>spawns</EM> the second process. The method by which processes
+communicate with each other is called the <EM>communication
+protocol</EM>. We use a <EM>message passing</EM> protocol in which the
+processes communicate by explicitly sending messages to each other. A
+message has a <EM>data array</EM>, a <EM>message tag</EM>, a <EM>sender</EM>,
+and one or more <EM>receivers</EM> associated with it. When one process
+sends a message to another, the second process must explicitly receive
+that message and know the structure of the message by looking at the
+message tag.
+
+<P>
+In parallel branch and cut, there are two major sources of
+parallelism. First, it is clear that any number of subproblems on the
+current candidate list can be processed simultaneously. Once a subproblem
+has been added to the list, it can be properly processed before,
+during, or after the processing of any other subproblem. This is not
+to say that processing a particular node at a different point in the
+algorithm won't produce different results--it most certainly
+will--but the algorithm will terminate correctly in any case.
+
+<P>
+The second major source of parallelism is to parallelize the
+processing of individual subproblems. By allowing separation to be
+performed in parallel with the solution of the linear programs, we can
+theoretically process a node in little more than the amount of time it
+takes to solve the sequence of LP relaxations. Most parallel
+implementations (including ours) employ a master-slave model, in which
+there is a central manager responsible for partitioning the work and
+parceling it out to the various slave processes, which perform the
+actual computation. The computation divides naturally into five
+different process types, which interact with each other through
+message-passing. In the next few sections, we introduce each of these
+five classes of processes and summarize their basic functions. In
+Sections <A HREF="node12.html#design">4</A> and <A HREF="node19.html#modules">5</A>, we will discuss the
+implementation of each process in more detail.
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html99"
+ HREF="node6.html">The Master Process</A>
+<LI><A NAME="tex2html100"
+ HREF="node7.html">The Cut Pool Process</A>
+<LI><A NAME="tex2html101"
+ HREF="node8.html">The Cut Generator Process</A>
+<LI><A NAME="tex2html102"
+ HREF="node9.html">The Linear Programming Process</A>
+<LI><A NAME="tex2html103"
+ HREF="node10.html">The Tree Manager Process</A>
+<LI><A NAME="tex2html104"
+ HREF="node11.html">Algorithm Overview</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html97"
+ HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html95"
+ HREF="symphony.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html89"
+ HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html98"
+ HREF="node6.html">The Master Process</A>
+<B>Up:</B> <A NAME="tex2html96"
+ HREF="symphony.html">SYMPHONY: A Parallel Framework </SUP></A>
+<B> Previous:</B> <A NAME="tex2html90"
+ HREF="node4.html">Branch and Cut</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

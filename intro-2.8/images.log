@@ -1,0 +1,210 @@
+This is TeX, Version 3.14159 (Web2C 7.3.1) (format=latex 2000.3.7)  8 SEP 2000 20:21
+**./images.tex
+(./images.tex
+LaTeX2e <1998/12/01> patch level 1
+Babel <v3.6x> and hyphenation patterns for american, french, german, ngerman, i
+talian, nohyphenation, loaded.
+
+(/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 1999/01/07 v1.4a Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size11.clo
+File: size11.clo 1999/01/07 v1.4a Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (/usr/share/texmf/tex/latex/graphics/epsfig.sty
+Package: epsfig 1999/02/16 v1.7a (e)psfig emulation (SPQR)
+(/usr/share/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+) (/usr/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 1999/02/16 v1.0l Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+) (/usr/share/texmf/tex/latex/config/graphics.cfg)
+Package graphics Info: Driver file: dvips.def on input line 80.
+(/usr/share/texmf/tex/latex/graphics/dvips.def
+File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+\epsfxsize=\dimen105
+\epsfysize=\dimen106
+) (/home/tkr/Papers/SYMPHONY/html.sty
+Package: html 1996/02/01 v1.0 hypertext commands for latex2html (nd, hs)
+\c@lpart=\count87
+\c@lchapter=\count88
+\c@lsection=\count89
+\c@lsubsection=\count90
+\c@lsubsubsection=\count91
+\c@lparagraph=\count92
+\c@lsubparagraph=\count93
+\c@lsubsubparagraph=\count94
+\c@lequation=\count95
+) (/usr/share/texmf/tex/latex/graphics/color.sty
+Package: color 1999/02/16 v1.0i Standard LaTeX Color (DPC)
+(/usr/share/texmf/tex/latex/config/color.cfg)
+Package color Info: Driver file: dvips.def on input line 125.
+(/usr/share/texmf/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\sizebox=\box26
+\lthtmlwrite=\write3
+(images.aux)
+\openout1 = `images.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 87.
+LaTeX Font Info:    ... okay on input line 87.
+latex2htmlLength hsize=451.0pt
+latex2htmlLength vsize=645.16pt
+latex2htmlLength hoffset=0.0pt
+latex2htmlLength voffset=0.0pt
+latex2htmlLength topmargin=0.0pt
+latex2htmlLength topskip=0.00003pt
+latex2htmlLength headheight=0.0pt
+latex2htmlLength headsep=0.0pt
+latex2htmlLength parskip=0.0pt plus 1.0pt
+latex2htmlLength oddsidemargin=18.06749pt
+latex2htmlLength evensidemargin=18.06749pt
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 109.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 109.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 109.
+l2hSize :tex2html_wrap_inline444:10.3129pt::10.3129pt::33.68297pt.
+[2
+
+
+]
+l2hSize :tex2html_wrap_inline446:8.10416pt::8.10416pt::25.86165pt.
+[3
+
+
+]
+l2hSize :tex2html_wrap_inline454:7.60416pt::0.0pt::5.1328pt.
+[4
+
+
+]
+l2hSize :tex2html_wrap_inline462:7.98248pt::7.98248pt::48.16968pt.
+[5
+
+
+]
+l2hSize :tex2html_wrap_inline464:7.98248pt::7.98248pt::53.60919pt.
+[6
+
+
+]
+l2hSize :tex2html_wrap702:130.21791pt::124.74294pt::451.0pt.
+[7
+
+
+]
+l2hSize :tex2html_wrap_inline522:8.7125pt::8.7125pt::60.91827pt.
+[8
+
+
+]
+l2hSize :tex2html_wrap_inline526:9.94032pt::9.94032pt::36.21045pt.
+[9
+
+
+]
+l2hSize :tex2html_wrap_inline528:9.94032pt::9.94032pt::34.7441pt.
+[10
+
+
+]
+l2hSize :tex2html_wrap_inline530:7.48248pt::0.0pt::8.95767pt.
+[11
+
+
+]
+l2hSize :tex2html_wrap_inline532:7.48248pt::0.0pt::8.5167pt.
+[12
+
+
+]
+l2hSize :tex2html_wrap_inline536:7.48248pt::0.0pt::7.55247pt.
+[13
+
+
+]
+l2hSize :displaymath133:16.3375pt::0.0pt::451.0pt.
+[14
+
+
+]
+l2hSize :tex2html_wrap714:55.41788pt::49.9429pt::451.0pt.
+[15
+
+
+]
+l2hSize :tex2html_wrap718:96.2179pt::90.74292pt::451.0pt.
+[16
+
+
+]
+l2hSize :tex2html_wrap_inline236:7.07185pt::0.0pt::5.475pt.
+[17
+
+
+]
+File: /home/tkr/Papers/pics/pbandc.ps Graphic file (type eps)
+</home/tkr/Papers/pics/pbandc.ps>
+l2hSize :figure266:514.92374pt::0.0pt::451.0pt.
+[18
+
+
+]
+l2hSize :tex2html_wrap_inline604:7.07185pt::0.0pt::6.30893pt.
+[19
+
+
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 328.
+
+(/usr/share/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1998/03/27 v2.5g Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 328.
+l2hSize :tex2html_wrap_inline606:9.01828pt::0.0pt::11.45003pt.
+[20
+
+
+] (images.aux) ) 
+Here is how much of TeX's memory you used:
+ 921 strings out of 10898
+ 11120 string characters out of 96882
+ 57660 words of memory out of 263001
+ 3886 multiletter control sequences out of 10000+0
+ 7822 words of font info for 28 fonts, out of 400000 for 1000
+ 14 hyphenation exceptions out of 1000
+ 32i,12n,21p,200b,336s stack positions out of 300i,100n,500p,50000b,4000s
+
+Output written on images.dvi (19 pages, 9268 bytes).

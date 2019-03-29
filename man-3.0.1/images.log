@@ -1,0 +1,328 @@
+This is TeX, Version 3.14159 (Web2C 7.3.1) (format=latex 2002.7.18)  29 MAY 2003 23:12
+**./images.tex
+(./images.tex
+LaTeX2e <2000/06/01>
+Babel <v3.7h> and hyphenation patterns for american, french, german, ngerman, i
+talian, nohyphenation, loaded.
+
+(/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 2000/05/19 v1.4b Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size11.clo
+File: size11.clo 2000/05/19 v1.4b Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (/usr/share/texmf/tex/latex/base/ifthen.sty
+Package: ifthen 1999/09/10 v1.1b Standard LaTeX ifthen package (DPC)
+)
+\headwidth=\skip43
+(/usr/share/texmf/tex/latex/graphics/epsfig.sty
+Package: epsfig 1999/02/16 v1.7a (e)psfig emulation (SPQR)
+(/usr/share/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+) (/usr/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 1999/02/16 v1.0l Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texmf/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+) (/usr/share/texmf/tex/latex/config/graphics.cfg)
+Package graphics Info: Driver file: dvips.def on input line 80.
+(/usr/share/texmf/tex/latex/graphics/dvips.def
+File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+\epsfxsize=\dimen105
+\epsfysize=\dimen106
+) (/usr/local/share/texmf/tex/latex/html/html.sty
+Package: html 1996/02/01 v1.0 hypertext commands for latex2html (nd, hs)
+\c@lpart=\count87
+\c@lchapter=\count88
+\c@lsection=\count89
+\c@lsubsection=\count90
+\c@lsubsubsection=\count91
+\c@lparagraph=\count92
+\c@lsubparagraph=\count93
+\c@lsubsubparagraph=\count94
+\c@lequation=\count95
+) (/usr/share/texmf/tex/latex/graphics/color.sty
+Package: color 1999/02/16 v1.0i Standard LaTeX Color (DPC)
+(/usr/share/texmf/tex/latex/config/color.cfg)
+Package color Info: Driver file: dvips.def on input line 125.
+(/usr/share/texmf/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+)) (/usr/share/texmf/tex/latex/base/inputenc.sty
+Package: inputenc 2000/07/01 v0.996 Input encoding file 
+(/usr/share/texmf/tex/latex/base/latin1.def
+File: latin1.def 2000/07/01 v0.996 Input encoding file 
+))
+\sizebox=\box26
+\lthtmlwrite=\write3
+(images.aux)
+\openout1 = `images.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 159.
+LaTeX Font Info:    ... okay on input line 159.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 159.
+LaTeX Font Info:    ... okay on input line 159.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 159.
+LaTeX Font Info:    ... okay on input line 159.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 159.
+LaTeX Font Info:    ... okay on input line 159.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 159.
+LaTeX Font Info:    ... okay on input line 159.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 159.
+LaTeX Font Info:    ... okay on input line 159.
+
+latex2htmlLength hsize=451.0pt
+
+latex2htmlLength vsize=554.0pt
+
+latex2htmlLength hoffset=0.0pt
+
+latex2htmlLength voffset=0.0pt
+
+latex2htmlLength topmargin=0.0pt
+
+latex2htmlLength topskip=0.00003pt
+
+latex2htmlLength headheight=0.0pt
+
+latex2htmlLength headsep=0.0pt
+
+latex2htmlLength parskip=0.0pt plus 1.0pt
+
+latex2htmlLength oddsidemargin=0.0pt
+
+latex2htmlLength evensidemargin=0.0pt
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 188.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 188.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 188.
+l2hSize :tex2html_wrap_inline600:7.48248pt::0.0pt::7.89314pt.
+[1
+
+
+
+]
+l2hSize :tex2html_wrap_inline602:10.3129pt::10.3129pt::34.2305pt.
+[2
+
+
+]
+l2hSize :tex2html_wrap_inline604:8.10416pt::8.10416pt::26.40918pt.
+[3
+
+
+]
+l2hSize :tex2html_wrap_inline612:7.60416pt::0.0pt::5.68033pt.
+[4
+
+
+]
+l2hSize :tex2html_wrap_inline616:7.07185pt::0.0pt::7.1201pt.
+[5
+
+
+]
+l2hSize :tex2html_wrap_inline620:7.98248pt::7.98248pt::48.71721pt.
+[6
+
+
+]
+l2hSize :tex2html_wrap_inline622:7.98248pt::7.98248pt::54.15672pt.
+[7
+
+
+]
+l2hSize :tex2html_wrap_inline838:130.71791pt::130.71791pt::416.10002pt.
+[8
+
+
+]
+l2hSize :tex2html_wrap_inline680:8.7125pt::8.7125pt::61.4658pt.
+[9
+
+
+]
+l2hSize :tex2html_wrap_inline682:7.48248pt::0.0pt::9.2619pt.
+[10
+
+
+]
+l2hSize :tex2html_wrap_inline684:9.94032pt::9.94032pt::36.75798pt.
+[11
+
+
+]
+l2hSize :tex2html_wrap_inline686:9.94032pt::9.94032pt::35.29163pt.
+[12
+
+
+]
+l2hSize :tex2html_wrap_inline688:7.48248pt::0.0pt::9.5052pt.
+[13
+
+
+]
+l2hSize :tex2html_wrap_inline690:7.48248pt::0.0pt::9.06422pt.
+[14
+
+
+]
+l2hSize :tex2html_wrap_inline694:7.48248pt::0.0pt::8.1pt.
+[15
+
+
+]
+l2hSize :displaymath353:16.3375pt::0.0pt::451.0pt.
+[16
+
+
+]
+l2hSize :tex2html_wrap_inline852:55.91788pt::55.91788pt::416.10002pt.
+[17
+
+
+]
+l2hSize :tex2html_wrap_inline858:96.7179pt::96.7179pt::416.10002pt.
+[18
+
+
+]
+l2hSize :tex2html_wrap_inline760:7.48248pt::0.0pt::8.76004pt.
+[19
+
+
+]
+l2hSize :tex2html_wrap_inline764:7.22179pt::0.0pt::4.31995pt.
+[20
+
+
+]
+l2hSize :tex2html_wrap_inline766:7.57185pt::7.57185pt::10.1997pt.
+[21
+
+
+]
+File: /home/tkr/Papers/pics/pbandc.eps Graphic file (type eps)
+</home/tkr/Papers/pics/pbandc.eps>
+l2hSize :figure482:541.02124pt::0.0pt::451.0pt.
+[22
+
+
+]
+File: /home/tkr/Papers/pics/lploop.eps Graphic file (type eps)
+</home/tkr/Papers/pics/lploop.eps>
+l2hSize :figure530:340.02467pt::0.0pt::451.0pt.
+[23
+
+
+]
+l2hSize :tex2html_wrap_inline1340:8.7125pt::8.7125pt::6.02254pt.
+[24
+
+
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 463.
+
+(/usr/share/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 463.
+l2hSize :tex2html_wrap_inline1829:9.01828pt::0.0pt::11.99756pt.
+[25
+
+
+]
+l2hSize :tex2html_wrap_inline4146:7.57185pt::7.57185pt::59.9203pt.
+[26
+
+
+]
+l2hSize :tex2html_wrap_inline4148:7.57185pt::7.57185pt::9.06422pt.
+[27
+
+
+]
+l2hSize :tex2html_wrap_inline4150:7.07185pt::0.0pt::9.06422pt.
+[28
+
+
+]
+l2hSize :tex2html_wrap_inline4152:7.57185pt::7.57185pt::9.06422pt.
+[29
+
+
+]
+l2hSize :tex2html_wrap_inline4156:7.07185pt::0.0pt::10.16177pt.
+[30
+
+
+]
+l2hSize :tex2html_wrap_inline4158:7.07185pt::0.0pt::22.99257pt.
+[31
+
+
+]
+l2hSize :tex2html_wrap_inline4170:8.8943pt::0.0pt::15.90096pt.
+[32
+
+
+]
+l2hSize :tex2html_wrap_inline4172:7.4181pt::0.0pt::14.40732pt.
+[33
+
+
+]
+l2hSize :tex2html_wrap_inline4174:7.07185pt::0.0pt::12.69397pt.
+[34
+
+
+]
+l2hSize :tex2html_wrap_inline4178:7.57185pt::7.57185pt::25.97838pt.
+[35
+
+
+]
+l2hSize :tex2html_wrap_inline4182:7.07185pt::0.0pt::4.99217pt.
+[36
+
+
+]
+l2hSize :tex2html_wrap_inline4188:7.57185pt::7.57185pt::14.53923pt.
+[37
+
+
+]
+l2hSize :tex2html_wrap_inline4194:8.86255pt::0.0pt::9.54765pt.
+[38
+
+
+] (images.aux) ) 
+Here is how much of TeX's memory you used:
+ 1111 strings out of 20887
+ 13434 string characters out of 197363
+ 59663 words of memory out of 350001
+ 4081 multiletter control sequences out of 10000+15000
+ 8158 words of font info for 30 fonts, out of 400000 for 1000
+ 14 hyphenation exceptions out of 10000
+ 32i,11n,21p,200b,341s stack positions out of 3000i,100n,1500p,50000b,4000s
+
+Output written on images.dvi (38 pages, 13044 bytes).

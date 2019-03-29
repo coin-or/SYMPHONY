@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Building in a Windows Terminal</TITLE>
+<META NAME="description" CONTENT="Building in a Windows Terminal">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node34.html">
+<LINK REL="previous" HREF="node32.html">
+<LINK REL="up" HREF="node31.html">
+<LINK REL="next" HREF="node34.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html837"
+  HREF="node34.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html833"
+  HREF="node31.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html827"
+  HREF="node32.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html835"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html838"
+  HREF="node34.html">Building with the MSVC++</A>
+<B>Up:</B> <A NAME="tex2html834"
+  HREF="node31.html">Building SYMPHONY Applications</A>
+<B> Previous:</B> <A NAME="tex2html828"
+  HREF="node32.html">Building With the MSVC++</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00323420000000000000">
+Building in a Windows Terminal</A>
+</H4>
+
+<UL>
+<LI>Open a command terminal (choose 
+<FONT COLOR="#a52a2a"><TT>Run</TT></FONT> on the Start menu and type
+
+<FONT COLOR="#a52a2a"><TT>cmd</TT></FONT> in the dialogue box) and type
+
+<PRE>
+ devenv xxx.sln /Build "Win32|Release"
+</PRE> 
+where 
+<FONT COLOR="#a52a2a"><TT>xxx</TT></FONT> is the name of the application. This will create the
+release version of the application executable, as above. 
+
+<P>
+</LI>
+<LI>To test the executable, type 
+
+<PRE>
+ Debug\xxx.exe -F ..\..\sample.xxx
+</PRE>
+</LI>
+<LI>If the source files for the application are modified, type 
+
+<PRE>
+ devenv user.sln /Rebuild "Win32|Release"
+</PRE>
+in order to clean and rebuild everything.
+</LI>
+</UL> 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2013-09-15</I>
+</ADDRESS>
+</BODY>
+</HTML>

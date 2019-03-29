@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Debugging with PVM</TITLE>
+<META NAME="description" CONTENT="Debugging with PVM">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html427" HREF="node19.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html425" HREF="node16.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html419" HREF="node17.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html429" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html428" HREF="node19.html">Using Purify and Quantify</A>
+<B>Up:</B> <A NAME="tex2html426" HREF="node16.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html420" HREF="node17.html">The First Rule</A>
+<BR> <P>
+<H3><A NAME="SECTION000212200000000000000">Debugging with PVM</A></H3>
+<P>
+<A NAME="debuggingPVM">&#160;</A>
+If you wish to venture into debugging your distributed application,
+then you simply need to set the parameter <TT>*_debug</TT>, where * is
+the name of the module you wish to debug, 
+to the value ``4'' in the parameter file (the number ``4'' is chosen
+by PVM). This will tell PVM to spawn the particular process or
+processes in question under a debugger. What PVM actually does in this
+case is to launch the script <TT>$PVM_ROOT/lib/debugger</TT>. You will
+undoubtedly want to modify this script to launch your preferred
+debugger in the manner you deem fit. If you have trouble with this,
+please send e-mail to the list serve (see Section <A HREF="node24.html#resources">1.14</A>).
+<P>
+It's a little tricky to debug interacting parallel processes, but you
+will quickly get the idea. The main difficulty is in that the order of
+operations is difficult to control. Random interactions can occur when
+processes run in parallel due to varying system loads, process
+priorities, etc. Therefore, it may not always be possible to duplicate
+errors. To force runs that you should be able to reproduce, make sure
+the parameter <TT>no_cut_timeout</TT> appears in the parameter file or
+start SYMPHONY with the ``<TT>-a</TT>'' option. This will keep the cut
+generator from timing out, a major source of randomness. Furthermore,
+run with only one active node allowed at a time (set <TT>
+max_active_nodes</TT> to ``1''). This will keep the tree search from
+becoming random. These two steps should allow runs to be reproduced.
+You still have to be careful, but this should make things easier.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

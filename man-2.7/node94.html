@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Cut Pool Parameters</TITLE>
+<META NAME="description" CONTENT="Cut Pool Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html1370" HREF="node95.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html1368" HREF="node87.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html1364" HREF="node93.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html1372" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html1371" HREF="node95.html">  About this document </A>
+<B>Up:</B> <A NAME="tex2html1369" HREF="node87.html">Parameter file</A>
+<B> Previous:</B> <A NAME="tex2html1365" HREF="node93.html">Cut Generator Parameters</A>
+<BR> <P>
+<H2><A NAME="SECTION00047000000000000000">Cut Pool Parameters</A></H2>
+<P>
+<DL ><DT><STRONG><TT>CP_verbosity</TT> - integer (0).</STRONG>
+<DD>
+Verbosity of the cut pool process.
+<P>
+<DT><STRONG><TT>cp_logging</TT> - boolean (0).</STRONG>
+<DD>
+Determines whether the logging option is enabled. In this case, the
+entire contents of the cut pool are written out periodically to disk
+(at the same interval as the tree manager log files are written). If
+this option is set, then the line following must start with the
+keyword <TT>cp_log_file_name</TT> and include the appropriate
+file name as the value.
+<P>
+<DT><STRONG><TT>cp_warm_start</TT> - boolean (0).</STRONG>
+<DD>
+Used to allow the cut pool to make a warm start by reading in a
+previously written log file. If
+this option is set, then the line following must start with the
+keyword <TT>cp_warm_start_file_name</TT> and include the appropriate
+file name as the value.
+<P>
+<DT><STRONG><TT>block_size</TT> - integer (5000).</STRONG>
+<DD>
+Indicates the size of the blocks to allocate when more space is needed
+in the cut list.
+<P>
+<DT><STRONG><TT>max_size</TT> - integer (1000000).</STRONG>
+<DD>
+Indicates the maximum size of the cut pool in bytes. This is the total
+memory taken up by the cut list, including all data structures and the
+array of pointers itself.
+<P>
+<DT><STRONG><TT>max_number_of_cuts</TT> - integer (10000).</STRONG>
+<DD>
+Indicates the maximum number of cuts allowed to be stored. When this
+max is reached, cuts are forceably purged, starting with duplicates
+and then with those having a high number of touches, until the list is
+below the allowable size.
+<P>
+<DT><STRONG><TT>min_to_delete</TT> - integer (100).</STRONG>
+<DD>
+Indicates the number of cuts required to be deleted when the pool reaches
+it's maximum size.
+<P>
+<DT><STRONG><TT>touches_until_deletion</TT> - integer (10).</STRONG>
+<DD>
+Indicates the number of touches a cut can have before being deleted
+from the pool. The number of touches is the number of times in a row
+that a cut has been checked without being found to be violated. It is
+a measure of a cut's relevance or effectiveness.
+<P>
+<DT><STRONG><TT>delete_which</TT> - integer 
+(<TT>DELETE_DUPLICATE_AND_INEFFECTIVE</TT>{2}).</STRONG>
+<DD>
+Indicates which cuts to delete when purging the pool--duplicates
+or duplicates plus those whose number of touches is too high. The only other
+option is <TT>DELETE_DUPLICATES</TT>{1}.
+<P>
+<DT><STRONG><TT>check_which</TT> - integer (<TT>CHECK_LEVEL_AND_TOUCHES</TT>{3}).</STRONG>
+<DD>
+Indicates which cuts should be checked for violation. The choices are
+to check all cuts (<TT>CHECK_ALL_CUTS</TT>{0}); only those that have
+number of touches below the threshold (<TT>CHECK_TOUCHES</TT>{2}); only
+those that were generated at a level higher in the tree than the
+current one (<TT>CHECK_LEVEL</TT>{1}); or both (<TT>
+CHECK_LEVEL_AND_TOUCHES</TT>{3}).
+<P>
+ </DL><HR><A NAME="tex2html1370" HREF="node95.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html1368" HREF="node87.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html1364" HREF="node93.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html1372" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1371" HREF="node95.html">  About this document </A>
+<B>Up:</B> <A NAME="tex2html1369" HREF="node87.html">Parameter file</A>
+<B> Previous:</B> <A NAME="tex2html1365" HREF="node93.html">Cut Generator Parameters</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

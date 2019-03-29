@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Controlling Execution and Output</TITLE>
+<META NAME="description" CONTENT="Controlling Execution and Output">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node26.html">
+<LINK REL="previous" HREF="node18.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node26.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html449"
+ HREF="node26.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html446"
+ HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html440"
+ HREF="node24.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html448"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html450"
+ HREF="node26.html">Other Resources</A>
+<B>Up:</B> <A NAME="tex2html447"
+ HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html441"
+ HREF="node24.html">Other Debugging Techniques</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000215000000000000000">&#160;</A>
+<A NAME="output">&#160;</A>
+<BR>
+Controlling Execution and Output
+</H2>
+Calling  SYMPHONY with no arguments simply lists all command-line options.
+Most of the common parameters can be set on the command line. Usually
+it is easier to use a parameter file. To invoke  SYMPHONY with a parameter
+file type ``<TT>master -f filename ...</TT>'' where filename is the name
+of the parameter file. The format of the file is explained in Section
+<A HREF="node89.html#parameter_file">3</A>. 
+
+<P>
+The output level can be controlled through the use of the verbosity
+parameter. Setting this parameter at different levels will cause
+different progress messages to be printed out. Level 0 only prints out
+the introductory and solution summary messages, along with status
+messages every 10 minutes. Level 1 prints out a message every time a
+new node is created. Level 3 prints out messages describing each
+iteration of the solution process. Levels beyond 3 print out even more
+detailed information.
+
+<P>
+There are also two possible graphical interfaces. For graph-based
+problems, the Interactive Graph Drawing Software allows visual display
+of fractional solutions, as well as feasible and optimal solutions
+discovered during the solution process. For all types of problems,
+VBCTOOL creates a visual picture of the branch and cut tree, either
+in real time as the solution process evolves or as an emulation from a
+file created by
+ SYMPHONY. See Section <A HREF="node93.html#tm_params">3.4</A> for information on how to use VBCTOOL
+with SYMPHONY. Binaries for VBCTOOL can be obtained at <BR> 
+<TT><A NAME="tex2html13"
+ HREF="http://www.informatik.uni-koeln.de/ls_juenger/projects/vbctool.html">http://www.informatik.uni-koeln.de/ls_juenger/projects/vbctool.html</A></TT>.
+
+<P>
+<HR>
+<A NAME="tex2html449"
+ HREF="node26.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html446"
+ HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html440"
+ HREF="node24.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html448"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html450"
+ HREF="node26.html">Other Resources</A>
+<B>Up:</B> <A NAME="tex2html447"
+ HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html441"
+ HREF="node24.html">Other Debugging Techniques</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Master Module</TITLE>
+<META NAME="description" CONTENT="The Master Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node14.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html395"
+ HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html392"
+ HREF="node14.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html386"
+ HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html394"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html396"
+ HREF="node16.html">The Tree Manager Module</A>
+<B>Up:</B> <A NAME="tex2html393"
+ HREF="node14.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html387"
+ HREF="node14.html">Modular Implementation</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00063100000000000000">&#160;</A>
+<A NAME="master-process">&#160;</A>
+<BR>
+The Master Module
+</H3>
+
+<P>
+The <EM>master module</EM> includes functions that perform problem
+initialization and I/O. These functions implement the
+following tasks:
+<UL>
+<LI>Read in the parameters from a data file.
+<LI>Read in the data for the problem instance.
+<LI>Compute an initial upper bound using heuristics.
+<LI>Perform problem preprocessing.
+<LI>Initialize the BCP algorithm by sending data
+        for the root node to the <EM>tree manager</EM>.
+<LI>Initialize output devices and act as a central
+        repository for output.
+<LI>Process requests for problem data.
+<LI>Receive new solutions and store the best one.
+<LI>Receive the message that the algorithm is finished and
+        print out data.
+<LI>Ensure that all modules are still functioning.
+</UL>
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

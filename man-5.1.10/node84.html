@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Branching</TITLE>
+<META NAME="description" CONTENT="Branching">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node83.html">
+<LINK REL="up" HREF="node81.html">
+<LINK REL="next" HREF="node85.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1563"
+  HREF="node85.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1559"
+  HREF="node81.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1555"
+  HREF="node83.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1561"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1564"
+  HREF="node85.html">The Tree Management Module</A>
+<B>Up:</B> <A NAME="tex2html1560"
+  HREF="node81.html">The Node Processing Module</A>
+<B> Previous:</B> <A NAME="tex2html1556"
+  HREF="node83.html">Managing the LP Relaxation</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00542300000000000000"></A>
+<A NAME="branching"></A>
+<BR>
+Branching
+</H3>
+
+<P>
+Branching takes place whenever either (1) both cut generation and
+column generation (if performed) have failed; (2) ``tailing off'' in
+the objective function value has been detected; or (3) the
+user chooses to force branching. Branching can take place on cuts or
+variables and can be fully automated or fully controlled by the user,
+as desired. Branching can result in as many children as the user
+desires, though two is typical. Once it is decided that branching will
+occur, the user must either select the list of candidates for <EM>strong branching</EM> (see below for the procedure) or allow SYMPHONY to
+do so automatically by using one of several built-in strategies, such
+as branching on the variable whose value is farthest from being
+integral. The number of candidates may depend on the level of the
+current node in the tree--it is usually best to expend more effort on
+branching near the top of the tree.
+
+<P>
+After the list of candidates is selected, each candidate is <EM>pre-solved</EM>, by performing a specified number of iterations of the
+dual simplex algorithm in each of the resulting subproblems. Based on
+the objective function values obtained in each of the potential
+children, the final branching object is selected, again either by the
+user or by built-in rule. This procedure of using exploratory LP
+information in this manner to select a branching candidate is commonly
+referred to as <EM>strong branching</EM>. When the branching object has
+been selected, the NP module sends a description of that object to the
+tree manager, which then creates the children and adds them to the
+list of candidate nodes. It is then up to the tree manager to specify
+which node the now-idle NP module should process next. This issue is
+further discussed below.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1563"
+  HREF="node85.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1559"
+  HREF="node81.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1555"
+  HREF="node83.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1561"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1564"
+  HREF="node85.html">The Tree Management Module</A>
+<B>Up:</B> <A NAME="tex2html1560"
+  HREF="node81.html">The Node Processing Module</A>
+<B> Previous:</B> <A NAME="tex2html1556"
+  HREF="node83.html">Managing the LP Relaxation</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-10-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

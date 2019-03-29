@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_send_feasible_solution</TITLE>
+<META NAME="description" CONTENT="user_send_feasible_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node103.html">
+<LINK REL="previous" HREF="node101.html">
+<LINK REL="up" HREF="node92.html">
+<LINK REL="next" HREF="node103.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1617"
+  HREF="node103.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1613"
+  HREF="node92.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1607"
+  HREF="node101.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1615"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1618"
+  HREF="node103.html">user_display_solution</A>
+<B>Up:</B> <A NAME="tex2html1614"
+  HREF="node92.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1608"
+  HREF="node101.html">user_is_feasible</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000112700000000000000">
+user_send_feasible_solution</A>
+</H3>
+<PRE>
+int user_send_feasible_solution(void *user, double lpetol,
+                                int varnum, int *indices, double *values)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+Send a feasible solution to the master process. The solution is sent
+using the communication functions described in Section
+<A HREF="node56.html#communication">9.4</A> in whatever logical format the user wants to use.
+The default is to pack the user indices and values of variables at
+non-zero level. If the user packs the
+solution herself then the same data must be packed here that will be
+received in the <TT><A HREF="node85.html#user_receive_feasible_solution">user_receive_feasible_solution()</A></TT> function in
+the master process. See the description of that function for details.
+This function will only be called when either the LP or tree manager
+are running as a separate executable. Otherwise, the solution gets
+stored within the LP user data structure.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double lpetol</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The <IMG
+ WIDTH="12" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img36.png"
+ ALT="$\epsilon$"> tolerance of the LP solver.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>The length of the <TT>indices</TT> and <TT>values</TT> arrays.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *indices</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>User indices of variables at nonzero level
+in the current solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *values</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Values of the variables listed in <TT>indices</TT>.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>Error. Do the default.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>User packed the solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>Regulated by the parameter <TT>pack_feasible_solution_default</TT>, but set to <TT>SEND_NONZEROS</TT>
+unless over-ridden by the user.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>SEND_NONZEROS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>Pack the nonzero values and their indices.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked:</STRONG></DT>
+<DD>as soon as feasibility is detected anywhere.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html1617"
+  HREF="node103.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1613"
+  HREF="node92.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1607"
+  HREF="node101.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1615"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1618"
+  HREF="node103.html">user_display_solution</A>
+<B>Up:</B> <A NAME="tex2html1614"
+  HREF="node92.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1608"
+  HREF="node101.html">user_is_feasible</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

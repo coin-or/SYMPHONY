@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Design Overview</TITLE>
+<META NAME="description" CONTENT="Design Overview">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node25.html">
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="node11.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html415"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html411"
+  HREF="node11.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html405"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html413"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html416"
+  HREF="node13.html">An Object-oriented Approach</A>
+<B>Up:</B> <A NAME="tex2html412"
+  HREF="node11.html">Design</A>
+<B> Previous:</B> <A NAME="tex2html406"
+  HREF="node11.html">Design</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00410000000000000000"></A>
+<A NAME="design"></A>
+<BR>
+Design Overview
+</H1>
+
+<P>
+SYMPHONY was designed with two major goals in mind--portability and
+ease of use. With respect to ease of use, we aimed for a ``black box''
+design, whereby the user would not be required to know anything about
+the implementation of the library, but only about the user interface.
+With respect to portability, we aimed not only for it to be <EM>possible</EM> to use the framework in a wide variety of settings and on a
+wide variety of hardware, but also for it to perform <EM>effectively</EM> in all
+these settings. Our primary measure of effectiveness was
+how well the framework would perform in comparison to a problem-specific
+(or hardware-specific) implementation written ``from scratch.''
+
+<P>
+It is important to point out that achieving such design goals involves
+a number of very difficult tradeoffs. For instance, ease of use is quite
+often at odds with efficiency. In several instances, we had to give up
+some efficiency to make the code easy to work with and to maintain a
+true black box implementation. Maintaining portability across a wide
+variety of hardware, both sequential and parallel, also required some
+difficult choices. For example, solving large-scale problems on
+sequential platforms requires extremely memory-efficient data
+structures in order to maintain the very large search trees that can
+be generated. These storage schemes, however, are highly centralized
+and do not scale well to large numbers of processors. 
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html417"
+  HREF="node13.html">An Object-oriented Approach</A>
+<LI><A NAME="tex2html418"
+  HREF="node14.html">Data Structures and Storage</A>
+<UL>
+<LI><A NAME="tex2html419"
+  HREF="node15.html">Variables</A>
+<LI><A NAME="tex2html420"
+  HREF="node16.html">Constraints</A>
+<LI><A NAME="tex2html421"
+  HREF="node17.html">Search Tree</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html422"
+  HREF="node18.html">Modular Implementation</A>
+<UL>
+<LI><A NAME="tex2html423"
+  HREF="node19.html">The Master Module</A>
+<LI><A NAME="tex2html424"
+  HREF="node20.html">The Tree Manager Module</A>
+<LI><A NAME="tex2html425"
+  HREF="node21.html">The Linear Programming Module</A>
+<LI><A NAME="tex2html426"
+  HREF="node22.html">The Cut Generator Module</A>
+<LI><A NAME="tex2html427"
+  HREF="node23.html">The Cut Pool Module</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html428"
+  HREF="node24.html">Algorithm Summary</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html415"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html411"
+  HREF="node11.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html405"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html413"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html416"
+  HREF="node13.html">An Object-oriented Approach</A>
+<B>Up:</B> <A NAME="tex2html412"
+  HREF="node11.html">Design</A>
+<B> Previous:</B> <A NAME="tex2html406"
+  HREF="node11.html">Design</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

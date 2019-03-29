@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Checking the Validity of Cuts and Tracing the Optimal Path</TITLE>
+<META NAME="description" CONTENT="Checking the Validity of Cuts and Tracing the Optimal Path">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node113.html">
+<LINK REL="previous" HREF="node111.html">
+<LINK REL="up" HREF="node109.html">
+<LINK REL="next" HREF="node113.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1915"
+  HREF="node113.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1911"
+  HREF="node109.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1905"
+  HREF="node111.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1913"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1916"
+  HREF="node113.html">Using the Interactive Graph</A>
+<B>Up:</B> <A NAME="tex2html1912"
+  HREF="node109.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1906"
+  HREF="node111.html">Debugging with PVM</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00663000000000000000"></A>
+<A NAME="debugging"></A>
+<BR>
+Checking the Validity of Cuts and Tracing the Optimal Path
+</H2>
+
+<P>
+Sometimes the only evidence of a bug is the fact that the optimal solution to
+a particular problem is never found. This is usually caused by either (1)
+adding an invalid cut, or (2) performing an invalid branching. There are two
+options available for discovering such errors. The first is for checking the
+validity of added cuts. This checking must, of course, be done by the user,
+but SYMPHONY can facilitate such checking. To do this, the user must fill in the
+function <A HREF="node257.html#user_check_validity_of_cut"><TT>user_check_validity_of_cut()</TT></A>. THIS function is called every time a cut is
+passed from the cut generator to the LP and can function as an independent
+verifier. To do this, the user must pass (through her own data structures) a
+known feasible solution. Then for each cut passed into the function, the user
+can check whether the cut is satisfied by the feasible solution. If not, then
+there is a problem! Of course, the problem could also be with the checking
+routine. To enable this functionality, the user must configure SYMPHONY with
+the flag 
+<FONT COLOR="#a52a2a"><TT>-enable-cut-check</TT></FONT> (see Section <A HREF="node21.html#configuring">2.2.2.2</A>). 
+
+<P>
+Tracing the optimal path can alert the user when the subproblem which admits a
+particular known feasible solution (at least according to the branching
+restrictions that have been imposed so far) is pruned. This could be due to an
+invalid branching. Note that this option currently only works for branching on
+binary variables. To use this facility, the user must fill in the function
+<A HREF="node220.html#user_send_feas_sol"><TT>user_send_feas_sol()</TT></A>. All that is required is to pass out an array
+of user indices that are in the feasible solution that you want to trace. Each
+time the subproblem which admits this feasible solution is branched on, the
+branch that continues to admit the solution is marked. When one of these
+marked subproblems is pruned, the user is notified. To enable this
+functionality, the user must configure SYMPHONY with the flag
+
+<FONT COLOR="#a52a2a"><TT>-enable-trace-path</TT></FONT> (see Section <A HREF="node21.html#configuring">2.2.2.2</A>). 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1915"
+  HREF="node113.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1911"
+  HREF="node109.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1905"
+  HREF="node111.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1913"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1916"
+  HREF="node113.html">Using the Interactive Graph</A>
+<B>Up:</B> <A NAME="tex2html1912"
+  HREF="node109.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1906"
+  HREF="node111.html">Debugging with PVM</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-11-07</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Checking the Validity of Cuts and Tracing the Optimal Path</TITLE>
+<META NAME="description" CONTENT="Checking the Validity of Cuts and Tracing the Optimal Path">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node61.html">
+<LINK REL="previous" HREF="node59.html">
+<LINK REL="up" HREF="node56.html">
+<LINK REL="next" HREF="node61.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html932"
+ HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html929"
+ HREF="node56.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html923"
+ HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html931"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html933"
+ HREF="node61.html">Using the Interactive Graph</A>
+<B>Up:</B> <A NAME="tex2html930"
+ HREF="node56.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html924"
+ HREF="node59.html">Using Purify and Quantify</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000914400000000000000">&#160;</A>
+<A NAME="debugging">&#160;</A>
+<BR>
+Checking the Validity of Cuts and Tracing the Optimal Path
+</H3>
+Sometimes the only evidence of a bug is the fact that the optimal
+solution to a particular problem is never found. This is usually
+caused by either (1) adding an invalid cut, or (2) performing an
+invalid branching. There are two options available for discovering
+such errors. The first is for checking the validity of added cuts.
+This checking must, of course, be done by the user, but  SYMPHONY can
+facilitate such checking. To do this, the user must fill in the
+function <A HREF="node113.html#user_check_validity_of_cut"><TT>user_check_validity_of_cut()</TT></A>. THIS function is called every time a
+cut is passed from the cut generator to the LP and can function as an
+independent verifier. To do this, the user must pass (through her own
+data structures) a known feasible solution. Then for each cut passed
+into the function, the user can check whether the cut is satisfied
+by the feasible solution. If not, then there is a problem! Of course,
+the problem could also be with the checking routine. To see how this is
+done, check out the sample application file <TT>Vrp/cg_user.c</TT>.
+After filling in this function, the user must recompile everything
+(including the libraries) after uncommenting the line in the make file
+that contains ``<TT>BB_DEFINES += -DCHECK_CUT_VALIDITY</TT>.'' Type
+``<TT>make clean_all</TT>'' and then ``<TT>make</TT>.''
+
+<P>
+Tracing the optimal path can alert the user when the subproblem which
+admits a particular known feasible solution (at least
+according to the branching restrictions that have been imposed so far)
+is pruned. This could be due to an invalid branching. Note that this
+option currently only works for branching on binary variables. To use
+this facility, the user must fill in the function <A HREF="node81.html#user_send_feas_sol"><TT>user_send_feas_sol()</TT></A>. All that is required is to pass out an array
+of user indices that are in the feasible solution that you want to
+trace. Each time the subproblem which admits this feasible solution is
+branched on, the branch that continues to admit the solution is
+marked. When one of these marked subproblems is pruned, the user is
+notified.
+
+<P>
+<HR>
+<A NAME="tex2html932"
+ HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html929"
+ HREF="node56.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html923"
+ HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html931"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html933"
+ HREF="node61.html">Using the Interactive Graph</A>
+<B>Up:</B> <A NAME="tex2html930"
+ HREF="node56.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html924"
+ HREF="node59.html">Using Purify and Quantify</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

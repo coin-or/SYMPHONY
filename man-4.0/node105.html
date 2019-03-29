@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>cut_data</TITLE>
+<META NAME="description" CONTENT="cut_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node107.html">
+<LINK REL="previous" HREF="node103.html">
+<LINK REL="up" HREF="node100.html">
+<LINK REL="next" HREF="node106.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1817"
+  HREF="node106.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1813"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1807"
+  HREF="node104.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1815"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1818"
+  HREF="node106.html">waiting_row</A>
+<B>Up:</B> <A NAME="tex2html1814"
+  HREF="node100.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1808"
+  HREF="node104.html">cut_data</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00612300000000000000"></A>
+<A NAME="cut_data"></A>
+<BR>
+cut_data
+</H3>
+
+<P>
+Another of the internally defined data structures that the user has to
+deal with frequently is the <TT>cut_data</TT> data structure, used to
+store the packed form of cuts. This structure has 8 fields listed
+below.
+<DL>
+<DT><STRONG><TT>int size</TT> -</STRONG></DT>
+<DD>The size of the <TT>coef</TT> array.
+</DD>
+<DT><STRONG><TT>char *coef</TT> -</STRONG></DT>
+<DD>An array containing the packed form of the
+cut, which is defined and constructed by the user. Given this packed
+form and a list of the variables active in the current relaxation, the
+user must be able to construct the corresponding constraint.
+</DD>
+<DT><STRONG><TT>double rhs</TT> -</STRONG></DT>
+<DD>The right hand side of the constraint.
+</DD>
+<DT><STRONG><TT>double range</TT> -</STRONG></DT>
+<DD>The range of the constraint. It is zero for
+a standard form constraint. Otherwise, the row activity level is
+limited to between <TT>rhs</TT> and <!-- MATH
+ ${\tt rhs}+{\tt range}$
+ -->
+<IMG
+ WIDTH="99" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img32.png"
+ ALT="${\tt rhs}+{\tt range}$">.
+</DD>
+<DT><STRONG><TT>char type</TT> -</STRONG></DT>
+<DD>A user-defined type identifier that represents the
+general class that the cut belongs to.
+</DD>
+<DT><STRONG><TT>char sense</TT> -</STRONG></DT>
+<DD>The sense of the constraint. Can be either 'L' 
+(<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img27.png"
+ ALT="$\leq$">), 'E' (<IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img28.png"
+ ALT="$=$">), 'G' (<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img29.png"
+ ALT="$\geq$">) or 'R' (ranged). This may be evident
+from the <TT>type</TT>.
+</DD>
+<DT><STRONG><TT>char deletable</TT> -</STRONG></DT>
+<DD>Determines whether or not a cut can be
+deleted once added to the formulation. <TT>TRUE</TT> by default.
+</DD>
+<DT><STRONG><TT>char branch</TT> -</STRONG></DT>
+<DD>Determines whether the cut can be branched
+on or not. Possible initial values are <TT>DO_NOT_BRANCH_ON_THIS_ROW</TT>
+and <TT>ALLOWED_TO_BRANCH_ON</TT>.
+</DD>
+<DT><STRONG><TT>int name</TT> -</STRONG></DT>
+<DD>Identifier used by SYMPHONY. The user should not
+set this.
+</DD>
+</DL>
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1819"
+  HREF="node106.html">waiting_row</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html1817"
+  HREF="node106.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1813"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1807"
+  HREF="node104.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1815"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1818"
+  HREF="node106.html">waiting_row</A>
+<B>Up:</B> <A NAME="tex2html1814"
+  HREF="node100.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1808"
+  HREF="node104.html">cut_data</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

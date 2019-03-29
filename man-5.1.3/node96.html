@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Fault Tolerance</TITLE>
+<META NAME="description" CONTENT="Fault Tolerance">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node95.html">
+<LINK REL="up" HREF="node93.html">
+<LINK REL="next" HREF="node97.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1706"
+  HREF="node97.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1702"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1698"
+  HREF="node95.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1704"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1707"
+  HREF="node97.html">Developing Custom Applications</A>
+<B>Up:</B> <A NAME="tex2html1703"
+  HREF="node93.html">Parallelizing BCP</A>
+<B> Previous:</B> <A NAME="tex2html1699"
+  HREF="node95.html">Inter-process Communication</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00553000000000000000"></A>
+<A NAME="fault-tolerance"></A>
+<BR>
+Fault Tolerance
+</H2><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">Fault tolerance is an important consideration for solving large problems on
+computing networks whose nodes may fail unpredictably. The tree manager tracks
+the status of all processes and can restart them as necessary. Since the state
+of the entire tree is known at all times, the most that will be lost if an NP
+module or cut generator is killed is the work that had been completed on that
+particular search node. To protect against the tree manager itself or a cut
+pool being killed, full logging capabilities have been implemented. If
+desired, the tree manager can write out the entire state of the tree to disk
+periodically, allowing a warm restart if a fault occurs. Similarly, the cut
+pool process can be warm-started from a log file. This not only allows for
+fault tolerance but also for full reconfiguration in the middle of solving a
+long-running problem. Such reconfiguration could consist of anything from
+adding more processors to moving the entire solution process to another
+network.
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1706"
+  HREF="node97.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1702"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1698"
+  HREF="node95.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1704"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1707"
+  HREF="node97.html">Developing Custom Applications</A>
+<B>Up:</B> <A NAME="tex2html1703"
+  HREF="node93.html">Parallelizing BCP</A>
+<B> Previous:</B> <A NAME="tex2html1699"
+  HREF="node95.html">Inter-process Communication</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

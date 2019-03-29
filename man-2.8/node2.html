@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Introduction</TITLE>
+<META NAME="description" CONTENT="Introduction">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node27.html">
+<LINK REL="previous" HREF="node1.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node3.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html168"
+ HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html165"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html159"
+ HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html167"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html169"
+ HREF="node3.html">New in Version 2.8</A>
+<B>Up:</B> <A NAME="tex2html166"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html160"
+ HREF="node1.html">Contents</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00020000000000000000">
+Introduction</A>
+</H1>
+
+<P>
+SYMPHONY (Single- or Multi-Process Optimization over Networks) Version 2.8
+is a powerful environment for implementing branch, cut, and price
+algorithms. The subroutines in the  SYMPHONY library comprise a
+state-of-the-art solver which is designed to be completely modular and
+easy to port to various problem settings. All library subroutines are
+generic--their implementation does not depend on the the
+problem-setting. To develop a full-scale, parallel branch and cut
+algorithm, the user has only to specify a few problem-specific
+functions such as preprocessing and separation. The vast majority of
+the computation takes place within a ``black box,'' of which the user
+need have no knowledge.  SYMPHONY communicates with the user's routines
+through well-defined interfaces and performs all the normal functions
+of branch and cut--tree management, LP solution, cut pool management,
+as well as inter-process or inter-thread communication. Although there
+are default options, the user can also assert control over the
+behavior of  SYMPHONY through a myriad of parameters and optional
+subroutines.  SYMPHONY can be built in a variety of configurations, ranging
+from fully parallel to completely sequential, depending on the user's
+needs. The library runs serially on almost any platform, and can also
+run in parallel in either a fully distributed environment (network of
+workstations) or shared-memory environment simply by changing a few
+options in the make file. To run in a distributed environment, the
+user must have installed <EM><A NAME="tex2html2"
+ HREF="http://www.ccs.ornl.gov/pvm/">Parallel Virtual
+Machine</A></EM> (PVM) software, available for
+free from Oak Ridge National Laboratories
+. 
+To run in a shared memory environment, the user must have installed an
+OpenMP compliant compiler. A cross-platform compiler called <EM>Omni</EM>, which uses <TT>cc</TT> or <TT>gcc</TT> as a back end, is available
+for free download
+. 
+This manual is concerned with the detailed specifications needed to
+develop an application using  SYMPHONY. It is assumed that the user has
+already read the white paper <EM><A NAME="tex2html3"
+ HREF="http://branchandcut.org/SYMPHONY/intro/symphony.html">SYMPHONY: A
+Parallel Framework for Branch, Cut, and
+Price</A></EM>, which
+provides a high-level introduction to parallel branch, cut, and price
+and the overall design and use of  SYMPHONY. Reading and understanding of
+the white paper should be undertaken before trying to develop an
+application.
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html170"
+ HREF="node3.html">New in Version 2.8</A>
+<LI><A NAME="tex2html171"
+ HREF="node4.html">Changes to the User Interface</A>
+<LI><A NAME="tex2html172"
+ HREF="node5.html">Getting Started</A>
+<LI><A NAME="tex2html173"
+ HREF="node6.html">Source Files</A>
+<LI><A NAME="tex2html174"
+ HREF="node7.html">User-written Functions</A>
+<LI><A NAME="tex2html175"
+ HREF="node8.html">Data Structures</A>
+<UL>
+<LI><A NAME="tex2html176"
+ HREF="node9.html">Internal Data Structures</A>
+<LI><A NAME="tex2html177"
+ HREF="node10.html">User-defined Data Structures</A>
+</UL>
+<LI><A NAME="tex2html178"
+ HREF="node11.html">Inter-process Communication for Distributed Computing</A>
+<LI><A NAME="tex2html179"
+ HREF="node12.html">Working with PVM</A>
+<LI><A NAME="tex2html180"
+ HREF="node13.html">Communication with Shared Memory</A>
+<LI><A NAME="tex2html181"
+ HREF="node14.html">The LP Engine</A>
+<LI><A NAME="tex2html182"
+ HREF="node15.html">Developing an Application</A>
+<LI><A NAME="tex2html183"
+ HREF="node16.html">Configuring the Modules</A>
+<LI><A NAME="tex2html184"
+ HREF="node17.html">Executable Names</A>
+<LI><A NAME="tex2html185"
+ HREF="node18.html">Debugging Your Application</A>
+<UL>
+<LI><A NAME="tex2html186"
+ HREF="node19.html">The First Rule</A>
+<LI><A NAME="tex2html187"
+ HREF="node20.html">Debugging with PVM</A>
+<LI><A NAME="tex2html188"
+ HREF="node21.html">Using <TT>Purify</TT> and <TT>Quantify</TT></A>
+<LI><A NAME="tex2html189"
+ HREF="node22.html">Checking the Validity of Cuts and Tracing the Optimal Path</A>
+<LI><A NAME="tex2html190"
+ HREF="node23.html">Using the <TT>Interactive Graph Drawing</TT> Software</A>
+<LI><A NAME="tex2html191"
+ HREF="node24.html">Other Debugging Techniques</A>
+</UL>
+<LI><A NAME="tex2html192"
+ HREF="node25.html">Controlling Execution and Output</A>
+<LI><A NAME="tex2html193"
+ HREF="node26.html">Other Resources</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html168"
+ HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html165"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html159"
+ HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html167"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html169"
+ HREF="node3.html">New in Version 2.8</A>
+<B>Up:</B> <A NAME="tex2html166"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html160"
+ HREF="node1.html">Contents</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

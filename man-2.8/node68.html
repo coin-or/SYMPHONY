@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_generate_cuts_in_lp</TITLE>
+<META NAME="description" CONTENT="user_generate_cuts_in_lp">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node69.html">
+<LINK REL="previous" HREF="node67.html">
+<LINK REL="up" HREF="node45.html">
+<LINK REL="next" HREF="node69.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html1021"
+ HREF="node69.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1018"
+ HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1012"
+ HREF="node67.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1020"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1022"
+ HREF="node69.html">user_print_stat_on_cuts_added</A>
+<B>Up:</B> <A NAME="tex2html1019"
+ HREF="node45.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1013"
+ HREF="node67.html">user_generate_column</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000322000000000000000">
+user_generate_cuts_in_lp</A>
+</H3>
+<PRE>
+int user_generate_cuts_in_lp(void *user, int varnum, var_desc **vars, 
+                             double *x, int *new_row_num, 
+                             waiting_row ***new_rows)
+</PRE>
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user might decide to generate cuts directly within the LP process
+instead of using the cut generator. This can be accomplished either
+through a call to this function or simply by configuring  SYMPHONY such
+that the cut generator is called directly from the LP solver. One
+example of when this might be done is when generating Gomory cuts
+(this is planned to be part of  SYMPHONY later) or something else that
+requires knowledge of the current LP tableau. The IN arguments are the
+same as in <TT><A HREF="node65.html#user_send_lp_solution">user_send_lp_solution()</A></TT> (except
+that there is no <TT>where</TT> argument). Not only the generated cuts
+but the corresponding rows must be returned (the cuts are in the
+<TT><A HREF="node48.html#waiting_row">waiting_row</A></TT> structures) because the <TT><A HREF="node64.html#user_unpack_cuts">user_unpack_cuts()</A></TT>
+function will not be invoked for the generated cuts. Also, the user
+must fill out the <TT>violation</TT> field for every row. The reason for
+this is that any cut generated here will definitely correspond to the
+current LP solution so the user must have already computed the
+violation when generating the cut.
+<BR>
+<BR>
+Post-processing consists of checking if any of the new cuts are
+already in the local pool (or dominated by a cut in the local pool).
+Since the user will probably use this function to generate
+tableau-dependent cuts, it is highly unlikely that any of the new cuts would
+already be in the pool. Therefore the user will probably return <TT>USER_AND_PP</TT> to force  SYMPHONY to skip post-processing.
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>The number of variables currently in the LP
+relaxation. (The length of the <TT> *vars</TT> and <TT> x</TT> arrays.)</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> var_desc **vars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>The variables currently in the LP relaxation.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> double *x</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>Values of the above variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> int *new_row_num</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>The number of cuts generated.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> waiting_row ***new_rows</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=226>The cuts and the corresponding rows.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>Error. Interpreted as if no cuts were generated.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>Cuts were generated but  SYMPHONY must compare them to those
+in the local pool.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_AND_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>Cuts were generated and  SYMPHONY should not compare them to
+those in the local pool.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=331>No cuts are generated. (At least for now. We might add Gomory
+cuts for default later.)</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Post-processing:</STRONG>
+<DD>
+
+<P>
+SYMPHONY checks if any of the newly generated rows are already in the
+local pool. 
+
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD><TT>receive_cuts()</TT> before the cuts from the CG
+process are received. Since the user will probably use this function
+to generate tableau-dependent cuts, it is highly unlikely that any of
+the new cuts would already be in the pool. Therefore the user will
+probably return <TT>USER_AND_PP</TT> to force  SYMPHONY to skip post-processing.
+
+<P>
+<DT><STRONG>Notes:</STRONG>
+<DD>
+<BR>
+
+<P>
+<UL>
+<BR>
+<LI>Just like in <TT><A HREF="node64.html#user_unpack_cuts">user_unpack_cuts()</A></TT>, 
+the user has to allocate space for the rows.
+<LI>Unless the <TT>name</TT> field of a cut is explicitly set to 
+<TT>CUT__SEND_TO_CP</TT>,  SYMPHONY will assume that the cut is locally
+valid only and set that field to <TT>CUT__DO_NOT_SEND_TO_CP</TT>.
+</UL></DL>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html1021"
+ HREF="node69.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1018"
+ HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1012"
+ HREF="node67.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1020"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1022"
+ HREF="node69.html">user_print_stat_on_cuts_added</A>
+<B>Up:</B> <A NAME="tex2html1019"
+ HREF="node45.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1013"
+ HREF="node67.html">user_generate_column</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

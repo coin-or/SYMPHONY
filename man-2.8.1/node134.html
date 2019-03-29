@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Cut Pool Parameters</TITLE>
+<META NAME="description" CONTENT="Cut Pool Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="previous" HREF="node133.html">
+<LINK REL="up" HREF="node127.html">
+<LINK REL="next" HREF="node135.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html1853"
+ HREF="node135.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1850"
+ HREF="node127.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1846"
+ HREF="node133.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1852"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1854"
+ HREF="node135.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html1851"
+ HREF="node127.html">SYMPHONY Parameters</A>
+<B> Previous:</B> <A NAME="tex2html1847"
+ HREF="node133.html">Cut Generator Parameters</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000117000000000000000">&#160;</A>
+<A NAME="cut_pool_params">&#160;</A>
+<BR>
+Cut Pool Parameters
+</H2>
+<DL>
+<DD><P>
+<DT><STRONG><TT>CP_verbosity</TT> - integer (0).</STRONG>
+<DD>Verbosity of the cut pool process.
+
+<P>
+<DT><STRONG><TT>cp_logging</TT> - boolean (0).</STRONG>
+<DD>Determines whether the logging option is enabled. In this case, the
+entire contents of the cut pool are written out periodically to disk
+(at the same interval as the tree manager log files are written). If
+this option is set, then the line following must start with the
+keyword <TT>cp_log_file_name</TT> and include the appropriate
+file name as the value.
+
+<P>
+<DT><STRONG><TT>cp_warm_start</TT> - boolean (0).</STRONG>
+<DD>Used to allow the cut pool to make a warm start by reading in a
+previously written log file. If
+this option is set, then the line following must start with the
+keyword <TT>cp_warm_start_file_name</TT> and include the appropriate
+file name as the value.
+
+<P>
+<DT><STRONG><TT>block_size</TT> - integer (5000).</STRONG>
+<DD>Indicates the size of the blocks to allocate when more space is needed
+in the cut list.
+
+<P>
+<DT><STRONG><TT>max_size</TT> - integer (2000000).</STRONG>
+<DD>Indicates the maximum size of the cut pool in bytes. This is the total
+memory taken up by the cut list, including all data structures and the
+array of pointers itself.
+
+<P>
+<DT><STRONG><TT>max_number_of_cuts</TT> - integer (10000).</STRONG>
+<DD>Indicates the maximum number of cuts allowed to be stored. When this
+max is reached, cuts are forceably purged, starting with duplicates
+and then those indicated by the parameter <A HREF="node134.html#delete_which">delete_which</A> (see below), until the list is below the allowable size.
+
+<P>
+<DT><STRONG><TT>min_to_delete</TT> - integer (1000).</STRONG>
+<DD>Indicates the number of cuts required to be deleted when the pool reaches
+it's maximum size.
+
+<P>
+<DT><STRONG><TT>touches_until_deletion</TT> - integer (10).</STRONG>
+<DD>When using the number of touches a cut has as a measure of its
+quality, this parameter indicates the number of touches a cut can have
+before being deleted from the pool. The number of touches is the
+number of times in a row that a cut has been checked without being
+found to be violated. It is a measure of a cut's relevance or
+effectiveness.
+
+<P>
+<A NAME="delete_which">&#160;</A><DT><STRONG><TT>delete_which</TT> - integer 
+(<TT>DELETE_BY_TOUCHES</TT>{2}).</STRONG>
+<DD>Indicates which cuts to delete when
+purging the pool. <TT>DELETE_BY_TOUCHES</TT> indicates that cuts whose
+number of touches is above the threshold (see <TT>touches_until_deletion</TT> above) should be purged if the pool gets too
+large. <TT>DELETE_BY_QUALITY</TT>{1} indicates that a user-defined
+measure of quality should be used (see the function <A HREF="node120.html#user_check_cuts"><TT>user_check_cuts()</TT></A>).
+
+<P>
+<DT><STRONG><TT>check_which</TT> - integer (<TT>CHECK_ALL_CUTS</TT>{0}).</STRONG>
+<DD>Indicates which cuts should be checked for violation. The choices are
+to check all cuts (<TT>CHECK_ALL_CUTS</TT>{0}); only those that have
+number of touches below the threshold (<TT>CHECK_TOUCHES</TT>{2}); only
+those that were generated at a level higher in the tree than the
+current one (<TT>CHECK_LEVEL</TT>{1}); or both (<TT>CHECK_LEVEL_AND_TOUCHES</TT>{3}). Note that with <TT>CHECK_ALL_CUTS</TT> set, SYMPHONY will still only check the first
+<A HREF="node134.html#cuts_to_check"><TT>cuts_to_check</TT></A> cuts in the list ordered
+by quality (see the function <A HREF="node120.html#user_check_cuts">user_check_cut</A>).
+
+<P>
+<A NAME="cuts_to_check">&#160;</A><DT><STRONG><TT>cuts_to_check</TT> - integer (1000).</STRONG>
+<DD>Indicates how many cuts in the pool to actually check. The list is
+ordered by quality and the first <TT>cuts_to_check</TT> cuts are
+checked for violation.
+
+<P>
+</DL>
+
+<P>
+
+<P>
+<HR>
+<A NAME="tex2html1853"
+ HREF="node135.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1850"
+ HREF="node127.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1846"
+ HREF="node133.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1852"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1854"
+ HREF="node135.html">Bibliography</A>
+<B>Up:</B> <A NAME="tex2html1851"
+ HREF="node127.html">SYMPHONY Parameters</A>
+<B> Previous:</B> <A NAME="tex2html1847"
+ HREF="node133.html">Cut Generator Parameters</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

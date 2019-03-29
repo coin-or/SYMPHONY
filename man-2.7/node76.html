@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_receive_cp_data</TITLE>
+<META NAME="description" CONTENT="user_receive_cp_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html1169" HREF="node77.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html1167" HREF="node75.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html1161" HREF="node75.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html1171" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html1170" HREF="node77.html">user_free_cp</A>
+<B>Up:</B> <A NAME="tex2html1168" HREF="node75.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html1162" HREF="node75.html">User-written functions of the </A>
+<BR> <P>
+<H3><A NAME="SECTION00034100000000000000">user_receive_cp_data</A></H3>
+<P>
+<A NAME="user_receive_cp_data">&#160;</A>
+<PRE>int user_receive_cp_data(void **user)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user has to receive here all problem-specific information sent
+from <A HREF="node39.html#user_send_cp_data"><TT>user_send_cp_data()</TT></A> function in the master process.
+The user has to allocate space for all the data structures, including
+<TT>user</TT> itself. Note that this function is only called if the
+either the Tree Manager, LP, or CP are running as a separate process
+(i.e.&nbsp;either <TT>COMPILE_IN_TM</TT>, <TT>COMPILE_IN_LP</TT>, or <TT>
+COMPILE_IN_CP</TT> are set to <TT>FALSE</TT> in the <TT>make</TT> file).
+Otherwise, this is done in <TT><A HREF="node39.html#user_send_cp_data">user_send_cp_data()</A></TT>. See the
+description of that function for more details.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=519 HEIGHT=13 ALIGN=BOTTOM ALT="tabular1924" SRC="img88.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=374 HEIGHT=38 ALIGN=BOTTOM ALT="tabular1926" SRC="img89.gif"  > <P>
+<P>
+<DT><STRONG>Invoked from:</STRONG>
+<DD> <TT>cp_initialize</TT> at process start.
+<P>
+ </DL>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

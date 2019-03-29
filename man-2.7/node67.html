@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_print_stat_on_cuts_added</TITLE>
+<META NAME="description" CONTENT="user_print_stat_on_cuts_added">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html1063" HREF="node68.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html1061" HREF="node43.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html1055" HREF="node66.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html1065" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html1064" HREF="node68.html">user_purge_waiting_rows</A>
+<B>Up:</B> <A NAME="tex2html1062" HREF="node43.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html1056" HREF="node66.html">user_generate_cuts_in_lp</A>
+<BR> <P>
+<H3><A NAME="SECTION000322100000000000000">user_print_stat_on_cuts_added</A></H3>
+<P>
+<PRE>int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user can print out some information (if he wishes to) on the cuts that
+will be added to the LP formulation. The default is to print out the number of
+cuts added.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=592 HEIGHT=81 ALIGN=BOTTOM ALT="tabular1681" SRC="img73.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=390 HEIGHT=55 ALIGN=BOTTOM ALT="tabular1683" SRC="img74.gif"  > <P>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>add_best_waiting_rows()</TT> after it has been decided how many cuts to
+add and after the cuts have been selected from the local pool.
+<P>
+ </DL>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

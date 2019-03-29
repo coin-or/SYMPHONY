@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Fault Tolerance</TITLE>
+<META NAME="description" CONTENT="Fault Tolerance">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="previous" HREF="node27.html">
+<LINK REL="up" HREF="node25.html">
+<LINK REL="next" HREF="node29.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html351"
+ HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html349"
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html345"
+ HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html352"
+ HREF="node29.html">The Cut Generator Process</A>
+<B>Up:</B> <A NAME="tex2html350"
+ HREF="node25.html">The Tree Manager Process</A>
+<B> Previous:</B> <A NAME="tex2html346"
+ HREF="node27.html">The Two-Phase Algorithm</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00053300000000000000">
+Fault Tolerance</A>
+</H3>
+
+<P>
+SYMPHONY is designed to be fault tolerant. This is a requirement for
+solving large problems on networks whose processors may fail
+unpredictably. The tree manager tracks the status of all processes and
+can restart them as necessary. Since the state of the entire tree is
+known at all times, the most that will be lost if an LP process or cut
+generator process is killed is the work that had been completed on that
+particular search node. To protect against the tree manager itself or
+a cut pool being killed, full logging capabilities have been
+implemented. If desired, the tree manager can write out the entire
+state of the tree to disk periodically, allowing a warm restart if a
+fault occurs. Similarly, the cut pool process can be warm-started from
+a log file. This not only allows for fault tolerance but also
+for full reconfiguration of the algorithm in the middle of solving
+a long-running problem. Such reconfiguration could consist of
+anything from adding more processors to moving the entire solution
+process to another network.
+
+<P>
+<HR>
+<A NAME="tex2html351"
+ HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html349"
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html345"
+ HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html352"
+ HREF="node29.html">The Cut Generator Process</A>
+<B>Up:</B> <A NAME="tex2html350"
+ HREF="node25.html">The Tree Manager Process</A>
+<B> Previous:</B> <A NAME="tex2html346"
+ HREF="node27.html">The Two-Phase Algorithm</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

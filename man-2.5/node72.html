@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>LP parameters</TITLE>
+<META NAME="description" CONTENT="LP parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html914" HREF="node73.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html912" HREF="node68.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html906" HREF="node71.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html915" HREF="node73.html">Cut Generator Parameters</A>
+<B>Up:</B> <A NAME="tex2html913" HREF="node68.html">Parameter file</A>
+<B> Previous:</B> <A NAME="tex2html907" HREF="node71.html">Tree Manager parameters</A>
+<BR> <P>
+<H2><A NAME="SECTION00034000000000000000">LP parameters</A></H2>
+<P>
+<DL ><DT><STRONG><TT>LP_verbosity</TT> - integer (0).</STRONG>
+<DD>
+Verbosity level of the LP process.
+<P>
+<DT><STRONG><TT>set_obj_upper_lim</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+Whether to stop solving the LP relaxation when it's optimal value is
+provably higher than the global upper bound. There are some advantages
+to continuing the solution process anyway. For instance, this results
+in the highest possible lower bound. On the other hand, if the matrix
+is full, this node will be pruned anyway and the rest of the
+computation is pointless.
+<P>
+<DT><STRONG><TT>try_to_recover_from_error</TT> - boolean (<TT>TRUE</TT>).</STRONG>
+<DD>
+Indicates what should be done in case the LP solver is unable to solve
+a particular LP relaxation because of numerical problems. It is
+possible to recover from this situation but further results may be
+suspect. On the other hand, the entire solution process can be
+abandoned.
+<P>
+<DT><STRONG><TT>problem_type</TT> - integer (<TT>ZERO_ONE_PROBLEM</TT>).</STRONG>
+<DD>
+The type of problem being solved. Other values are <TT>INTEGER_PROBLEM</TT> or
+<TT>MIXED_INTEGER_PROBLEM</TT>. (Caution: The mixed-integer option is
+not well tested.)
+<P>
+<DT><STRONG><TT>cut_pool_check_frequency</TT> - integer (10).</STRONG>
+<DD>
+The number of iterations between sending LP solutions to the cut pool
+to find violated cuts. It is not advisable to check the cut pool too
+frequently as the cut pool process can get bogged down and the LP
+solution generally do not change that drastically from one iteration
+to the next anyway.
+<P>
+<DT><STRONG><TT>not_fixed_storage_size</TT> - integer (2048).</STRONG>
+<DD>
+The <EM>not fixed list</EM> is a partial list of indices of variables not
+in the matrix that have not been fixed by reduced cost. Keeping this
+list allows SYMPHONY to avoid repricing variables (an expensive operation)
+that are not in the matrix because they have already been permanently
+fixed. When this array reaches its maximum size, no more variable
+indices can be stored. It is therefore advisable to keep the maximum
+size of this array as large as possible, given memory limitations.
+<P>
+<DT><STRONG><TT>max_non_dual_feas_to_add_min,
+max_non_dual_feas_to_add_max,
+max_non_dual_feas_to_add_frac</TT> - integer, integer, double (20,
+200, .05).</STRONG>
+<DD>
+These three parameters determine the maximum number of
+non-dual-feasible columns that can be added in any one iteration
+after pricing. This maximum is set to the indicated
+fraction of the current number of active columns unless this numbers
+exceeds the given maximum or is less than the given minimum, in which
+case, it is set to the max or min, respectively.
+<P>
+<DT><STRONG><TT>max_not_fixable_to_add_min,
+max_not_fixable_to_add_max,
+max_not_fixable_to_add_frac</TT> - integer, integer, double (100,
+500, .1).</STRONG>
+<DD>
+As above, these three parameters determine the maximum number of new
+columns to be added to the problem because they cannot be priced out.
+These variables are only added when trying to restore infeasibility
+and usually, this does not require many variables anyway.
+<P>
+<DT><STRONG><TT>mat_col_compress_num, mat_col_compress_ratio</TT> - integer,
+double (50, .05).</STRONG>
+<DD>
+Determines when the matrix should be physically compressed. This only
+happens when the number of columns is high enough to make it
+``worthwhile.'' The matrix is physically compressed when the number of
+deleted columns exceeds either an absolute number <EM>and</EM> a specified
+fraction of the current number of active columns.
+<P>
+<DT><STRONG><TT>mat_row_compress_num, mat_row_compress_ratio</TT> - integer,
+double (20, .05).</STRONG>
+<DD>
+Same as above except for rows.
+<P>
+<DT><STRONG><TT>tailoff_gap_backsteps, tailoff_gap_frac</TT> - integer, double
+(2, .99).</STRONG>
+<DD>
+Determines when tailoff is detected in the LP process.
+Tailoff is reported if the average ratio of the current gap to the
+previous iteration's gap over the last <TT>tailoff_gap_backsteps</TT>
+iterations wasn't at least <TT>tailoff_gap_frac</TT>.
+<P>
+<DT><STRONG><TT>tailoff_obj_backsteps, tailoff_obj_frac</TT> - integer, double
+(2, .99).</STRONG>
+<DD>
+Same as above, only the ratio is taken with respect to the change in
+objective function values instead of the change in the gap.
+<P>
+<DT><STRONG><TT>ineff_cnt_to_delete</TT> - integer (0).</STRONG>
+<DD>
+Determines after how many iterations of being deemed ineffective a
+constraint is removed from the current relaxation.
+<P>
+<DT><STRONG><TT>eff_cnt_before_cutpool</TT> - integer (3).</STRONG>
+<DD>
+Determines after how many iterations of being deemed effective each
+cut will be sent to the global pool.
+<P>
+<DT><STRONG><TT>ineffective_constraints</TT> - integer
+(<TT>BASIC_SLACKS_ARE_INEFFECTIVE</TT>).</STRONG>
+<DD>
+Determines under what condition a constraint is deemed ineffective in
+the current relaxation. Other possible values are <TT>
+NO_CONSTRAINT_IS_INEFFECTIVE</TT>,  <TT>
+NONZERO_SLACKS_ARE_INEFFECTIVE</TT>, and <BR> 
+<TT>ZERO_DUAL_VALUES_ARE_INEFFECTIVE</TT>.
+<P>
+<DT><STRONG><TT>base_constraints_always_effective</TT> - boolean (<TT>TRUE</TT>).</STRONG>
+<DD>
+Determines whether the base constraints can ever be removed from the
+relaxation. In some case, removing the base constraints from the
+problem can be disastrous depending on the assumptions made by the cut
+generator.
+<P>
+<DT><STRONG><TT>branch_on_cuts</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+This informs the framework whether the user plans on branching on cuts
+or not. If so, there is additional bookkeeping to be done, such as
+maintaining a pool of slack cuts to be used for branching. Therefore,
+the user should not set this flag unless he actually plans on using
+this feature.
+<P>
+<DT><STRONG><TT>discard_slack_cuts</TT> - integer (<TT>
+DISCARD_SLACKS_BEFORE_NEW_ITERATION</TT>).</STRONG>
+<DD>
+Determines when the pool of slack cuts is discarded. The other option
+is <TT>DISCARD_SLACKS_WHEN_STARTING_NEW_NODE</TT>.
+<P>
+<DT><STRONG><TT>first_lp_first_cut_time_out,
+first_lp_all_cuts_time_out,
+later_lp_first_cut_time_out], <BR> later_lp_all_cuts_time_out</TT> - 
+double (0, 0, 5, 1).</STRONG>
+<DD>
+The next group of parameters determines when the LP should give up
+waiting for cuts from the cut generator and start to solve the
+relaxation in its current form or possibly branch if necessary. There
+are two factors that contribute to determining this timeout. First
+is whether this is the first LP in the search node of whether it is a
+later LP. Second is whether any cuts have been added already in this
+iteration. The four timeout parameters correspond to the four possible
+combinations of these two variables.
+<P>
+<DT><STRONG><TT>no_cut_timeout</TT> - </STRONG>
+<DD>
+This keyword does not have an associated value. If this keyword
+appears on a line by itself or with a value, this tells the framework
+to never time out while waiting for cuts.
+<P>
+<DT><STRONG><TT>all_cut_timeout</TT> - double (no default).</STRONG>
+<DD>
+This keyword tells the framework to set all of the above timeout
+parameters to the value indicated.
+<P>
+<DT><STRONG><TT>max_cut_num_per_iter</TT> - integer (20).</STRONG>
+<DD>
+The maximum number of cuts that can be added to the LP in an
+iteration. The remaining cuts stay in the local pool to be added in
+subsequent iterations, if they are strong enough.
+<P>
+<DT><STRONG><TT>do_reduced_cost_fixing</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+Whether or not to attempt to fix variables by reduced cost. This
+option is highly recommended
+<P>
+<DT><STRONG><TT>gap_as_ub_frac, gap_as_last_gap_frac</TT> - double (.1, .7).</STRONG>
+<DD>
+Determines when reduced cost fixing should be attempted. It is only
+done when the gap is within the fraction <TT>gap_as_ub_frac</TT> of the upper
+bound or when the gap has decreased by the fraction 
+<TT>gap_as_last_gap_frac</TT> since the last time variables were fixed.
+<P>
+<DT><STRONG><TT>do_logical_fixing</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+Determines whether the user's logical fixing routine should be used.
+<P>
+<DT><STRONG><TT>fixed_to_ub_before_logical_fixing,
+fixed_to_ub_frac_before_logical_fixing</TT> - integer, double
+(1, .01).</STRONG>
+<DD>
+Determines when logical fixing should be attempted. It will be called
+only when a certain absolute number <EM>and</EM> a certain number of variables
+have been fixed to their upper bounds by reduced cost. This is because
+it is typically only after fixing variables to their upper bound that
+other variables can be logically fixed.
+<P>
+<DT><STRONG><TT>max_presolve_iter</TT> - integer (10).</STRONG>
+<DD>
+Number of simplex iterations to be performed in the pre-solve for
+strong branching.
+<P>
+<DT><STRONG><TT>candidate_num_for_strong_branching</TT> - integer (7).</STRONG>
+<DD>
+Determines the maximum number of candidates that should be selected
+during strong branching.
+<P>
+<DT><STRONG><TT>is_feasible_default</TT> - integer (<TT>TEST_INTEGRALITY</TT>).</STRONG>
+<DD>
+Determines the default test to be used to determine feasibility. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+<P>
+<DT><STRONG><TT>send_feasible_solution_default</TT> - integer 
+(<TT>SEND_NONZEROS</TT>).</STRONG>
+<DD>
+Determines the form in which to send the feasible solution. This
+parameter is provided so that the user can change the default behavior
+without recompiling. This is currently the only option.
+<P>
+<DT><STRONG><TT>send_lp_solution_default</TT> - integer (<TT>SEND_NONZEROS</TT>).</STRONG>
+<DD>
+Determines the default form in which to send the LP solution to the
+cut generator and cut pool. This
+parameter is provided so that the user can change the default behavior
+without recompiling. The other option is <TT>SEND_FRACTIONS</TT>.
+<P>
+<DT><STRONG><TT>display_solution_default</TT> - integer (<TT>DISP_NOTHING</TT>).</STRONG>
+<DD>
+Determines how to display the current LP solution if desired.
+See the description of <A HREF="node28.html#user_display_solution"><TT>user_display_solution()</TT></A> for other
+possible values. This parameter is provided so that
+the user can change the default behavior without recompiling.
+<P>
+<DT><STRONG><TT>shall_we_branch_default</TT> - integer 
+(<TT>USER__BRANCH_IF_MUST</TT>).</STRONG>
+<DD>
+Determines the default branching behavior. Other values are <TT>
+USER__DO_NOT_BRANCH</TT> (not recommended as a default), <TT>
+USER__DO_BRANCH</TT> (also not recommended as a default), and <TT>
+USER__BRANCH_IF_TAILOFF</TT>. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+<P>
+<DT><STRONG><TT>select_candidates_default</TT> - integer (<TT>
+USER__CLOSE_TO_HALF_AND_EXPENSIVE</TT>).</STRONG>
+<DD>
+Determines the default rule for selecting strong branching candidates.
+Other values are <TT>USER__CLOSE_TO_HALF</TT> and 
+<TT>USER__CLOSE_TO_ONE_AND_CHEAP</TT>. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+<P>
+<DT><STRONG><TT>compare_candidates_default</TT> - integer 
+(<TT>LOWEST_LOW_OBJ</TT>).</STRONG>
+<DD>
+Determines the default rule for comparing candidates. See the
+description of <A HREF="node44.html#user_compare_candidates"><TT>user_compare_candidates()</TT></A> for other values. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+<P>
+<DT><STRONG><TT>select_child_default</TT> - integer 
+(<TT>PREFER_LOWER_OBJ_VALUE</TT>).</STRONG>
+<DD>
+Determines the default rule for selecting the child to be processed
+next. For other possible values, see the description <A HREF="node45.html#user_select_child"><TT>
+user_select_child()</TT></A>. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+<P>
+ </DL><HR><A NAME="tex2html914" HREF="node73.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html912" HREF="node68.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html906" HREF="node71.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html915" HREF="node73.html">Cut Generator Parameters</A>
+<B>Up:</B> <A NAME="tex2html913" HREF="node68.html">Parameter file</A>
+<B> Previous:</B> <A NAME="tex2html907" HREF="node71.html">Tree Manager parameters</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

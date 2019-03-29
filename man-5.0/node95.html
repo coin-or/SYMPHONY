@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Checking the Validity of Cuts and Tracing the Optimal Path</TITLE>
+<META NAME="description" CONTENT="Checking the Validity of Cuts and Tracing the Optimal Path">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node96.html">
+<LINK REL="previous" HREF="node94.html">
+<LINK REL="up" HREF="node91.html">
+<LINK REL="next" HREF="node96.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1647"
+  HREF="node96.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1643"
+  HREF="node91.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1637"
+  HREF="node94.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1645"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1648"
+  HREF="node96.html">Using the Interactive Graph</A>
+<B>Up:</B> <A NAME="tex2html1644"
+  HREF="node91.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1638"
+  HREF="node94.html">Using Purify and Quantify</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00784000000000000000"></A>
+<A NAME="debugging"></A>
+<BR>
+Checking the Validity of Cuts and Tracing the Optimal Path
+</H2>
+Sometimes the only evidence of a bug is the fact that the optimal
+solution to a particular problem is never found. This is usually
+caused by either (1) adding an invalid cut, or (2) performing an
+invalid branching. There are two options available for discovering
+such errors. The first is for checking the validity of added cuts.
+This checking must, of course, be done by the user, but SYMPHONY can
+facilitate such checking. To do this, the user must fill in the
+function <A HREF="node237.html#user_check_validity_of_cut"><TT>user_check_validity_of_cut()</TT></A>. THIS function is called every time a
+cut is passed from the cut generator to the LP and can function as an
+independent verifier. To do this, the user must pass (through her own
+data structures) a known feasible solution. Then for each cut passed
+into the function, the user can check whether the cut is satisfied
+by the feasible solution. If not, then there is a problem! Of course,
+the problem could also be with the checking routine. 
+After filling in this function, the user must recompile everything
+(including the libraries) after uncommenting the line in the makefile
+that contains ``<TT>BB_DEFINES += -DCHECK_CUT_VALIDITY</TT>.'' Type
+``<TT>make clean_all</TT>'' and then ``<TT>make</TT>.''
+
+<P>
+Tracing the optimal path can alert the user when the subproblem which
+admits a particular known feasible solution (at least
+according to the branching restrictions that have been imposed so far)
+is pruned. This could be due to an invalid branching. Note that this
+option currently only works for branching on binary variables. To use
+this facility, the user must fill in the function <A HREF="node200.html#user_send_feas_sol"><TT>user_send_feas_sol()</TT></A>. All that is required is to pass out an array
+of user indices that are in the feasible solution that you want to
+trace. Each time the subproblem which admits this feasible solution is
+branched on, the branch that continues to admit the solution is
+marked. When one of these marked subproblems is pruned, the user is
+notified.
+
+<P>
+<HR>
+<A NAME="tex2html1647"
+  HREF="node96.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1643"
+  HREF="node91.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1637"
+  HREF="node94.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1645"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1648"
+  HREF="node96.html">Using the Interactive Graph</A>
+<B>Up:</B> <A NAME="tex2html1644"
+  HREF="node91.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1638"
+  HREF="node94.html">Using Purify and Quantify</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,314 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>SYMPHONY FAQ</title>
+<base target="_self">
+</head>
+
+<body bgcolor="#0033CC" text="#FFFFFF" link="#FFFFFF"
+vlink="#FFFFFF" alink="#FFFFFF" topmargin="0" leftmargin="15">
+
+<p><font size="5" face="Arial Black">SYMPHONY FAQ</font></p>
+
+<table border="0" cellpadding="0" width="100%">
+    <tr>
+        <td width="100%"><table border="0" cellpadding="2"
+        width="100%">
+            <tr>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/index.htm"
+                style="text-decoration:none;"><font
+                color="#FFFFFF" size="3">Home</font></a> </td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/man-5.2"
+                style="text-decoration:none;"><font size="3">Manual</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/applications.htm"
+                style="text-decoration:none;"><font size="3">Applications</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/faq.htm"
+                style="text-decoration:none;"><font size="3">FAQ</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/reference.htm"
+                style="text-decoration:none;"><font size="3">Reference</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/links.htm"
+                style="text-decoration:none;"><font size="3">Links</font></a></td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+    <tr>
+        <td width="100%"><table border="0" cellpadding="0"
+        width="100%">
+            <tr>
+                <td width="100%"><hr color="#FFFFFF">
+                </td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+</table>
+
+<font size="4">
+
+Frequently Asked Questions
+
+<ul>
+    <li> <a href="#2">What is branch, cut, and price</a>? </li>
+    <li> <a href="#1">What is SYMPHONY</a>? </li>
+    <li> <a href="#15">What is open source software</a>?
+    <li> <a href="#16">What is COIN-OR</a>?
+    <li> <a href="#3">Is SYMPHONY documented</a>? </li>
+    <li> <a href="#4">What platforms will SYMPHONY run on</a>? </li>
+    <li> <a href="#5">What language is SYMPHONY written in</a>? </li>
+    <li> <a href="#6">How do I develop an application using SYMPHONY</a>? </li>
+    <li> <a href="#13">Are there samples available to help in development</a>? </li>
+    <li> <a href="#14">What modeling languages and file formats does SYMPHONY work with</a>? </li>
+    <li> <a href="#7">Do I need additional software to use SYMPHONY</a>? </li>
+    <li> <a href="#8">What do I need to run SYMPHONY in parallel</a>? </li>
+    <li> <a href="#9">How do I get SYMPHONY</a>? </li>
+    <li> <a href="#11">How does SYMPHONY compare to COIN/BCP</a>? </li>
+    <li> <a href="#10">How does SYMPHONY compare to ABACUS</a>? </li>
+    <li> <a href="#17">Should I just use a generic MILP solver?</a>
+    <li> <a href="#12">Is there a SYMPHONY users' mailing list</a>? </li>
+</ul>
+
+<hr color="#FFFFFF">
+<br>
+
+<a NAME="2">What is branch, cut, and price?</a>
+<br>
+<blockquote>
+Please see the branch, cut, and price <a
+href="branchandcut/faq.htm">FAQ</a>
+</blockquote>
+
+<hr>
+
+<a NAME="1">What is SYMPHONY?</a> <br> <blockquote> SYMPHONY is a callable
+library for solving mixed-integer linear programs (MILPs) that can be
+customized through a wide variety of user callback functions and control
+parameters. It runs in both sequential and parallel environments (distributed-
+or shared-memory). SYMPHONY's core solution methodology is a branch and cut
+algorithm that incorporates most of the advanced solution management features
+available in other codes. Branch and cut is a technique for solving
+large-scale discrete optimization problems (see question <a
+href="#2">below</a>). For a more complete description of SYMPHONY, click <a
+href="description.htm">here</a> or see the on-line SYMPHONY <a
+href="http://www.coin-or.org/SYMPHONY/SYMPHONY/man-5.2/">manual</a>. </blockquote>
+
+<hr>
+
+<a NAME="15">What is open source software?</a>
+<br>
+<blockquote>
+Open-source software is software that is distributed under an open-source
+license. Open source license allow the user of the software certain rights,
+such as access to the source code and the ability to redistribute the software
+under certain conditions. The big advantage of open-source software is that
+the user has access to the inner workings and can participate directly in
+development efforts. This also allows development of highly specialized
+versions of the original code. All of the software available on this site is
+distributed under the <a href="http://www-106.ibm.com/developerworks/library/os-cplfaq.html">Common Public License</a>, an open
+source license used by the <a href="http://www.coin-or.org">COIN-OR</a>
+project. For more information on open-source development, visit the <a
+href="http://www.opensource.org">Open Source Initiative</a>.
+</blockquote>
+
+<hr>
+
+<a NAME="16">What is COIN-OR?</a>
+<br>
+<blockquote>
+<a
+href="http://www.coin-or.org">COIN-OR</a> is the Computational Infrastructure
+for Operations Research project and is a consortium of researchers and
+practitioners from both academia and industry who support the development og
+open-source software tools for operations research. The project is run by the
+non-profit <a href="http://www.coin-or.org/foundation.html">COIN-OR
+Foundation</a>. The software available on this site is part of the <a
+href="http://www.coin-or.org">COIN-OR</a> software repository. All software
+available at this site uses <a href="http://www.coin-or.org">COIN-OR</a>'s
+open-source <a href="SYMPHONY/license.htm">license</a>, called the <a
+href="http://www-106.ibm.com/developerworks/library/os-cplfaq.html"> Common
+Public License</a>. </blockquote>
+
+<hr>
+
+<a NAME="3">Is SYMPHONY documented?</a>
+<br>
+<blockquote>
+There is an extensive <a href="http://www.coin-or.org/SYMPHONY/SYMPHONY/man-5.2/">user's
+manual</a> available both on-line and in <a
+href="http://www.coin-or.org/SYMPHONY/doc/SYMPHONY-5.2-Manual.pdf">PDF</a>.
+The manual is included with the standard distribution. There is also a simple
+walkthrough <a
+href="docs/SYMPHONY-Walkthrough.pdf">guide</a> to
+developing an application with SYMPHONY.
+</blockquote>
+
+<hr>
+
+<a NAME="4">What platforms will SYMPHONY run on?</a>
+<br>
+<blockquote>
+SYMPHONY has been used on most common Unix platforms. It has tested under the
+following operating systems
+<ul>
+<li>Linux
+<li>SunOS/Solaris
+<li>AIX
+<li>IRIX
+<li>OSF
+<li>Microsoft Windows (serial mode only)
+</ul>
+It should be easy to port to others as well. 
+</blockquote>
+
+<hr>
+
+<a NAME="5">What language is SYMPHONY written in?</a>
+<br>
+<blockquote>
+SYMPHONY is implemented in C, although it calls on some third-party codes
+written in C++ and will compile using a C++ compiler. SYMPHONY also has a C++
+interface derived from the <a href="www.coin-or.org">COIN-OR</a> Open Solver 
+Interface.
+</blockquote>
+
+<hr>
+
+<a NAME="6">How do I develop an application using SYMPHONY?</a>
+<br>
+<blockquote>
+Starting with the SYMPHONY generic MILP solver, you customize the algorithm by
+providing problem-specific subroutines, such as functions for performing cut
+generation or branching, that inherently depend on problem structure. This is
+described in more detail in the <a href="#3"> documentation</a>. There is also
+a quick start guide in the README file included with the distribution and in
+the <a href="http://www.coin-or.org/SYMPHONY/SYMPHONY/man-5.2/">user's manual</a>.
+</blockquote>
+
+<hr>
+
+<a NAME="13">Are there samples available to help in development?</a>
+<br>
+<blockquote>
+There are a number of <a
+href="http://www.coin-or.org/SYMPHONY/applications.htm">applications</a> available for
+<a href="license.htm">download</a> that illustrate SYMPHONY development. There
+is also a generic template code that can be used as a starting point for
+customization.
+</blockquote>
+
+<hr>
+
+<a NAME="14">What modeling languages and file formats does SYMPHONY work with?</a>
+<br>
+<blockquote>
+SYMPHONY will read AMPL/GMPL files using GLPKs parser, or MPS file using <a
+href="http://www.coin-or.org">COIN-OR</a>'s parser. It can also use <a
+href="http://www.mat.ua.pt/thh/flopc/">FlopC++</a> as a modeling interface.
+</blockquote>
+
+<hr>
+
+<a NAME="7">Do I need additional software to use SYMPHONY?</a>
+<br>
+<blockquote>
+SYMPHONY requires the use of a third-party LP solver. The LP solver links with
+the framework through a defined interface. Through <a
+href="http://www.coin-or.org">COIN-OR</a>'s Open Solver Interface, it is now
+possible to use most commonly available LP solvers, including a few
+open-source alternatives. There are also native interfaces to CPLEX and OSL
+that are slightly more efficient. SYMPHONY also relies on other third-party
+software for some functionality. For instance, SYMPHONY can use <a
+href="http://www.coin-or.org">COIN-OR</a>'s Cut Generator Library for
+generating generic cutting planes, <a
+href="http://www.coin-or.org">COIN-OR</a>'s MPS file parser for reading MPS
+files and GLPKs parser for reading in AMPL files. It can also use <a
+href="http://www.mat.ua.pt/thh/flopc/">FlopC++</a> as a modeling interface.
+Most of the software needed is now included in the SYMPHONY distribution.
+</blockquote>
+
+<hr>
+
+<a NAME="8">What do I need to run SYMPHONY in parallel?</a>
+<br>
+<blockquote>
+To run SYMPHONY in a distributed memory environment requires the use
+of a third-party communications protocol supporting basic
+message-passing functions. Currently, there is an interface to
+<a href="http://www.csm.ornl.gov/pvm/">Parallel Virtual Machine</a>,
+an open source message-passing library available for free download
+from Oak Ridge National Labs.
+</blockquote>
+
+<hr>
+
+<a NAME="9">How do I get SYMPHONY?</a>
+<br>
+<blockquote>
+FOr information on getting the latest SYMPHONY packaged release, go <a
+href="index.htm">here</a>. 
+</blockquote>
+
+<hr>
+
+<a NAME="11">What is the relationship of SYMPHONY and COIN/BCP?</a> <br>
+<blockquote> COIN/BCP is a C++ framework based roughly on an ancestor of
+SYMPHONY, so they take substantially the same approach and have similar
+functionality. COIN/BCP was developed at IBM and is also part of the <a
+href="http://www.coin-or.org">COIN-OR</a> software repository. Currently,
+SYMPHONY is easier to use "out of the box" and is a better choice for
+beginners. However, the most recent versions can only be used for implementing
+pure branch and cut (without column generation). COIN/BCP is much better than
+SYMPHONY in some areas, however, such as support for column generation.
+COIN/BCP is missing some features that SYMPHONY has, such as an implementation
+of global cut pools. SYMPHONY and COIN/BCP may be combined into a
+third-generation framework currently under development. </blockquote>
+
+<hr>
+
+<a NAME="17">Should I just use a generic MILP solver?</a>
+<br>
+<blockquote>
+Although many excellent generic MILP solvers employing a version of the branch
+and cut algorithm are now available, most are not as flexible as framework
+like SYMPHONY, which is designed to allow the user to insert specialized
+methods that take advantage of problem structure. It is not possible to solve
+many of the toughest discrete optimization problems without problem-specific
+modifications to the generic algorithm. In recent versions of commercial MILP
+solvers such as CPLEX, it has become possible to add problem-specific cuts and
+customize certain features, but frameworks such as <a
+href="SYMPHONY/">SYMPHONY</a> are more flexible and support a much wider range
+of options. If you do not need to develop a custom code, then you are
+probably better off with a commercial MILP solver. Of course, having access to
+the full source code is also a big advantage of SYMPHONY and other
+open-source alternatives.
+</blockquote>
+
+<hr>
+
+<a NAME="12">Is there a SYMPHONY users' mailing list?</a>
+<br>
+<blockquote>
+Yes. To subscribe to the SYMPHONY user's list serve, click
+<a href="http://list.coin-or.org/mailman/listinfo/coin-symphony">here</a>.
+</blockquote>
+
+</font>
+
+<hr>
+
+<p>This page maintained by Ted Ralphs (<a
+href="mailto:tkralphs@lehigh.edu">tkralphs@lehigh.edu</a>)</p>
+
+<p>Last updated June 12, 2007</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

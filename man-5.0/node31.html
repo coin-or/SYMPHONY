@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Master Module</TITLE>
+<META NAME="description" CONTENT="The Master Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node32.html">
+<LINK REL="previous" HREF="node30.html">
+<LINK REL="up" HREF="node30.html">
+<LINK REL="next" HREF="node32.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html811"
+  HREF="node32.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html807"
+  HREF="node30.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html801"
+  HREF="node30.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html809"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html812"
+  HREF="node32.html">The Tree Manager Module</A>
+<B>Up:</B> <A NAME="tex2html808"
+  HREF="node30.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html802"
+  HREF="node30.html">Modular Implementation</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00513100000000000000"></A>
+<A NAME="master-process"></A>
+<BR>
+The Master Module
+</H3>
+
+<P>
+The <EM>master module</EM> includes functions that perform problem initialization
+and I/O. This module is the only persistent module and stores all static
+problem data. The other modules are created only during a solve call and
+destroyed afterward. All calls to the API are processed through the master
+module. These functions of the master module implement the following tasks:
+
+<UL>
+<LI>Initialize the environment.
+</LI>
+<LI>Set and maintain parameter values.
+</LI>
+<LI>Read and store static problem data for instance to be solved.
+</LI>
+<LI>Compute an initial upper bound using heuristics.
+</LI>
+<LI>Perform problem preprocessing.
+</LI>
+<LI>Initialize the solution process, pass problem information to the
+        solver modules and store the results after completion of the solve 
+	call.
+</LI>
+<LI>Track the status of associated processes during parallel
+        solution calls.
+</LI>
+<LI>Act as a clearing house for output during the solution process.
+</LI>
+<LI>Store warm start information between solver calls.
+</LI>
+<LI>Service requests from the user through the API for problem data,
+        problem modification, and parameter modification.
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html811"
+  HREF="node32.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html807"
+  HREF="node30.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html801"
+  HREF="node30.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html809"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html812"
+  HREF="node32.html">The Tree Manager Module</A>
+<B>Up:</B> <A NAME="tex2html808"
+  HREF="node30.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html802"
+  HREF="node30.html">Modular Implementation</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Shared-memory Architectures</TITLE>
+<META NAME="description" CONTENT="Shared-memory Architectures">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node108.html">
+<LINK REL="up" HREF="node107.html">
+<LINK REL="next" HREF="node110.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1884"
+  HREF="node110.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1880"
+  HREF="node107.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1876"
+  HREF="node108.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1882"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1885"
+  HREF="node110.html">Debugging Your Application</A>
+<B>Up:</B> <A NAME="tex2html1881"
+  HREF="node107.html">Parallel Implementation</A>
+<B> Previous:</B> <A NAME="tex2html1877"
+  HREF="node108.html">Distributed-memory Architectures</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00652000000000000000"></A>
+<A NAME="shared"></A>
+<BR>
+Shared-memory Architectures
+</H2>
+
+<P>
+In the shared memory configuration, it is not necessary to use
+message passing to move information from one module to another since
+memory is globally accessible. In the few cases where the user would
+ordinarily have to pass information using message passing, it is
+easiest and most efficient to simply copy the information to the new
+location. This copying gets done in the <EM>send</EM> function and hence
+the <EM>receive</EM> function is never actually called. This means that
+the user must perform all necessary initialization, etc. in the send
+function. This makes it a little confusing to write source code which
+will work for all configurations. However, the confusion should be
+minimized by looking at the sample applications, especially the VRP solver,
+which works in all configurations, sequential, distributed parallel, and
+shared parallel. 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-10-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

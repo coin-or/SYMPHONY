@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Constraints</TITLE>
+<META NAME="description" CONTENT="Constraints">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node13.html">
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="node10.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html381"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html377"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html371"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html379"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html382"
+  HREF="node13.html">Search Tree</A>
+<B>Up:</B> <A NAME="tex2html378"
+  HREF="node10.html">Data Structures and Storage</A>
+<B> Previous:</B> <A NAME="tex2html372"
+  HREF="node11.html">Variables</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00062200000000000000"></A>
+<A NAME="constraints"></A>
+<BR>
+Constraints
+</H3>
+
+<P>
+Because the global list of potential constraints (also called cuts) is
+not usually known a priori or is extremely large, constraints cannot
+generally be represented simply by a user-assigned index. Instead,
+each constraint is assigned a global index only after it becomes
+active in some subproblem. It is up to the user, if desired, to
+designate a compact <EM>representation</EM> for each class of constraints
+that is to be generated and to implement subroutines for converting
+from this compact representation to a matrix row, given the list of
+active variables. For instance, suppose that the set of nonzero
+variables in a particular class of constraints corresponds to the set
+of edges across a cut in a graph. Instead of storing the indices of
+each variable explicitly, one could simply store the set of nodes on
+one side (``shore'') of the cut as a bit array. The constraint could
+then be constructed easily for any particular set of active variables
+(edges).
+
+<P>
+Just as with variables, the constraints are divided into <EM>core
+constraints</EM> and <EM>extra constraints</EM>. The core constraints are
+those that are active in every subproblem, whereas the extra
+constraints can be generated dynamically and are free to enter and leave
+as appropriate. Obviously, the set of core constraints must be known
+and constructed explicitly by the user. Extra constraints, on the
+other hand, are generated dynamically by the cut generator as they are
+violated. As with variables, a good set of core constraints can have a
+significant effect on efficiency.
+
+<P>
+Note that the user is not <EM>required</EM> to designate a compact
+representation scheme. Constraints can simply be represented
+explicitly as matrix rows with respect to the global set of variables.
+However, designating a compact form can result in large reductions in
+memory use if the number of variables in the problem is large.
+
+<P>
+<HR>
+<A NAME="tex2html381"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html377"
+  HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html371"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html379"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html382"
+  HREF="node13.html">Search Tree</A>
+<B>Up:</B> <A NAME="tex2html378"
+  HREF="node10.html">Data Structures and Storage</A>
+<B> Previous:</B> <A NAME="tex2html372"
+  HREF="node11.html">Variables</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,374 @@
+This is TeX, Version 3.14159 (C version 6.1) (format=latex 0.3.11)  8 JUN 2000 12:45
+**images.tex
+(images.tex
+LaTeX2e <1997/06/01>
+Babel <v3.6h> and hyphenation patterns for american, french, german, spanish, l
+oaded.
+
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/article.cls
+Document Class: article 1997/06/16 v1.3v Standard LaTeX document class
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/size11.clo
+File: size11.clo 1997/06/16 v1.3v Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+\headwidth=\skip43
+(/home/tkr/BB-2.7/Doc/html.sty
+Package: html 1996/02/01 v1.0 hypertext commands for latex2html (nd, hs)
+\c@lpart=\count87
+\c@lchapter=\count88
+\c@lsection=\count89
+\c@lsubsection=\count90
+\c@lsubsubsection=\count91
+\c@lparagraph=\count92
+\c@lsubparagraph=\count93
+\c@lsubsubparagraph=\count94
+\c@lequation=\count95
+)
+\lthtmlwrite=\write3
+\sizebox=\box26
+(images.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 125.
+LaTeX Font Info:    ... okay on input line 125.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 125.
+LaTeX Font Info:    ... okay on input line 125.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 125.
+LaTeX Font Info:    ... okay on input line 125.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 125.
+LaTeX Font Info:    ... okay on input line 125.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 125.
+LaTeX Font Info:    ... okay on input line 125.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 125.
+LaTeX Font Info:    ... okay on input line 125.
+[1
+
+
+]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 140.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 140.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 140.
+[2
+
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 170.
+
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1997/06/16 v2.5e Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 170.
+latex2htmlSize :tex2html_wrap_inline2620: 9.01828pt::0.0pt.
+[3
+
+] [4
+
+] [5
+
+] [6
+
+] [7
+
+] [8
+
+] [9
+
+] [10
+
+] [11
+
+] [12
+
+] [13
+
+] [14
+
+] [15
+
+] [16
+
+] [17
+
+] [18
+
+] [19
+
+] [20
+
+] [21
+
+] [22
+
+] [23
+
+] [24
+
+] [25
+
+] [26
+
+] [27
+
+] [28
+
+] [29
+
+] [30
+
+]
+latex2htmlSize :tex2html_wrap_inline2622: 6.69167pt::2.43333pt.
+[31
+
+]
+latex2htmlSize :tex2html_wrap_inline2624: 6.96387pt::1.48888pt.
+[32
+
+]
+latex2htmlSize :tex2html_wrap_inline2628: 6.96387pt::1.48888pt.
+[33
+
+] [34
+
+] [35
+
+] [36
+
+] [37
+
+]
+latex2htmlSize :tex2html_wrap_inline2646: 8.8943pt::0.0pt.
+[38
+
+]
+latex2htmlSize :tex2html_wrap_inline2648: 7.4181pt::0.0pt.
+[39
+
+] [40
+
+] [41
+
+] [42
+
+] [43
+
+] [44
+
+] [45
+
+] [46
+
+] [47
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 656--659
+[]\OT1/cmr/m/n/10.95 The type of so-lu-tion passed on to the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 656--659
+\OT1/cmr/m/n/10.95 dis-play-ing func-tion. Pos-si-ble val-ues are
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 656--659
+\OT1/cmtt/m/n/10.95 DISP[]FEAS[]SOLUTION\OT1/cmr/m/n/10.95 , \OT1/cmtt/m/n/10.9
+5 DISP[]RELAXED[]SOLUTION \OT1/cmr/m/n/10.95 and
+ []
+
+[48
+
+] [49
+
+]
+
+LaTeX Warning: Reference `cut_data' on page 50 undefined on input line 700.
+
+
+LaTeX Warning: Reference `cut_data' on page 50 undefined on input line 705.
+
+
+Underfull \hbox (badness 3179) in paragraph at lines 712--717
+\OT1/cmtt/m/n/10.95 FIXED[]-TO[]-UB\OT1/cmr/m/n/10.95 , \OT1/cmtt/m/n/10.95 PER
+M[]-FIXED[]-TO[]-UB\OT1/cmr/m/n/10.95 , \OT1/cmtt/m/n/10.95 TEMP[]-
+ []
+
+[50
+
+] [51
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 745--747
+[]\OT1/cmr/m/n/10.95 Regulated by the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 745--747
+\OT1/cmtt/m/n/10.95 select[]candidates[]default \OT1/cmr/m/n/10.95 pa-ram-e-ter
+
+ []
+
+[52
+
+] [53
+
+] [54
+
+] [55
+
+] [56
+
+] [57
+
+] [58
+
+] [59
+
+] [60
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 873--876
+[]\OT1/cmr/m/n/10.95 Possible val-ues: \OT1/cmtt/m/n/10.95 SAME\OT1/cmr/m/n/10.
+95 , \OT1/cmtt/m/n/10.95 FIRST[]CUT[]BETTER\OT1/cmr/m/n/10.95 ,
+ []
+
+
+Underfull \hbox (badness 3954) in paragraph at lines 873--876
+\OT1/cmtt/m/n/10.95 SECOND[]CUT[]BETTER \OT1/cmr/m/n/10.95 and \OT1/cmtt/m/n/10
+.95 DIFFERENT \OT1/cmr/m/n/10.95 (i.e., not com-
+ []
+
+[61
+
+] [62
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 895--897
+[]\OT1/cmtt/m/n/10.95 UNPACK[]CUTS[]SINGLE \OT1/cmr/m/n/10.95 or
+ []
+
+[63
+
+] [64
+
+]
+Underfull \hbox (badness 3724) in paragraph at lines 928--929
+[]\OT1/cmr/m/n/10.95 Where the so-lu-tion is to be sent---\OT1/cmtt/m/n/10.95 L
+P[]SOL[]TO[]CG \OT1/cmr/m/n/10.95 or
+ []
+
+[65
+
+] [66
+
+] [67
+
+] [68
+
+]
+Underfull \hbox (badness 1371) in paragraph at lines 976--978
+[]\OT1/cmtt/m/n/10.95 GENERATE[]NEXTIND \OT1/cmr/m/n/10.95 or \OT1/cmtt/m/n/10.
+95 GENERATE[]REAL[]NEXTIND \OT1/cmr/m/n/10.95 (see
+ []
+
+[69
+
+] [70
+
+] [71
+
+] [72
+
+] [73
+
+] [74
+
+]
+latex2htmlSize :tex2html_wrap_inline2670: 8.86255pt::0.0pt.
+[75
+
+] [76
+
+] [77
+
+] [78
+
+] [79
+
+] [80
+
+] [81
+
+] [82
+
+] [83
+
+] [84
+
+] [85
+
+] [86
+
+] [87
+
+] [88
+
+] [89
+
+] [90
+
+] [91
+
+] [92
+
+] [93
+
+] [94
+
+]
+Underfull \hbox (badness 1867) in paragraph at lines 1266--1268
+[]\OT1/cmr/m/n/10.95 Cut is not sent to the LP, re-gard-less of the value of
+ []
+
+[95
+
+] [96
+
+] [97
+
+] [98
+
+] [99
+
+] [100
+
+] [101
+
+] [102
+
+] (images.aux)
+
+LaTeX Warning: There were undefined references.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 416 strings out of 10878
+ 4472 string characters out of 71383
+ 49892 words of memory out of 262141
+ 3365 multiletter control sequences out of 9500
+ 7492 words of font info for 28 fonts, out of 150000 for 255
+ 15 hyphenation exceptions out of 607
+ 21i,10n,21p,237b,211s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on images.dvi (102 pages, 48700 bytes).

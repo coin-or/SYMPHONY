@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The LP Engine</TITLE>
+<META NAME="description" CONTENT="The LP Engine">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node65.html">
+<LINK REL="previous" HREF="node63.html">
+<LINK REL="up" HREF="node57.html">
+<LINK REL="next" HREF="node65.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1137"
+  HREF="node65.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1133"
+  HREF="node57.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1127"
+  HREF="node63.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1135"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1138"
+  HREF="node65.html">Cut Generation</A>
+<B>Up:</B> <A NAME="tex2html1134"
+  HREF="node57.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html1128"
+  HREF="node63.html">Inter-process Communication for Distributed</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00525000000000000000">
+The LP Engine</A>
+</H2>
+
+<P>
+SYMPHONY requires the use of a third-party callable library to solve the LP 
+relaxations once they are formulated. Native interfaces to ILOG's
+<A NAME="tex2html19"
+  HREF="http://www.cplex.com">CPLEX</A><IMG
+ WIDTH="25" HEIGHT="23" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$^{\copyright}$">
+and IBM's
+<A NAME="tex2html20"
+  HREF="http://www-4.ibm.com/software/data/bi/osl/index.html">OSL</A>
+are available. As of Version 4.0, the Open Solver Interface, available from
+<A NAME="tex2html21"
+  HREF="http://www.coin-or.org">COIN</A>
+.
+can be used to interface with most commonly available LP solvers. The list of
+solvers with OSI interfaces currently numbers eight and includes both
+commercial and open source alternatives. If the COIN libraries are used, make
+sure to set the proper paths in the SYMPHONY makefile.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

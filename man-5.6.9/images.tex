@@ -1,0 +1,1147 @@
+\batchmode
+
+
+\documentclass[twoside,11pt]{book}
+\RequirePackage{ifthen}
+
+
+
+
+\oddsidemargin 0in
+\evensidemargin 0in
+\topmargin 0in
+\textwidth 6.5in
+
+\newlength{\headwidth} 
+
+\setlength{\headwidth}{\textwidth} 
+
+\addtolength{\headwidth}{-4.4444pt} 
+\textheight 8.7in
+\setcounter{secnumdepth}{3}
+
+
+\catcode`\@=11\relax   %allow @ in macro names
+
+
+\if@twoside         % If two-sided printing.
+\else               % If one-sided printing.
+
+\fi
+
+
+\catcode`\@=12\relax   %disable @ in macro names
+
+
+\pagestyle{headings}
+
+
+\markright{\bf\thesection }{}
+
+
+\usepackage{epsfig,html}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{easyeqn}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{splitidx}
+\usepackage[usenames]{color}
+
+
+\makeindex
+\newindex[Index of C API Functions]{f}
+\newindex[Index of User Callback API Functions]{cf}
+\newindex[Index of Parameters]{p}
+
+\lstloadlanguages{C++}
+
+%
+\providecommand{\be}{\begin{enumerate}}%
+\providecommand{\ee}{\end{enumerate}}%
+\providecommand{\bc}{\begin{center}}%
+\providecommand{\ec}{\end{center}}%
+\providecommand{\bt}{\begin{tabular}}%
+\providecommand{\et}{\end{tabular}}%
+\providecommand{\bd}{\begin{description}}%
+\providecommand{\ed}{\end{description}}%
+\providecommand{\bi}{\begin{itemize}}%
+\providecommand{\ei}{\end{itemize}}%
+\providecommand{\bv}{\begin{verbatim}
+}
+\newcommand{\ev}{\end{verbatim}
+}%
+\providecommand{\functiondef}[1]{\subsubsection{#1}}%
+\providecommand{\firstfuncdef}[1]{\subsubsection{#1}}%
+\providecommand{\code}[1]{{\color{Brown}\texttt{#1}}}%
+\providecommand{\describe}{\item[{\color{cyan}Description:}] \hfill}%
+\providecommand{\args}{\item[{\color{Brown}Arguments:}] \hfill}%
+\providecommand{\returns}{\item[{\color{green}Return values:}] \hfill}%
+\providecommand{\postp}{\item[Post-processing:] \hfill}%
+\providecommand{\nopostp}{\item[Post-processing:] None \hfill} 
+
+%
+\providecommand{\BB}{{\sc SYMPHONY}}%
+\providecommand{\TM}{{\sc TreeManager}}%
+\providecommand{\LP}{{\sc LP}}%
+\providecommand{\ra}{$\rightarrow$}%
+\providecommand{\vmin}{\mathop{\text{vmin}}}%
+\providecommand{\Z}{\mathbb{Z}}%
+\providecommand{\Q}{\mathbb{Q}} 
+%
+\renewcommand{\Re}{\mathbb{R}}%
+\providecommand{\ptt}[1]{{\tt {\color{BrickRed} #1}}}%
+\providecommand{\bs}{{$\backslash$}} 
+
+
+\usepackage[latex2html,dvipdfm,colorlinks]{hyperref}
+\hypersetup{
+  linkcolor=blue,
+}
+
+
+
+\setlength{\parindent}{0in} 
+
+\setlength{\parskip}{0.1in} 
+
+
+
+
+
+\pagecolor[gray]{.7}
+
+\usepackage[latin1]{inputenc}
+
+
+
+\makeatletter
+
+\makeatletter
+\count@=\the\catcode`\_ \catcode`\_=8 
+\newenvironment{tex2html_wrap}{}{}%
+\catcode`\<=12\catcode`\_=\count@
+\newcommand{\providedcommand}[1]{\expandafter\providecommand\csname #1\endcsname}%
+\newcommand{\renewedcommand}[1]{\expandafter\providecommand\csname #1\endcsname{}%
+  \expandafter\renewcommand\csname #1\endcsname}%
+\newcommand{\newedenvironment}[1]{\newenvironment{#1}{}{}\renewenvironment{#1}}%
+\let\newedcommand\renewedcommand
+\let\renewedenvironment\newedenvironment
+\makeatother
+\let\mathon=$
+\let\mathoff=$
+\ifx\AtBeginDocument\undefined \newcommand{\AtBeginDocument}[1]{}\fi
+\newbox\sizebox
+\setlength{\hoffset}{0pt}\setlength{\voffset}{0pt}
+\addtolength{\textheight}{\footskip}\setlength{\footskip}{0pt}
+\addtolength{\textheight}{\topmargin}\setlength{\topmargin}{0pt}
+\addtolength{\textheight}{\headheight}\setlength{\headheight}{0pt}
+\addtolength{\textheight}{\headsep}\setlength{\headsep}{0pt}
+\setlength{\textwidth}{451pt}
+\setlength{\textheight}{554pt}
+\newwrite\lthtmlwrite
+\makeatletter
+\let\realnormalsize=\normalsize
+\global\topskip=2sp
+\def\preveqno{}\let\real@float=\@float \let\realend@float=\end@float
+\def\@float{\let\@savefreelist\@freelist\real@float}
+\def\liih@math{\ifmmode$\else\bad@math\fi}
+\def\end@float{\realend@float\global\let\@freelist\@savefreelist}
+\let\real@dbflt=\@dbflt \let\end@dblfloat=\end@float
+\let\@largefloatcheck=\relax
+\let\if@boxedmulticols=\iftrue
+\def\@dbflt{\let\@savefreelist\@freelist\real@dbflt}
+\def\adjustnormalsize{\def\normalsize{\mathsurround=0pt \realnormalsize
+ \parindent=0pt\abovedisplayskip=0pt\belowdisplayskip=0pt}%
+ \def\phantompar{\csname par\endcsname}\normalsize}%
+\def\lthtmltypeout#1{{\let\protect\string \immediate\write\lthtmlwrite{#1}}}%
+\newcommand\lthtmlhboxmathA{\adjustnormalsize\setbox\sizebox=\hbox\bgroup\kern.05em }%
+\newcommand\lthtmlhboxmathB{\adjustnormalsize\setbox\sizebox=\hbox to\hsize\bgroup\hfill }%
+\newcommand\lthtmlvboxmathA{\adjustnormalsize\setbox\sizebox=\vbox\bgroup %
+ \let\ifinner=\iffalse \let\)\liih@math }%
+\newcommand\lthtmlboxmathZ{\@next\next\@currlist{}{\def\next{\voidb@x}}%
+ \expandafter\box\next\egroup}%
+\newcommand\lthtmlmathtype[1]{\gdef\lthtmlmathenv{#1}}%
+\newcommand\lthtmllogmath{\dimen0\ht\sizebox \advance\dimen0\dp\sizebox
+  \ifdim\dimen0>.95\vsize
+   \lthtmltypeout{%
+*** image for \lthtmlmathenv\space is too tall at \the\dimen0, reducing to .95 vsize ***}%
+   \ht\sizebox.95\vsize \dp\sizebox\z@ \fi
+  \lthtmltypeout{l2hSize %
+:\lthtmlmathenv:\the\ht\sizebox::\the\dp\sizebox::\the\wd\sizebox.\preveqno}}%
+\newcommand\lthtmlfigureA[1]{\let\@savefreelist\@freelist
+       \lthtmlmathtype{#1}\lthtmlvboxmathA}%
+\newcommand\lthtmlpictureA{\bgroup\catcode`\_=8 \lthtmlpictureB}%
+\newcommand\lthtmlpictureB[1]{\lthtmlmathtype{#1}\egroup
+       \let\@savefreelist\@freelist \lthtmlhboxmathB}%
+\newcommand\lthtmlpictureZ[1]{\hfill\lthtmlfigureZ}%
+\newcommand\lthtmlfigureZ{\lthtmlboxmathZ\lthtmllogmath\copy\sizebox
+       \global\let\@freelist\@savefreelist}%
+\newcommand\lthtmldisplayA{\bgroup\catcode`\_=8 \lthtmldisplayAi}%
+\newcommand\lthtmldisplayAi[1]{\lthtmlmathtype{#1}\egroup\lthtmlvboxmathA}%
+\newcommand\lthtmldisplayB[1]{\edef\preveqno{(\theequation)}%
+  \lthtmldisplayA{#1}\let\@eqnnum\relax}%
+\newcommand\lthtmldisplayZ{\lthtmlboxmathZ\lthtmllogmath\lthtmlsetmath}%
+\newcommand\lthtmlinlinemathA{\bgroup\catcode`\_=8 \lthtmlinlinemathB}
+\newcommand\lthtmlinlinemathB[1]{\lthtmlmathtype{#1}\egroup\lthtmlhboxmathA
+  \vrule height1.5ex width0pt }%
+\newcommand\lthtmlinlineA{\bgroup\catcode`\_=8 \lthtmlinlineB}%
+\newcommand\lthtmlinlineB[1]{\lthtmlmathtype{#1}\egroup\lthtmlhboxmathA}%
+\newcommand\lthtmlinlineZ{\egroup\expandafter\ifdim\dp\sizebox>0pt %
+  \expandafter\centerinlinemath\fi\lthtmllogmath\lthtmlsetinline}
+\newcommand\lthtmlinlinemathZ{\egroup\expandafter\ifdim\dp\sizebox>0pt %
+  \expandafter\centerinlinemath\fi\lthtmllogmath\lthtmlsetmath}
+\newcommand\lthtmlindisplaymathZ{\egroup %
+  \centerinlinemath\lthtmllogmath\lthtmlsetmath}
+\def\lthtmlsetinline{\hbox{\vrule width.1em \vtop{\vbox{%
+  \kern.1em\copy\sizebox}\ifdim\dp\sizebox>0pt\kern.1em\else\kern.3pt\fi
+  \ifdim\hsize>\wd\sizebox \hrule depth1pt\fi}}}
+\def\lthtmlsetmath{\hbox{\vrule width.1em\kern-.05em\vtop{\vbox{%
+  \kern.1em\kern0.8 pt\hbox{\hglue.17em\copy\sizebox\hglue0.8 pt}}\kern.3pt%
+  \ifdim\dp\sizebox>0pt\kern.1em\fi \kern0.8 pt%
+  \ifdim\hsize>\wd\sizebox \hrule depth1pt\fi}}}
+\def\centerinlinemath{%
+  \dimen1=\ifdim\ht\sizebox<\dp\sizebox \dp\sizebox\else\ht\sizebox\fi
+  \advance\dimen1by.5pt \vrule width0pt height\dimen1 depth\dimen1 
+ \dp\sizebox=\dimen1\ht\sizebox=\dimen1\relax}
+
+\def\lthtmlcheckvsize{\ifdim\ht\sizebox<\vsize 
+  \ifdim\wd\sizebox<\hsize\expandafter\hfill\fi \expandafter\vfill
+  \else\expandafter\vss\fi}%
+\providecommand{\selectlanguage}[1]{}%
+\makeatletter \tracingstats = 1 
+\providecommand{\Beta}{\textrm{B}}
+\providecommand{\Mu}{\textrm{M}}
+\providecommand{\Kappa}{\textrm{K}}
+\providecommand{\Rho}{\textrm{R}}
+\providecommand{\Epsilon}{\textrm{E}}
+\providecommand{\Chi}{\textrm{X}}
+\providecommand{\Iota}{\textrm{J}}
+\providecommand{\omicron}{\textrm{o}}
+\providecommand{\Zeta}{\textrm{Z}}
+\providecommand{\Eta}{\textrm{H}}
+\providecommand{\Nu}{\textrm{N}}
+\providecommand{\Omicron}{\textrm{O}}
+\providecommand{\Tau}{\textrm{T}}
+\providecommand{\Alpha}{\textrm{A}}
+
+
+\begin{document}
+\pagestyle{empty}\thispagestyle{empty}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength hsize=\the\hsize}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength vsize=\the\vsize}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength hoffset=\the\hoffset}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength voffset=\the\voffset}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength topmargin=\the\topmargin}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength topskip=\the\topskip}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength headheight=\the\headheight}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength headsep=\the\headsep}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength parskip=\the\parskip}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength oddsidemargin=\the\oddsidemargin}\lthtmltypeout{}%
+\makeatletter
+\if@twoside\lthtmltypeout{latex2htmlLength evensidemargin=\the\evensidemargin}%
+\else\lthtmltypeout{latex2htmlLength evensidemargin=\the\oddsidemargin}\fi%
+\lthtmltypeout{}%
+\makeatother
+\setcounter{page}{1}
+\onecolumn
+
+% !!! IMAGES START HERE !!!
+
+\setcounter{secnumdepth}{3}
+\stepcounter{chapter}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{chapter}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure615}%
+\begin{figure}\begin{tabular}{ll}
+\hline
+\texttt{--enable-debug} & compile all projects with debug options set \\
+\texttt{--enable-debug-symphony} & compile only SYMPHONY project with debug options \\
+\texttt{--enable-doscompile} & Under Cygwin, compile so that executables do
+not depend on the CYGWIN DLL \\
+\texttt{--enable-static} & build static libraries \\
+\texttt{--enable-static-executable} &  create a complete static executable \\
+\texttt{--enable-gnu-packages} & compile with GNU packages \\
+& compile interactive optimizer with readline library \\
+\hline
+\texttt{--disable-cgl-cuts} & disable generic cut generation \\
+\texttt{--enable-sensitivity-analysis} & compile in the sensitivity analysis features \\
+\texttt{--enable-root-only} & process only the root node \\
+\texttt{--enable-frac-branching} & compile in the fractional branching option \\
+\texttt{--enable-tests}&  perform additional sanity checks (for debugging purposes) \\
+\texttt{--enable-tm-tests }& perform more tests  \\
+\texttt{--enable-trace-path}&  additional debugging options \\
+\texttt{--enable-cut-check}& additional debugging options \\
+\texttt{--enable-statistics}& additional statistics \\
+\texttt{--enable-pseudo-costs}& enable some experimental pseudo-cost branching tools \\
+\texttt{--enable-draw-graph} &  enable IGD graph drawing application \\
+\hline
+\texttt{ --with-XXX-incdir} &  specify the directory with the header files for the XXX package \\
+&where XXX is one of LP solver packages: cplex, glpk, osl, soplex, \\
+& xpress \\
+\texttt{--with-XXX-lib} &  specify the flags to link with the library  
+XXX package \\
+&where XXX is one of LP solver packages: cplex, glpk, osl, soplex, \\
+& xpress \\
+\texttt{--with-lp-solver[=lpsolver]} &  specify the LP solver in small 
+letters (default lpsolver=clp) \\
+\texttt{--with-application} &  compile the application library \\
+\hline
+\texttt{--enable-openmp} &   compile in OpenMP features \\
+\texttt{--with-pvm } &  compile in parallel architecture (assuming that pvm is \\
+&installed and the variable PVM\_ROOT is defined.) \\
+\texttt{--without-cg} &  compile without cut generator module \\
+\texttt{--without-cp} &  compile without cut pool module \\
+\texttt{--without-lp} &  compile without LP solver module \\
+\texttt{--without-tm} &  compile without tree manager module
+\end{tabular}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22324}%
+\bgroup\color{Brown}$ \backslash$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{chapter}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+{\newpage\clearpage
+\lthtmlfigureA{figure1885}%
+\begin{figure}{\color{Brown}
+\begin{Verbatim}
+[frame=lines]
+int main(int argc, char **argv)
+{
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   sym_solve(env);
+   sym_close_environment(env);
+}\end{Verbatim}
+
+}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{figure1910}%
+\begin{figure}{\color{Brown}
+\begin{Verbatim}
+[frame=lines]
+int main(int argc, char **argv)
+{
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   sym_set_int_param(env, "find_first_feasible", TRUE);
+   sym_set_int_param(env, "node_selection_strategy", DEPTH_FIRST_SEARCH);
+   sym_solve(env);
+   sym_set_int_param(env, "find_first_feasible", FALSE);
+   sym_set_int_param(env, "node_selection_strategy", BEST_FIRST_SEARCH);
+   sym_warm_solve(env);
+}\end{Verbatim}
+
+}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{figure1917}%
+\begin{figure}{\color{Brown}
+\begin{Verbatim}
+[frame=lines]
+int main(int argc, char **argv)
+{
+   warm_start_desc *ws;
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   sym_set_int_param(env, "node_limit", 100);
+   sym_set_int_param(env, "keep_warm_start", TRUE);
+   sym_solve(env);
+   ws = sym_get_warm_start(env);
+   sym_set_int_param(env, "node_limit", -1);
+   sym_warm_solve(env);
+   sym_set_obj_coeff(env, 0, 100);
+   sym_set_obj_coeff(env, 200, 150);
+   sym_set_warm_start(ws);
+   sym_warm_solve(env);
+}\end{Verbatim}
+
+}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22384}%
+\bgroup\color{Brown}$ i$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22386}%
+\bgroup\color{Brown}$ i^\textrm{th}$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlfigureA{figure1925}%
+\begin{figure}{\color{Brown}
+\begin{Verbatim}
+[frame=lines]
+int main(int argc, char **argv)
+{
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   sym_set_obj2_coeff(env, 0, 1);
+   sym_mc_solve(env);
+}\end{Verbatim}
+
+}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure1941}%
+\begin{figure}{\color{Brown}
+\begin{Verbatim}
+[frame=lines]
+int main(int argc, char **argv)
+{
+   OsiSymSolverInterface si;
+   si.parseCommandLine(argc, argv);
+   si.loadProblem();
+   si.branchAndBound();
+}\end{Verbatim}
+
+}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{chapter}
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22399}%
+\bgroup\color{Brown}$ S$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22401}%
+\bgroup\color{Brown}$ c \in {\bf R}^S$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22403}%
+\bgroup\color{Brown}$ \hat{s} \in S$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22411}%
+\bgroup\color{Brown}$ \hat{s}$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22415}%
+\bgroup\color{Brown}$ n$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22419}%
+\bgroup\color{Brown}$ S_1, \ldots, S_n$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22421}%
+\bgroup\color{Brown}$ \cup_{i = 1}^n S_i = S$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlpictureA{tex2html_wrap3073}%
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Bounding Operation}\\
+\underbar{Input:} A subproblem ${\cal S}$, described in
+terms of a ``small'' set of inequalities ${\cal L'}$\  such that ${\cal
+S} = \{x^s : s \in {\cal F}\;\hbox{\rm and}\;ax^s \leq \beta\;\forall
+\;(a,\beta) \in {\cal L'}\}$\  and $\alpha$, an upper bound on the global
+optimal value. \\
+\underbar{Output:} Either (1) an optimal solution $s^* \in {\cal S}$\  to
+the subproblem, (2) a lower bound on the optimal value of the
+subproblem, or (3) a message {\tt pruned} indicating that the
+subproblem should not be considered further. \\
+{\bf Step 1.} Set ${\cal C} \leftarrow {\cal L'}$. \\
+{\bf Step 2.} Solve the LP $\min\{cx : ax \leq \beta\;\forall\;(a, \beta)
+\in {\cal C}\}$. \\
+{\bf Step 3.} If the LP has a feasible solution $\hat{x}$, then go to
+Step 4. Otherwise, STOP and output {\tt pruned}. This subproblem has no
+feasible solutions. \\
+{\bf Step 4.} If $c\hat{x} < \alpha$, then go to Step
+5. Otherwise, STOP and output {\tt pruned}. This subproblem
+cannot produce a solution of value better than $\alpha$. \\
+{\bf Step 5.} If $\hat{x}$\  is the incidence vector of some $\hat{s}
+\in {\cal S}$, then $\hat{s}$\  is the optimal solution to this
+subproblem. STOP and output $\hat{s}$\  as $s^*$. Otherwise, apply
+separation algorithms and heuristics to $\hat{x}$\  to get a set of
+violated inequalities ${\cal C'}$. If ${\cal C'} = \emptyset$, then
+$c\hat{x}$\  is a lower bound on the value of an optimal element of
+${\cal S}$.  STOP and return $\hat{x}$\  and the lower bound
+$c\hat{x}$. Otherwise, set ${\cal C} \leftarrow {\cal C} \cup {\cal
+C'}$\  and go to Step 2.}
+\end{minipage}
+}%
+\lthtmlpictureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22438}%
+\bgroup\color{Brown}$ \hbox{\em CP} =
+(E, {\cal F})$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22440}%
+\bgroup\color{Brown}$ E$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22442}%
+\bgroup\color{Brown}$ {\cal F}
+\subseteq 2^E$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22444}%
+\bgroup\color{Brown}$ c \in {\bf R}^E$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22446}%
+\bgroup\color{Brown}$ {\cal F}$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22448}%
+\bgroup\color{Brown}$ {\cal
+P}$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22452}%
+\bgroup\color{Brown}$ {\cal L}$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay22456}%
+$\displaystyle {\cal P} = \{x \in {\bf R}^n: ax \leq \beta\;\;\forall\;(a, \beta) \in  {\cal L}\}.$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlpictureA{tex2html_wrap3087}%
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Branching Operation} \\
+\underbar{Input:} A subproblem ${\cal S}$\  and $\hat{x}$, the LP solution
+yielding the lower bound. \\
+\underbar{Output:} $S_1, \ldots, S_p$\  such that ${\cal S} = \cup_{i = 1}^p
+S_i$. \\
+{\bf Step 1.} Determine sets ${\cal L}_1, \ldots, {\cal L}_p$\  of
+inequalities such that ${\cal S} = \cup_{i = 1}^n \{x \in {\cal S}: ax \leq
+\beta\;\forall\;(a, \beta) \in {\cal L}_i\}$\  and $\hat{x} \notin
+\cup_{i = 1}^n S_i$. \\
+{\bf Step 2.} Set $S_i = \{x \in {\cal S}: ax \leq
+\beta\;\;\forall\;(a, \beta) \in {\cal L}_i \cup {\cal L}'\}$\  where
+${\cal L'}$\  is the set of inequalities used to describe ${\cal S}$.}
+\end{minipage}
+}%
+\lthtmlpictureZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlpictureA{tex2html_wrap3093}%
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Generic Branch and Cut Algorithm}\\
+\underbar{Input:} A data array specifying the problem instance.\\
+\underbar{Output:} The global optimal solution $s^*$\  to the problem
+instance. \\
+{\bf Step 1.} Generate a ``good'' feasible solution ${\hat s}$\  using
+heuristics. Set $\alpha \leftarrow c(\hat{s})$. \\
+{\bf Step 2.} Generate the first subproblem ${\cal S}^I$\  by constructing a
+small set ${\cal L'}$\  of inequalities valid for ${\cal P}$. Set $A
+\leftarrow \{{\cal S}^I\}$. \\
+{\bf Step 3.} If $A = \emptyset$, STOP and output $\hat{s}$\  as the
+global optimum $s^*$. Otherwise, choose some ${\cal S} \in A$. Set $A
+\leftarrow A \setminus \{{\cal S}\}$. Process ${\cal S}$. \\
+{\bf Step 4.} If the result of Step 3 is a feasible solution
+$\overline{s}$, then $c\overline{s} < c\hat{s}$.
+Set $\hat{s} \leftarrow \overline{s}$\  and $\alpha \leftarrow
+c(\overline{s})$\  and go to Step 3. If the subproblem was pruned, go to
+Step 3. Otherwise, go to Step 5. \\
+{\bf Step 5.} Perform the branching operation. Add the set of
+subproblems generated to $A$\  and go to Step 3.}
+\end{minipage}
+}%
+\lthtmlpictureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure2673}%
+\begin{figure}\centering
+\psfig{figure=pbandc.eps}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmldisplayA{displaymath22495}%
+\begin{displaymath}\begin{array}{lrcl} \mathop{\text{vmin}}& [cx, dx],\\\textrm{s.t.} & Ax & \leq & b, \\& x & \in & \mathbb{Z}^{n}. \end{array}\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22497}%
+\bgroup\color{Brown}$ p$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22499}%
+\bgroup\color{Brown}$ q$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22501}%
+\bgroup\color{Brown}$ cq \leq cp$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22503}%
+\bgroup\color{Brown}$ dq \leq dp$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22505}%
+\bgroup\color{Brown}$ 0 \leq \alpha \leq 1$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay22507}%
+$\displaystyle (\alpha c + (1 - \alpha) d) x.$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22509}%
+\bgroup\color{Brown}$ \alpha$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22511}%
+\bgroup\color{Brown}$ x^c$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22513}%
+\bgroup\color{Brown}$ \alpha = 1$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22515}%
+\bgroup\color{Brown}$ x^d$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22517}%
+\bgroup\color{Brown}$ \alpha = 0$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_indisplay22521}%
+$\displaystyle \max \{\alpha (cp - cx^c), (1 - \alpha)(dp - dx^d)\}.$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure2774}%
+\begin{figure}\centering
+\psfig{figure=lploop.eps,width=4.80in}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{chapter}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22588}%
+\bgroup\color{Brown}$ (i,j)$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22590}%
+\bgroup\color{Brown}$ i<j$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{chapter}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22676}%
+$ \leq$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline22678}%
+$ \geq$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{paragraph}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24555}%
+\bgroup\color{Brown}$ \times$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24557}%
+\bgroup\color{Brown}$ \leq$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24559}%
+\bgroup\color{Brown}$ =$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24561}%
+\bgroup\color{Brown}$ \geq$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24563}%
+\bgroup\color{Brown}$ 0^{th}$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24565}%
+\bgroup\color{Brown}$ 1^{st}$\egroup%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{paragraph}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24569}%
+$ {\tt rhs}+{\tt range}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24573}%
+$ =$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{paragraph}
+\stepcounter{subsubsection}
+\stepcounter{paragraph}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline24642}%
+$ \epsilon$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25158}%
+$ -1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25285}%
+$ ^{\tt th}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25655}%
+$ 2$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25657}%
+$ 5$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25659}%
+$ 1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25786}%
+$ z_i^+,
+z_i^-$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25788}%
+$ i$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25792}%
+$ s_i =
+\alpha\times\min\{z_i^+, z_i^-\} + (1-\alpha)\times\max\{z_i^+,z_i^-\}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25794}%
+$ \alpha$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25796}%
+$ [0,1]$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25798}%
+$ n^{\textrm th}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline25800}%
+$ n$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+
+\end{document}

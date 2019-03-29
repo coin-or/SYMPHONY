@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Executable Names</TITLE>
+<META NAME="description" CONTENT="Executable Names">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node56.html">
+<LINK REL="previous" HREF="node54.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node56.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html871"
+ HREF="node56.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html868"
+ HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html862"
+ HREF="node54.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html870"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html872"
+ HREF="node56.html">Debugging Your Application</A>
+<B>Up:</B> <A NAME="tex2html869"
+ HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html863"
+ HREF="node54.html">Configuring the Modules</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000913000000000000000">&#160;</A>
+<A NAME="exe_names">&#160;</A>
+<BR>
+Executable Names
+</H2>
+In order to keep track of the various possible configurations,
+executable and their corresponding libraries are named as follows. For
+the fully distributed version, the names are <TT>master</TT>, <TT>tm</TT>,
+<TT>lp</TT>, <TT>cg</TT>, and <TT>cp</TT>. For other configurations, the
+executable name is a combination of all the modules that were compiled
+together joined by underscores. In other words, if the LP and the cut
+generator modules were compiled together (i.e.&nbsp;<TT>COMPILE_IN_CG</TT>
+set to <TT>TRUE</TT>), then the executable name would be ``<TT>lp_cg</TT>''
+and the corresponding library file would be called ``<TT>liblp_cg.a</TT>.'' You can rename the executables as you like. However, if
+you are using PVM to spawn the modules, as in the fully distributed
+version, you must set the parameters <TT>*_exe</TT> in the parameter
+file to the new executable names. See Section <A HREF="node131.html#tm_params">10.4</A> for
+information on setting parameters in the parameter file.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

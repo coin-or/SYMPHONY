@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_same_cuts</TITLE>
+<META NAME="description" CONTENT="user_same_cuts">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node245.html">
+<LINK REL="previous" HREF="node243.html">
+<LINK REL="up" HREF="node222.html">
+<LINK REL="next" HREF="node245.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3917"
+  HREF="node245.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3913"
+  HREF="node222.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3907"
+  HREF="node243.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3915"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3918"
+  HREF="node245.html">user_unpack_cuts</A>
+<B>Up:</B> <A NAME="tex2html3914"
+  HREF="node222.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3908"
+  HREF="node243.html">user_add_to_desc</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007321800000000000000">
+user_same_cuts</A>
+</H3>
+[cf]user_same_cuts
+<PRE>
+int user_same_cuts (void *user, cut_data *cut1, cut_data *cut2, 
+                    int *same_cuts)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Determine whether the two cuts are comparable (the normals of the half-spaces
+corresponding to the cuts point in the same direction) and if yes, which one
+is stronger. The default is to declare the cuts comparable only if the <TT>type</TT>, <TT>sense</TT> and <TT>coef</TT> fields of the two cuts are the same byte by
+byte; and if this is the case to compare the right hand sides to decide which
+cut is stronger.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data *cut1</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>The first cut.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data *cut2</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>The second cut.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *same_cuts</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=276>Possible values: <TT>SAME</TT>, <TT>FIRST_CUT_BETTER</TT>, <TT>SECOND_CUT_BETTER</TT> and <TT>DIFFERENT</TT> (i.e., not
+comparable).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=296>Error. <TT>DEFAULT</TT> is used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=296>User did the comparison, filled out <TT>*same_cuts</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=296>Compare byte by byte (see above).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>process_message()</TT> when a <TT>PACKED_CUT</TT>
+arrives.
+
+<P>
+</DD>
+<DT><STRONG>Note:</STRONG></DT>
+<DD>
+
+<P>
+This function is used to check whether a newly arrived cut is already
+in the local pool. If so, or if it is weaker than a cut in the local
+pool, then the new cut is discarded; if it is stronger then a cut in
+the local pool, then the new cut replaces the old one and if the new
+is different from all the old ones, then it is added to the local pool.
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3917"
+  HREF="node245.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3913"
+  HREF="node222.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3907"
+  HREF="node243.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3915"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3918"
+  HREF="node245.html">user_unpack_cuts</A>
+<B>Up:</B> <A NAME="tex2html3914"
+  HREF="node222.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3908"
+  HREF="node243.html">user_add_to_desc</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2013-09-15</I>
+</ADDRESS>
+</BODY>
+</HTML>

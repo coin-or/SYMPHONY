@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_receive_feasible_solution</TITLE>
+<META NAME="description" CONTENT="user_receive_feasible_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html402" HREF="node25.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html400" HREF="node15.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html394" HREF="node23.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html403" HREF="node25.html">user_send_lp_data</A>
+<B>Up:</B> <A NAME="tex2html401" HREF="node15.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html395" HREF="node23.html">user_create_root</A>
+<BR> <P>
+<H3><A NAME="SECTION00021900000000000000">user_receive_feasible_solution</A></H3>
+<P>
+<A NAME="user_receive_feasible_solution">&#160;</A>
+<PRE>int user_receive_feasible_solution(void *user, int msgtag, double cost, 
+                                   int numvars, int *indices, double *values)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+Feasible solutions can be sent and/or stored in a user-defined packed
+form if desired. For instance, the TSP, a tour can be specified simply
+as a permutation, rather than as a list of variable indices. In the LP
+process, a feasible solution is packed either by the user or by a
+default packing routine. If the default packing routine was used, the
+<TT>msgtag</TT> will be <TT>FEASIBLE_SOLUTION_NONZEROS</TT>. In this case,
+<TT>cost</TT>, <TT>numvars</TT>, <TT>indices</TT> and <TT>values</TT> will contain
+the solution value, the number of nonzeros in the feasible solution,
+and their user indices and values. The user has only to interpret and
+store the solution. Otherwise, when <TT>msgtag</TT> is <TT>
+FEASIBLE_SOLUTION_USER</TT>, SYMPHONY will send and receive the solution
+value only and the user has to unpack exactly what she has packed in
+the LP process. In this case the contents of the last three arguments
+are undefined.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=664 HEIGHT=146 ALIGN=BOTTOM ALT="tabular556" SRC="img20.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=441 HEIGHT=38 ALIGN=BOTTOM ALT="tabular558" SRC="img21.gif"  > <P> 
+ </DL>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

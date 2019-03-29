@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Tree Management Module</TITLE>
+<META NAME="description" CONTENT="The Tree Management Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node70.html">
+<LINK REL="previous" HREF="node68.html">
+<LINK REL="up" HREF="node67.html">
+<LINK REL="next" HREF="node70.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1366"
+  HREF="node70.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1362"
+  HREF="node67.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1356"
+  HREF="node68.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1364"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1367"
+  HREF="node70.html">The Node Processing Module</A>
+<B>Up:</B> <A NAME="tex2html1363"
+  HREF="node67.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html1357"
+  HREF="node68.html">The Master Module</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00533200000000000000">
+The Tree Management Module</A>
+</H3>
+
+<P>
+The <SPAN  CLASS="textit">tree manager</SPAN> controls the overall execution of the algorithm. It
+tracks the status of its worker modules, as well as that of the search
+tree, and distributes the subproblems to be processed to the node processing
+module(s). Functions performed by the tree management module are:
+
+<UL>
+<LI>Receive data for the root node and place it on the list 
+        of candidates for processing.
+</LI>
+<LI>Receive data for subproblems to be held for later
+        processing.
+</LI>
+<LI>Handle requests from linear programming modules to
+        release a subproblem for processing.
+</LI>
+<LI>Receive branching object information, set up data structures
+        for the children, and add them to the list of candidate subproblems.
+</LI>
+<LI>Keep track of the global upper bound and notify all node
+        processing modules when it changes.
+</LI>
+<LI>Write current state information out to disk periodically
+        to allow a restart in the event of a system crash.
+</LI>
+<LI>Keep track of run data and send it to the master
+        program at termination.
+</LI>
+</UL> 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-06-12</I>
+</ADDRESS>
+</BODY>
+</HTML>

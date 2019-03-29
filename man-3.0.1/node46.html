@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Compiling the Sample Application with Microsoft Windows</TITLE>
+<META NAME="description" CONTENT="Compiling the Sample Application with Microsoft Windows">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node47.html">
+<LINK REL="previous" HREF="node41.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node47.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html815"
+  HREF="node47.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html811"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html805"
+  HREF="node45.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html813"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html816"
+  HREF="node47.html">Developing a New Application</A>
+<B>Up:</B> <A NAME="tex2html812"
+  HREF="node40.html">Quick Start Guide</A>
+<B> Previous:</B> <A NAME="tex2html806"
+  HREF="node45.html">Compiling the Distributed Version.</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00092000000000000000"></A>
+<A NAME="getting_strated_windows"></A>
+<BR>
+Compiling the Sample Application with Microsoft Windows
+</H2>
+
+<P>
+Here is a sketch outline of how to compile the sample application, a VRP and
+TSP solver, in Microsoft Windows. This is the same information contained in
+the README file that comes with the distribution. Direct support is provided
+for compilation under MS Visual Studio 6.0. Compilation for other compilers
+should also be possible. Note that the windows version has some
+limitations. Detailed timing information is not currently provided.  Support
+is only provided for running in sequential mode at this time.
+
+<P>
+
+<UL>
+<LI>Download <TT>SYMPHONY-3.0.1.zip</TT> and unzip the archive. This will
+create a subdirectory called <TT>SYMPHONY-3.0.1<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$"></TT> containing all 
+the source files.
+
+<P>
+</LI>
+<LI>In MS Visual C++ 6.0, open the workspace 
+<TT>SYMPHONY-3.0.1<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">WIN32<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">vrp.dsw</TT>.  Note that there are
+two projects, one called ``<TT>symphony</TT>'' and one called ``<TT>vrp</TT>''.  The
+symphony project contains the source code needed to build the internal
+library. The vrp project contains the source code for the user-defined
+functions needed to build the sample application, a VRP and TSP solver. Note
+that to develop a solver of your own, you would replace the VRP library with
+one of your own. A template for doing so is provided (see the quick start
+guide in Section <A HREF="#getting_started_windows"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="file:/usr/share/latex2html/icons/crossref.png"></A>).
+
+<P>
+</LI>
+<LI>By default, SYMPHONY is set up to use CPLEX 8.1 installed in a folder
+called ``<TT>C:<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">ILOG<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">CPLEX81</TT>''. To use a different LP 
+solver or to specify a different location for CPLEX, there are a number of 
+changes that need to be made.
+
+<P>
+
+<UL>
+<LI>You must specify the name of and path to the library to be linked. Do 
+this by right-clicking on the symphony project and choosing ``Add Files to
+Project...'' Then locate the library file for the LP solver you are using
+(either CPLEX or OSL). For CPLEX, you need the library called <TT>cplex**.lib</TT>, where ** is your CPLEX version. Make sure to delete the old
+library dependency.
+
+<P>
+</LI>
+<LI>You must set the include path for the solver header files. Do this
+by right-clicking on the symphony project and choosing ``Settings...'' Then
+choose the ``C/C++'' tab, and choose the category ``Preprocessor'' on the
+drop-down menu.  Edit the path in the ``Additional include directories'' 
+window.
+
+<P>
+</LI>
+<LI>You must set the compiler defines so that the right LP solver interface
+will be used. Follow the procedure above to get to the preprocessor settings
+and edit the ``Preprocessor definitions.'' Make sure that <TT>__OSL__</TT> is
+defined if you are using OSL or <TT>__CPLEX__</TT> is defined if you are
+using CPLEX. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP
+SOLVER. Important note for OSL users: When using OSL in Windows, you must also add <TT>OSLMSDLL</TT> to the list of definitions. 
+
+<P>
+</LI>
+</UL>
+
+<P>
+</LI>
+<LI>Note that there are a number of additional compiler defines that control
+the functionality of SYMPHONY. These defines are described in <TT>SYMPHONY-3.0.1<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">Makefile</TT>, a Unix-style makefile included with the
+distribution. To enable the functionality associated with a particular
+compiler define, simply add it to the list of defines under the preprocessor
+settings, as above.
+
+<P>
+</LI>
+<LI>You must also be sure to have any ``.dll'' files required for your LP 
+solver to be in your search path. Either move the required .dll to the
+directory containing symphony.exe or add the path to the ``<TT>PATH</TT>''
+Windows environment variable.
+
+<P>
+</LI>
+<LI>Once you have the proper settings for your LP solver, choose "Build
+symphony.exe" from the ``Build'' menu. This should successfully build the
+executable.
+
+<P>
+</LI>
+<LI>To test the executable, right click on the symphony project, go to the
+``Debug'' tab and set the Program arguments to ``<TT>-F
+SYMPHONY-3.0.1<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">sample.vrp -N 5 -u 522.</TT>'' Note that command-line
+switches are Unix-style. The argument to -N is the number of routes that
+should be used in the solution and the -u argument supplies the solver with an
+initial upper bound.
+
+<P>
+</LI>
+<LI>Now choose ``Execute'' from the ``Build'' menu and the solver should 
+solve the sample VRP file.
+
+<P>
+</LI>
+<LI>Note that there is some functionality missing from the Windows
+version. Most prominently, the timing functions do not work. I suppose this
+functionality should be easy to add. In addition, the Windows
+version will only run in sequential mode for a variety of reasons. However, it
+should be relatively easy to get it running in parallel if you can get PVM
+working under Windows.
+
+<P>
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html815"
+  HREF="node47.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html811"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html805"
+  HREF="node45.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html813"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html816"
+  HREF="node47.html">Developing a New Application</A>
+<B>Up:</B> <A NAME="tex2html812"
+  HREF="node40.html">Quick Start Guide</A>
+<B> Previous:</B> <A NAME="tex2html806"
+  HREF="node45.html">Compiling the Distributed Version.</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

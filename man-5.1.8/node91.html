@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Maintaining and Scanning the Pool</TITLE>
+<META NAME="description" CONTENT="Maintaining and Scanning the Pool">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node92.html">
+<LINK REL="previous" HREF="node90.html">
+<LINK REL="up" HREF="node90.html">
+<LINK REL="next" HREF="node92.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1648"
+  HREF="node92.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1644"
+  HREF="node90.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1638"
+  HREF="node90.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1646"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1649"
+  HREF="node92.html">Using Multiple Pools</A>
+<B>Up:</B> <A NAME="tex2html1645"
+  HREF="node90.html">The Cut Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1639"
+  HREF="node90.html">The Cut Management Module</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00545100000000000000">
+Maintaining and Scanning the Pool</A>
+</H3>
+
+<P>
+The cut manager's primary job is to receive a solution from an
+NP module and return cuts from the pool that are violated by it. The
+cuts are stored along with two pieces of information--the level of
+the tree on which the cut was generated, known simply as the <EM>level</EM> of the cut, and the number of times it has been checked for
+violation since the last time it was actually found to be violated,
+known as the number of <EM>touches</EM>. The number of touches
+can be used as a simplistic measure of its effectiveness. Since the pool
+can get quite large, the user can choose to scan only cuts whose
+number of touches is below a specified threshold and/or cuts that were
+generated on a level at or above the current one in the tree. The idea
+behind this second criterion is to try to avoid checking cuts that were
+not generated ``nearby'' in the tree, as they are less likely to be
+effective. Any cut generated at a level in the tree
+below the level of the current node must have been generated in a
+different part of the tree. Although this is admittedly a naive
+method, it does seem to work reasonably well.
+
+<P>
+On the other hand, the user may define a specific measure of quality for
+each cut to be used instead. For example, the degree of
+violation is an obvious candidate. This measure of quality must be
+computed by the user, since the cut pool module has no knowledge of
+the cut data structures. The quality is recomputed every time
+the user checks the cut for violation and a running average is used as
+the global quality measure. The cuts in the pool are periodically
+sorted by this measure and only the highest quality cuts
+are checked each time. All duplicate cuts, as well as all cuts whose
+number of touches exceeds or whose quality falls below specified
+thresholds, are periodically purged from the pool to keep it as small as
+possible.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1648"
+  HREF="node92.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1644"
+  HREF="node90.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1638"
+  HREF="node90.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1646"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1649"
+  HREF="node92.html">Using Multiple Pools</A>
+<B>Up:</B> <A NAME="tex2html1645"
+  HREF="node90.html">The Cut Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1639"
+  HREF="node90.html">The Cut Management Module</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-05-20</I>
+</ADDRESS>
+</BODY>
+</HTML>

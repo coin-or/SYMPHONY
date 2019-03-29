@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Tree Manager Module</TITLE>
+<META NAME="description" CONTENT="The Tree Manager Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node17.html">
+<LINK REL="previous" HREF="node15.html">
+<LINK REL="up" HREF="node14.html">
+<LINK REL="next" HREF="node17.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html406"
+ HREF="node17.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html403"
+ HREF="node14.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html397"
+ HREF="node15.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html405"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html407"
+ HREF="node17.html">The Linear Programming Module</A>
+<B>Up:</B> <A NAME="tex2html404"
+ HREF="node14.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html398"
+ HREF="node15.html">The Master Module</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00063200000000000000">
+The Tree Manager Module</A>
+</H3>
+
+<P>
+The <EM>tree manager</EM> controls the overall execution of the algorithm. It
+tracks the status of all processes, as well as that of the search
+tree, and distributes the subproblems to be processed to the LP
+module(s). Functions performed by the tree manager module are:
+<UL>
+<LI>Receive data for the root node and place it on the list 
+        of candidates for processing.
+<LI>Receive data for subproblems to be held for later
+        processing.
+<LI>Handle requests from linear programming modules to
+        release a subproblem for processing.
+<LI>Receive branching object information, set up data structures
+        for the children, and add them to the list of candidate subproblems.
+<LI>Keep track of the global upper bound and notify all LP
+        modules when it changes.
+<LI>Write current state information out to disk periodically
+        to allow a restart in the event of a system crash.
+<LI>Keep track of run data and send it to the master
+        program at termination.
+</UL> 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

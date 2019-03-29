@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Inter-process Communication for Distributed Computing</TITLE>
+<META NAME="description" CONTENT="Inter-process Communication for Distributed Computing">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html322" HREF="node10.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html320" HREF="node2.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html314" HREF="node8.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html324" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html323" HREF="node10.html">Working with PVM</A>
+<B>Up:</B> <A NAME="tex2html321" HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html315" HREF="node8.html">User-defined Data Structures</A>
+<BR> <P>
+<H2><A NAME="SECTION00025000000000000000">Inter-process Communication for Distributed Computing</A></H2>
+<P>
+<A NAME="communication">&#160;</A>
+While the implementation of SYMPHONY strives to shield the user from
+having to know anything about communications protocols or the
+specifics of inter-process communication, it may be necessary for the
+user to pass information from one module to another in some
+cases--for instance, if the user must pass problem-specific data to
+the LP process after reading them in from a data file. In cases where
+this might be appropriate, user functions are supplied in pairs--a
+<EM>send</EM> function and a <EM>receive</EM> function. All data are sent in
+the form of arrays of either type <TT>char</TT>, <TT>int</TT>, or <TT>
+double</TT>, or as strings. To send an array, the user has simply to
+invoke the function <TT>send_?_array(? *array, int length)</TT> where ?
+is one of the previously listed types. To receive that array, there is
+a corresponding function called <TT>receive_?_array(? *array, int
+length)</TT>. When receiving an array, the user must first
+allocate the appropriate amount of memory. In cases where variable
+length arrays need to be passed, the user must first pass the length
+of the array (as a separate array of length one) and then the array
+itself. In the receive function, this allows the length to be received
+first so that the proper amount of space can be allocated before
+receiving the array itself. Note that data must be received in exactly
+the same order as it was passed, as data is read linearly into and out
+of the message buffer. The easiest way to ensure this is done properly
+is to simply copy the send statements into the receive function and
+change the function names. It may then be necessary to add some
+allocation statements in between the receive function calls.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

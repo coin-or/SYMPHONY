@@ -1,0 +1,162 @@
+This is TeX, Version 3.14159 (C version 6.1) (format=latex 97.9.25)  11 FEB 2000 13:47
+**images.tex
+(images.tex
+LaTeX2e <1997/06/01>
+Babel <v3.6h> and hyphenation patterns for american, french, german, spanish, l
+oaded.
+
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/article.cls
+Document Class: article 1997/06/16 v1.3v Standard LaTeX document class
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/size11.clo
+File: size11.clo 1997/06/16 v1.3v Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/graphics/epsfig.sty
+Package: epsfig 1996/10/04 v1.7 (e)psfig emulation (SPQR)
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 1996/10/31 v1.0c Enhanced LaTeX Graphics (DPC,SPQR)
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 1995/09/21 v1.09 key=value parser (DPC)
+) (/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 1996/10/31 v1.0c Standard LaTeX Graphics (DPC,SPQR)
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/graphics/trig.sty
+Package: trig 1994/10/16 v1.08 sin cos tan (DPC)
+) (/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/config/graphics.cfg)
+Package graphics Info: Driver file: dvips.def on input line 82.
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/graphics/dvips.def
+File: dvips.def 1996/12/12 v3.0d Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+\epsfxsize=\dimen105
+\epsfysize=\dimen106
+) (html.sty
+Package: html 1996/02/01 v1.0 hypertext commands for latex2html (nd, hs)
+\c@lpart=\count87
+\c@lchapter=\count88
+\c@lsection=\count89
+\c@lsubsection=\count90
+\c@lsubsubsection=\count91
+\c@lparagraph=\count92
+\c@lsubparagraph=\count93
+\c@lsubsubparagraph=\count94
+\c@lequation=\count95
+)
+\c@theorem=\count96
+\c@proposition=\count97
+\c@lemma=\count98
+\c@corollary=\count99
+\lthtmlwrite=\write3
+\sizebox=\box26
+(images.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 43.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 43.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 43.
+latex2htmlSize :tex2html_wrap_inline775: 9.8129pt::0.42812pt.
+[2
+
+
+]
+latex2htmlSize :tex2html_wrap_inline777: 7.60416pt::0.42812pt.
+[3
+
+]
+latex2htmlSize :tex2html_wrap_inline785: 7.60416pt::0.0pt.
+[4
+
+]
+latex2htmlSize :tex2html_wrap_inline793: 7.48248pt::2.12917pt.
+[5
+
+]
+latex2htmlSize :tex2html_wrap_inline795: 7.48248pt::2.91495pt.
+[6
+
+] [7]
+latex2htmlSize :tex2html_wrap_inline853: 8.2125pt::2.73749pt.
+[8
+
+
+]
+latex2htmlSize :tex2html_wrap_inline857: 9.44032pt::1.48888pt.
+[9
+
+]
+latex2htmlSize :tex2html_wrap_inline859: 9.44032pt::0.42812pt.
+[10
+
+]
+latex2htmlSize :tex2html_wrap_inline861: 7.48248pt::0.0pt.
+[11
+
+]
+latex2htmlSize :tex2html_wrap_inline863: 7.48248pt::0.0pt.
+[12
+
+]
+latex2htmlSize :tex2html_wrap_inline867: 7.48248pt::0.0pt.
+[13
+
+] [14
+
+] [15] [16]
+File: /home/tkr/Papers/pics/pbandc.ps Graphic file (type eps)
+</home/tkr/Papers/pics/pbandc.ps> [17]
+latex2htmlSize :tex2html_wrap_inline943: 4.71457pt::0.0pt.
+[18
+
+
+
+
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 251.
+
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1997/06/16 v2.5e Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 251.
+latex2htmlSize :tex2html_wrap_inline945: 9.01828pt::0.0pt.
+[19
+
+] (images.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 760 strings out of 10878
+ 8275 string characters out of 71682
+ 53047 words of memory out of 262141
+ 3667 multiletter control sequences out of 9500
+ 7822 words of font info for 28 fonts, out of 150000 for 255
+ 15 hyphenation exceptions out of 607
+ 32i,12n,21p,236b,329s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on images.dvi (18 pages, 6784 bytes).

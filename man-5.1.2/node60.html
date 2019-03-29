@@ -1,0 +1,377 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Branch and Cut</TITLE>
+<META NAME="description" CONTENT="Branch and Cut">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node61.html">
+<LINK REL="previous" HREF="node59.html">
+<LINK REL="up" HREF="node58.html">
+<LINK REL="next" HREF="node61.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1240"
+  HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1236"
+  HREF="node58.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1230"
+  HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1238"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1241"
+  HREF="node61.html">Design of SYMPHONY</A>
+<B>Up:</B> <A NAME="tex2html1237"
+  HREF="node58.html">Technical Details</A>
+<B> Previous:</B> <A NAME="tex2html1231"
+  HREF="node59.html">Branch and Bound</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00520000000000000000"></A>
+<A NAME="branchandcut"></A>
+<BR>
+Branch and Cut
+</H1>
+
+<P>
+In many applications, the bounding operation is accomplished using the
+tools of linear programming (LP), a technique first described in full
+generality by Hoffman and Padberg [<A
+ HREF="node282.html#hoff:LP">20</A>]. This general class of
+algorithms is known as <EM>LP-based branch and bound</EM>. Typically, the
+integrality constraints of an integer programming formulation of the
+problem are relaxed to obtain a <EM>LP relaxation</EM>, which is then
+solved to obtain a lower bound for the problem. In [<A
+ HREF="node282.html#padb:branc">29</A>],
+Padberg and Rinaldi improved on this basic idea by describing a method
+of using globally valid inequalities (i.e., inequalities valid for the
+convex hull of integer solutions) to strengthen the LP relaxation.
+They called this technique <EM>branch and cut</EM>. Since then, many
+implementations (including ours) have been fashioned around the
+framework they described for solving the Traveling Salesman Problem.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="proc-bound"></A><A NAME="2852"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 4.1:</STRONG>
+Bounding in the branch and cut algorithm</CAPTION>
+<TR><TD><!-- MATH
+ $\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Bounding Operation}\\
+\underbar{Input:} A subproblem ${\cal S}$, described in
+terms of a ``small'' set of inequalities ${\cal L'}$\  such that ${\cal
+S} = \{x^s : s \in {\cal F}\;\hbox{\rm and}\;ax^s \leq \beta\;\forall
+\;(a,\beta) \in {\cal L'}\}$\  and $\alpha$, an upper bound on the global
+optimal value. \\
+\underbar{Output:} Either (1) an optimal solution $s^* \in {\cal S}$\  to
+the subproblem, (2) a lower bound on the optimal value of the
+subproblem, or (3) a message {\tt pruned} indicating that the
+subproblem should not be considered further. \\
+{\bf Step 1.} Set ${\cal C} \leftarrow {\cal L'}$. \\
+{\bf Step 2.} Solve the LP $\min\{cx : ax \leq \beta\;\forall\;(a, \beta)
+\in {\cal C}\}$. \\
+{\bf Step 3.} If the LP has a feasible solution $\hat{x}$, then go to
+Step 4. Otherwise, STOP and output {\tt pruned}. This subproblem has no
+feasible solutions. \\
+{\bf Step 4.} If $c\hat{x} < \alpha$, then go to Step
+5. Otherwise, STOP and output {\tt pruned}. This subproblem
+cannot produce a solution of value better than $\alpha$. \\
+{\bf Step 5.} If $\hat{x}$\  is the incidence vector of some $\hat{s}
+\in {\cal S}$, then $\hat{s}$\  is the optimal solution to this
+subproblem. STOP and output $\hat{s}$\  as $s^*$. Otherwise, apply
+separation algorithms and heuristics to $\hat{x}$\  to get a set of
+violated inequalities ${\cal C'}$. If ${\cal C'} = \emptyset$, then
+$c\hat{x}$\  is a lower bound on the value of an optimal element of
+${\cal S}$.  STOP and return $\hat{x}$\  and the lower bound
+$c\hat{x}$. Otherwise, set ${\cal C} \leftarrow {\cal C} \cup {\cal
+C'}$\  and go to Step 2.}
+\end{minipage}
+}$
+ -->
+<IMG
+ WIDTH="748" HEIGHT="406" ALIGN="BOTTOM" BORDER="0"
+ SRC="img17.png"
+ ALT="\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Bounding Operati...
+...{\cal C} \leftarrow {\cal C} \cup {\cal
+C'}$ and go to Step 2.}
+\end{minipage}}">
+</TD></TR>
+</TABLE>
+</DIV>
+As an example, let a combinatorial optimization problem 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\hbox{\em CP} =
+(E, {\cal F})$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="101" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img18.png"
+ ALT="\bgroup\color{Brown}$ \hbox{\em CP} =
+(E, {\cal F})$\egroup"></SPAN>
+</FONT> with <EM>ground set</EM> 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img19.png"
+ ALT="\bgroup\color{Brown}$ E$\egroup"></SPAN>
+</FONT> and <EM>feasible set</EM> 
+<FONT COLOR="#a52a2a"><!-- MATH
+ ${\cal F}
+\subseteq 2^E$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="62" HEIGHT="40" ALIGN="MIDDLE" BORDER="0"
+ SRC="img20.png"
+ ALT="\bgroup\color{Brown}$ {\cal F}
+\subseteq 2^E$\egroup"></SPAN>
+</FONT> be given along with a cost function 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $c \in {\bf R}^E$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="60" HEIGHT="40" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="\bgroup\color{Brown}$ c \in {\bf R}^E$\egroup"></SPAN>
+</FONT>.
+The incidence vectors corresponding to the members of 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img22.png"
+ ALT="\bgroup\color{Brown}$ {\cal F}$\egroup"></SPAN>
+</FONT> are
+sometimes specified as the the set of all incidence vectors obeying a
+(relatively) small set of inequalities. These inequalities are
+typically the ones used in the initial LP relaxation. Now let 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img23.png"
+ ALT="\bgroup\color{Brown}$ {\cal
+P}$\egroup"></SPAN>
+</FONT> be the convex hull of incidence vectors of members of 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img22.png"
+ ALT="\bgroup\color{Brown}$ {\cal F}$\egroup"></SPAN>
+</FONT>. Then we know by Weyl's Theorem (see [<A
+ HREF="node282.html#nemwol88">28</A>]) that there exists
+a finite set 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img24.png"
+ ALT="\bgroup\color{Brown}$ {\cal L}$\egroup"></SPAN>
+</FONT> of inequalities valid for 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img23.png"
+ ALT="\bgroup\color{Brown}$ {\cal
+P}$\egroup"></SPAN>
+</FONT> such that
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="the-polyhedron"></A><!-- MATH
+ \begin{equation}
+{\cal P} = \{x \in {\bf R}^n: ax \leq \beta\;\;\forall\;(a, \beta) \in
+{\cal L}\}.
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="285" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img25.png"
+ ALT="$\displaystyle {\cal P} = \{x \in {\bf R}^n: ax \leq \beta\;\;\forall\;(a, \beta) \in {\cal L}\}.$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+The inequalities in 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img24.png"
+ ALT="\bgroup\color{Brown}$ {\cal L}$\egroup"></SPAN>
+</FONT> are the potential cutting planes to be
+added to the relaxation as needed. Unfortunately, it is usually
+difficult, if not impossible, to enumerate all of inequalities in
+
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img24.png"
+ ALT="\bgroup\color{Brown}$ {\cal L}$\egroup"></SPAN>
+</FONT> or we could simply solve the problem using linear
+programming. Instead, they are defined implicitly and we use
+separation algorithms and heuristics to generate these inequalities
+when they are violated. In Figure <A HREF="#proc-bound">4.1</A>, we describe more
+precisely how the bounding operation is carried out in branch and cut.
+
+<DIV ALIGN="CENTER"><A NAME="branching-fig"></A><A NAME="2902"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 4.2:</STRONG>
+Branching in the branch and cut algorithm</CAPTION>
+<TR><TD><!-- MATH
+ $\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Branching Operation} \\
+\underbar{Input:} A subproblem ${\cal S}$\  and $\hat{x}$, the LP solution
+yielding the lower bound. \\
+\underbar{Output:} $S_1, \ldots, S_p$\  such that ${\cal S} = \cup_{i = 1}^p
+S_i$. \\
+{\bf Step 1.} Determine sets ${\cal L}_1, \ldots, {\cal L}_p$\  of
+inequalities such that ${\cal S} = \cup_{i = 1}^n \{x \in {\cal S}: ax \leq
+\beta\;\forall\;(a, \beta) \in {\cal L}_i\}$\  and $\hat{x} \notin
+\cup_{i = 1}^n S_i$. \\
+{\bf Step 2.} Set $S_i = \{x \in {\cal S}: ax \leq
+\beta\;\;\forall\;(a, \beta) \in {\cal L}_i \cup {\cal L}'\}$\  where
+${\cal L'}$\  is the set of inequalities used to describe ${\cal S}$.}
+\end{minipage}
+}$
+ -->
+<IMG
+ WIDTH="748" HEIGHT="164" ALIGN="BOTTOM" BORDER="0"
+ SRC="img26.png"
+ ALT="\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Branching Operat...
+...l L'}$ is the set of inequalities used to describe ${\cal S}$.}
+\end{minipage}}">
+</TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+Once we have failed to either prune the current subproblem or separate
+the current fractional solution from 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="18" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img23.png"
+ ALT="\bgroup\color{Brown}$ {\cal
+P}$\egroup"></SPAN>
+</FONT>, we are forced to
+branch. The branching operation is accomplished by specifying a set of
+hyperplanes which divide the current subproblem in such a way that the
+current solution is not feasible for the LP relaxation of any of the
+new subproblems. For example, in a combinatorial optimization problem,
+branching could be accomplished simply by fixing a variable whose
+current value is fractional to 0 in one branch and 1
+in the other. The procedure is described more formally in Figure
+<A HREF="#branching-fig">4.2</A>. Figure <A HREF="#gb_SPMamp_c">4.3</A> gives a high level description
+of the generic branch and cut algorithm.
+
+<DIV ALIGN="CENTER"><A NAME="gb_SPMamp_c"></A><A NAME="2936"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 4.3:</STRONG>
+Description of the generic branch and cut algorithm</CAPTION>
+<TR><TD><!-- MATH
+ $\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Generic Branch and Cut Algorithm}\\
+\underbar{Input:} A data array specifying the problem instance.\\
+\underbar{Output:} The global optimal solution $s^*$\  to the problem
+instance. \\
+{\bf Step 1.} Generate a ``good'' feasible solution ${\hat s}$\  using
+heuristics. Set $\alpha \leftarrow c(\hat{s})$. \\
+{\bf Step 2.} Generate the first subproblem ${\cal S}^I$\  by constructing a
+small set ${\cal L'}$\  of inequalities valid for ${\cal P}$. Set $A
+\leftarrow \{{\cal S}^I\}$. \\
+{\bf Step 3.} If $A = \emptyset$, STOP and output $\hat{s}$\  as the
+global optimum $s^*$. Otherwise, choose some ${\cal S} \in A$. Set $A
+\leftarrow A \setminus \{{\cal S}\}$. Process ${\cal S}$. \\
+{\bf Step 4.} If the result of Step 3 is a feasible solution
+$\overline{s}$, then $c\overline{s} < c\hat{s}$.
+Set $\hat{s} \leftarrow \overline{s}$\  and $\alpha \leftarrow
+c(\overline{s})$\  and go to Step 3. If the subproblem was pruned, go to
+Step 3. Otherwise, go to Step 5. \\
+{\bf Step 5.} Perform the branching operation. Add the set of
+subproblems generated to $A$\  and go to Step 3.}
+\end{minipage}
+}$
+ -->
+<IMG
+ WIDTH="748" HEIGHT="276" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.png"
+ ALT="\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Generic Branch a...
+... Add the set of
+subproblems generated to $A$ and go to Step 3.}
+\end{minipage}}">
+</TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+In the remainder of the manual, we often use the term <EM>search
+tree</EM>. This term derives from the common representation of the list of
+subproblems as the nodes of a graph in which each subproblem is
+connected only to its parent and its children. Storing the subproblems
+in such a form is an important aspect of our global data structures.
+Since the subproblems correspond to the nodes of this graph, they are
+sometimes be referred to as <EM>nodes in the search tree</EM> or simply
+as <EM>nodes</EM>. The <EM>root node</EM> or <EM>root</EM> of the tree is the
+node representing the initial subproblem.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1240"
+  HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1236"
+  HREF="node58.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1230"
+  HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1238"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1241"
+  HREF="node61.html">Design of SYMPHONY</A>
+<B>Up:</B> <A NAME="tex2html1237"
+  HREF="node58.html">Technical Details</A>
+<B> Previous:</B> <A NAME="tex2html1231"
+  HREF="node59.html">Branch and Bound</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

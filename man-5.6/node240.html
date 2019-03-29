@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_shall_we_branch</TITLE>
+<META NAME="description" CONTENT="user_shall_we_branch">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node241.html">
+<LINK REL="previous" HREF="node239.html">
+<LINK REL="up" HREF="node224.html">
+<LINK REL="next" HREF="node241.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3878"
+  HREF="node241.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3874"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3868"
+  HREF="node239.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3876"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3879"
+  HREF="node241.html">user_select_candidates</A>
+<B>Up:</B> <A NAME="tex2html3875"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3869"
+  HREF="node239.html">user_display_lp_solution</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007321200000000000000"></A>
+<A NAME="user_shall_we_branch"></A>
+<BR>
+user_shall_we_branch
+</H3>
+[cf]user_shall_we_branch
+<PRE>
+int user_shall_we_branch(void *user, double lpetol, int cutnum, 
+                         int slacks_in_matrix_num,
+                         cut_data **slacks_in_matrix,
+                         int slack_cut_num, cut_data **slack_cuts,
+                         int varnum, var_desc **vars, double *x, 
+                         char *status, int *cand_num, 
+                         branch_obj ***candidates, int *action)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+There are two user-written functions invoked from <TT>select_candidates_u</TT>. The first one
+(<TT><A HREF="#user_shall_we_branch">user_shall_we_branch()</A></TT>) decides
+whether to branch at all, the second one (<TT><A HREF="node241.html#user_select_candidates">user_select_candidates()</A></TT>) chooses
+the branching objects. The argument lists of the two functions are the
+same, and if branching occurs (see discussion below) then the contents
+of <TT>*cand_num</TT> and <TT>*candidates</TT> will not change between the
+calls to the two functions.
+<BR>
+<BR>
+The first of these two functions is invoked in each iteration
+after solving the LP relaxation and (possibly) generating cuts.
+Therefore, by the time it is called, some violated cuts might be known.
+Still, the user might decide to branch anyway. The second function is
+invoked only when branching is decided on.
+<BR>
+<BR>
+Given (1) the number of known violated cuts that can be added to the
+problem when this function is invoked, (2) the constraints that are
+slack in the LP relaxation, (3) the slack cuts not in the matrix that
+could be branched on (more on this later), and (4) the solution to the
+current LP relaxation, the user must decide whether to branch or not.
+Branching can be done either on variables or slack cuts. A pool of
+slack cuts which has been removed from the problem and kept for
+possible branching is passed to the user. If any of these happen to
+actually be violated (it is up to the user to determine this), they
+can be passed back as branching candidate type <TT>VIOLATED_SLACK</TT>
+and will be added into the current relaxation. In this case, branching
+does not have to occur (the structure of the <TT>*candidates</TT> array
+is described below in <TT><A HREF="node241.html#user_select_candidates">user_select_candidates()</A></TT>). 
+<BR>
+<BR>
+This function has two outputs. The first output is <TT>*action</TT> which
+can take four values: <TT>USER__DO_BRANCH</TT> if the user wants to
+branch, <TT>USER__DO_NOT_BRANCH</TT> if he doesn't want to branch,
+<TT>USER__BRANCH_IF_MUST</TT> if he wants to branch only if there are
+no known violated cuts, or finally <TT>USER__BRANCH_IF_TAILOFF</TT> if he
+wants to branch in case tailing off is detected. The second output is the
+number of candidates and their description. In this function the only
+sensible ``candidates'' are <TT>VIOLATED_SLACK</TT>s. 
+<BR>
+<BR>
+There is no post processing, but in case branching is
+selected, the <TT>col_gen_before_branch()</TT> function is invoked
+before the branching would take place. If that function finds dual
+infeasible variables then (instead of branching) they are added to the
+LP relaxation and the problem is resolved. (Note that the behavior of
+the <TT>col_gen_before_branch()</TT> is governed by the <TT>colgen_strat[]</TT> TM parameters.)
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double lpetol</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>The <SPAN CLASS="MATH"><IMG
+ WIDTH="11" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img55.png"
+ ALT="$ \epsilon$"></SPAN> tolerance of the LP solver.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int cutnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>The number of violated cuts (known before invoking
+this function) that could be added to the problem (instead of branching).</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int slacks_in_matrix_num</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>Number of slack constraints in the
+matrix.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data **slacks_in_matrix</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>The description of the cuts
+corresponding to these constraints (see Section <A HREF="node229.html#cut_data">6.3.2.1</A>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int slack_cut_num</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>The number of slack cuts not in the
+matrix.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data **slack_cuts</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>Array of pointers to these cuts
+(see Section <A HREF="node229.html#cut_data">6.3.2.1</A>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>The number of variables in the current lp
+relaxation (the length of the following three arrays).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>var_desc **vars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>Description of the variables in the
+relaxation.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *x</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>The corresponding solution values (in the optimal
+solution to the relaxation).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char *status</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>The stati of the variables. 
+There are five possible status values: 
+<TT>NOT_FIXED</TT>, <TT>TEMP_FIXED_TO_UB</TT>, <TT>PERM_FIXED_TO_UB</TT>, <TT>TEMP_FIXED_TO_LB</TT> and <TT>PERM_FIXED_TO_LB</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *cand_num</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>Pointer to the number of candidates
+returned (the length of <TT>*candidates</TT>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>candidate ***candidates</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>Pointer to the array of
+candidates generated (see description below).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *action</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=206>What to do. Must be one of the four above described
+values unless the return code is <TT>USER_DEFAULT</TT>.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=341>Error. <TT>DEFAULT</TT> is used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=341>The user filled out <TT>*action</TT> (and possibly <TT>*cand_num</TT> and <TT>*candidates</TT>).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=341>Action taken is controlled by the parameter <TT>shall_we_branch_default</TT>, which is initially
+<TT>USER__BRANCH_IF_MUST</TT> unless overridden by the user.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Notes:</STRONG></DT>
+<DD>
+
+<UL>
+<LI>The user has to allocate the pointer array for the
+	candidates and place the pointer for the array into <TT>	***candidates</TT> (if candidates are returned).
+
+<P>
+</LI>
+<LI>Candidates of type <TT>VIOLATED_SLACK</TT> are always
+	added to the LP relaxation regardless of what <TT>action</TT> is
+	chosen and whether branching will be carried out or not.
+
+<P>
+</LI>
+<LI>Also note that the user can change his mind in 
+	<TT><A HREF="node241.html#user_select_candidates">user_select_candidates()</A></TT> and not branch after all, even if
+	she chose to branch in this function. A possible scenario:
+	<TT>cut_num</TT> is zero when this function is invoked and the
+	user asks for <TT>USER__BRANCH_IF_MUST</TT> without checking
+	the slack constraints and slack cuts. Afterward no columns
+	are generated (no dual infeasible variables found) and thus
+	SYMPHONY decides branching is called for and invokes 
+	<TT><A HREF="node241.html#user_select_candidates">user_select_candidates()</A></TT>. 
+	However, in that function the
+	user checks the slack cuts, finds that some are violated,
+	cancels the branching request and adds the violated cuts to
+	the relaxation instead.
+</LI>
+</UL>
+
+<P>
+</DD>
+<DT><STRONG><B>Warning:</STRONG></DT>
+<DD></B>
+<P>
+<B>The cuts the user unpacks and wants to be added to the
+problem (either because they are of type <TT>VIOLATED_SLACK</TT> or type
+<TT>CANDIDATE_CUT_NOT_IN_MATRIX</TT>) will be deleted from the list
+of slack cuts after this routine returns. Therefore the same
+warning applies here as in the function <TT><A HREF="node247.html#user_unpack_cuts">user_unpack_cuts()</A></TT>.
+</B>
+<P>
+<B>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>select_branching_object()</TT>.
+</B>
+<P>
+<B>
+</DD>
+</DL></B>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3878"
+  HREF="node241.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3874"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3868"
+  HREF="node239.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3876"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3879"
+  HREF="node241.html">user_select_candidates</A>
+<B>Up:</B> <A NAME="tex2html3875"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3869"
+  HREF="node239.html">user_display_lp_solution</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2016-02-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

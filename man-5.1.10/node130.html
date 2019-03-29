@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>sym_mc_solve</TITLE>
+<META NAME="description" CONTENT="sym_mc_solve">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node131.html">
+<LINK REL="previous" HREF="node129.html">
+<LINK REL="up" HREF="node119.html">
+<LINK REL="next" HREF="node131.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html2403"
+  HREF="node131.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2399"
+  HREF="node119.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2393"
+  HREF="node129.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2401"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2404"
+  HREF="node131.html">sym_create_permanent_cut_pools</A>
+<B>Up:</B> <A NAME="tex2html2400"
+  HREF="node119.html">Primary Interface Functions</A>
+<B> Previous:</B> <A NAME="tex2html2394"
+  HREF="node129.html">sym_warm_solve</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007111100000000000000">
+sym_mc_solve</A>
+</H3>
+[f]sym_mc_solve
+<PRE>
+int sym_mc_solve(sym_environment *env)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This routine is used to solve the loaded problem as a multicriteria problem.
+For this function, a second objective function must be set either by calling
+the <TT>sym_set_obj2_coeff()</TT> function or by passing it directly using the
+<TT>sym_explict_load_problem()</TT> function.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>sym_environment *env</TT></TD>
+<TD ALIGN="LEFT">INOUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Pointer to the SYMPHONY environment.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"> 
+<TT>ERROR__USER</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Error. User error detected in one of</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251><TT>user_send_lp_data()</TT>,</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251><TT>user_send_cg_data()</TT>,</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251><TT>user_send_cp_data()</TT>,</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251><TT>user_receive_feasible_solution()</TT>,</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251><TT>user_display_solution()</TT>,</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251><TT>user_process_own_messages()</TT> functions.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TM_OPTIMAL_SOLUTION_FOUND</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>The set of supported or nondominated 
+solutions have been found.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TM_ERROR__NO_BRANCHING_CANDIDATE</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Error. TM stopped. User didn't 
+select branching candidate in <TT>user_select_candidates</TT> callback</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TM_ERROR__ILLEGAL_RETURN_CODE</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Error. TM stopped after getting a 
+non-valid return code.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TM_ERROR__NUMERICAL_INSTABILITY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Error. TM stopped due to some 
+numerical difficulties.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TM_ERROR__COMM_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Error. TM stopped due to communication 
+error.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>TM_ERROR__USER</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Error. TM stopped. User error detected in one of 
+user callbacks activated by user and invoked during TM processes.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>FUNCTION_TERMINATED_ABNORMALLY</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=251>Function invoked unsuccessfully.</TD>
+</TR>
+</TABLE>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html2403"
+  HREF="node131.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html2399"
+  HREF="node119.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html2393"
+  HREF="node129.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html2401"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html2404"
+  HREF="node131.html">sym_create_permanent_cut_pools</A>
+<B>Up:</B> <A NAME="tex2html2400"
+  HREF="node119.html">Primary Interface Functions</A>
+<B> Previous:</B> <A NAME="tex2html2394"
+  HREF="node129.html">sym_warm_solve</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-10-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

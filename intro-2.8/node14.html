@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Configuration of the Modules</TITLE>
+<META NAME="description" CONTENT="Configuration of the Modules">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node15.html">
+<LINK REL="previous" HREF="node13.html">
+<LINK REL="up" HREF="node12.html">
+<LINK REL="next" HREF="node15.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html197"
+ HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html195"
+ HREF="node12.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html189"
+ HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html198"
+ HREF="node15.html">Data Structures and Storage</A>
+<B>Up:</B> <A NAME="tex2html196"
+ HREF="node12.html">The Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html190"
+ HREF="node13.html">Computing Environment</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00042000000000000000">
+Configuration of the Modules</A>
+</H2>
+
+<P>
+Although SYMPHONY was originally designed as a parallel code, it can
+be built in a variety of configurations ranging from completely
+sequential to fully parallel using the same source code. As described
+in the previous section, there are five modules in the standard
+distributed configuration. However, various combinations of these
+modules can be linked together into ``combined'' modules depending on
+the user's needs. For instance, if cut generation is fast and not
+memory-intensive, it may not be worthwhile to have the LP solver and
+its associated cut generator working independently since this
+increases communication overhead. In this case, the separation
+function can be called directly from the LP solver, creating a single,
+more efficient executable. For debugging purposes, it is often
+convenient to have the entire framework run as a single executable.
+This may also be more efficient if only one LP process is to be used.
+These and other configurations can be specified at compile time. When
+compiling for shared memory, several subproblems can be processed in
+parallel by using threading or some similar technique, depending on
+the architecture and compiler used.
+
+<P>
+<HR>
+<A NAME="tex2html197"
+ HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html195"
+ HREF="node12.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html189"
+ HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html198"
+ HREF="node15.html">Data Structures and Storage</A>
+<B>Up:</B> <A NAME="tex2html196"
+ HREF="node12.html">The Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html190"
+ HREF="node13.html">Computing Environment</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

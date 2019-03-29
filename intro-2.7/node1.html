@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Introduction</TITLE>
+<META NAME="description" CONTENT="Introduction">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html57" HREF="node2.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html55" HREF="symphony.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html49" HREF="symphony.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html58" HREF="node2.html">Branch and Cut Algorithms</A>
+<B>Up:</B> <A NAME="tex2html56" HREF="symphony.html">SYMPHONY: A Parallel Framework </A>
+<B> Previous:</B> <A NAME="tex2html50" HREF="symphony.html">SYMPHONY: A Parallel Framework </A>
+<BR> <P>
+<H1><A NAME="SECTION00010000000000000000">Introduction</A></H1>
+<P>
+SYMPHONY (Single- or Multi-Process Optimization over Networks) is a
+state-of-the-art, parallel implementation of the <EM>branch, cut, and
+price algorithm</EM>, referred to henceforth as simply <EM>branch and
+cut</EM>. This general class of algorithm has long been the method of
+choice for solving hard combinatorial and general mixed-integer
+optimization problems. However, because of the inherent need for
+problem-dependent techniques (most notably separation), implementation
+has often been time-consuming and difficult. SYMPHONY seeks to
+minimize these difficulties by providing a generic library that
+implements the framework of the algorithm, while requiring the user to
+supply only those subroutines that depend on the problem setting.
+<P>
+To develop a full-scale, parallel branch, cut, and price algorithm,
+the user has only to supply a few problem-specific functions that
+depend on the problem setting, such as preprocessing and separation.
+The vast majority of the computation takes place within a ``black
+box,'' of which the user need have no knowledge. The internal library
+communicates with the user's routines through well-defined interfaces
+and performs all the normal functions of branch and cut--tree
+management, LP solution, and cut pool management, as well as
+inter-process communication. Although there are default options, the
+user can also assert control over the behavior of the algorithm
+through a myriad of parameters and optional subroutines. The
+executables can be built in a variety of configurations, ranging from
+completely sequential to fully parallel with independently functioning
+cut generators, cut pools, and LP solvers. The distributed version
+currently runs in any environment supported by the
+<A NAME="tex2html6" HREF="http://www.ccs.ornl.gov/pvm/">PVM</A> message passing
+protocol. The same source code can also be compiled for shared-memory
+architectures using any OpenMP compliant compiler. SYMPHONY
+can be used in a variety of problem-settings and has already been
+ported to solve the <EM>Traveling Salesman Problem</EM> (TSP)
+([<A HREF="node34.html#Lthesis">15</A>]), <EM>Vehicle Routing Problem</EM> (VRP)
+([<A HREF="node34.html#thesis">20</A>, <A HREF="node34.html#Leo">14</A>]), and the <EM>Set Partitioning Problem</EM>
+([<A HREF="node34.html#Marta">6</A>]).
+<P>
+<HR><A NAME="tex2html57" HREF="node2.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html55" HREF="symphony.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html49" HREF="symphony.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html58" HREF="node2.html">Branch and Cut Algorithms</A>
+<B>Up:</B> <A NAME="tex2html56" HREF="symphony.html">SYMPHONY: A Parallel Framework </A>
+<B> Previous:</B> <A NAME="tex2html50" HREF="symphony.html">SYMPHONY: A Parallel Framework </A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 14:31:17 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Inter-process Communication for Distributed Computing</TITLE>
+<META NAME="description" CONTENT="Inter-process Communication for Distributed Computing">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node50.html">
+<LINK REL="previous" HREF="node46.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node50.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html805"
+ HREF="node50.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html802"
+ HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html796"
+ HREF="node48.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html804"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html806"
+ HREF="node50.html">Working with PVM</A>
+<B>Up:</B> <A NAME="tex2html803"
+ HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html797"
+ HREF="node48.html">User-defined Data Structures</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00097000000000000000">&#160;</A>
+<A NAME="communication">&#160;</A>
+<BR>
+Inter-process Communication for Distributed Computing
+</H2>
+While the implementation of  SYMPHONY strives to shield the user from
+having to know anything about communications protocols or the
+specifics of inter-process communication, it may be necessary for the
+user to pass information from one module to another in some
+cases--for instance, if the user must pass problem-specific data to
+the LP process after reading them in from a data file. In cases where
+this might be appropriate, user functions are supplied in pairs--a
+<EM>send</EM> function and a <EM>receive</EM> function. All data are sent in
+the form of arrays of either type <TT>char</TT>, <TT>int</TT>, or <TT>double</TT>, or as strings. To send an array, the user has simply to
+invoke the function <TT>send_?_array(? *array, int length)</TT> where ?
+is one of the previously listed types. To receive that array, there is
+a corresponding function called <TT>receive_?_array(? *array, int
+length)</TT>. When receiving an array, the user must first
+allocate the appropriate amount of memory. In cases where variable
+length arrays need to be passed, the user must first pass the length
+of the array (as a separate array of length one) and then the array
+itself. In the receive function, this allows the length to be received
+first so that the proper amount of space can be allocated before
+receiving the array itself. Note that data must be received in exactly
+the same order as it was passed, as data is read linearly into and out
+of the message buffer. The easiest way to ensure this is done properly
+is to simply copy the send statements into the receive function and
+change the function names. It may then be necessary to add some
+allocation statements in between the receive function calls.
+
+<P>
+<HR>
+<A NAME="tex2html805"
+ HREF="node50.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html802"
+ HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html796"
+ HREF="node48.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html804"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html806"
+ HREF="node50.html">Working with PVM</A>
+<B>Up:</B> <A NAME="tex2html803"
+ HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html797"
+ HREF="node48.html">User-defined Data Structures</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

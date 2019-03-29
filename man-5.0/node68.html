@@ -1,0 +1,450 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using the MSVC++ Workspace</TITLE>
+<META NAME="description" CONTENT="Using the MSVC++ Workspace">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node67.html">
+<LINK REL="up" HREF="node66.html">
+<LINK REL="next" HREF="node69.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1287"
+  HREF="node69.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1283"
+  HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1279"
+  HREF="node67.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1285"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1288"
+  HREF="node69.html">Compiling a Custom Application</A>
+<B>Up:</B> <A NAME="tex2html1284"
+  HREF="node66.html">Compiling the Library and</A>
+<B> Previous:</B> <A NAME="tex2html1280"
+  HREF="node67.html">Using the NMAKE Utility</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00622000000000000000">
+Using the MSVC++ Workspace</A>
+</H2>
+
+<P>
+
+<UL>
+<LI>In MS Visual C++ 6.0, open the workspace
+<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">symphony.dsw</TT>. 
+Note that there are two projects, one called <TT>symphony</TT> and the other 
+called
+<TT>symphonyLib</TT>. The <TT>symphonyLib</TT> project compiles the source 
+code to create the callable library: <TT>symphonyLib.lib</TT>. The 
+<TT>symphony</TT> project compiles the main  function and links that with the c
+allable library to create the executable: <TT>symphony.exe</TT>. 
+
+<P>
+</LI>
+<LI>To use many of the new capabilities of SYMPHONY, you must have installed
+the <A NAME="tex2html20"
+  HREF="http://www.ccs.ornl.gov/pvm/">COIN</A>
+optimization
+libraries 
+. By default SYMPHONY is 
+set up to use COIN LP solver, <TT>CLP</TT>, COIN Open Solver Interface, 
+<TT>OSI</TT>, and COIN Cut Generation Library, <TT>CGL</TT>. To keep this 
+configuration, you should install <TT>OSI</TT>, <TT>CGL</TT>, <TT>CLP</TT> 
+and additionally, the Coin utilities (under COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Coin).
+The default location for COIN is C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">.
+
+<P>
+</LI>
+<LI>By default, SYMPHONY is set up to use the OSI CLP interface. To see this
+check the following settings:
+
+<P>
+
+<UL>
+<LI><TT>__OSI_CLP__</TT> is defined in the preprocessor
+definitions of both <TT>symphony</TT> and <TT>symphonyLib</TT> projects 
+(right-click on one of the projects, and then choose <TT>Settings -&gt; C/C++
+-&gt; Preprocessor</TT> in the category drop-down menu).
+
+<P>
+</LI>
+<LI>Paths to the include files of COIN utilities (Coin), OSI, OSI_CLP, and
+CLP are specified in the same settings window as for the preprocessor
+definitions. Note that the Coin, OSI, and OSI_CLP and CLP include 
+directories are assumed to be in <TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Coin</TT>,
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Osi</TT>,
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Osi<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">OsiClp</TT> and 
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Clp</TT>,
+directories, respectively. If they are not, make sure that you have set the
+correct paths in both projects before compiling.
+
+<P>
+</LI>
+<LI>The <TT>symphony</TT> project is dependent on the <TT>symphonyLib</TT> 
+project (see the dependencies in <TT>Project -&gt; Dependencies</TT>) 
+and it includes the necessary libraries: <TT>symphonyLib</TT>, 
+<TT>coinLib</TT>, <TT>osiLib</TT>, <TT>osiClpLib</TT> and <TT>clpLib</TT> 
+(solver library).
+
+<P>
+</LI>
+</UL>
+
+<P>
+If you want to use the native CPLEX or OSL interface 
+(without downloading COIN) or a solver other than CLP:
+
+<P>
+
+<UL>
+<LI>If another OSI interface, change the preprocessor
+definition in both projects from <TT>__OSI_CLP__</TT> to 
+<TT>__OSI_XXX__</TT> ,
+where <TT>XXX</TT> is replaced by the desired solver's acronym (e.g.,
+<TT>__OSI_CPLEX__</TT>, <TT>__OSI_GLPK__</TT>,
+<TT>__OSI_OSL__</TT>, etc.). Otherwise, change it to either
+<TT>__CPLEX__</TT> or <TT>__OSL__</TT> in both projects.
+
+<P>
+</LI>
+<LI>Change the path definitions of the include files: for instance, if you 
+want to use <TT>__OSI_CPLEX__</TT>, define
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Osi<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">OsiCpx</TT> and 
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">ILOG<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">cplex81<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">include<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">ilcplex</TT> 
+(assuming it is installed there) instead of the OSI CLP and CLP path 
+definitions. Or, if you want to use <TT>__OSI_OSL__</TT>, define 
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Osi<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">OsiOsl</TT> and 
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">ProgramFiles<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">IbmOslV3Lib<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">osllib</TT>
+(assuming OSL is installed there) instead of the OSI CLP and CLP path 
+definitions. If you want to use the native CPLEX or OSL interface, 
+delete all the path  definitions (you are not required to have COIN or OSI), 
+and just add the path definitions for the CPLEX or OSL include files.
+
+<P>
+</LI>
+<LI>Add the appropriate libraries to the <TT>symphony</TT> project. For
+instance, if you want to use <TT>__OSI_CPLEX__</TT>, then add the
+<TT>osiCpxLib</TT> and <TT>cplex81</TT> library files after deleting 
+<TT>osiClpLib</TT> and <TT>clpLib</TT> libraries from the
+<TT>symphony</TT> project. If you want to use the native CPLEX interface, 
+then delete all the libraries (except the <TT>symphonyLib</TT>) 
+and just add the <TT>cplex81</TT> library file for it is the unique solver 
+library file we need now.
+
+<P>
+</LI>
+</UL>
+
+<P>
+</LI>
+<LI>By default, SYMPHONY is also set up to use the <TT>COIN CGL</TT> library for
+generating cuts. To use CGL, the <TT>symphonyLib</TT> project has the
+<TT>ADD_CGL_CUTS</TT> preprocessor definition, the path to
+<TT>C:<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Cgl<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$"></TT> (be sure that this path
+directs SYMPHONY to the include subdirectory of CGL). If you don't want to use the 
+CGL library, simply
+delete the <TT>ADD_CGL_CUTS</TT> preprocessor definition, the CGL path
+definitions and the <TT>cgllib</TT> library from the <TT>symphony</TT>
+project.
+
+<P>
+</LI>
+<LI>DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important 
+note for OSL users: when using OSL in Windows, you must also add 
+<TT>OSLMSDLL</TT> to the list of definitions.
+
+<P>
+</LI>
+<LI>Note that there are a number of additional preprocessor definitions that
+control the functionality of SYMPHONY. These definitions are described in
+<TT>SYMPHONY-5.0/Makefile</TT>, a Unix-style makefile included with the
+distribution. To enable the functionality associated with a particular
+definition, simply add it to the list of definitions, as above.
+
+<P>
+</LI>
+<LI>You must also be sure to have any <TT>.dll</TT> files required for your
+LP solver to be in your search path. Either move the required <TT>.dll</TT> to
+the subdirectory containing <TT>symphony.exe</TT> or add the path to the 
+<TT>PATH</TT> Windows environment variable.
+
+<P>
+</LI>
+<LI>Once you have the proper settings for your LP solver, choose 
+<TT>Build symphony.exe</TT> from the <TT>Build menu</TT>. This should 
+successfully build the SYMPHONY library and the executable.
+
+<P>
+</LI>
+<LI>To test the executable, right click on the <TT>symphony</TT> project, go
+to the <TT>Debug</TT> tab and set the program arguments to <TT>-F
+..<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">sample.mps</TT> Note that command-line switches are Unix-style.
+
+<P>
+</LI>
+<LI>Now choose <TT>Execute</TT> from the build menu and the solver
+should solve the sample problem.
+
+<P>
+</LI>
+</UL>
+
+<P>
+Note that there is some functionality missing from the Windows version. Most
+prominently, the timing functions do not work. This functionality
+should be easy to add--let me know if you are interested in doing it and I
+will give you all the help I can. In addition, the Windows version will only
+run in sequential mode for a variety of reasons. However, it should be
+relatively easy to get it running in parallel if you can get PVM working under
+Windows. Let me know if you are interested.
+
+<P>
+<HR>
+<A NAME="tex2html1287"
+  HREF="node69.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1283"
+  HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1279"
+  HREF="node67.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1285"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1288"
+  HREF="node69.html">Compiling a Custom Application</A>
+<B>Up:</B> <A NAME="tex2html1284"
+  HREF="node66.html">Compiling the Library and</A>
+<B> Previous:</B> <A NAME="tex2html1280"
+  HREF="node67.html">Using the NMAKE Utility</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using the MSDEV Utility</TITLE>
+<META NAME="description" CONTENT="Using the MSDEV Utility">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node102.html">
+<LINK REL="previous" HREF="node100.html">
+<LINK REL="up" HREF="node100.html">
+<LINK REL="next" HREF="node102.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1784"
+  HREF="node102.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1780"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1774"
+  HREF="node100.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1782"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1785"
+  HREF="node102.html">Using the MSVC++ IDE</A>
+<B>Up:</B> <A NAME="tex2html1781"
+  HREF="node100.html">Microsoft Visual C++</A>
+<B> Previous:</B> <A NAME="tex2html1775"
+  HREF="node100.html">Microsoft Visual C++</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00622100000000000000">
+Using the MSDEV Utility</A>
+</H3>
+
+<UL>
+<LI>Open a command line terminal and type
+
+<PRE>
+ devenv user.sln /Build "Win32|Release"
+</PRE> 
+This will create both the release version of the USER application, including
+the executable 
+<FONT COLOR="#a52a2a"><TT>user</TT></FONT> and the SYMPHONY library needed for linking with
+applications.
+
+<P>
+</LI>
+<LI>To test the executable, type 
+
+<PRE>
+ Debug\user.exe -F ..\..\sample.user
+</PRE>
+</LI>
+<LI>If USER source files are modified, type 
+
+<PRE>
+ devenv user.sln /make all /rebuild
+</PRE>
+in order to clean and rebuild everything.
+</LI>
+</UL> 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2014-10-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

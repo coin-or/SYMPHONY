@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Building</TITLE>
+<META NAME="description" CONTENT="Building">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node23.html">
+<LINK REL="previous" HREF="node21.html">
+<LINK REL="up" HREF="node19.html">
+<LINK REL="next" HREF="node23.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html709"
+  HREF="node23.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html705"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html699"
+  HREF="node21.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html707"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html710"
+  HREF="node23.html">Building for parallel architectures</A>
+<B>Up:</B> <A NAME="tex2html706"
+  HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A NAME="tex2html700"
+  HREF="node21.html">Configuring</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00322300000000000000"></A><A NAME="building"></A>
+<BR>
+Building
+</H3>
+
+<P>
+After configuring, the code can be built by typing the commands
+
+<PRE>
+ make
+ make install
+</PRE> This will first create the required libraries and executables and then will
+install them. By default, the library 
+<FONT COLOR="#a52a2a"><TT>libSym</TT></FONT> and the
+executable 
+<FONT COLOR="#a52a2a"><TT>symphony</TT></FONT> will be installed to the
+
+<FONT COLOR="#a52a2a"><TT>lib/</TT></FONT> and 
+<FONT COLOR="#a52a2a"><TT>bin/</TT></FONT> directories. To
+install in another directory, use the option
+
+<FONT COLOR="#a52a2a"><TT>-prefix=DIR</TT></FONT> to the 
+<FONT COLOR="#a52a2a"><TT>configure</TT></FONT>
+command.
+
+<P>
+After compilation, the SYMPHONY library, together with the header files in the
+subdirectory 
+<FONT COLOR="#a52a2a"><TT>include/</TT></FONT>, can then be used to call
+SYMPHONY from any C/C++ code. The API for this is described in
+Chapter&nbsp;<A HREF="node36.html#API-overview">3</A>. The executable can also be used for solving
+generic MILP problems in MPS and GMPL format. In order to read GMPL files, you
+will need to have GLPK (<TT><A NAME="tex2html13"
+  HREF="http://www.gnu.org/software/glpk/">http://www.gnu.org/software/glpk/</A></TT>) installed. To
+install it automatically, run the <TT>get.Glpk</TT> script in the
+<TT>ThirdParty/Glpk</TT> directory. After that, Glpk should be built and
+linked automatically, enabling the ability to read GMPL files.
+
+<P>
+For a more powerful modeling interface, FlopC++ can also be used to obtain a
+capability similar to ILOG's Concert technology for building math programming
+models (see SYMPHONY/Examples/FLOPC++). 
+
+<P>
+To test SYMPHONY after building, type
+
+<PRE>
+ make test
+</PRE> to execute an automated unit test. To test out the optimizer manually. a
+sample MPS file called 
+<FONT COLOR="#a52a2a"><TT>sample.mps</TT></FONT> and a sample GMPL/AMPL file called
+
+<FONT COLOR="#a52a2a"><TT>sample.mod</TT></FONT> together with its data file
+
+<FONT COLOR="#a52a2a"><TT>sample.dat</TT></FONT> are included with the distribution. You can
+use either the command-line or the interactive optimizer. To solve the sample
+MPS model, type 
+<PRE>
+ bin/symphony -F SYMPHONY/Datasets/sample.mps
+</PRE> To solve the GMPL model, use the 
+<FONT COLOR="#a52a2a"><TT>-F</TT></FONT> switch to specify the file name
+and the 
+<FONT COLOR="#a52a2a"><TT>-D</TT></FONT> for the data file name if the input is in GMPL/AMPL format,
+i.e., type 
+
+<PRE>
+ bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
+</PRE>
+For more MPS data files for further testing, see the MIPLIB library in the
+
+<FONT COLOR="#a52a2a"><TT>Data/</TT></FONT> subdirectory. To run the interactive optimizer, execute SYMPHONY
+without any command-line arguments, i.e., type
+
+<PRE>
+  bin/symphony
+</PRE>
+and then type 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT> or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT> to see a list of available commands.
+After the SYMPHONY library and the executable are compiled and tested, you
+can type
+
+<PRE>
+ make clean
+</PRE>
+if you want to save disk space. That's it! Now you are ready to use SYMPHONY
+callable library or solve generic MILP problems through the executable.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html709"
+  HREF="node23.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html705"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html699"
+  HREF="node21.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html707"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html710"
+  HREF="node23.html">Building for parallel architectures</A>
+<B>Up:</B> <A NAME="tex2html706"
+  HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A NAME="tex2html700"
+  HREF="node21.html">Configuring</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2009-07-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

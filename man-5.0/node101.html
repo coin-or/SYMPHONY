@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Callable Library C API</TITLE>
+<META NAME="description" CONTENT="Callable Library C API">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node185.html">
+<LINK REL="previous" HREF="node100.html">
+<LINK REL="up" HREF="node100.html">
+<LINK REL="next" HREF="node102.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1875"
+  HREF="node102.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1871"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1865"
+  HREF="node100.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1873"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1876"
+  HREF="node102.html">Primary Interface Functions</A>
+<B>Up:</B> <A NAME="tex2html1872"
+  HREF="node100.html">Reference</A>
+<B> Previous:</B> <A NAME="tex2html1866"
+  HREF="node100.html">Reference</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00810000000000000000"></A>
+<A NAME="callable-library"></A>
+<BR>
+Callable Library C API
+</H1>
+
+<P>
+<A NAME="C_Interface"></A>
+<P>
+This chapter specifies the interface for using SYMPHONY's callable
+library. These function calls can be used to build custom applications that
+call SYMPHONY as a subroutine, as described in Section
+<A HREF="node12.html#callable_library">3.1</A>. All callable library function begin with the
+prefix <TT>sym_</TT>. To call these function from an application, include the
+header file <TT>symphony_api.h</TT> and then link with the SYMPHONY library as
+described <A HREF="node60.html#getting_started">here</A>. In general, if an
+array is requested, such as the array of lower bounds on the variables, for
+instance, the user is responsible for allocating an array of appropriate size
+and passing it to SYMPHONY. SYMPHONY will then fill up the array.
+
+<P>
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1877"
+  HREF="node102.html">Primary Interface Functions</A>
+<UL>
+<LI><A NAME="tex2html1878"
+  HREF="node103.html">sym_open_environment</A>
+<LI><A NAME="tex2html1879"
+  HREF="node104.html">sym_create_copy_environment</A>
+<LI><A NAME="tex2html1880"
+  HREF="node105.html">sym_parse_command_line</A>
+<LI><A NAME="tex2html1881"
+  HREF="node106.html">sym_find_initial_bounds</A>
+<LI><A NAME="tex2html1882"
+  HREF="node107.html">sym_load_problem</A>
+<LI><A NAME="tex2html1883"
+  HREF="node108.html">sym_explicit_load_problem</A>
+<LI><A NAME="tex2html1884"
+  HREF="node109.html">sym_solve</A>
+<LI><A NAME="tex2html1885"
+  HREF="node110.html">sym_warm_solve</A>
+<LI><A NAME="tex2html1886"
+  HREF="node111.html">sym_mc_solve</A>
+<LI><A NAME="tex2html1887"
+  HREF="node112.html">sym_create_permanent_cut_pools</A>
+<LI><A NAME="tex2html1888"
+  HREF="node113.html">sym_set_user_data</A>
+<LI><A NAME="tex2html1889"
+  HREF="node114.html">sym_close_environment</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1890"
+  HREF="node115.html">Parameter Query and Modification</A>
+<UL>
+<LI><A NAME="tex2html1891"
+  HREF="node116.html">sym_set_defaults</A>
+<LI><A NAME="tex2html1892"
+  HREF="node117.html">sym_set_int_param</A>
+<LI><A NAME="tex2html1893"
+  HREF="node118.html">sym_set_dbl_param</A>
+<LI><A NAME="tex2html1894"
+  HREF="node119.html">sym_set_str_param</A>
+<LI><A NAME="tex2html1895"
+  HREF="node120.html">sym_get_int_param</A>
+<LI><A NAME="tex2html1896"
+  HREF="node121.html">sym_get_dbl_param</A>
+<LI><A NAME="tex2html1897"
+  HREF="node122.html">sym_get_str_param</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1898"
+  HREF="node123.html">Solver Status Query Functions</A>
+<UL>
+<LI><A NAME="tex2html1899"
+  HREF="node124.html">sym_get_status</A>
+<LI><A NAME="tex2html1900"
+  HREF="node125.html">sym_is_proven_optimal</A>
+<LI><A NAME="tex2html1901"
+  HREF="node126.html">sym_is_proven_primal_infeasible</A>
+<LI><A NAME="tex2html1902"
+  HREF="node127.html">sym_is_iteration_limit_reached</A>
+<LI><A NAME="tex2html1903"
+  HREF="node128.html">sym_is_time_limit_reached</A>
+<LI><A NAME="tex2html1904"
+  HREF="node129.html">sym_is_target_gap_achieved</A>
+<LI><A NAME="tex2html1905"
+  HREF="node130.html">sym_is_abandoned</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1906"
+  HREF="node131.html">Data Query Functions</A>
+<UL>
+<LI><A NAME="tex2html1907"
+  HREF="node132.html">sym_create_copy_mip_desc</A>
+<LI><A NAME="tex2html1908"
+  HREF="node133.html">sym_get_num_cols</A>
+<LI><A NAME="tex2html1909"
+  HREF="node134.html">sym_get_num_rows</A>
+<LI><A NAME="tex2html1910"
+  HREF="node135.html">sym_get_num_elements</A>
+<LI><A NAME="tex2html1911"
+  HREF="node136.html">sym_get_col_lower</A>
+<LI><A NAME="tex2html1912"
+  HREF="node137.html">sym_get_col_upper</A>
+<LI><A NAME="tex2html1913"
+  HREF="node138.html">sym_get_row_sense</A>
+<LI><A NAME="tex2html1914"
+  HREF="node139.html">sym_get_rhs</A>
+<LI><A NAME="tex2html1915"
+  HREF="node140.html">sym_get_row_range</A>
+<LI><A NAME="tex2html1916"
+  HREF="node141.html">sym_get_row_lower</A>
+<LI><A NAME="tex2html1917"
+  HREF="node142.html">sym_get_row_upper</A>
+<LI><A NAME="tex2html1918"
+  HREF="node143.html">sym_get_obj_coeff</A>
+<LI><A NAME="tex2html1919"
+  HREF="node144.html">sym_get_obj2_coeff</A>
+<LI><A NAME="tex2html1920"
+  HREF="node145.html">sym_get_obj_sense</A>
+<LI><A NAME="tex2html1921"
+  HREF="node146.html">sym_is_continuous</A>
+<LI><A NAME="tex2html1922"
+  HREF="node147.html">sym_is_binary</A>
+<LI><A NAME="tex2html1923"
+  HREF="node148.html">sym_is_integer</A>
+<LI><A NAME="tex2html1924"
+  HREF="node149.html">sym_get_infinity</A>
+<LI><A NAME="tex2html1925"
+  HREF="node150.html">sym_get_col_solution</A>
+<LI><A NAME="tex2html1926"
+  HREF="node151.html">sym_get_row_activity</A>
+<LI><A NAME="tex2html1927"
+  HREF="node152.html">sym_get_obj_val</A>
+<LI><A NAME="tex2html1928"
+  HREF="node153.html">sym_get_primal_bound</A>
+<LI><A NAME="tex2html1929"
+  HREF="node154.html">sym_get_iteration_count</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1930"
+  HREF="node155.html">Data Modification Functions</A>
+<UL>
+<LI><A NAME="tex2html1931"
+  HREF="node156.html">sym_set_obj_coeff</A>
+<LI><A NAME="tex2html1932"
+  HREF="node157.html">sym_set_obj2_coeff</A>
+<LI><A NAME="tex2html1933"
+  HREF="node158.html">sym_set_col_lower</A>
+<LI><A NAME="tex2html1934"
+  HREF="node159.html">sym_set_col_upper</A>
+<LI><A NAME="tex2html1935"
+  HREF="node160.html">sym_set_row_lower</A>
+<LI><A NAME="tex2html1936"
+  HREF="node161.html">sym_set_row_upper</A>
+<LI><A NAME="tex2html1937"
+  HREF="node162.html">sym_set_row_type</A>
+<LI><A NAME="tex2html1938"
+  HREF="node163.html">sym_set_obj_sense</A>
+<LI><A NAME="tex2html1939"
+  HREF="node164.html">sym_set_col_solution</A>
+<LI><A NAME="tex2html1940"
+  HREF="node165.html">sym_set_primal_bound</A>
+<LI><A NAME="tex2html1941"
+  HREF="node166.html">sym_set_continuous</A>
+<LI><A NAME="tex2html1942"
+  HREF="node167.html">sym_set_integer</A>
+<LI><A NAME="tex2html1943"
+  HREF="node168.html">sym_set_col_names</A>
+<LI><A NAME="tex2html1944"
+  HREF="node169.html">sym_add_col</A>
+<LI><A NAME="tex2html1945"
+  HREF="node170.html">sym_add_row</A>
+<LI><A NAME="tex2html1946"
+  HREF="node171.html">sym_delete_cols</A>
+<LI><A NAME="tex2html1947"
+  HREF="node172.html">sym_delete_rows</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1948"
+  HREF="node173.html">Warm Starting Functions</A>
+<UL>
+<LI><A NAME="tex2html1949"
+  HREF="node174.html">sym_write_warm_start_desc</A>
+<LI><A NAME="tex2html1950"
+  HREF="node175.html">sym_read_warm_start</A>
+<LI><A NAME="tex2html1951"
+  HREF="node176.html">sym_delete_warm_start</A>
+<LI><A NAME="tex2html1952"
+  HREF="node177.html">sym_get_warm_start</A>
+<LI><A NAME="tex2html1953"
+  HREF="node178.html">sym_set_warm_start</A>
+<LI><A NAME="tex2html1954"
+  HREF="node179.html">sym_create_copy_warm_start</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html1955"
+  HREF="node180.html">Sensitivity Analysis Functions</A>
+<UL>
+<LI><A NAME="tex2html1956"
+  HREF="node181.html">sym_get_lb_for_new_rhs</A>
+<LI><A NAME="tex2html1957"
+  HREF="node182.html">sym_get_ub_for_new_rhs</A>
+<LI><A NAME="tex2html1958"
+  HREF="node183.html">sym_get_lb_for_new_obj</A>
+<LI><A NAME="tex2html1959"
+  HREF="node184.html">sym_get_ub_for_new_obj</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

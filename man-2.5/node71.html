@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Tree Manager parameters</TITLE>
+<META NAME="description" CONTENT="Tree Manager parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html904" HREF="node72.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html902" HREF="node68.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html896" HREF="node70.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html905" HREF="node72.html">LP parameters</A>
+<B>Up:</B> <A NAME="tex2html903" HREF="node68.html">Parameter file</A>
+<B> Previous:</B> <A NAME="tex2html897" HREF="node70.html">Master Process parameters</A>
+<BR> <P>
+<H2><A NAME="SECTION00033000000000000000">Tree Manager parameters</A></H2>
+<P>
+<DL ><DT><STRONG><TT>TM_verbosity</TT> - integer (0).</STRONG>
+<DD>
+The verbosity of TM.
+<P>
+<DT><STRONG><TT>lp_exe, cg_exe, cp_exe</TT> - strings (``glp_c'', ``cg'',
+``cp'').</STRONG>
+<DD>
+The name of the executable files of the LP, CG, and CP processes.
+Note: when running in parallel using PVM, these executables (or links
+to them) must reside in the <TT>PVM_ROOT/bin/PVM_ARCH/</TT> directory.
+Also, be sure to note that the executable names may have extensions
+that depend on the configuration of the modules so these defaults may
+not work!
+<P>
+<DT><STRONG><TT>lp_debug, cg_debug, cp_debug</TT> - boolean (all <TT>
+FALSE</TT>).</STRONG>
+<DD>
+Whether the processes should be started under a debugger or not.
+<P>
+<DT><STRONG><TT>max_active_nodes</TT> - integer (1).</STRONG>
+<DD>
+The maximum number of active search tree nodes, equal to the number of
+LP and CG tandems to be started up.
+<P>
+<DT><STRONG><TT>max_cp_num</TT> - integer (0).</STRONG>
+<DD>
+The maximum number of cut pools to be used.
+<P>
+<DT><STRONG><TT>lp_mach_num, cg_mach_num, cp_mach_num</TT> - integers
+(all 0).</STRONG>
+<DD>
+<P>
+The number of processors in the virtual machine to run LP (CG/CP)
+processes. If this value is 0 then the processes will be assigned to
+processors in round-robin order. Otherwise the next <TT>xx_mach_num</TT> lines
+describe the processors where the LP (CG/CP) processes must run. The
+keyword - value pairs on these lines must be <B>TM_xx_machine</B> and the
+name or IP address of a processor (the processor names need not be distinct).
+In this case the actual processes are assigned in a round robin fashion to the
+processors on this list.<BR> 
+<BR> 
+This feature is useful if a specific software package is needed for
+some process, but that software is not licensed for every node of the
+virtual machine or if a certain process must run on a certain type of
+machine due to resource requirements.
+<P>
+<DT><STRONG><TT>use_cg</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+Whether to use a cut generator or not. This should be set to <TT>
+FALSE</TT> if <TT>COMPILE_IN_CG</TT> is set to <TT>TRUE</TT> in the <TT>make</TT>
+file.
+<P>
+<DT><STRONG><TT>TM_random_seed</TT> - integer (17).</STRONG>
+<DD>
+A random seed just for TM.
+<P>
+<DT><STRONG><TT>unconditional_dive_frac</TT> - double (0.1).</STRONG>
+<DD>
+The fraction of the nodes on which SYMPHONY randomly dives
+unconditionally into one of the children.
+<P>
+<DT><STRONG><TT>diving_strategy</TT> - integer (<TT>COMP_BEST_K</TT>).</STRONG>
+<DD>
+The strategy employed when deciding whether to dive or not. The <TT>
+COMP_BEST_K</TT> strategy computes the average lower bound on the best
+<TT>diving_k</TT> search tree nodes and decides to dive if the objective
+value of the child to be dived into does not exceed this average by
+more than the fraction <TT>diving_threshold</TT>. (Currently this is the
+only implemented strategy.)
+<P>
+<DT><STRONG><TT>diving_k, diving_threshold</TT> - integer, double (20, 0.1).</STRONG>
+<DD>
+See above.
+<P>
+<DT><STRONG><TT>node_selection_rule</TT> - integer (<TT>LOWEST_LP_FIRST</TT>).</STRONG>
+<DD>
+The rule for selecting the next search tree node to be processed. This rule
+selects the one with lowest lower bound. Other possible values are: <TT>
+HIGHEST_LP_FIRST</TT>, <TT>BREADTH_FIRST_SEARCH</TT> and <TT>
+DEPTH_FIRST_SEARCH</TT>.
+<P>
+<DT><STRONG><TT>keep_description_of_pruned</TT> - integer (<TT>DISCARD</TT>).</STRONG>
+<DD>
+Whether to keep the description of pruned search tree nodes or not.
+The only real reasons to do this are (1) if the user wants to write
+out a proof of optimality using the logging function, or (2) for
+debugging. Otherwise, keeping the pruned nodes around just takes up
+memory. There are two options if it is desired to keep them around.
+First, they can be written to disk and freed from memory (<TT>
+KEEP_ON_DISK</TT>). In this case, the line following <TT>
+keep_description_of_pruned</TT> should be a line containing the keyword
+<TT>pruned_node_file_name</TT> with its corresponding value being the
+name of a file to which a description of the pruned nodes can be
+written. The file does not need to exist and will be over-written if
+it does not exist. Alternatively, the user can set the value to of
+this parameter to <TT>KEEP_IN_MEMORY</TT>, in which case all pruned
+nodes will be kept in memory and written out to the regular log file
+if that option is chosen. This is really only useful for debugging.
+<P>
+<DT><STRONG><TT>logging</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+Whether or not to write out the state of the search tree and all other
+necessary data to disk periodically in order to allow a warm start in
+the case of a system crash. In case logging is desired, the following
+two lines of the param file should contain the keywords <TT>
+tree_log_file_name</TT> and <TT>cut_log_file_name</TT> along with
+corresponding file names. These will be the files used to record the
+search tree and related data and the list of cuts needed to
+reconstruct the tree.
+<P>
+<DT><STRONG><TT>logging_interval</TT> - integer (1800).</STRONG>
+<DD>
+Interval (in seconds) between writing out the log files.
+<P>
+<DT><STRONG><TT>cp_warm_start</TT> - boolean (0).</STRONG>
+<DD>
+Used to allow the tree manager to make a warm start by reading in
+previously written log files. If this option is set, then the two line
+following must start with the keywords <TT>
+warm_start_tree_file_name</TT> and <TT>warm_start_cut_file_name</TT>
+and include the appropriate file names as the corresponding values.
+<P>
+<DT><STRONG><TT>price_in_root</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+Whether to price out variables in the root node before the second
+phase starts (called <EM>repricing the root</EM>).
+<P>
+<DT><STRONG><TT>trim_search_tree</TT> - boolean (<TT>FALSE</TT>).</STRONG>
+<DD>
+Whether to trim the search tree before the second phase starts or not. Useful
+only if there are two phases. (It is very useful then.)
+<P>
+<DT><STRONG><TT>colgen_in_first_phase, colgen_in_second_phase</TT> -
+integers (both 4).</STRONG>
+<DD>
+The column generation (or pricing out) strategy in the first phase of the
+algorithm. The default is to generate no columns before branching or
+fathoming. (I.e., both the <TT>BEFORE_BRANCH__DO_NOT_GENERATE_COLS</TT> and
+the <TT>FATHOM__DO_NOT_GENERATE_COLS__DISCARD</TT> bits are set in <TT>
+colgen_strat[0]</TT>.)
+<P>
+<DT><STRONG><TT>time_limit</TT> - integer (0).</STRONG>
+<DD>
+Number of seconds of wall-clock time allowed for solution. When this
+time limit is reached, the solution process will stop and the best
+solution found to that point, along with other relevant data, will be
+ouput. A time limit of zero means there is no limit.
+<P>
+ </DL><HR><A NAME="tex2html904" HREF="node72.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html902" HREF="node68.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html896" HREF="node70.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html905" HREF="node72.html">LP parameters</A>
+<B>Up:</B> <A NAME="tex2html903" HREF="node68.html">Parameter file</A>
+<B> Previous:</B> <A NAME="tex2html897" HREF="node70.html">Master Process parameters</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

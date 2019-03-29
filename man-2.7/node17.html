@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>The First Rule</TITLE>
+<META NAME="description" CONTENT="The First Rule">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html416" HREF="node18.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html414" HREF="node16.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html408" HREF="node16.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html418" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html417" HREF="node18.html">Debugging with PVM</A>
+<B>Up:</B> <A NAME="tex2html415" HREF="node16.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html409" HREF="node16.html">Debugging Your Application</A>
+<BR> <P>
+<H3><A NAME="SECTION000212100000000000000">The First Rule</A></H3>
+<P>
+SYMPHONY has many built-in options to make debugging easier. The most
+important one, however, is the following rule. <B>It is easier to
+debug the fully sequential version than the fully distributed
+version</B>. Debugging parallel code is not terrible, but it is more
+difficult to understand what is going on when you have to look at the
+interaction of several different modules running as separate
+processes. This means multiple debugging windows which have to be
+closed and restarted each time the application is re-run. For this
+reason, it is highly recommended to develop code that can be compiled
+serially even if you eventually intend to run in a fully distributed
+environment. This does make the coding marginally more complex, but
+believe me, it's worth the effort. The vast majority of your code will
+be the same for either case. Make sure to set the compile flag to
+``<TT>-g</TT>'' in the make file.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Configuring the Modules.</TITLE>
+<META NAME="description" CONTENT="Configuring the Modules.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node89.html">
+<LINK REL="previous" HREF="node87.html">
+<LINK REL="up" HREF="node85.html">
+<LINK REL="next" HREF="node89.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1561"
+  HREF="node89.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1557"
+  HREF="node85.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1551"
+  HREF="node87.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1559"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1562"
+  HREF="node89.html">Executable Names.</A>
+<B>Up:</B> <A NAME="tex2html1558"
+  HREF="node85.html">Unix Operating Systems</A>
+<B> Previous:</B> <A NAME="tex2html1552"
+  HREF="node87.html">Communication with Shared Memory.</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00771030000000000000"></A>
+<A NAME="configuration"></A>
+<BR>
+Configuring the Modules.
+</H4>
+In the application makefile, e.g., <TT>SYMPHONY-5.0/USER/Makefile</TT>,there
+are four variables that control which modules run as separate executables and
+which are called directly in serial fashion. The variables are as follows:
+<DL>
+<DT><STRONG>COMPILE_IN_CG:</STRONG></DT>
+<DD>If set to <TT>TRUE</TT>, then the cut generator
+        function will be called directly from the LP in serial
+        fashion, instead of running as a separate executable. This is
+        desirable if cut generation is quick and running it in
+        parallel is not worth the price of the communication overhead.
+        
+</DD>
+<DT><STRONG>COMPILE_IN_CP:</STRONG></DT>
+<DD>If set to <TT>TRUE</TT>, then the cut
+        pool(s) will be maintained as a data structure auxiliary to the
+        tree manager. 
+        
+</DD>
+<DT><STRONG>COMPILE_IN_LP:</STRONG></DT>
+<DD>If set to <TT>TRUE</TT>, then the LP
+        functions will be called directly from the tree manager. When
+        running the distributed version, this
+        necessarily implies that there will only be one active
+        subproblem at a time, and hence the code will essentially be
+        running serially. IN the shared-memory version, however, the
+        tree manager will be threaded in order to execute subproblems 
+        in parallel.
+        
+</DD>
+<DT><STRONG>COMPILE_IN_TM:</STRONG></DT>
+<DD>If set to <TT>TRUE</TT>, then the tree
+        will be managed directly from the master process. This is only
+        recommended if a single executable is desired (i.e.&nbsp;the three
+        other variables are also set to true). A single executable is
+        extremely useful for debugging purposes.
+</DD>
+</DL>
+These variables can be set in virtually any combination, though some
+don't really make much sense. Note that in a few user functions that
+involve process communication, there will be different versions for
+serial and parallel computation. This is accomplished through the use
+of <TT>#ifdef</TT> statements in the source code. This is well documented
+in the function descriptions and the in the source files containing
+the function stubs. See also Section <A HREF="node87.html#shared">6.7.1</A>.
+
+<P>
+<HR>
+<A NAME="tex2html1561"
+  HREF="node89.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1557"
+  HREF="node85.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1551"
+  HREF="node87.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1559"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1562"
+  HREF="node89.html">Executable Names.</A>
+<B>Up:</B> <A NAME="tex2html1558"
+  HREF="node85.html">Unix Operating Systems</A>
+<B> Previous:</B> <A NAME="tex2html1552"
+  HREF="node87.html">Communication with Shared Memory.</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

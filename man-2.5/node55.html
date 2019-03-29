@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_purge_waiting_rows</TITLE>
+<META NAME="description" CONTENT="user_purge_waiting_rows">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html734" HREF="node56.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html732" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html728" HREF="node54.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html735" HREF="node56.html">User-written functions of the </A>
+<B>Up:</B> <A NAME="tex2html733" HREF="node30.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html729" HREF="node54.html">user_print_stat_on_cuts_added</A>
+<BR> <P>
+<H3><A NAME="SECTION000222200000000000000">user_purge_waiting_rows</A></H3>
+<P>
+<PRE>int user_purge_waiting_rows(void *user, int rownum,
+                            waiting_row **rows, char *delete)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The local pool is purged from time to time to control its size. In
+this function the user has the power to decide which cuts to purge
+from this pool if desired. To mark the <TT>i <IMG WIDTH=13 HEIGHT=8 ALIGN=BOTTOM ALT="tex2html_wrap_inline2150" SRC="img74.gif"  > </TT> waiting row
+(an element of the pre-pool) for removal she has to set <TT>
+delete[i]</TT> to be <TT>TRUE</TT> (<TT>delete</TT> is allocated before the
+function is called and its elements are set to <TT>FALSE</TT> by
+default).<BR> 
+<BR> 
+Post-processing consists of actually deleting those entries from the waiting
+row list and compressing the list. The default is to discard the least
+violated waiting rows and keep no more than what can be added in the next
+iteration (this is determined by the <TT>max_cut_num_per_iter</TT>
+parameter).
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=688 HEIGHT=124 ALIGN=BOTTOM ALT="tabular1487" SRC="img75.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=696 HEIGHT=99 ALIGN=BOTTOM ALT="tabular1489" SRC="img76.gif"  > <P>
+<P>
+<DT><STRONG>Post-processing:</STRONG>
+<DD>
+<P>
+Delete the appropriate rows.
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>receive_cuts()</TT> after cuts have been added.
+<P>
+ </DL>
+<P>
+%<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

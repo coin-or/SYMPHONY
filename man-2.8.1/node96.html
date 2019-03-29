@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_select_candidates</TITLE>
+<META NAME="description" CONTENT="user_select_candidates">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node97.html">
+<LINK REL="previous" HREF="node95.html">
+<LINK REL="up" HREF="node83.html">
+<LINK REL="next" HREF="node97.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html1425"
+ HREF="node97.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1422"
+ HREF="node83.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1416"
+ HREF="node95.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1424"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1426"
+ HREF="node97.html">user_compare_candidates</A>
+<B>Up:</B> <A NAME="tex2html1423"
+ HREF="node83.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1417"
+ HREF="node95.html">user_shall_we_branch</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION0001021000000000000000">&#160;</A>
+<A NAME="user_select_candidates">&#160;</A>
+<BR>
+user_select_candidates
+</H3>
+<PRE>
+int user_select_candidates(void *user, double lpetol, int cutnum, 
+                           int slacks_in_matrix_num,
+                           cut_data **slacks_in_matrix,
+                           int slack_cut_num, cut_data **slack_cuts,
+                           int varnum, var_desc **vars, double *x, 
+                           char *status, int *cand_num, 
+                           branch_obj ***candidates, int *action,
+                           int bc_level)
+</PRE>
+<P>
+<DL>
+<DD><P>
+<DT><STRONG>Description:</STRONG>
+<DD>
+
+<P>
+The purpose of this function is to generate branching candidates. Note
+that <TT>*action</TT> from <TT><A HREF="node95.html#user_shall_we_branch">user_shall_we_branch()</A></TT> is passed on to
+this function (but its value can be changed here, see notes at the
+previous function), as well as the candidates in <TT>**candidates</TT>
+and their number in <TT>*cand_num</TT> if there were any. <BR>
+<BR>
+Violated cuts found among the slack cuts (not in the matrix) can be
+added to the candidate list. These violated cuts will be added to the
+LP relaxation regardless of the value of <TT>*action</TT>. <BR>
+<BR>
+The <TT>branch_obj</TT> structure contains fields similar to the
+<TT><A HREF="node85.html#cut_data">cut_data</A></TT> data structure. Branching is
+accomplished by imposing inequalities which divide the current
+subproblem while cutting off the corresponding fractional solution.
+Branching on cuts and variables is treated symmetrically and branching
+on a variable can be thought of as imposing a constraint with a single
+unit entry in the appropriate column. Following is a list of the
+fields of the <TT>branch_obj</TT> data structure which must be set by
+the user.
+
+<P>
+<DL>
+<DD><P>
+<DT><STRONG><TT>char type</TT></STRONG>
+<DD>Can take five values:
+<DL>
+<DT><STRONG><TT>CANDIDATE_VARIABLE</TT></STRONG>
+<DD>The object is a variable.
+<DT><STRONG><TT>CANDIDATE_CUT_IN_MATRIX</TT></STRONG>
+<DD>The object is a cut (it must
+be slack) which is in the current formulation.
+<DT><STRONG><TT>CANDIDATE_CUT_NOT_IN_MATRIX</TT></STRONG>
+<DD>The object is a cut (it
+must be slack) which has been deleted from the formulation and is listed among
+the slack cuts.
+<DT><STRONG><TT>VIOLATED_SLACK</TT></STRONG>
+<DD>The object is not offered as a candidate for
+branching, but rather it is selected because it was among the slack cuts but
+became violated again.
+<DT><STRONG><TT>SLACK_TO_BE_DISCARDED</TT></STRONG>
+<DD>The object is not selected as a candidate
+for branching rather it is selected because it is a slack cut which should be
+discarded even from the list of slack cuts.
+</DL>
+<P>
+<DT><STRONG><TT>int position</TT></STRONG>
+<DD><P>
+The position of the object in the appropriate array (which is one of <TT>vars</TT>, <TT>slacks_in_matrix</TT>, or <TT>slack_cuts</TT>.
+
+<P>
+<DT><STRONG><TT>waiting_row *row</TT></STRONG>
+<DD><P>
+Used only if the type is <TT>CANDIDATE_CUT_NOT_IN_MATRIX</TT> or <TT>VIOLATED_SLACK</TT>. In these cases this field holds the row extension
+corresponding to the cut. This structure can be filled out easily
+using a call to <TT><A HREF="node102.html#user_unpack_cuts">user_unpack_cuts()</A></TT>.
+
+<P>
+<DT><STRONG><TT>int child_num</TT></STRONG>
+<DD>
+
+<P>
+The number of children of this branching object.
+
+<P>
+<DT><STRONG><TT>char *sense, double *rhs, double *range, int *branch</TT></STRONG>
+<DD>
+
+<P>
+The description of the children. These arrays determine the sense,
+rhs, etc. for the cut to be imposed in each of the children. These are
+defined and used exactly as in the <TT><A HREF="node85.html#cut_data">cut_data</A></TT>
+data structure. <B>Note:</B> If a limit is defined on the number of
+children by defining the <TT>MAX_CHILDREN_NUM</TT> macro to be a number
+(it is pre-defined to be 4 as a default), then these arrays will be
+statically defined to be the correct length and don't have to be
+allocated. This option is highly recommended. Otherwise, the user must
+allocate them to be of length <TT>child_num</TT>.
+
+<P>
+<DT><STRONG><TT>double lhs</TT></STRONG>
+<DD><P>
+The activity level for the row (for branching cuts). This field is
+purely for the user's convenience.  SYMPHONY doesn't use it so it need not
+be filled out.
+
+<P>
+<DT><STRONG><TT>double *objval, int *termcode, int *iterd, int *feasible</TT></STRONG>
+<DD>
+
+<P>
+The objective values, termination codes, number of iterations and
+feasibility stati of the children after pre-solving them. These are all
+filed out by  SYMPHONY during strong branching. The user may access them in
+<TT><A HREF="node97.html#user_compare_candidates">user_compare_candidates()</A></TT> 
+(see below).
+
+<P>
+</DL>
+<P>
+There are three default options (see below), each chooses a few variables (the
+number is determined by the <A HREF="node132.html#strong_branching">strong branching parameters</A>.
+
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+
+<P>
+Same as for <A HREF="node95.html#user_shall_we_branch"><TT>user_shall_we_branch()</TT></A>, except
+that <TT>*action</TT> must be either <TT>USER__DO_BRANCH</TT> or <TT>USER__DO_NOT_BRANCH</TT>, and if branching is asked for, there must be
+a real candidate in the candidate list (not only <TT>VIOLATED_SLACK</TT>s and <TT>SLACK_TO_BE_DISCARDED</TT>s). Also, the
+argument <TT>bc_level</TT> is the level in the tree. This could be used
+in deciding how many strong branching candidates to use.
+
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=211>Error. <TT> DEFAULT</TT> is used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=211>User generated branching candidates.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=211>Regulated by the <TT> select_candidates_default</TT> parameter
+(one of the following three options).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER__CLOSE_TO_HALF</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=211>Choose variables with values closest to half.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER__CLOSE_TO_HALF_AND_EXPENSIVE</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=211>Choose variables
+with values close to half and with high objective function coefficients.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> USER__CLOSE_TO_ONE_AND_CHEAP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=211>Choose variables with
+values close to one and with low objective function coefficients.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD><TT>select_branching_object()</TT>.
+
+<P>
+<DT><STRONG>Notes:</STRONG>
+<DD>See the notes at <TT><A HREF="node95.html#user_shall_we_branch">user_shall_we_branch()</A></TT>.
+
+<P>
+</DL>
+<P>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html1425"
+ HREF="node97.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html1422"
+ HREF="node83.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html1416"
+ HREF="node95.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html1424"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1426"
+ HREF="node97.html">user_compare_candidates</A>
+<B>Up:</B> <A NAME="tex2html1423"
+ HREF="node83.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html1417"
+ HREF="node95.html">user_shall_we_branch</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

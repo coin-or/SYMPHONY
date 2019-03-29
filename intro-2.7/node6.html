@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>The Master Process</TITLE>
+<META NAME="description" CONTENT="The Master Process">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="symphony.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html113" HREF="node7.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://cbl.leeds.ac.uk/nikos/figs/next_motif.gif"></A> <A NAME="tex2html111" HREF="node5.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://cbl.leeds.ac.uk/nikos/figs/up_motif.gif"></A> <A NAME="tex2html105" HREF="node5.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://cbl.leeds.ac.uk/nikos/figs/previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html114" HREF="node7.html">The Cut Pool Process</A>
+<B>Up:</B> <A NAME="tex2html112" HREF="node5.html">Parallelizing Branch and Cut</A>
+<B> Previous:</B> <A NAME="tex2html106" HREF="node5.html">Parallelizing Branch and Cut</A>
+<BR> <P>
+<H2><A NAME="SECTION00031000000000000000">The Master Process</A></H2>
+<P>
+<A NAME="masterprocess">&#160;</A>
+<P>
+The <EM>master process</EM> is the first one started and the last one to
+exit. It performs problem initialization and I/O functions. There is
+always only one master process running. <BR> <BR> 
+<B>Functions Performed by the Master Process</B>
+<UL><LI> Read in the parameters from a data file.<LI> Read in the data for the problem instance.<LI> Compute an initial upper bound using heuristics.<LI> Perform problem preprocessing.<LI> Initialize the branch and cut algorithm by sending data
+	for the root node to the tree manager.<LI> Initialize output devices and act as a central
+	repository for output.<LI> Process requests for problem data.<LI> Receive new solutions and store the best one.<LI> Receive the message that the algorithm is finished and
+	print out data.<LI> Ensure that all processes are still running.
+</UL><BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 14:31:17 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

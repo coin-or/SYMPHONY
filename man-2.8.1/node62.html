@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Other Debugging Techniques</TITLE>
+<META NAME="description" CONTENT="Other Debugging Techniques">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="previous" HREF="node61.html">
+<LINK REL="up" HREF="node56.html">
+<LINK REL="next" HREF="node63.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html952"
+ HREF="node63.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html949"
+ HREF="node56.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html945"
+ HREF="node61.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html951"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html953"
+ HREF="node63.html">Controlling Execution and Output</A>
+<B>Up:</B> <A NAME="tex2html950"
+ HREF="node56.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html946"
+ HREF="node61.html">Using the Interactive Graph</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000914600000000000000">
+Other Debugging Techniques</A>
+</H3>
+
+<P>
+Another useful built-in function is MakeMPS, which will write the
+current LP relaxation to a file in MPS format. This file can then be
+read into the LP solver interactively or examined by hand for errors.
+Many times, CPLEX gives much more explicit error messages
+interactively than through the callable library. The form of the
+function is 
+<PRE>
+void MakeMPS(LPData *lp_data, int bc_index, int iter_num)
+</PRE>The matrix is written to the file ``<TT>matrix.[bc_index].[iter_num].mps</TT>'' where <EM>bc_index</EM> is the
+usually passed as the index of the current subproblem and <EM>iter_num</EM> is the current iteration number. These can, however, be any
+numbers the user chooses. If  SYMPHONY is forced to abandon solution
+of an LP because the LP solver returns an error code, the current LP
+relaxation is automatically written to the file ``<TT>matrix.[bc_index].[iter_num].mps</TT>'' where <EM>bc_index</EM> is the
+index of the current subproblem and <EM>iter_num</EM> is the current
+iteration number. MakeMPS can be called using breakpoint code to
+examine the status of the matrix at any point during execution.
+
+<P>
+Logging is another useful feature. Logging the state of the search tree can
+help isolate some problems more easily. See Section <A HREF="node131.html#tm_params">10.4</A>
+for the appropriate parameter settings to use logging.
+
+<P>
+<HR>
+<A NAME="tex2html952"
+ HREF="node63.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html949"
+ HREF="node56.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html945"
+ HREF="node61.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html951"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html953"
+ HREF="node63.html">Controlling Execution and Output</A>
+<B>Up:</B> <A NAME="tex2html950"
+ HREF="node56.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html946"
+ HREF="node61.html">Using the Interactive Graph</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

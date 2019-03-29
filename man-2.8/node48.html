@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>waiting_row</TITLE>
+<META NAME="description" CONTENT="waiting_row">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node49.html">
+<LINK REL="previous" HREF="node47.html">
+<LINK REL="up" HREF="node46.html">
+<LINK REL="next" HREF="node49.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html803"
+ HREF="node49.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html800"
+ HREF="node46.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html794"
+ HREF="node47.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html802"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html804"
+ HREF="node49.html">var_desc</A>
+<B>Up:</B> <A NAME="tex2html801"
+ HREF="node46.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html795"
+ HREF="node47.html">cut_data</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00032120000000000000">&#160;</A>
+<A NAME="waiting_row">&#160;</A>
+<BR>
+waiting_row
+</H4>
+A closely related data structure is the <TT>waiting_row</TT>,
+essentially the ``unpacked'' form of a cut. There are six fields.
+
+<P>
+<DL>
+<DD><P>
+<DT><STRONG><TT>source_pid</TT> -</STRONG>
+<DD>Used internally by  SYMPHONY.
+
+<P>
+<DT><STRONG><TT>cut_data *cut</TT> -</STRONG>
+<DD>Pointer to the cut from which the row was generated.
+
+<P>
+<DT><STRONG><TT>int nzcnt, *matind, *matval</TT> -</STRONG>
+<DD>Fields describing the row. <TT>nzcnt</TT> is the number of nonzeros in
+the row, i.e., the length of the <TT>matind</TT> and <TT>matval</TT> arrays,
+which are the variable indices (wrt. the current LP relaxation) and
+nonzero coefficients in the row.
+
+<P>
+<DT><STRONG><TT>double violation</TT> -</STRONG>
+<DD>If the constraint corresponding to the cut is violated, this value
+contains the degree of violation (the absolute value of the difference
+between the row activity level (i.e., lhs) and the right hand
+side). This value does not have to be set by the user.
+
+<P>
+</DL>
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

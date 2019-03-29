@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Distributed-memory architectures</TITLE>
+<META NAME="description" CONTENT="Distributed-memory architectures">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node24.html">
+<LINK REL="up" HREF="node23.html">
+<LINK REL="next" HREF="node26.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html740"
+  HREF="node26.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html736"
+  HREF="node23.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html732"
+  HREF="node24.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html738"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html741"
+  HREF="node26.html">Building SYMPHONY Applications</A>
+<B>Up:</B> <A NAME="tex2html737"
+  HREF="node23.html">Building for parallel architectures</A>
+<B> Previous:</B> <A NAME="tex2html733"
+  HREF="node24.html">Shared-memory architectures.</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00322420000000000000"></A>
+<A NAME="distributed-build"></A>
+<BR>
+Distributed-memory architectures
+</H4>
+
+<P>
+<A NAME="PVM"></A>To compile a distributed application, it is necessary that PVM be installed
+either in the system path or in the directory pointed to by the environment
+variable 
+<FONT COLOR="#a52a2a"><TT>PVM_ROOT</TT></FONT> (this can be your home directory if PVM is not
+already installed on your network). To install PVM yourself, the current
+version can be obtained at <TT>
+<A NAME="tex2html14"
+  HREF="http://www.csm.ornl.gov/pvm/">http://www.csm.ornl.gov/pvm/</A></TT>. It should compile and install without
+problems on most architectures. You will have to make a few modifications to
+your 
+<FONT COLOR="#a52a2a"><TT>.cshrc</TT></FONT> file, such as defining the 
+<FONT COLOR="#a52a2a"><TT>PVM_ROOT</TT></FONT> environment
+variable, but this is all explained clearly in the PVM documentation. Note
+that all executables (or at least a link to them) must reside in the
+
+<FONT COLOR="#a52a2a"><TT>$PVM_ROOT/bin/$PVM_ARCH</TT></FONT> directory in order for parallel processes
+to be spawned correctly. The environment variable 
+<FONT COLOR="#a52a2a"><TT>PVM_ARCH</TT></FONT> is set in
+your 
+<FONT COLOR="#a52a2a"><TT>.cshrc</TT></FONT> file and should contain a string representing the current
+architecture type. To run a parallel application, you must first start up the
+daemon on each of the machines you plan to use in the computation. How to do
+this is also explained in the PVM documentation.
+
+<P>
+To configure for a parallel build with the default parallel configuration,
+invoke the configuration script as follows: 
+<PRE>
+ ./configure --with-pvm
+</PRE> 
+Note that there are a number of different parallel configurations (see
+Chapter <A HREF="node66.html#SYMPHONY-modules">4.3.3</A> for an overview of SYMPHONY's parallel
+modules). The default configuration is to build two parallel modules, the
+first consisting of the master, tree management, and cut management modules,
+while the second consisting of the node processing, and cut generation
+modules. To build in another configuration, there are four configure flags
+that control which modules run as separate executables and which are called
+directly in serial fashion. The variables are as follows:
+<DL>
+<DT></DT>
+<DD>
+<FONT COLOR="#a52a2a"><TT>-with-cg</TT></FONT>: If set, then the cut generator function will
+        be called directly from the LP in serial fashion, instead of running
+        as a separate executable. This is desirable if cut generation is quick
+        and running it in parallel is not worth the price of the communication
+        overhead.
+        
+</DD>
+<DT></DT>
+<DD>
+<FONT COLOR="#a52a2a"><TT>-with-cp</TT></FONT>: If set, then the cut pool(s) will be
+        maintained as a data structure auxiliary to the tree manager.
+        
+</DD>
+<DT></DT>
+<DD>
+<FONT COLOR="#a52a2a"><TT>-with-lp</TT></FONT>: If set, then the LP functions will be called
+        directly from the tree manager. When running the distributed version,
+        this necessarily implies that there will only be one active subproblem
+        at a time, and hence the code will essentially be running serially. In
+        the shared-memory version, however, the tree manager will be threaded
+        in order to execute subproblems in parallel.
+        
+</DD>
+<DT></DT>
+<DD>
+<FONT COLOR="#a52a2a"><TT>-with-tm</TT></FONT>: If set, then the tree will be managed
+        directly from the master process. This is only recommended if a single
+        executable is desired (i.e.&nbsp;the three other variables are also set to
+        true). A single executable is extremely useful for debugging purposes.
+</DD>
+</DL>
+These variables can be set in virtually any combination, though some
+don't really make much sense. Note that in a few user functions that
+involve process communication, there will be different versions for
+serial and parallel computation. This is accomplished through the use
+of 
+<FONT COLOR="#a52a2a"><TT>#ifdef</TT></FONT> statements in the source code. This is well documented
+in the function descriptions and the in the source files containing
+the function stubs.
+
+<P>
+Once configured, follow the build instructions in Section <A HREF="node11.html#building-unix">2.1.1</A>
+to build the code. Note that this will also compile the sequential version.
+Make sure there are links from your 
+<FONT COLOR="#a52a2a"><TT>$PVM_ROOT/bin/$PVM_ARCH</TT></FONT>
+subdirectory to each of the executables in your 
+<FONT COLOR="#a52a2a"><TT>bin/</TT></FONT> directory, as
+required by PVM. In order to keep track of the various possible
+configurations, executable and their corresponding libraries are named as
+follows. The name of each executable is 
+<FONT COLOR="#a52a2a"><TT>symphony</TT></FONT>, along with a
+combination of the (abbreviated) names of the modules that were combined to
+produce that executable joined by underscores: 
+<FONT COLOR="#a52a2a"><TT>m</TT></FONT> for the master module,
+
+<FONT COLOR="#a52a2a"><TT>tm</TT></FONT> for the tree management module, 
+<FONT COLOR="#a52a2a"><TT>lp</TT></FONT> for the node processing
+module, 
+<FONT COLOR="#a52a2a"><TT>cg</TT></FONT> for the cut generation module, and 
+<FONT COLOR="#a52a2a"><TT>cp</TT></FONT> for the cut
+management module. For instance, in the default distributed configuration, the
+executables produced are 
+<FONT COLOR="#a52a2a"><TT>symphony_m_tm_cp</TT></FONT> and
+
+<FONT COLOR="#a52a2a"><TT>symphony_lp_cg</TT></FONT>.
+
+<P>
+To test the parallel version, first start the PVM daemon by typing 
+<FONT COLOR="#a52a2a"><TT>pvm</TT></FONT>
+on the command line and then typing 
+<FONT COLOR="#a52a2a"><TT>quit</TT></FONT>. As above, invoke SYMPHONY
+using the sample MPS file called 
+<FONT COLOR="#a52a2a"><TT>sample.mps</TT></FONT> included with the
+distribution. To specify the file name, use the 
+<FONT COLOR="#a52a2a"><TT>-F</TT></FONT> command-line option,
+i.e., in the root directory, type 
+<PRE>
+ bin/symphony_m_EXT -F SYMPHONY/Datasets/sample.mps
+</PRE> 
+
+<P>
+where 
+<FONT COLOR="#a52a2a"><TT>EXT</TT></FONT> is the extension to be added according to the chosen
+configuration of the modules.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html740"
+  HREF="node26.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html736"
+  HREF="node23.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html732"
+  HREF="node24.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html738"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html741"
+  HREF="node26.html">Building SYMPHONY Applications</A>
+<B>Up:</B> <A NAME="tex2html737"
+  HREF="node23.html">Building for parallel architectures</A>
+<B> Previous:</B> <A NAME="tex2html733"
+  HREF="node24.html">Shared-memory architectures.</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2016-02-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

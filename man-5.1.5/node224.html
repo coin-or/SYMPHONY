@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>LP module callbacks</TITLE>
+<META NAME="description" CONTENT="LP module callbacks">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node255.html">
+<LINK REL="previous" HREF="node208.html">
+<LINK REL="up" HREF="node207.html">
+<LINK REL="next" HREF="node225.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3659"
+  HREF="node225.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3655"
+  HREF="node207.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3649"
+  HREF="node223.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3657"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3660"
+  HREF="node225.html">Data Structures</A>
+<B>Up:</B> <A NAME="tex2html3656"
+  HREF="node207.html">User Callback API</A>
+<B> Previous:</B> <A NAME="tex2html3650"
+  HREF="node223.html">user_free_master</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00732000000000000000"></A>
+<A NAME="user-written-lp"></A>
+<BR>
+LP module callbacks
+</H2>
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html3661"
+  HREF="node225.html">Data Structures</A>
+<UL>
+<LI><A NAME="tex2html3662"
+  HREF="node226.html">MIPdesc</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html3663"
+  HREF="node227.html">MIPdesc</A>
+<UL>
+<LI><A NAME="tex2html3664"
+  HREF="node228.html">cut_data</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html3665"
+  HREF="node229.html">cut_data</A>
+<UL>
+<LI><A NAME="tex2html3666"
+  HREF="node230.html">waiting_row</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html3667"
+  HREF="node231.html">waiting_row</A>
+<UL>
+<LI><A NAME="tex2html3668"
+  HREF="node232.html">var_desc</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html3669"
+  HREF="node233.html">var_desc</A>
+<LI><A NAME="tex2html3670"
+  HREF="node234.html">Function Descriptions</A>
+<LI><A NAME="tex2html3671"
+  HREF="node235.html">user_receive_lp_data</A>
+<LI><A NAME="tex2html3672"
+  HREF="node236.html">user_create_subproblem</A>
+<LI><A NAME="tex2html3673"
+  HREF="node237.html">user_is_feasible</A>
+<LI><A NAME="tex2html3674"
+  HREF="node238.html">user_send_feasible_solution</A>
+<LI><A NAME="tex2html3675"
+  HREF="node239.html">user_display_lp_solution</A>
+<LI><A NAME="tex2html3676"
+  HREF="node240.html">user_shall_we_branch</A>
+<LI><A NAME="tex2html3677"
+  HREF="node241.html">user_select_candidates</A>
+<LI><A NAME="tex2html3678"
+  HREF="node242.html">user_compare_candidates</A>
+<LI><A NAME="tex2html3679"
+  HREF="node243.html">user_select_child</A>
+<LI><A NAME="tex2html3680"
+  HREF="node244.html">user_print_branch_stat</A>
+<LI><A NAME="tex2html3681"
+  HREF="node245.html">user_add_to_desc</A>
+<LI><A NAME="tex2html3682"
+  HREF="node246.html">user_same_cuts</A>
+<LI><A NAME="tex2html3683"
+  HREF="node247.html">user_unpack_cuts</A>
+<LI><A NAME="tex2html3684"
+  HREF="node248.html">user_send_lp_solution</A>
+<LI><A NAME="tex2html3685"
+  HREF="node249.html">user_logical_fixing</A>
+<LI><A NAME="tex2html3686"
+  HREF="node250.html">user_generate_column</A>
+<LI><A NAME="tex2html3687"
+  HREF="node251.html">user_generate_cuts_in_lp</A>
+<LI><A NAME="tex2html3688"
+  HREF="node252.html">user_print_stat_on_cuts_added</A>
+<LI><A NAME="tex2html3689"
+  HREF="node253.html">user_purge_waiting_rows</A>
+<LI><A NAME="tex2html3690"
+  HREF="node254.html">user_free_lp</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-10-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

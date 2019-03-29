@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>sym_close_environment()</TITLE>
+<META NAME="description" CONTENT="sym_close_environment()">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node19.html">
+<LINK REL="up" HREF="node12.html">
+<LINK REL="next" HREF="node21.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html627"
+  HREF="node21.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html623"
+  HREF="node12.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html619"
+  HREF="node19.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html625"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html628"
+  HREF="node21.html">The OSI Interface</A>
+<B>Up:</B> <A NAME="tex2html624"
+  HREF="node12.html">The Callable Library</A>
+<B> Previous:</B> <A NAME="tex2html620"
+  HREF="node19.html">sym_mc_solve()</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00410080000000000000">
+<TT>sym_close_environment()</TT></A>
+</H4> Frees all problem data and
+deletes the environment. 
+<BR>
+<P>
+As an example of the use of the library functions, Figure
+<A HREF="node20.html#default_main">3.1</A> shows the code for implementing a generic MILP solver with
+default parameter settings.
+
+<DIV ALIGN="CENTER"><A NAME="default_main"></A><A NAME="888"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.1:</STRONG>
+Implementation of a generic MILP solver with the SYMPHONY
+C callable library.</CAPTION>
+<TR><TD><IMG
+ WIDTH="445" HEIGHT="168" BORDER="0"
+ SRC="img22.png"
+ ALT="\begin{figure}\begin{Verbatim}[frame=lines]
+int main(int argc, char **argv)
+{
+s...
+...(env);
+sym_solve(env);
+sym_close_environment(env);
+}\end{Verbatim}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+To read in an MPS file called <TT>sample.mps</TT> and solve it using 
+this program, the following command would be issued: 
+<BR><PRE>
+symphony -F sample.mps
+</PRE>
+The user does not have to invoke a command to read the MPS file. During the
+call to <TT>sym_parse_command_line()</TT>, SYMPHONY determines that the
+user wants to read in an MPS file. During the subsequent call to
+<TT>sym_load_problem()</TT>, the file is read and the problem data stored.
+To read an GMPL file, the user would issue the command
+<PRE>
+symphony -F sample.mod -D sample.dat
+</PRE>
+Although the same command-line switch is used to specify the model file, the
+additional presence of the <TT>-D</TT> option indicates to SYMPHONY that the
+model file is in GMPL format and GLPK's GMPL parser is invoked
+[<A
+ HREF="node261.html#GLPK">27</A>]. Note that the interface and the code of Figure <A HREF="node20.html#default_main">3.1</A>
+is the same for both sequential and parallel computations. The choice between
+sequential and parallel execution modes is made at compile-time through
+modification of the makefile or the project settings, depending on the
+operating system.
+
+<P>
+To start the solution process from a warm start, the <TT>sym_warm_solve()</TT>
+command is used. SYMPHONY automatically records the warm start information
+resulting from the last solve call and restarts from that checkpoint if a call
+to <TT>sym_warm_solve()</TT> is made. Alternatively, external warm start
+information can be loaded manually. Figure <A HREF="node20.html#dynamic">3.2</A> illustrates the use
+of the re-solve capability by showing the code for implementing a solver that
+changes from depth first search to best first search after the first feasible
+solution is found.
+
+<DIV ALIGN="CENTER"><A NAME="dynamic"></A><A NAME="889"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.2:</STRONG>
+Implementation of a dynamic MILP solver with SYMPHONY.</CAPTION>
+<TR><TD><IMG
+ WIDTH="665" HEIGHT="254" BORDER="0"
+ SRC="img23.png"
+ ALT="\begin{figure}\begin{Verbatim}[frame=lines]
+int main(int argc, char **argv)
+{
+s...
+...trategy'', BEST_FIRST_SEARCH);
+sym_warm_solve(env);
+}\end{Verbatim}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+The user can also modify problem data in between calls to the solver. Code for
+doing so is shown in Figure <A HREF="node20.html#warm_start">3.3</A>. In this example, the
+solver is allowed to process 100 nodes and then save the warm start
+information. Afterward, the original problem is solved to optimality, then is
+modified and re-solved from the saved checkpoint. 
+
+<DIV ALIGN="CENTER"><A NAME="warm_start"></A><A NAME="890"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.3:</STRONG>
+Use of SYMPHONY's warm start capability.</CAPTION>
+<TR><TD><IMG
+ WIDTH="463" HEIGHT="362" BORDER="0"
+ SRC="img24.png"
+ ALT="\begin{figure}\begin{Verbatim}[frame=lines]
+int main(int argc, char **argv)
+{
+w...
+...150);
+sym_set_warm_start(ws);
+sym_warm_solve(env);
+}\end{Verbatim}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+Finally, SYMPHONY now also has a bicriteria solve call. The applications of
+such a solver are numerous. Besides yielding the ability to closely examine
+the tradeoffs between competing objectives, the method can be used to perform
+detailed sensitivity analysis in a manner analogous to that which can be done
+with simplex based solvers for linear programs. As an example, suppose we
+would like to know exactly how the optimal objective function value for a
+given pure integer program depends on the value of a given objective function
+coefficient. Consider increasing the objective function
+coefficient of variable <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$ i$"> from its current value. Taking the first objective
+function to be the original one and taking the second objective function to be
+the <!-- MATH
+ $i^\textrm{th}$
+ -->
+<IMG
+ WIDTH="24" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img25.png"
+ ALT="$ i^\textrm{th}$"> unit vector, we can derive the desired sensitivity
+function by using the bicriteria solution algorithm to enumerate all supported
+solutions and breakpoints. This information can easily be used to obtain the
+desired function. Figure <A HREF="node20.html#multi_criteria">3.4</A> shows the code for performing
+this analysis on variable 0. 
+
+<DIV ALIGN="CENTER"><A NAME="multi_criteria"></A><A NAME="891"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.4:</STRONG>
+Performing sensitivity analysis with SYMPHONY's bicriteria solver.</CAPTION>
+<TR><TD><IMG
+ WIDTH="445" HEIGHT="168" BORDER="0"
+ SRC="img26.png"
+ ALT="\begin{figure}\begin{Verbatim}[frame=lines]
+int main(int argc, char **argv)
+{
+s...
+...
+syn_set_obj2_coeff(env, 0, 1);
+sym_mc_solve(env);
+}\end{Verbatim}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+In addition to the parts of the API we have just described, there are a number
+of standard subroutines for accessing and modifying problem data and
+parameters. These can be used between calls to the solver to change the
+behavior of the algorithm or to modify the instance being solved. These
+modifications are discussed in more detail in Section <A HREF="node40.html#warm_solve">4.2.1</A>.
+
+<P>
+<HR>
+<A NAME="tex2html627"
+  HREF="node21.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html623"
+  HREF="node12.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html619"
+  HREF="node19.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html625"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html628"
+  HREF="node21.html">The OSI Interface</A>
+<B>Up:</B> <A NAME="tex2html624"
+  HREF="node12.html">The Callable Library</A>
+<B> Previous:</B> <A NAME="tex2html620"
+  HREF="node19.html">sym_mc_solve()</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

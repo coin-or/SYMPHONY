@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using the NMAKE Utility</TITLE>
+<META NAME="description" CONTENT="Using the NMAKE Utility">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node68.html">
+<LINK REL="previous" HREF="node66.html">
+<LINK REL="up" HREF="node66.html">
+<LINK REL="next" HREF="node68.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1277"
+  HREF="node68.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1273"
+  HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1267"
+  HREF="node66.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1275"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1278"
+  HREF="node68.html">Using the MSVC++ Workspace</A>
+<B>Up:</B> <A NAME="tex2html1274"
+  HREF="node66.html">Compiling the Library and</A>
+<B> Previous:</B> <A NAME="tex2html1268"
+  HREF="node66.html">Compiling the Library and</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00621000000000000000"></A>
+<A NAME="using_nmake"></A>
+<BR>
+Using the NMAKE Utility
+</H2>
+
+<P>
+
+<UL>
+<LI>Edit the file
+<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">sym.mak</TT> makefile to
+reflect your environment. This involves specifying the LP solver to be used
+and various paths. Only minor edits should be required. An explanation of what
+has to be set is contained in the comments in the makefile.
+
+<P>
+</LI>
+<LI>To use many of the new capabilities of SYMPHONY, you must have installed
+the <I><A NAME="tex2html19"
+  HREF="http://www.ccs.ornl.gov/pvm/">COIN</A></I> optimization
+libraries 
+. By default SYMPHONY is 
+set to use COIN LP solver, <TT>CLP</TT>, COIN Open Solver Interface, 
+<TT>OSI</TT>, and COIN Cut Generation Library, <TT>CGL</TT>. To keep this 
+configuration, you should install <TT>OSI</TT>, <TT>CGL</TT>, <TT>CLP</TT> 
+and additionally, the Coin utilities (under COIN<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Coin).The path to 
+the COIN libraries must be specified in 
+<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">sym.mak</TT>.
+
+<P>
+</LI>
+<LI>If you wish to read <TT>GMPL/AMPL</TT> files, you will have to install the 
+Gnu Linear Programming Kit (GLPK), which contains a parser for GMPL/AMPL
+files. The path to the GLPK libraries must be specified in
+the makefile.
+
+<P>
+</LI>
+<LI>Once configuration is done, type <TT>nmake /f sym.mak</TT> at the
+command prompt in the 
+<BR><TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32</TT> subdirectory. 
+This will first make the SYMPHONY library (sequential version): 
+<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Debug<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">symphonyLib.lib</TT>. This library together with the header files in the subdirectory
+(<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">include</TT>) can then be
+be used to call SYMPHONY from any C code. The <TT>API</TT> for this is 
+described in section <A HREF="node186.html#API">7.3</A>.
+After compiling the SYMPHONY library, the default <TT>main</TT> function will 
+be compiled and linked with the the callable library to form an executable
+called <TT>symphony.exe</TT> to be used for solving generic MILP problems 
+in <TT>MPS</TT> or <TT>GMPL</TT> format. The executable will be created in the
+<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Debug</TT> subdirectory.
+
+<P>
+</LI>
+<LI>To test the executable, type <TT>symphony.exe -F 
+..<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">..<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">sample.mps</TT> at a command prompt in the
+<TT>SYMPHONY-5.0<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">WIN32<!-- MATH
+ $\backslash$
+ -->
+<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$ \backslash$">Debug</TT> subdirectory.
+
+<P>
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html1277"
+  HREF="node68.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1273"
+  HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1267"
+  HREF="node66.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1275"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1278"
+  HREF="node68.html">Using the MSVC++ Workspace</A>
+<B>Up:</B> <A NAME="tex2html1274"
+  HREF="node66.html">Compiling the Library and</A>
+<B> Previous:</B> <A NAME="tex2html1268"
+  HREF="node66.html">Compiling the Library and</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

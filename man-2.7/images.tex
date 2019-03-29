@@ -1,0 +1,1348 @@
+\batchmode
+\documentclass[twoside,11pt]{article}
+\makeatletter
+
+\oddsidemargin 0in
+\evensidemargin 0in
+\topmargin 0in
+\textwidth 6.5in
+\newlength{\headwidth}
+\setlength{\headwidth}{\textwidth}
+\addtolength{\headwidth}{-4.4444pt}
+\textheight 8.7in
+
+\catcode`\@=11\relax   
+\if@twoside         
+\else               
+\fi
+
+\catcode`\@=12\relax   
+\pagestyle{headings}
+
+\markright{\bf \thesection}{}
+
+\usepackage{html}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\def\ps@headings{\let\@mkboth\markboth
+\def  \@oddfoot{}\def  \@evenfoot{}\def  \@evenhead{
+\begin{tabular}{@{}c@{}}
+\hspace*{\headwidth} \\ [-3ex]
+\rm \thepage  \hfill  \sl \leftmark \\ 
+\hline
+\end{tabular}
+} \def  \@oddhead{
+\begin{tabular}{@{}c@{}}
+\hspace*{\headwidth} \\ [-3ex]
+\sl \rightmark \hfill \rm \thepage \\ 
+\hline
+\end{tabular}
+} \def  \sectionmark##1{\markboth {\uppercase{\ifnum \c@secnumdepth >\z@
+    \thesection\hskip 1em\relax \fi ##1}}{}}\def  \subsectionmark##1{\markright {\ifnum \c@secnumdepth >\@ne
+          \thesubsection\hskip 1em\relax \fi ##1}}}
+
+\def\ps@headings{\let\@mkboth\markboth
+\def  \@oddfoot{}\def  \@evenfoot{}\def  \@oddhead{
+\begin{tabular}{@{}c@{}}
+\hspace*{\headwidth} \\ [-3ex]
+\sl \rightmark \hfill \rm \thepage \\ 
+\hline
+\end{tabular}
+} \def  \sectionmark##1{\markright {\uppercase{\ifnum \c@secnumdepth >\z@
+    \thesection\hskip 1em\relax \fi ##1}}}}
+
+\newcommand {\be}{\begin{enumerate}}
+
+\newcommand {\ee}{\end{enumerate}}
+
+\newcommand {\bc}{\begin{center}}
+
+\newcommand {\ec}{\end{center}}
+
+\newcommand {\bt}{\begin{tabular}}
+
+\newcommand {\et}{\end{tabular}}
+
+\newcommand {\bd}{\begin{description}}
+
+\newcommand {\ed}{\end{description}}
+
+\newcommand {\bi}{\begin{itemize}}
+
+\newcommand {\ei}{\end{itemize}}
+
+\newcommand {\bv}{\begin{verbatim}\end{verbatim}}
+
+\newcommand {\functiondef}[1]{\subsubsection{#1}}
+
+\newcommand {\describe}{\item[Description:] \hfill}
+
+\newcommand {\args}{\item[Arguments:] \hfill}
+
+\newcommand {\returns}{\item[Return values:] \hfill}
+
+\newcommand {\postp}{\item[Post-processing:] \hfill}
+
+\newcommand {\nopostp}{\item[Post-processing:] None \hfill}
+
+\newcommand {\BB}{{\sc SYMPHONY}}
+
+\newcommand {\TM}{{\sc TreeManager}}
+
+\newcommand {\LP}{{\sc LP}}
+
+\newcommand {\ra}{$\rightarrow$}
+
+\makeatother
+\newenvironment{tex2html_wrap}{}{}
+\newwrite\lthtmlwrite
+\def\lthtmltypeout#1{{\let\protect\string\immediate\write\lthtmlwrite{#1}}}%
+\newbox\sizebox
+\begin{document}
+\pagestyle{empty}
+{\newpage
+\clearpage
+\samepage % latex2html id marker 2619
+\thesection
+}
+
+\setcounter{page}{1}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{310pt}} 
+
+{\tt ERROR} & Error in the user function. Printing an error message is
+the user's responsibility. Depending on the work the user function was
+supposed to do, the error might be ignored (and some default option
+used), or the process aborts. \\ 
+
+{\tt USER\_AND\_PP} & The user implemented both the user function and
+post-processing (post-processing by {\sc SYMPHONY}\ will be skipped).\\ 
+
+{\tt USER\_NO\_PP} & The user implemented the user function only. \\ 
+
+{\tt DEFAULT} & The default option is going to be used (the default is one of
+the built-in options, {\sc SYMPHONY}\ decides which one to use based on initial parameter
+settings and the execution of the algorithm). \\ 
+
+{\tt built\_in\_option1 } & \\ 
+{\tt built\_in\_option2 } ... & The specified built-in option will be used.\\ 
+\end{tabular}
+}
+
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage
+\clearpage
+\samepage \setbox\sizebox=\hbox{$^{\copyright}$}\lthtmltypeout{latex2htmlSize :tex2html_wrap_inline2620: \the\ht\sizebox::\the\dp\sizebox.}\box\sizebox
+}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+{\tt void **user} & OUT & Pointer to the user-defined data structure. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ stops. \\ 
+{\tt USER\_NO\_PP} & Initialization is done. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure
+(should be {\tt NULL} on return). \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Ignored. This is probably not a fatal error.\\ 
+{\tt USER\_NO\_PP} & Everything was freed successfully. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt char *filename} & IN & The name of the parameter file. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ stops. \\ 
+{\tt USER\_NO\_PP} & User parameters were read successfully. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ stops. \\ 
+{\tt USER\_NO\_PP} & User I/O was completed successfully. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int dg\_id} & IN & The process id of the graph drawing process. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ stops. \\ 
+{\tt USER\_NO\_PP} & The user completed initialization successfully. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{300pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int *ub} & OUT & Pointer to the global upper bound. Initially,
+the upper bound is set to either {\tt -MAXDOUBLE} or the bound read in
+from the parameter file, and should be changed by the user only if
+a better valid upper bound is found.\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. This error is probably not fatal. \\ 
+{\tt USER\_NO\_PP} & User executed function successfully. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{245pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int *varnum} & OUT & Pointer to the number of base variables. \\ 
+{\tt int **userind} & OUT & Pointer to an array containing the user
+indices of the base variables. \\ 
+{\tt int **lb} & OUT & Pointer to an array containing the lower bounds for
+the base variables. \\ 
+{\tt int **ub} & OUT & Pointer to an array containing the upper bounds for
+the base variables. \\ 
+{\tt int *cutnum} & OUT & The number of base constraints. \\ 
+{\tt int *colgen\_strat} & INOUT & The default strategy or one that has
+been read in from the parameter file is passed in, but the user is free
+to change it. See {\tt colgen\_strat} in the description of
+parameters for details on how to set it.
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ stops. \\ 
+{\tt USER\_NO\_PP} & The required data are filled in, but no
+post-processing done. \\ 
+{\tt USER\_AND\_PP} & All required post-processing done. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{265pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int *extravarnum} & OUT & Pointer to the number of extra active
+variables in the root. \\ 
+{\tt int *extravars} & OUT & Pointer to an array containing a list of
+user indices of the extra variables to be active in the root. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ stops. \\ 
+{\tt USER\_NO\_PP} & All required data  filled out, but no
+post-processing done. \\ 
+{\tt USER\_AND\_PP} & All required post-processing done. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{290pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int msgtag} &    IN & {\tt FEASIBLE\_SOLUTION\_NONZEROS} or {\tt
+FEASIBLE\_SOLUTION\_USER} \\ 
+{\tt double cost}  &    IN & The cost of the feasible solution.\\ 
+{\tt int numvars} &  IN & The number of variables whose user indices and
+values were sent (length of {\tt indices} and {\tt values}). \\ 
+{\tt int *indices} &  IN & The user indices of the nonzero variables. \\ 
+{\tt double *values} & IN & The corresponding values. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Ignored. This is probably not a fatal error.\\ 
+{\tt USER\_NO\_PP} & The solution has been unpacked and stored. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt void **user\_lp} & OUT & Pointer to the user-defined data
+structure for the LP process. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ stops. \\ 
+{\tt USER\_NO\_PP} & Packing is done. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt void **user\_cg} & OUT & Pointer to the user-defined data
+structure for the cut generator process. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt void **user\_cp} & OUT & Pointer to the user-defined data
+structure for the cut pool process. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Ignored. \\ 
+{\tt USER\_NO\_PP} & Displaying is done. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{245pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int *feas\_sol\_size} & INOUT & Pointer to size of the feasible
+solution passed by the user. \\ 
+{\tt int **feas\_sol} & INOUT & Pointer to the array of user indices
+containing the feasible solution. This array is simply copied by the tree
+manager and must be freed by the user. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{260pt}}
+{\tt ERROR} & Solution tracing is not enabled. \\ 
+{\tt USER\_NO\_PP} & Tracing of the given solution is enabled. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int msgtag} & IN & The message tag of the message. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Ignored. \\ 
+{\tt USER\_NO\_PP} & Message is processed. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+\stepcounter{paragraph}
+{\newpage
+\clearpage
+\samepage \setbox\sizebox=\hbox{${\tt rhs}+{\tt range}$}\lthtmltypeout{latex2htmlSize :tex2html_wrap_inline2622: \the\ht\sizebox::\the\dp\sizebox.}\box\sizebox
+}
+
+{\newpage
+\clearpage
+\samepage \setbox\sizebox=\hbox{$\leq$}\lthtmltypeout{latex2htmlSize :tex2html_wrap_inline2624: \the\ht\sizebox::\the\dp\sizebox.}\box\sizebox
+}
+
+{\newpage
+\clearpage
+\samepage \setbox\sizebox=\hbox{$\geq$}\lthtmltypeout{latex2htmlSize :tex2html_wrap_inline2628: \the\ht\sizebox::\the\dp\sizebox.}\box\sizebox
+}
+
+\stepcounter{paragraph}
+\stepcounter{paragraph}
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+{\tt void **user} & OUT & Pointer to the user-defined LP data
+structure. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ aborts this LP process. \\ 
+{\tt USER\_NO\_PP} & User received the data. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined LP data structure. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ ignores error message. \\ 
+{\tt USER\_NO\_PP} & User freed everything in the user space. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \setbox\sizebox=\hbox{$0^th$}\lthtmltypeout{latex2htmlSize :tex2html_wrap_inline2646: \the\ht\sizebox::\the\dp\sizebox.}\box\sizebox
+}
+
+{\newpage
+\clearpage
+\samepage \setbox\sizebox=\hbox{$1^st$}\lthtmltypeout{latex2htmlSize :tex2html_wrap_inline2648: \the\ht\sizebox::\the\dp\sizebox.}\box\sizebox
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{257pt}}
+{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+
+{\tt int varnum} & IN & Number of variables in the relaxation (base
+and extra). \\ 
+
+{\tt var\_desc **vars} & IN & An array of length {\tt n} containing the user
+indices of the active variables (base and extra). \\ 
+
+{\tt int rownum} & IN & Number of constraints in the relaxation (base
+and extra). \\ 
+
+{\tt int cutnum} & IN & Number of extra constraints. \\ 
+
+{\tt cut\_data **cuts} & IN & Packed description of extra constraints. \\ 
+& & \\ 
+
+{\tt int *nz} & OUT &  Pointer to the number of nonzeros in the LP.\\ 
+
+{\tt int **matbeg} & INOUT & Pointers to the arrays that describe the LP
+problem (see description above. \\ 
+{\tt int **matind} & INOUT & \\ 
+{\tt double **matval} & INOUT & \\ 
+{\tt double **obj} & INOUT & \\ 
+{\tt double **rhs} & INOUT & \\ 
+{\tt char **sense} & INOUT & \\ 
+{\tt double **rngval} & INOUT & \\ 
+& & \\ 
+{\tt int *maxn} & INOUT & The maximum number of variables.\\ 
+{\tt int *maxm} & INOUT & The maximum number of constraints.\\ 
+{\tt int *maxnz} & INOUT & The maximum number of nonzeros. \\ 
+& & \\ 
+{\tt int *allocn} & INOUT & The length of the {\tt *matbeg} and {\tt *obj}
+arrays (should be {\tt *maxm + *maxn +1}). \\ 
+{\tt int *allocm} & INOUT & The length of the {\tt *rhs}, {\tt *sense}
+and {\tt *rngval} arrays. \\ 
+{\tt int *allocnz} & INOUT & The length of the {\tt *matval} and {\tt
+*matind} arrays (should be {\tt *maxnz + *maxm}. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{330pt}}
+{\tt ERROR} & Error. The LP process is aborted. \\ 
+{\tt USER\_AND\_PP} & Post-processing will be skipped, the user added the
+constraints corresponding to the cuts. \\ 
+{\tt USER\_NO\_PP} & User created the matrix with only the base constraints. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+& & \\ 
+{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\ 
+
+{\tt int varnum} & IN & Length of {\tt vars}. \\ 
+{\tt int *vars} & IN & Array containing the user indices of the variables. \\ 
+{\tt double *ub} & OUT & Array of upper bounds (to be filled out by
+the user).
+\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. The LP process is aborted. \\  
+{\tt DEFAULT} & Upper bounds are set to one. \\  
+{\tt USER\_NO\_PP} & The user filled up the upper bound array. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{265pt}}
+{\tt void *user} & INOUT & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt double lpetol} & IN & The $\epsilon$ tolerance of the LP solver. \\ 
+{\tt int varnum} & IN & The length of the {\tt indices} and {\tt values}
+arrays.\\  
+{\tt int *indices} & IN & User indices of variables at nonzero level in the
+current solution.\\  
+{\tt double *values} & IN & Values of the variables listed in {\tt indices}.\\ 
+& & \\ 
+{\tt int *feasible} & OUT & Feasibility status of the solution ({\tt
+NOT\_FEASIBLE}, or {\tt FEASIBLE}). \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Solution is considered to be not feasible.\\ 
+{\tt USER\_NO\_PP} & User checked IP feasibility. \\ 
+{\tt DEFAULT} & Regulated by the parameter {\tt is\_feasible\_default},
+but set to {\tt TEST\_INTEGRALITY} unless over-ridden by the user.\\ 
+{\tt TEST\_INTEGRALITY} & Test integrality of the given solution. \\ 
+{\tt TEST\_ZERO\_ONE} & Tests whether the solution is binary. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{290pt}}
+{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt double lpetol} & IN & The $\epsilon$ tolerance of the LP solver. \\ 
+{\tt int varnum} & IN & The length of the {\tt indices} and {\tt
+values} arrays.\\ 
+{\tt int *indices} & IN & User indices of variables at nonzero level
+in the current solution.\\ 
+{\tt double *values} & IN & Values of the variables listed in {\tt indices}.\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{315pt}}
+{\tt ERROR} & Error. Do the default.\\ 
+{\tt USER\_NO\_PP} & User packed the solution.\\ 
+{\tt DEFAULT} & Regulated by the parameter {\tt
+pack\_feasible\_solution\_default}, but set to {\tt SEND\_NONZEROS}
+unless over-ridden by the user.\\ 
+{\tt SEND\_NONZEROS} & Pack the nonzero values and their indices.\\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{290pt}}
+{\tt void *user} & IN & Pointer to the user-defined LP data structure.\\ 
+& & \\ 
+{\tt int which\_sol} & IN & The type of solution passed on to the
+displaying function. Possible values are {\tt DISP\_FEAS\_SOLUTION},
+{\tt DISP\_RELAXED\_SOLUTION} and {\tt DISP\_FINAL\_RELAXED\_SOLUTION}. \\ 
+{\tt int varnum} & IN & The number of variables in the current
+solution at nonzero level (the length of the {\tt indices} and {\tt
+values} arrays). \\ 
+{\tt int *indices} & IN & User indices of variables at
+nonzero level in the current solution.\\ 
+{\tt double *values} & IN & Values of the nonzero variables.\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{317pt}}
+{\tt ERROR} & Error. {\sc SYMPHONY}\ ignores error message. \\ 
+{\tt USER\_NO\_PP} & User displayed whatever she wanted to.\\ 
+{\tt DEFAULT} & Regulated by the parameter {\tt display\_solution\_default}. \\ 
+{\tt DISP\_NOTHING} & Display nothing. \\ 
+{\tt DISP\_NZ\_INT} & Display user indices (as integers) and values of
+nonzero variables. \\ 
+{\tt DISP\_NZ\_HEXA} & Display user indices (as hexadecimals) and
+values of nonzero variables. \\ 
+{\tt DISP\_FRAC\_INT} & Display user indices (as integers) and values
+of variables not at their lower or upper bounds. \\ 
+{\tt DISP\_FRAC\_HEXA} & Display user indices (as hexadecimals) and
+values of variables not at their lower and upper bounds. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}% latex2html id marker 1576
+{llp{205pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+{\tt double lpetol} & IN & The $\epsilon$ tolerance of the LP solver. \\ 
+& & \\ 
+{\tt int cutnum} & IN & The number of violated cuts (known before invoking
+this function) that could be added to the problem (instead of branching).\\ 
+& & \\ 
+{\tt int slacks\_in\_matrix\_num} & IN & Number of slack constraints in the
+matrix. \\ 
+{\tt cut\_data **slacks\_in\_matrix} & IN & The description of the cuts
+corresponding to these constraints (see Section \ref{cut_data}). \\ 
+& & \\ 
+{\tt int slack\_cut\_num} & IN & The number of slack cuts not in the
+matrix. \\ 
+{\tt cut\_data **slack\_cuts} & IN & Array of pointers to these cuts
+(see Section \ref{cut_data}).\\ 
+{\tt int varnum} & IN & The number of variables in the current lp
+relaxation (the length of the following three arrays).\\ 
+{\tt var\_desc **vars} & IN & Description of the variables in the
+relaxation. \\ 
+{\tt double *x} & IN & The corresponding solution values (in the optimal
+solution to the relaxation).\\ 
+{\tt char *status} & IN & The stati of the variables. 
+There are five possible status values: 
+{\tt NOT\_\-FIXED}, {\tt TEMP\_\-FIXED\_\-TO\_\-UB}, {\tt
+PERM\_\-FIXED\_\-TO\_\-UB}, {\tt TEMP\_\-FIXED\_\-TO\_\-LB} and {\tt
+PERM\_\-FIXED\_\-TO\_\-LB}.\\  
+& & \\ 
+{\tt int *cand\_num} & OUT & Pointer to the number of candidates
+returned (the length of {\tt *candidates}).\\ 
+{\tt candidate ***candidates} & OUT & Pointer to the array of
+candidates generated (see description below).\\ 
+{\tt int *action} & OUT & What to do. Must be one of the four above described
+values.
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{340pt}}
+{\tt ERROR} & Error. {\tt DEFAULT} is used. \\ 
+{\tt USER\_NO\_PP} & The user filled out {\tt *action} (and possibly {\tt
+*cand\_num} and {\tt *candidates}). \\ 
+{\tt DEFAULT} & action is set to the value of the parameter {\tt
+shall\_we\_branch\_default}, which is initially
+{\tt USER\_\_BRANCH\_IF\_MUST} unless over-ridden by the user. \\  
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{210pt}}
+{\tt ERROR} & Error. {\tt DEFAULT} is used. \\ 
+{\tt USER\_NO\_PP} & User generated branching candidates. \\ 
+{\tt DEFAULT} & Regulated by the {\tt select\_candidates\_default} parameter
+(one of the following three options).\\ 
+{\tt USER\_\_CLOSE\_TO\_HALF} & Choose variables with values closest to half.\\ 
+{\tt USER\_\_CLOSE\_TO\_HALF\_AND\_EXPENSIVE} & Choose variables
+with values close to half and with high objective function coefficients.\\ 
+{\tt USER\_\_CLOSE\_TO\_ONE\_AND\_CHEAP} & Choose variables with
+values close to one and with low objective function coefficients.\\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{245pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt branch\_obj *can1} & IN & One of the candidates to be compared.\\ 
+{\tt branch\_obj *can2} & IN & The other candidate to be compared. \\ 
+{\tt int *which\_is\_better} & OUT & The user's choice. See the description
+above. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{290pt}}
+{\tt ERROR} & Error. {\tt DEFAULT} is used. \\ 
+{\tt USER\_NO\_PP} & User filled out {\tt *which\_is\_better}. \\ 
+{\tt DEFAULT} & Regulated by the {\tt compare\_candidates\_default}
+parameter, initially set to {\tt LOWEST\_LOW\_OBJ} unless over-ridden by the
+user. \\ 
+{\tt BIGGEST\_DIFFERENCE} & Prefer the candidate with the biggest
+difference between highest and lowest objective function values.\\ 
+{\tt LOWEST\_LOW} & Prefer the candidate with the lowest minimum
+objective function value. The minimum is taken over the objective function
+values of all the children. \\ 
+{\tt HIGHEST\_LOW} & Prefer the candidate with the highest minimum
+objective function value. \\ 
+{\tt LOWEST\_HIGH} & Prefer the candidate with the lowest maximum
+objective function value. \\ 
+{\tt HIGHEST\_HIGH} & Prefer the candidate with the highest maximum
+objective function value .\\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{270pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int ub} & IN & The current best upper bound. \\ 
+{\tt double etol} & IN & Epsilon tolerance. \\ 
+{\tt branch\_obj *can} & IN & The branching candidate. \\ 
+& & \\ 
+{\tt char *action} & OUT & Array of actions for the children. The array is
+already allocated to length {\tt can->number}.\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{265pt}}
+{\tt ERROR} & Error. {\tt DEFAULT} is used. \\ 
+{\tt USER\_NO\_PP} & User filled out {\tt *action}. \\ 
+{\tt USER\_AND\_PP} & User filled out {\tt *action} and did an
+equivalent of the post-processing.\\ 
+{\tt DEFAULT} & Regulated by the {\tt select\_child\_default}
+parameter, which is initially set to {\tt PREFER\_LOWER\_OBJ\_VALUE},
+unless over-ridden by the user. \\ 
+{\tt PREFER\_HIGHER\_OBJ\_VALUE} & Choose child with the highest
+objective value.\\ 
+{\tt PREFER\_LOWER\_OBJ\_VALUE} & Choose child with the lowest
+objective value.\\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{285pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt branch\_obj *can} & IN & The branching candidate. \\ 
+{\tt cut\_data *cut} & IN & The description of the cut if the
+branching object is a cut. \\ 
+{\tt char *action} & IN & Array of actions for the children. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Ignored by {\sc SYMPHONY}. \\ 
+{\tt USER\_NO\_PP} & The user printed out whatever she wanted to. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int *desc\_size} & OUT & The size of the additional information, the
+length of {\tt *desc} in bytes. \\ 
+{\tt char **desc} & OUT & Pointer to the additional information (space must be
+allocated by the user).\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. {\tt DEFAULT} is used. \\ 
+{\tt USER\_NO\_PP} & User filled out {\tt *desc\_size} and {\tt *desc}.\\ 
+{\tt DEFAULT} & No description is appended. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined LP data structure.\\ 
+& & \\ 
+{\tt cut\_data *cut1} & IN & The first cut.\\ 
+{\tt cut\_data *cut2} & IN & The second cut.\\ 
+{\tt int *same\_cuts} & OUT & Possible values: {\tt SAME}, {\tt
+FIRST\_CUT\_BETTER}, {\tt SECOND\_CUT\_BETTER} and {\tt DIFFERENT} (i.e., not
+comparable).\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{295.386pt}}
+{\tt ERROR} & Error. {\tt DEFAULT} is used.\\ 
+{\tt USER\_NO\_PP} & User did the comparison, filled out {\tt *same\_cuts}. \\ 
+{\tt DEFAULT} & Compare byte by byte (see above). \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{225pt}}
+{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int from} & IN & See below in ``Notes''. \\ 
+{\tt int one\_row\_only} & IN & {\tt UNPACK\_CUTS\_SINGLE} or {\tt
+UNPACK\_CUTS\_MULTIPLE} (see notes below). \\ 
+{\tt int varnum} & IN & The number of variables. \\ 
+{\tt var\_desc **vars} & IN & The variables currently in the problem. \\ 
+{\tt int cutnum} & IN & The number of cuts to be decoded. \\ 
+{\tt cut\_data **cuts} & IN & Cuts that need to be converted to rows
+for the current LP. See ``Warning'' below. \\ 
+& & \\ 
+{\tt int *new\_row\_num} & OUT & Pointer to the number of rows in
+{\tt **new\_rows}. \\ 
+{\tt waiting\_row ***new\_rows} & OUT & Pointer to the array of
+pointers to the new rows. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. The cuts are discarded.\\ 
+{\tt USER\_NO\_PP} & User unpacked the cuts.\\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{285pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int varnum} & IN & The number of variables currently in the LP
+relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\ 
+{\tt var\_desc **vars} & IN & The variables currently in the LP relaxation.\\ 
+{\tt double *x} & IN & Values of the above variables.\\ 
+{\tt int where} & IN & Where the solution is to be sent---{\tt LP\_SOL\_TO\_CG} or {\tt LP\_SOL\_TO\_CP}. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{315pt}}
+{\tt ERROR} & Error. No message will be sent. \\ 
+{\tt USER\_NO\_PP} & User packed and sent the message. \\ 
+{\tt DEFAULT} & Regulated by the {\tt pack\_lp\_solution\_default}
+parameter, initially set to {\tt SEND\_NOZEROS}. \\ 
+{\tt SEND\_NONZEROS} & Send user indices and values of variables
+at nonzero level.\\ 
+{\tt SEND\_FRACTIONS} & Send user indices and values of variables
+at fractional level.\\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{260pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int varnum} & IN & The number of variables currently in the LP
+relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\ 
+{\tt var\_desc **vars} & IN & The variables currently in the LP relaxation.\\ 
+{\tt double *x} & IN & Values of the above variables.\\ 
+{\tt char *status} & INOUT & Stati of variables currently in the LP
+relaxation. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Ignored by {\sc SYMPHONY}. \\ 
+{\tt USER\_NO\_PP} & User changed the stati of the variables she
+wanted. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{260pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int generate\_what} & IN & {\tt GENERATE\_NEXTIND} or {\tt
+GENERATE\_REAL\_NEXTIND} (see description above). \\ 
+{\tt int cutnum} & IN & The number of added rows in the LP formulation
+(i.e., the total number of rows less the number of base constraints).
+This is the length of the {\tt **cuts} array.\\  
+{\tt cut\_data **cuts} & IN & Description of the cuts corresponding to
+the added rows of the current LP formulation. The user is supposed to
+know about the cuts corresponding to the base constraints. \\ 
+{\tt int prevind} & IN & The last variable processed ($-1$ if there was
+none) by {\sc SYMPHONY}.\\ 
+{\tt int nextind} & IN & The next variable ($-1$ if there are none)
+known to {\sc SYMPHONY}.\\ 
+& & \\ 
+{\tt int *real\_nextind} & OUT & Pointer to the user index of the next
+variable ($-1$ if there is none). \\ 
+{\tt double *colval} & OUT & Values of the nonzero entries in the
+column of the next variable. (Sufficient space is already allocated for this
+array.) \\ 
+{\tt int *colind} & OUT & Row indices of the nonzero entries in the column.
+(Sufficient space is already allocated for this array.) \\ 
+{\tt int *collen} & OUT & The length of the {\tt colval} and {\tt
+colind} arrays.\\ 
+{\tt double *obj} & OUT & Objective coefficient corresponding to the
+next variable.\\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. The LP process is aborted.\\ 
+{\tt USER\_NO\_PP} & User filled out {\tt *real\_nextind} and
+generated its column if needed.\\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{225pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int varnum} & IN & The number of variables currently in the LP
+relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\ 
+{\tt var\_desc **vars} & IN & The variables currently in the LP relaxation.\\ 
+{\tt double *x} & IN & Values of the above variables.\\ 
+{\tt int *new\_row\_num} & OUT & The number of cuts generated. \\ 
+{\tt waiting\_row ***new\_rows} & OUT & The cuts and the corresponding rows. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{330pt}}
+{\tt ERROR} & Error. Interpreted as if no cuts were generated. \\ 
+{\tt USER\_NO\_PP} & Cuts were generated but {\sc SYMPHONY}\ must compare them to those
+in the local pool. \\ 
+{\tt USER\_AND\_PP} & Cuts were generated and {\sc SYMPHONY}\ should not compare them to
+those in the local pool. \\ 
+{\tt DEFAULT} & No cuts are generated. (At least for now. We might add Gomory
+cuts for default later.) \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{265pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int rownum} & IN & The number of cuts added. \\ 
+{\tt waiting\_row **rows} & IN & Array of waiting rows containing the
+cuts added. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Revert to default. \\ 
+{\tt USER\_AND\_PP} & User printed whatever he wanted. \\ 
+{\tt DEFAULT} & Print out the number of cuts added. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \setbox\sizebox=\hbox{$^{\tt th}$}\lthtmltypeout{latex2htmlSize :tex2html_wrap_inline2670: \the\ht\sizebox::\the\dp\sizebox.}\box\sizebox
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{255pt}}
+{\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\ 
+& & \\ 
+{\tt int rownum} & IN & The number of waiting rows. \\ 
+{\tt waiting\_row **rows} & IN & The array of waiting rows.\\ 
+{\tt char *delete} & OUT & An array of indicators (each of them is one {\tt
+char}) showing which waiting rows are to be deleted. \\  
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{330pt}}
+{\tt ERROR} & Purge every single waiting row. \\ 
+{\tt USER\_AND\_PP} & The user removed the unwanted waiting rows and
+compressed the remaining list. \\ 
+{\tt USER\_NO\_PP} & The user marked in {\tt delete} the rows to be deleted. \\ 
+{\tt DEFAULT} & Described above. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. CG exits. \\ 
+{\tt USER\_NO\_PP} & The user received the data properly. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. This LP solution is not processed. \\ 
+{\tt USER\_NO\_PP} & The user received the LP solution. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure
+(should be {\tt NULL} on exit from this function). \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Ignored. \\ 
+{\tt USER\_NO\_PP} & The user freed all data structures. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure.
+\\ 
+{\tt int iter\_num} & IN & The iteration number of the current LP solution. \\ 
+{\tt int level} & IN & The level in the tree on which the current LP
+solution was generated. \\ 
+{\tt index} & IN & The index of the node in which LP solution was generated.
+\\ 
+{\tt objval} & IN & The objective function value of the current LP solution.
+\\ 
+{\tt int varnum} & IN & The number of nonzeros in the current LP solution. \\ 
+{\tt indices} & IN & The column indices of the nonzero variables in the current
+LP solution. \\ 
+{\tt values} & IN & The values of the nonzero variables listed in 
+{\tt indices}.
+\\ 
+{\tt double ub} & IN & The current global upper bound. \\ 
+{\tt double lpetol} & IN & The current error tolerance in the LP. \\ 
+{\tt int *cutnum} & OUT & Pointer to the number of cuts generated
+and sent to the LP. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Ignored. \\ 
+{\tt USER\_NO\_PP} & The user function exited properly. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt cut\_data *new\_cut} & IN & Pointer to the cut that must be
+checked. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Ignored. \\ 
+{\tt USER\_NO\_PP} & The user is done checking the cut. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Cut Pool exits. \\ 
+{\tt USER\_NO\_PP} & The user received data successfully. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{280pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure
+(should be {\tt NULL} on exit). \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Cuts are not checked for this LP solution. \\ 
+{\tt USER\_NO\_PP} & The user function exited properly. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{285pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\ 
+{\tt int varnum} & IN & The number of nonzero/fractional variables described
+in {\tt indices} and {\tt values}. \\ 
+{\tt int *indices} & IN & The user indices of the nonzero/fractional
+variables. \\ 
+{\tt double *values} & IN & The nonzero/fractional values. \\  
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Cuts are not checked for this LP solution. \\ 
+{\tt USER\_NO\_PP} & The user is prepared to check cuts. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{255pt}}
+{\tt void *user} & INOUT & The user defined part of p. \\ 
+{\tt double lpetol} & IN & The $\epsilon$ tolerance in the LP process. \\ 
+{\tt int varnum} & IN & Same as the previous function. \\ 
+{\tt int *indices} & IN & Same as the previous function. \\ 
+{\tt double *values} & IN & Same as the previous function. \\ 
+{\tt cut\_data *cut} & IN & Pointer to the cut to be tested. \\ 
+{\tt int *is\_violated} & OUT & TRUE/FALSE based on whether the cut is violated
+or not. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Cut is not sent to the LP, regardless of the value of
+{\tt *is\_violated}. \\ 
+{\tt USER\_NO\_PP} & The user function exited properly. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+\stepcounter{subsection}
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+{\tt void *user} & INOUT & Pointer to the user-defined data structure. \\ 
+{\tt window *win} & INOUT & The window that received the message. \\ 
+{\tt FILE *write\_to} & IN & Pipe to the wish process. \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Message ignored. \\ 
+{\tt USER\_NO\_PP} & The user processed the message. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{275pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure. \\ 
+{\tt window *win} & INOUT & \\ 
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Ignored. \\ 
+{\tt USER\_NO\_PP} & The user successfully performed initialization. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Ignored. \\ 
+{\tt USER\_NO\_PP} & The user successfully freed the data structures. \\ 
+\end{tabular}
+}
+
+\stepcounter{subsubsection}
+{\newpage
+\clearpage
+\samepage \begin{tabular}{llp{250pt}}
+{\tt void *user} & INOUT & Pointer to the user-defined data structure. \\ 
+{\tt int text\_length} & IN & The length of {\tt text}. \\ 
+{\tt char *text} & IN &  \\ 
+{\tt int owner\_tid} & IN & The tid of the process that initiated this window.
+\\  
+\end{tabular}
+}
+
+{\newpage
+\clearpage
+\samepage \begin{tabular}{lp{300pt}}
+{\tt ERROR} & Error. Ignored. \\ 
+{\tt USER\_NO\_PP} & The user successfully interpreted the text. \\ 
+\end{tabular}
+}
+
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+
+\end{document}

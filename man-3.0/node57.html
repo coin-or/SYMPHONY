@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Inter-process Communication for Distributed Computing</TITLE>
+<META NAME="description" CONTENT="Inter-process Communication for Distributed Computing">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node58.html">
+<LINK REL="previous" HREF="node54.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node58.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html978"
+  HREF="node58.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html974"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html968"
+  HREF="node56.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html976"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html979"
+  HREF="node58.html">The LP Engine</A>
+<B> Up:</B> <A NAME="tex2html975"
+  HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html969"
+  HREF="node56.html">User-defined Data Structures</A>
+ &nbsp <B>  <A NAME="tex2html977"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00099000000000000000"></A>
+<A NAME="communication"></A>
+<BR>
+Inter-process Communication for Distributed Computing
+</H2>
+While the implementation of SYMPHONY strives to shield the user from
+having to know anything about communications protocols or the
+specifics of inter-process communication, it may be necessary for the
+user to pass information from one module to another in some
+cases--for instance, if the user must pass problem-specific data to
+the LP process after reading them in from a data file. In cases where
+this might be appropriate, user functions are supplied in pairs--a
+<EM>send</EM> function and a <EM>receive</EM> function. All data are sent in
+the form of arrays of either type <TT>char</TT>, <TT>int</TT>, or <TT>double</TT>, or as strings. To send an array, the user has simply to
+invoke the function <TT>send_?_array(? *array, int length)</TT> where ?
+is one of the previously listed types. To receive that array, there is
+a corresponding function called <TT>receive_?_array(? *array, int
+length)</TT>. When receiving an array, the user must first
+allocate the appropriate amount of memory. In cases where variable
+length arrays need to be passed, the user must first pass the length
+of the array (as a separate array of length one) and then the array
+itself. In the receive function, this allows the length to be received
+first so that the proper amount of space can be allocated before
+receiving the array itself. Note that data must be received in exactly
+the same order as it was passed, as data is read linearly into and out
+of the message buffer. The easiest way to ensure this is done properly
+is to simply copy the send statements into the receive function and
+change the function names. It may then be necessary to add some
+allocation statements in between the receive function calls.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html978"
+  HREF="node58.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html974"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html968"
+  HREF="node56.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html976"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html979"
+  HREF="node58.html">The LP Engine</A>
+<B> Up:</B> <A NAME="tex2html975"
+  HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html969"
+  HREF="node56.html">User-defined Data Structures</A>
+ &nbsp <B>  <A NAME="tex2html977"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

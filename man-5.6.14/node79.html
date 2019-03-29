@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Bicriteria Solve</TITLE>
+<META NAME="description" CONTENT="Bicriteria Solve">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node76.html">
+<LINK REL="up" HREF="node74.html">
+<LINK REL="next" HREF="node80.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1501"
+  HREF="node80.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1497"
+  HREF="node74.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1493"
+  HREF="node78.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1499"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1502"
+  HREF="node80.html">The Node Processing Module</A>
+<B>Up:</B> <A NAME="tex2html1498"
+  HREF="node74.html">The Master Module</A>
+<B> Previous:</B> <A NAME="tex2html1494"
+  HREF="node78.html">Modifying Problem Data.</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00541300000000000000"></A><A NAME="mc_solve"></A>
+<BR>
+Bicriteria Solve
+</H3>
+
+<P>
+For those readers not familiar with bicriteria integer programming, we briefly
+review the basic notions here. For clarity, we restrict the discussion here to
+pure integer programs (ILPs), but the principles are easily generalized. A
+bicriteria ILP is a generalization of a standard ILP presented earlier that
+includes a second objective function, yielding an optimization problem of the
+form
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="bicrit"></A><!-- MATH
+ \begin{equation}
+\begin{array}{lrcl}
+\mathop{\text{vmin}}& [cx, dx],\\
+\textrm{s.t.} & Ax & \leq & b, \\
+& x & \in & \mathbb{Z}^{n}.
+\end{array}
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="182" HEIGHT="82" BORDER="0"
+ SRC="img29.png"
+ ALT="\begin{displaymath}\begin{array}{lrcl} \mathop{\text{vmin}}&amp; [cx, dx],\ \textrm{s.t.} &amp; Ax &amp; \leq &amp; b, \ &amp; x &amp; \in &amp; \mathbb{Z}^{n}. \end{array}\end{displaymath}"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+The operator <SPAN  CLASS="textit">vmin</SPAN> is understood to mean that solving this program is
+the problem of generating <SPAN  CLASS="textit">efficient</SPAN> solutions, which are these feasible
+solutions 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img30.png"
+ ALT="\bgroup\color{Brown}$ p$\egroup"></SPAN></FONT> to <A HREF="#bicrit">4.2</A> for which there does not exist a second
+distinct feasible solution 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img31.png"
+ ALT="\bgroup\color{Brown}$ q$\egroup"></SPAN></FONT> such that 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $cq \leq cp$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="60" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img32.png"
+ ALT="\bgroup\color{Brown}$ cq \leq cp$\egroup"></SPAN></FONT> and 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $dq \leq dp$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="63" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img33.png"
+ ALT="\bgroup\color{Brown}$ dq \leq dp$\egroup"></SPAN></FONT> and at
+least one inequality is strict. Note that (<A HREF="#bicrit">4.2</A>) does not have a
+unique optimal solution value, but a set of pairs of solution values called
+<SPAN  CLASS="textit">outcomes</SPAN>. The pairs of solution values corresponding to efficient
+solutions are called <SPAN  CLASS="textit">Pareto outcomes</SPAN>. Surveys of methodology for for
+enumerating the Pareto outcomes of multicriteria integer programs are provided
+by Climaco et al.&nbsp;[<A
+ HREF="node282.html#climaco97">7</A>] and more recently by Ehrgott and
+Gandibleux&nbsp;[<A
+ HREF="node282.html#ehrgott00">11</A>,<A
+ HREF="node282.html#ehrgott02">12</A>] and Ehrgott and
+Wiecek&nbsp;[<A
+ HREF="node282.html#ehrgott04">13</A>].
+
+<P>
+The bicriteria ILP (<A HREF="#bicrit">4.2</A>) can be converted to a standard ILP by
+taking a nonnegative linear combination of the objective
+functions&nbsp;[<A
+ HREF="node282.html#geoff68">17</A>]. Without loss of generality, the weights can be
+scaled so they sum to one, resulting in a family of ILPs parameterized by a
+scalar 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $0 \leq \alpha \leq 1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="79" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img34.png"
+ ALT="\bgroup\color{Brown}$ 0 \leq \alpha \leq 1$\egroup"></SPAN></FONT>, with the bicriteria objective function replaced
+by the <SPAN  CLASS="textit">weighted sum objective</SPAN>
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="wsum"></A><!-- MATH
+ \begin{equation}
+(\alpha c + (1 - \alpha) d) x.
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="137" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img35.png"
+ ALT="$\displaystyle (\alpha c + (1 - \alpha) d) x.$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">3</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Each selection of weight 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img36.png"
+ ALT="\bgroup\color{Brown}$ \alpha$\egroup"></SPAN></FONT> produces a different single-objective
+problem. Solving the resulting ILP produces a Pareto outcome called a
+<SPAN  CLASS="textit">supported outcome</SPAN>, since it is an extreme point on the convex lower
+envelope of the set of Pareto outcomes. Unfortunately, not all efficient
+outcomes are supported, so it is not possible to enumerate the set of Pareto
+outcomes by solving a sequence of ILPs from this parameterized family. To
+obtain all Pareto outcomes, one must replace the weighted sum objective
+(<A HREF="#wsum">4.3</A>) with an objective based on the <SPAN  CLASS="textit">weighted Chebyshev norm</SPAN>
+studied by Eswaran et al.&nbsp;[<A
+ HREF="node282.html#eswaran89">14</A>] and Solanki&nbsp;[<A
+ HREF="node282.html#solanki91">34</A>]. If
+
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="21" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img37.png"
+ ALT="\bgroup\color{Brown}$ x^c$\egroup"></SPAN></FONT> is a solution to a weighted sum problem with 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\alpha = 1$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="47" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img38.png"
+ ALT="\bgroup\color{Brown}$ \alpha = 1$\egroup"></SPAN></FONT> and 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="22" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img39.png"
+ ALT="\bgroup\color{Brown}$ x^d$\egroup"></SPAN></FONT> is
+the solution with 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\alpha = 0$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="47" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img40.png"
+ ALT="\bgroup\color{Brown}$ \alpha = 0$\egroup"></SPAN></FONT>, then the weighted Chebyshev norm of a feasible
+solution 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img30.png"
+ ALT="\bgroup\color{Brown}$ p$\egroup"></SPAN></FONT> is
+<P></P>
+<DIV ALIGN="CENTER" CLASS="mathdisplay"><A NAME="chebyshev"></A><!-- MATH
+ \begin{equation}
+\max \{\alpha (cp - cx^c), (1 - \alpha)(dp - dx^d)\}.
+\end{equation}
+ -->
+<TABLE CLASS="equation" CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><SPAN CLASS="MATH"><IMG
+ WIDTH="287" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img41.png"
+ ALT="$\displaystyle \max \{\alpha (cp - cx^c), (1 - \alpha)(dp - dx^d)\}.$"></SPAN></TD>
+<TD NOWRAP CLASS="eqno" WIDTH="10" ALIGN="RIGHT">
+(<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Although this objective function is not linear, it can easily be linearized by
+adding an artificial variable, resulting in a second parameterized family of
+ILPs. Under the assumption of <SPAN  CLASS="textit">uniform dominance</SPAN>, Bowman showed that an
+outcome is Pareto if and only if it can be obtained by solving some ILP in
+this family&nbsp;[<A
+ HREF="node282.html#bowman76">5</A>]. In [<A
+ HREF="node282.html#WCN">31</A>], the authors presented a method for
+enumerating all Pareto outcomes by solving a sequence of ILPs in this
+parameterized family. By slightly perturbing the objective function, they also
+showed how to relax the uniform dominance assumption. Note that the set of all
+supported outcomes, which can be thought of as an approximation of the set of
+Pareto outcomes, can be similarly obtained by solving a sequence of ILPs with
+weighted sum objectives.
+
+<P>
+SYMPHONY 5.6.14  contains a generic implementation of the algorithm described in
+[<A
+ HREF="node282.html#WCN">31</A>], along with a number of methods for approximating the set of Pareto
+outcomes. To support these capabilities, we have extended the OSI interface so
+that it allows the user to define a second objective function. Of course, we
+have also added a method for invoking this bicriteria solver called
+<TT>multiCriteriaBranchAndBound()</TT>. Relaxing the uniform dominance
+requirement requires the underlying ILP solver to have the ability to
+generate, among all optimal solutions to a ILP with a primary objective, a
+solution minimizing a given secondary objective. We added this capability to
+SYMPHONY through the use of optimality cuts, as described in [<A
+ HREF="node282.html#WCN">31</A>].
+
+<P>
+Because implementing the algorithm requires the solution of a sequence of
+ILPs that vary only in their objective functions, it is possible to use warm
+starting to our advantage.  Although the linearization of (<A HREF="#chebyshev">4.4</A>)
+requires modifying the constraint matrix from iteration to iteration, it is
+easy to show that these modifications cannot invalidate the basis. In the case
+of enumerating all supported outcomes, only the objective function is modified
+from one iteration to the next. In both cases, we save warm start information
+from the solution of the first ILP in the sequence and use it for each
+subsequent computation.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1501"
+  HREF="node80.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1497"
+  HREF="node74.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1493"
+  HREF="node78.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1499"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1502"
+  HREF="node80.html">The Node Processing Module</A>
+<B>Up:</B> <A NAME="tex2html1498"
+  HREF="node74.html">The Master Module</A>
+<B> Previous:</B> <A NAME="tex2html1494"
+  HREF="node78.html">Modifying Problem Data.</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2016-02-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

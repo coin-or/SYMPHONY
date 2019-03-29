@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Building with the MSVC++ compiler in CYGWIN</TITLE>
+<META NAME="description" CONTENT="Building with the MSVC++ compiler in CYGWIN">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node33.html">
+<LINK REL="up" HREF="node31.html">
+<LINK REL="next" HREF="node35.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html848"
+  HREF="node35.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html844"
+  HREF="node31.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html840"
+  HREF="node33.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html846"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html849"
+  HREF="node35.html">Using SYMPHONY</A>
+<B>Up:</B> <A NAME="tex2html845"
+  HREF="node31.html">Building SYMPHONY Applications</A>
+<B> Previous:</B> <A NAME="tex2html841"
+  HREF="node33.html">Building in a Windows</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00323430000000000000">
+Building with the MSVC++ compiler in CYGWIN</A>
+</H4>
+
+<P>
+It is possible to build applications using an automated build of SYMPHONY
+with the MSVC++ compiler 
+<FONT COLOR="#a52a2a"><TT>cl</TT></FONT> using the GNU autotools in the CYGWIN
+environment. To do so, follow the instuctions for building in Unix-like
+environments (see Section <A HREF="node19.html#getting_started_unix">2.2.2</A>), except when
+configuring, use the command
+
+<P>
+
+<PRE>
+ ./configure --enable-doscompile=msvc
+</PRE>
+
+<P>
+Afterwards, you can build the individual applications using the ``make''
+command, as usual in a Unix-like environment except that thecompiler used will
+be 
+<FONT COLOR="#a52a2a"><TT>cl</TT></FONT>.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2014-10-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

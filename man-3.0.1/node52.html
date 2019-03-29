@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Writing the User Functions</TITLE>
+<META NAME="description" CONTENT="Writing the User Functions">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node53.html">
+<LINK REL="previous" HREF="node51.html">
+<LINK REL="up" HREF="node50.html">
+<LINK REL="next" HREF="node53.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html908"
+  HREF="node53.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html904"
+  HREF="node50.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html898"
+  HREF="node51.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html906"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html909"
+  HREF="node53.html">Data Structures</A>
+<B>Up:</B> <A NAME="tex2html905"
+  HREF="node50.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html899"
+  HREF="node51.html">Orienting Yourself</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000102000000000000000">
+Writing the User Functions</A>
+</H2>
+
+<P>
+The majority of the user functions are called from either the master
+process or the LP process. For these two modules, user functions are
+invoked from so-called <EM>wrapper functions</EM> that provide the
+interface. Each wrapper function is named <TT>*_u()</TT> , where <TT>*</TT>
+is the name of the corresponding user function, and is defined in a
+file called <TT>*_wrapper.c</TT>. The wrapper function first collects
+the necessary data and hands it to the user by calling the user
+function. Based on the return value from the user, the wrapper then
+performs any necessary post-processing. Most user functions are
+designed so that the user can do as little or as much as she likes.
+Where it is feasible, there are default options that allow the user to
+do nothing if the default behavior is acceptable. This is not possible
+in all cases and the user must provide certain functions, such as
+separation.
+
+<P>
+In the next section, the user functions are described in detail.
+The name of every user written function starts with <TT>user_</TT>.
+There are three kinds of arguments:
+<DL>
+<DT><STRONG>IN:</STRONG></DT>
+<DD>An argument containing information that the user might need
+to perform the function.
+</DD>
+<DT><STRONG>OUT:</STRONG></DT>
+<DD>A pointer to an argument in which the user should
+return a result (requested data, decision, etc.) of the function. 
+</DD>
+<DT><STRONG>INOUT:</STRONG></DT>
+<DD>An argument which contains information the user might need,
+but also for which the user can change the value.
+</DD>
+</DL>
+The return values from each function are as follows:
+<DL>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>Error in the user function. Printing an error message is
+the user's responsibility. Depending on the work the user function was
+supposed to do, the error might be ignored (and some default option
+used), or the process aborts.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_AND_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The user implemented both the user function and
+post-processing (post-processing by SYMPHONY will be skipped).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The user implemented the user function only.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The default option is going to be used (the default is one of
+the built-in options, SYMPHONY decides which one to use based on initial parameter
+settings and the execution of the algorithm).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>built_in_option1 </TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>built_in_option2 </TT> ...</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The specified built-in option will be used.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Notes:</STRONG></DT>
+<DD>
+
+<BR>
+
+<UL>
+<LI>Sometimes an output is optional. This is always be noted in the
+function descriptions.
+
+<P>
+</LI>
+<LI>If an array has to be returned (i.e., the argument is <TT>type
+**array</TT>) then (unless otherwise noted) the user has to allocate space
+for the array itself and set <TT>*array</TT> to be the array allocated.
+If an output array is optional then the user <EM>must not</EM> set <TT>*array</TT> for the array she is not going to fill up because this is how
+SYMPHONY decides which optional arrays are filled up.
+
+<P>
+</LI>
+<LI>Some built-in options are implemented so that the user can invoke them
+directly from the user function. This might be useful if, for example,
+the user wants to use different built-in options at different stages
+of the algorithm, or if he wants to do the post-processing himself but
+does not want to implement the option itself.
+</LI>
+</UL>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<HR>
+<A NAME="tex2html908"
+  HREF="node53.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html904"
+  HREF="node50.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html898"
+  HREF="node51.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html906"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html909"
+  HREF="node53.html">Data Structures</A>
+<B>Up:</B> <A NAME="tex2html905"
+  HREF="node50.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html899"
+  HREF="node51.html">Orienting Yourself</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_compare_candidates</TITLE>
+<META NAME="description" CONTENT="user_compare_candidates">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node243.html">
+<LINK REL="previous" HREF="node241.html">
+<LINK REL="up" HREF="node224.html">
+<LINK REL="next" HREF="node243.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3901"
+  HREF="node243.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3897"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3891"
+  HREF="node241.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3899"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3902"
+  HREF="node243.html">user_select_child</A>
+<B>Up:</B> <A NAME="tex2html3898"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3892"
+  HREF="node241.html">user_select_candidates</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007321400000000000000"></A>
+<A NAME="user_compare_candidates"></A>
+<BR>
+user_compare_candidates
+</H3><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+[cf]user_compare_candidates
+</FONT></FONT><PRE>
+int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
+                            double ub, double granularity, 
+                            int *which_is_better)
+</PRE><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT><DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+By the time this function is invoked, the children of the current search tree
+node corresponding to each branching candidate have been pre-solved, i.e., the
+<TT>objval</TT>, <TT>termcode</TT>, <TT>iterd</TT>, and <TT>feasible</TT> fields of the
+<TT>can1</TT> and <TT>can2</TT> structures are filled out. Note that if the
+termination code for a child is <TT>LP_D_UNBOUNDED</TT> or <TT>LP_D_OBJLIM</TT>,
+i.e., the dual problem is unbounded or the objective limit is reached, then
+the objective value of that child is set to <TT>MAXDOUBLE / 2</TT>. Similarly, if
+the termination code is one of <TT>LP_D_ITLIM</TT> (iteration limit reached),
+<TT>LP_D_INFEASIBLE</TT> (dual infeasible) or <TT>LP_ABANDONED</TT> (because of
+numerical difficulties) then the objective value of that child is set to that
+of the parent's.
+<BR>
+<BR>
+Based on this information the user must choose which candidate he
+considers better and whether to branch on this better one immediately
+without checking the remaining candidates. As such, there are four
+possible answers: <TT>FIRST_CANDIDATE_BETTER</TT>, <TT>SECOND_CANDIDATE_BETTER</TT>, <TT>FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT</TT> and <TT>SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT</TT>. An answer ending with
+<TT>_AND_BRANCH_ON_IT</TT> indicates that the user wants to terminate
+the strong branching process and select that particular candidate for
+branching.
+<BR>
+<BR>
+There are several default options. In each of them, objective values of
+the pre-solved LP relaxations are compared. 
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>branch_obj *can1</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>One of the candidates to be compared.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>branch_obj *can2</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>The other candidate to be compared.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double ub</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>The current best upper bound.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double granularity</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>Defined tolerance</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *which_is_better</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=246>The user's choice. See the description
+above.</TD>
+</TR>
+</TABLE>
+
+<P>
+
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Error. <TT>DEFAULT</TT> is used.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>User filled out <TT>*which_is_better</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Regulated by the <TT>compare_candidates_default</TT>
+parameter, initially set to <TT>LOWEST_LOW_OBJ</TT> unless overridden by the
+user.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>BIGGEST_DIFFERENCE_OBJ</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the biggest
+difference between highest and lowest objective function values.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>LOWEST_LOW_OBJ</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the lowest minimum
+objective function value. The minimum is taken over the objective function
+values of all the children.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>HIGHEST_LOW_OBJ</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the highest minimum
+objective function value.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>LOWEST_HIGH_OBJ</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the lowest maximum
+objective function value.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>HIGHEST_HIGH_OBJ</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the highest maximum
+objective function value .</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>LOWEST_LOW_FRAC</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the lowest minimum
+number of fractional variables. The minimum is taken over the number of
+fractional variables in all the children. Fractional branching options are 
+only available if the fractional branching compile-time option is set in the
+makefile.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>HIGHEST_LOW_FRAC</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the highest minimum
+number of fractional variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>LOWEST_HIGH_FRAC</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the lowest maximum
+number of fractional variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>HIGHEST_HIGH_FRAC</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=291>Prefer the candidate with the highest maximum
+number of fractional variables.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>select_branching_object()</TT> after
+the LP relaxations of the children have been pre-solved.
+
+<P>
+</DD>
+</DL><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+<BR>
+<BR>
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3901"
+  HREF="node243.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3897"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3891"
+  HREF="node241.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3899"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3902"
+  HREF="node243.html">user_select_child</A>
+<B>Up:</B> <A NAME="tex2html3898"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3892"
+  HREF="node241.html">user_select_candidates</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

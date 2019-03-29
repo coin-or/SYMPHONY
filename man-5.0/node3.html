@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Introducing SYMPHONY 5.0</TITLE>
+<META NAME="description" CONTENT="Introducing SYMPHONY 5.0">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node4.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node4.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html405"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html401"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html395"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html403"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html406"
+  HREF="node4.html">How to Use This</A>
+<B>Up:</B> <A NAME="tex2html402"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html396"
+  HREF="node2.html">Introduction</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00210000000000000000"></A>
+<A NAME="whats-new"></A>
+<BR>
+Introducing SYMPHONY 5.0
+</H1>
+
+<P>
+Welcome to the SYMPHONY user's manual. Whether you are a new user or simply
+upgrading to version 5.0, this manual will help you get started with what we
+hope you will find to be a very useful framework for solving mixed-integer
+linear programs either using the generic tools provided or by developing a
+custom branch, cut, and price algorithm. There have been some very significant
+developments since the last version of SYMPHONY was released. IN particular,
+SYMPHONY is now a callable library with an interface whose look and feel is
+similar to other popular solvers. This change allows SYMPHONY to be used in a
+variety of new and powerful ways that were not possible before. For existing
+users, there have been a few minor changes to the API needed to make SYMPHONY
+thread-safe. Code written for previous versions of SYMPHONY will have to be
+ported. Instructions for porting from previous version are contained in the
+file <TT>SYMPHONY-5.0/README-5.0</TT>. As always, these changes have
+undoubtedly introduced bugs. There are now an even larger number of
+configurations in which SYMPHONY can be used and we have tested many of them,
+but it is simply not possible to test them all. Please keep this in mind and
+report all bugs that you find. Among the new enhancements and features are:
+
+<P>
+
+<UL>
+<LI>SYMPHONY is now a C callable library with an interface whose look and
+feel is similar to other popular solvers. This interface works for SYMPHONY's
+built-in generic MILP solver, as well as any customized algorithm developed by
+implementing one or more of SYMPHONY's user callback functions. The interface
+is exactly the same for both sequential and parallel versions of the code.
+
+<P>
+</LI>
+<LI>The callable library also has a C++ interface conforming to COIN-OR's
+Open Solver Interface standard for accessing LP and MILP solvers.
+
+<P>
+</LI>
+<LI>SYMPHONY has been made thread-safe in order to allow multiple
+environments to be opened within a single executable.
+
+<P>
+</LI>
+<LI>It is now possible to stop SYMPHONY during the solution process and then
+restart the computation later, even after modifying the problem data. The user
+can also save warm start information outside the solver environment and then
+reload it later into a different environment, in much the same way as can be
+done with a simplex-based linear programming solver. This allows the user to
+efficiently implement procedures, such as those for multi-criteria
+optimization, in which a series of similar MILPs must be solved.
+
+<P>
+</LI>
+<LI>Along with the ability to perform warm starts, the user call also define
+permanent cut pools that persist between solver calls. This is useful for
+situations in which a series of MILPs needs to be solved and the cuts
+generated during one solution call are still valid during later calls.
+
+<P>
+</LI>
+<LI>SYMPHONY now has the ability to enumerate the efficient solutions of a
+bicriteria MILP if the user specifies a second objective function. This is
+done using a new algorithm described in [<A
+ HREF="node261.html#WCN">33</A>] and takes advantage of the
+warm starting capabilities of SYMPHONY.
+
+<P>
+</LI>
+<LI>SYMPHONY has a very rudimentary to perform sensitivity analysis for
+MILP. This capability is till very much in the development stages, but is
+present in version 5.0.
+
+<P>
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html405"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html401"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html395"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html403"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html406"
+  HREF="node4.html">How to Use This</A>
+<B>Up:</B> <A NAME="tex2html402"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html396"
+  HREF="node2.html">Introduction</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using Multiple Pools</TITLE>
+<META NAME="description" CONTENT="Using Multiple Pools">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node37.html">
+<LINK REL="up" HREF="node36.html">
+<LINK REL="next" HREF="node39.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html754"
+  HREF="node39.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html750"
+  HREF="node36.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html746"
+  HREF="node37.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html752"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html755"
+  HREF="node39.html">Parallelizing BCP</A>
+<B>Up:</B> <A NAME="tex2html751"
+  HREF="node36.html">The Cut Pool Module</A>
+<B> Previous:</B> <A NAME="tex2html747"
+  HREF="node37.html">Maintaining and Scanning the</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00425200000000000000"></A>
+<A NAME="multi-cut-pools"></A>
+<BR>
+Using Multiple Pools
+</H3>
+
+<P>
+For several reasons, it may be desirable to have multiple cut pools.
+When there are multiple cut pools, each pool is initially assigned
+to a particular node in the search tree. After being assigned to that
+node, the pool services requests for cuts from that node and all
+of its descendants until such time as one of its descendants gets
+assigned to another cut pool. After that, it continues to
+serve all the descendants of its assigned node that are not assigned
+to other cut pools.
+
+<P>
+Initially, the first cut pool is assigned to the root
+node. All other cut pools are unassigned. During execution, when a new
+node is sent to be processed, the tree manager must determine
+which cut pool the node should be serviced by. The default is to use
+the same cut pool as its parent. However, if there is currently an
+idle cut pool process (either it has never been assigned to any node
+or all the descendants of its assigned node have been processed or
+reassigned), then that cut pool is assigned to this new node. All the
+cuts currently in the cut pool of its parent node are copied to the
+new pool to initialize it, after which the two pools operate
+independently on their respective subtrees. When generating cuts, the
+LP process sends the new cuts to the cut pool assigned to
+service the node during whose processing the cuts were generated.
+
+<P>
+The primary motivation behind the idea of multiple cut pools is
+two-fold. First, we want simply to limit the size of each pool as
+much as possible. By limiting the number of nodes that a cut pool has
+to service, the number of cuts in the pool will be similarly limited.
+This not only allows cut storage to spread over multiple processors,
+and hence increases the available memory, but at the same time, the
+efficiency with which the cut pool can be scanned for violated cuts is
+also increased. A secondary reason for maintaining multiple cut pools is
+that it allows us to limit the scanning of cuts to only those that
+were generated in the same subtree as the current search node. As
+described above, this helps focus the search and should increase the
+efficiency and effectiveness of the search. This idea also
+allows us to generate locally valid cuts, such as the classical
+Gomory cuts (see [<A
+ HREF="node157.html#N_SPMamp_W">26</A>]).
+
+<P>
+<HR>
+<A NAME="tex2html754"
+  HREF="node39.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html750"
+  HREF="node36.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html746"
+  HREF="node37.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html752"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html755"
+  HREF="node39.html">Parallelizing BCP</A>
+<B>Up:</B> <A NAME="tex2html751"
+  HREF="node36.html">The Cut Pool Module</A>
+<B> Previous:</B> <A NAME="tex2html747"
+  HREF="node37.html">Maintaining and Scanning the</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

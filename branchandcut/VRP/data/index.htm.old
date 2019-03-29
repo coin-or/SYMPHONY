@@ -1,0 +1,1821 @@
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>Vehicle Routing Data Sets</title>
+<base target="_self">
+</head>
+
+<body bgcolor="#0033CC" text="#FFFFFF" link="#FFFFFF"
+vlink="#FFFFFF" alink="#FFFFFF" topmargin="0" leftmargin="15">
+
+<p><font size="5" face="Arial Black">Vehicle Routing Data Sets</font></p>
+
+<table border="0" cellpadding="0" width="100%">
+    <tr>
+        <td width="100%"><table border="0" cellpadding="2"
+        width="100%">
+            <tr>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/index.htm"
+                style="text-decoration:none;"><font
+                color="#FFFFFF" size="3">Home</font></a> </td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/software.htm"
+                style="text-decoration:none;"><font size="3">Software</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/applications.htm"
+                style="text-decoration:none;"><font size="3">Applications</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/faq.htm"
+                style="text-decoration:none;"><font size="3">FAQ</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/reference.htm"
+                style="text-decoration:none;"><font size="3">Reference</font></a></td>
+                <td align="center" width="16%" bgcolor="#000000"><a
+                href="http://www.coin-or.org/SYMPHONY/branchandcut/links.htm"
+                style="text-decoration:none;"><font size="3">Links</font></a></td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+    <tr>
+        <td width="100%"><table border="0" cellpadding="0"
+        width="100%">
+            <tr>
+                <td width="100%"><hr color="#FFFFFF">
+                </td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+</table>
+
+<br>
+
+This page contains data sets for the Capacitated Vehicle Routing Problem
+gathered from various sources identified below. By clicking on the links, you
+can also get charts listing the characteristics of the various instances, as
+well as an optimal solution where one is known. There are some gaps in the
+charts---we are working on filling them out completely and verifying all the
+data. Please let us know if you find any mistakes or know of more recent
+results. 
+
+<ul><font size="4" face="Arial Black">
+    <li>Download the entire library 
+    (<a href="Vrp-All.tgz">tar file</a>)
+    (<a href="Vrp-All.zip">zip file</a>)
+    </li>
+    <li><a href="spec.ps">
+    Description</a> of file format</li>
+    <li><a href="#A">Augerat, et al. Set A</a></li>
+    <li><a href="#B">Augerat, et al. Set B</a></li>
+    <li><a href="#P">Augerat, et al. Set P</a></li>
+    <li><a href="#E">Christofides and Eilon</a></li>
+    <li><a href="#F">Fisher</a></li>
+    <li><a href="#G">Gillet and Johnson</a></li>
+    <li><a href="#M">Christofides, Mingozzi, and Toth</a></li>
+    <li><a href="#V">Converted TSPLIB Problems</a></li>
+    </font>
+</ul>
+
+<br>
+<hr>
+<br>
+
+The best solutions and gaps listed here are from the following
+papers that report computational results:
+
+<ul>
+
+<li><p><a STYLE="font-variant:small-caps">P. Augerat, J.M. Belenguer, E.
+Benavent, A. Corber&aacute;n, D. Naddef, G. Rinaldi</a>, <em>Computational
+Results with a Branch and Cut Code for the Capacitated Vehicle Routing
+Problem</em>, Research Report 949-M, Universite Joseph Fourier, Grenoble,
+France.</p>
+
+<li><p><a STYLE="font-variant:small-caps">U. Blasum and W. Hochstattler</a>,
+<em> Application of the Branch and Cut Method to the Vehicle Routing
+Problem</em>, Zentrum fur Angewandte Informatik Koln Technical Report
+zpr2000-386 (2000).
+</p>
+
+<li><p><a STYLE="font-variant:small-caps">R. Fukasawa, J. Lysgaard, 
+M.P. de Aragao, M. Reis, E. Uchoa and R.F.
+Werneck</a>, <em>Robust Branch-and-Cut-and-Price for the Capacitated Vehicle
+Routing Problem</em>, D. Bienstock and G. Nemhauser (Eds.): IPCO 2004, LNCS
+3064, Springer-Verlag (2004), 1.</p>
+
+<li><p><a STYLE="font-variant:small-caps">J. Lysgaard, A.N. Letchford, and 
+R.W. Eglese</a>, <em>A New Branch-and-cut Algorithm for Capacitated Vehicle 
+Routing Problems</em>, submitted to Mathematical Programming (2003).</p> 
+
+<li><p><a STYLE="font-variant:small-caps">T.K. Ralphs, L. Kopman, W.R.
+Pulleyblank, and L.E. Trotter Jr.</a>, <em>On the Capacitated Vehicle Routing
+Problem</em>, Mathematical Programming Series B <strong>94</strong> (2003),
+343.</p>
+
+<li><p><a STYLE="font-variant:small-caps">K.M. Wenger</a>, <em>Generic Cut
+Generation Methods for Routing Problems</em>, Ph.D Dissertation, Institute of
+Computer Science, University of Heidelberg (2003).</p> 
+
+</ul>
+
+<br>
+<hr>
+<br>
+
+<ul><font size="4" face="Arial Black">
+    <li><a NAME="A" href="ftp://branchandcut.org/pub/data/VRP/A/">Augerat, et
+    al. Set A</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-A.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-A.zip">zip
+    file</a>)</li></font>
+</ul> 
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n32-k5.vrp">A-n32-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">31</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.82</td>
+                <td align="center">0</td>
+                <td align="center">784</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n32-k5.opt">A-n32-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n33-k5.vrp">A-n33-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">32</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.89</td>
+                <td align="center">0</td>
+                <td align="center">661</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n33-k5.opt">A-n33-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n33-k6.vrp">A-n33-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">32</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.90</td>
+                <td align="center">0</td>
+                <td align="center">742</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n33-k6.opt">A-n33-k6.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n34-k5.vrp">A-n34-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">33</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">778</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n34-k5.opt">A-n34-k5.opt
+                     </a></td>
+           </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n36-k5.vrp">A-n36-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">35</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">799</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n36-k5.opt">A-n36-k5.opt
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n37-k5.vrp">A-n37-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">36</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.81</td>
+                <td align="center">0</td>
+                <td align="center">669</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n37-k5.opt">A-n37-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n37-k6.vrp">A-n37-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">36</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">949</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n37-k6.opt">A-n37-k6.opt
+                    </a></td>
+            </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n38-k5.vrp">A-n38-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">37</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.96</td>
+                <td align="center">0</td>
+                <td align="center">730</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n38-k5.opt">A-n38-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n39-k5.vrp">A-n39-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">38</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">822</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n39-k5.opt">A-n39-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n39-k6.vrp">A-n39-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">38</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">831</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n39-k6.opt">A-n39-k6.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n44-k6.vrp">A-n44-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">43</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">937</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n44-k6.opt">A-n44-k6.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n45-k6.vrp">A-n45-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">44</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.99</td>
+                <td align="center">0</td>
+                <td align="center">944</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n45-k6.opt">A-n45-k6.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n45-k7.vrp">A-n45-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">44</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">1146</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n45-k7.opt">A-n45-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n46-k7.vrp">A-n46-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">45</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.86</td>
+                <td align="center">0</td>
+                <td align="center">914</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n46-k7.opt">A-n46-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n48-k7.vrp">A-n48-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">47</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.89</td>
+                <td align="center">0</td>
+                <td align="center">1073</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n48-k7.opt">A-n48-k7.opt
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n53-k7.vrp">A-n53-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">52</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">1010</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n53-k7.opt">A-n53-k7.opt
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n54-k7.vrp">A-n54-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">53</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.96</td>
+                <td align="center">0</td>
+                <td align="center">1167</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n54-k7.opt">A-n54-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n55-k9.vrp">A-n55-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">54</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.93</td>
+                <td align="center">0</td>
+                <td align="center">1073</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n55-k9.opt">A-n55-k9.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n60-k9.vrp">A-n60-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">59</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">1354</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n60-k9.opt">A-n60-k9.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n61-k9.vrp">A-n61-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">60</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.98</td>
+                <td align="center">0</td>
+                <td align="center">1034</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n61-k9.opt">A-n61-k9.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n62-k8.vrp">A-n62-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">61</td>
+                <td align="center">8</td>
+                <td align="center">100</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">1288</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n62-k8.opt">A-n62-k8.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n63-k9.vrp">A-n63-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">62</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">1616</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n63-k9.opt">A-n63-k9.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n63-k10.vrp">A-n63-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">62</td>
+                <td align="center">10</td>
+                <td align="center">100</td>
+                <td align="center">0.93</td>
+                <td align="center">0</td>
+                <td align="center">1314</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n63-k10.opt">A-n63-k10.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n64-k9.vrp">A-n64-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">63</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">1401</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n64-k9.opt">A-n64-k9.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n65-k9.vrp">A-n65-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">64</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">1174</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n65-k9.opt">A-n65-k9.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n69-k9.vrp">A-n69-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">68</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">1159</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n69-k9.opt">A-n69-k9.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n80-k10.vrp">A-n80-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">79</td>
+                <td align="center">10</td>
+                <td align="center">100</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">1763</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/A/A-n80-k10.opt">A-n80-k10.opt
+                    </a></td>
+            </tr>
+              </table>
+
+<ul><font size="4" face="Arial Black">
+   <li><a NAME="B" href="ftp://branchandcut.org/pub/data/VRP/B/">Augerat, et
+    al. Set B</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-B.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-B.zip">zip
+    file</a>)</li></font>
+</ul>
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n31-k5.vrp">B-n31-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">30</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.82</td>
+                <td align="center">0</td>
+                <td align="center">672</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n31-k5.opt">B-n31-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n34-k5.vrp">B-n34-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">33</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">788</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n34-k5.opt">B-n34-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n35-k5.vrp">B-n35-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">34</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.87</td>
+                <td align="center">0</td>
+                <td align="center">955</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n35-k5.opt">B-n35-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n38-k6.vrp">B-n38-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">37</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.85</td>
+                <td align="center">0</td>
+                <td align="center">805</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n38-k6.opt">B-n38-k6.opt
+                     </a></td>
+           </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n39-k5.vrp">B-n39-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">38</td>
+                <td align="center">5</td>
+                <td align="center">100</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">549</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n39-k5.opt">B-n39-k5.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n41-k6.vrp">B-n41-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">40</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">829</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n41-k6.opt">B-n41-k6.opt
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n43-k6.vrp">B-n43-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">42</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.87</td>
+                <td align="center">0</td>
+                <td align="center">742</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n43-k6.opt">B-n43-k6.opt
+                     </a></td>
+           </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n44-k7.vrp">B-n44-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">43</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">909</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n44-k7.opt">B-n44-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n45-k5.vrp">B-n45-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">44</td>
+                <td align="center">4</td>
+                <td align="center">100</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">751</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n45-k5.opt">B-n45-k5.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n45-k6.vrp">B-n45-k6.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">44</td>
+                <td align="center">6</td>
+                <td align="center">100</td>
+                <td align="center">0.99</td>
+                <td align="center">0</td>
+                <td align="center">678</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n45-k6.opt">B-n45-k6.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n50-k7.vrp">B-n50-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">49</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.87</td>
+                <td align="center">0</td>
+                <td align="center">741</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n50-k7.opt">B-n50-k7.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n50-k8.vrp">B-n50-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">49</td>
+                <td align="center">8</td>
+                <td align="center">100</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">1312</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n50-k8.opt">B-n50-k8.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n51-k7.vrp">B-n51-k7.vrp</a>**</td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">50</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.98</td>
+                <td align="center">0</td>
+                <td align="center">1032</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n51-k7.opt">B-n51-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n52-k7.vrp">B-n52-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">51</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.87</td>
+                <td align="center">0</td>
+                <td align="center">747</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n52-k7.opt">B-n52-k7.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n56-k7.vrp">B-n56-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">55</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">707</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n56-k7.opt">B-n56-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n57-k7.vrp">B-n57-k7.vrp</a>**</td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">56</td>
+                <td align="center">7</td>
+                <td align="center">100</td>
+                <td align="center">1.00</td>
+                <td align="center">0</td>
+                <td align="center">1153</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n57-k7.opt">B-n57-k7.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n57-k9.vrp">B-n57-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">56</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.89</td>
+                <td align="center">0</td>
+                <td align="center">1598</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n57-k9.opt">B-n57-k9.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n63-k10.vrp">B-n63-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">62</td>
+                <td align="center">10</td>
+                <td align="center">100</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">1496</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n63-k10.opt">B-n63-k10.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n64-k9.vrp">B-n64-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">63</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.98</td>
+                <td align="center">0</td>
+                <td align="center">861</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n64-k9.opt">B-n64-k9.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n66-k9.vrp">B-n66-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">65</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.96</td>
+                <td align="center">0</td>
+                <td align="center">1316</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n66-k9.opt">B-n66-k9.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n67-k10.vrp">B-n67-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">66</td>
+                <td align="center">10</td>
+                <td align="center">100</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">1032</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n67-k10.opt">B-n67-k10.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n68-k9.vrp">B-n68-k9.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">67</td>
+                <td align="center">9</td>
+                <td align="center">100</td>
+                <td align="center">0.93</td>
+                <td align="center">0</td>
+                <td align="center">1272</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n68-k9.opt">B-n68-k9.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n78-k10.vrp">B-n78-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">77</td>
+                <td align="center">10</td>
+                <td align="center">100</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">1221</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/B/B-n78-k10.opt">B-n78-k10.opt
+                     </a></td>
+           </tr>
+              </table>
+
+<p> ** Note that for these instances, increasing the number of trucks by 1 
+decreases the optimal value. </p>
+
+<ul><font size="4" face="Arial Black">
+    <li><a NAME="P" href="ftp://branchandcut.org/pub/data/VRP/P/">Augerat, et
+    al. Set P</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-P.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-P.zip">zip
+    file</a>)</li></font>
+</ul>
+
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n16-k8.vrp">P-n16-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">15</td>
+                <td align="center">8</td>
+                <td align="center">35</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">450</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n16-k8.opt">P-n16-k8.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n19-k2.vrp">P-n19-k2.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">18</td>
+                <td align="center">2</td>
+                <td align="center">160</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">212</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n19-k2.opt">P-n19-k2.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n20-k2.vrp">P-n20-k2.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">19</td>
+                <td align="center">2</td>
+                <td align="center">160</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">216</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n20-k2.opt">P-n20-k2.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n21-k2.vrp">P-n21-k2.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">20</td>
+                <td align="center">2</td>
+                <td align="center">160</td>
+                <td align="center">0.93</td>
+                <td align="center">0</td>
+                <td align="center">211</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n21-k2.opt">P-n21-k2.opt
+                     </a></td>
+           </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n22-k2.vrp">P-n22-k2.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">21</td>
+                <td align="center">2</td>
+                <td align="center">160</td>
+                <td align="center">0.96</td>
+                <td align="center">0</td>
+                <td align="center">216</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n22-k2.opt">P-n22-k2.opt
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n22-k8.vrp">P-n22-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">21</td>
+                <td align="center">8</td>
+                <td align="center">3000</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">603</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n22-k8.opt">P-n22-k8.opt
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n23-k8.vrp">P-n23-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">22</td>
+                <td align="center">8</td>
+                <td align="center">40</td>
+                <td align="center">0.98</td>
+                <td align="center">0</td>
+                <td align="center">529</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n23-k8.opt">P-n23-k8.opt
+            </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n40-k5.vrp">P-n40-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">39</td>
+                <td align="center">5</td>
+                <td align="center">140</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">458</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n40-k5.opt">P-n40-k5.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n45-k5.vrp">P-n45-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">44</td>
+                <td align="center">5</td>
+                <td align="center">150</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">510</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n40-k5.opt">P-n45-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n50-k7.vrp">P-n50-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">49</td>
+                <td align="center">7</td>
+                <td align="center">150</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">554</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n50-k7.opt">P-n50-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n50-k8.vrp">P-n50-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">49</td>
+                <td align="center">8</td>
+                <td align="center">120</td>
+                <td align="center">0.99</td>
+                <td align="center">0</td>
+                <td align="center">631</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n50-k8.opt">P-n50-k8.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n50-k10.vrp">P-n50-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">49</td>
+                <td align="center">10</td>
+                <td align="center">100</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">696</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n50-k10.opt">P-n50-k10.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n51-k10.vrp">P-n51-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">50</td>
+                <td align="center">10</td>
+                <td align="center">80</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">741</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n51-k10.opt">P-n51-k10.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n55-k7.vrp">P-n55-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">54</td>
+                <td align="center">7</td>
+                <td align="center">170</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">568</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n55-k7.opt">P-n55-k7.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n55-k10.vrp">P-n55-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">54</td>
+                <td align="center">10</td>
+                <td align="center">115</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">694</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n55-k10.opt">P-n55-k10.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n55-k15.vrp">P-n55-k15.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">54</td>
+                <td align="center">15</td>
+                <td align="center">70</td>
+                <td align="center">0.99</td>
+                <td align="center">0</td>
+                <td align="center">989</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n55-k15.opt">P-n55-k15.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n60-k10.vrp">P-n60-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">59</td>
+                <td align="center">10</td>
+                <td align="center">120</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">744</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n60-k10.opt">P-n60-k10.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n60-k15.vrp">P-n60-k15.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">59</td>
+                <td align="center">15</td>
+                <td align="center">80</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">968</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n60-k15.opt">P-n60-k15.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n65-k10.vrp">P-n65-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+               <td align="center">64</td>
+               <td align="center">10</td>
+                <td align="center">130</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">792</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n65-k10.opt">P-n65-k10.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n70-k10.vrp">P-n70-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">69</td>
+                <td align="center">10</td>
+                <td align="center">135</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">827</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n70-k10.opt">P-n70-k10.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n76-k4.vrp">P-n76-k4.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">75</td>
+                <td align="center">4</td>
+                <td align="center">350</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">593</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n76-k4.opt">P-n76-k4.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n76-k5.vrp">P-n76-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">75</td>
+                <td align="center">5</td>
+                <td align="center">280</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">627</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n76-k5.opt">P-n76-k5.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n101-k4.vrp">P-n101-k4.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">100</td>
+                <td align="center">4</td>
+                <td align="center">400</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">681</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/P/P-n101-k4.opt">P-n101-k4.opt
+                    </a></td>
+             </tr>
+              </table>
+
+<ul><font size="4" face="Arial Black">
+    <li><a NAME="E" href="ftp://branchandcut.org/pub/data/VRP/E/">Christofides
+    and Eilon</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-E.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-E.zip">zip
+    file</a>)</li></font>
+</ul>
+
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n13-k4.vrp">E-n13-k4.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Explicit</td>
+                <td align="center">12</td>
+                <td align="center">5</td>
+                <td align="center">6000</td>
+                <td align="center">0.76</td>
+                <td align="center">0</td>
+                <td align="center">247</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n13-k4.opt">E-n13-k4.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n22-k4.vrp">E-n22-k4.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">21</td>
+                <td align="center">4</td>
+                <td align="center">6000</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">375</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n22-k4.opt">E-n22-k4.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n23-k3.vrp">E-n23-k3.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">22</td>
+                <td align="center">3</td>
+                <td align="center">4500</td>
+                <td align="center">0.75</td>
+                <td align="center">0</td>
+                <td align="center">569</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n23-k3.opt">E-n23-k3.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n30-k3.vrp">E-n30-k3.vrp</a>**</td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">29</td>
+                <td align="center">3</td>
+                <td align="center">4500</td>
+                <td align="center">0.94</td>
+                <td align="center">0</td>
+                <td align="center">534</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n30-k3.opt">E-n30-k3.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n31-k7.vrp">E-n31-k7.vrp</a>**</td>
+                <td align="center">General</td>
+                <td align="center">Explicit</td>
+                <td align="center">30</td>
+                <td align="center">7</td>
+                <td align="center">140</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">379</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n31-k7.opt">E-n31-k7.opt
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n33-k4.vrp">E-n33-k4.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">32</td>
+                <td align="center">4</td>
+                <td align="center">8000</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">835</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n33-k4.opt">E-n33-k4.opt
+                    </a></td>
+            </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n51-k5.vrp">E-n51-k5.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">50</td>
+                <td align="center">5</td>
+                <td align="center">160</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">521</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n51-k5.opt">E-n51-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k7.vrp">E-n76-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">75</td>
+                <td align="center">7</td>
+                <td align="center">220</td>
+                <td align="center">0.89</td>
+                <td align="center">0</td>
+                <td align="center">682</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k7.opt">E-n76-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k8.vrp">E-n76-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">75</td>
+                <td align="center">8</td>
+                <td align="center">180</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">735</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k7.opt">E-n76-k8.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k10.vrp">E-n76-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">75</td>
+                <td align="center">10</td>
+                <td align="center">140</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">830</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k10.opt">E-n76-k10.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k14.vrp">E-n76-k14.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">75</td>
+                <td align="center">14</td>
+                <td align="center">100</td>
+                <td align="center">0.97</td>
+                <td align="center">0</td>
+                <td align="center">1021</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n76-k14.opt">E-n76-k14.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n101-k8.vrp">E-n101-k8.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">100</td>
+                <td align="center">8</td>
+                <td align="center">200</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">815</td>
+                 <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n101-k8.opt">E-n101-k8.opt
+                    </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n101-k14.vrp">E-n101-k14.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">100</td>
+                <td align="center">14</td>
+                <td align="center">112</td>
+                <td align="center">0.93</td>
+                <td align="center">0</td>
+                <td align="center">1067</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/E/E-n101-k14.opt">E-n101-k14.opt
+                    </a></td>
+            </tr>
+              </table>
+
+<p> ** Note that for these instances, increasing the number of trucks by 1 
+decreases the optimal value. </p>
+
+<ul><font size="4" face="Arial Black">
+    <li><a NAME="F" href="ftp://branchandcut.org/pub/data/VRP/F/">Fisher</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-F.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-F.zip">zip
+    file</a>)</li></font>
+</ul>
+
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/F/F-n45-k4.vrp">F-n45-k4.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">44</td>
+                <td align="center">4</td>
+                <td align="center">2010</td>
+                <td align="center">0.90</td>
+                <td align="center">0</td>
+                <td align="center">724</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/F/F-n45-k4.opt">F-n45-k4.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/F/F-n72-k4.vrp">F-n72-k4.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">71</td>
+                <td align="center">4</td>
+                <td align="center">30000</td>
+                <td align="center">0.96</td>
+                <td align="center">0</td>
+                <td align="center">237</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/F/F-n72-k4.opt">F-n72-k4.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/F/F-n135-k7.vrp">F-n135-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">134</td>
+                <td align="center">7</td>
+                <td align="center">2210</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">1162</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/F/F-n135-k7.opt">F-n135-k7.opt
+                    </a></td>
+            </tr>
+              </table>
+
+ <ul><font size="4" face="Arial Black">
+    <li><a NAME="G" href="ftp://branchandcut.org/pub/data/VRP/G/">Gillet and 
+    Johnson</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-G.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-G.zip">zip
+    file</a>)</li></font>
+</ul>
+
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/G/G-n262-k25.vrp">G-n262-k25.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">261</td>
+                <td align="center">25</td>
+                <td align="center">500</td>
+                <td align="center">0.97</td>
+                <td align="center">13.48</td>
+                <td align="center">5853</td>
+            </tr>
+		  </table>
+
+<ul><font size="4" face="Arial Black">
+   <li><a NAME="M" href="ftp://branchandcut.org/pub/data/VRP/M/">Christofides,
+   Mingozzi, and Toth</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-M.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-M.zip">zip
+    file</a>)</li></font>
+</ul>
+
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/M/M-n101-k10.vrp">M-n101-k10.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">100</td>
+                <td align="center">10</td>
+                <td align="center">200</td>
+                <td align="center">0.91</td>
+                <td align="center">0</td>
+                <td align="center">820</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/M/M-n101-k10.opt">M-n101-k10.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/M/M-n121-k7.vrp">M-n121-k7.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">120</td>
+                <td align="center">7</td>
+                <td align="center">200</td>
+                <td align="center">0.98</td>
+                <td align="center">0</td>
+                <td align="center">1034</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/M/M-n121-k7.opt">M-n121-k7.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/M/M-n151-k12.vrp">M-n151-k12.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">150</td>
+                <td align="center">12</td>
+                <td align="center">200</td>
+                <td align="center">0.93</td>
+                <td align="center">7.69</td>
+                <td align="center">1053</td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/M/M-n200-k16.vrp">M-n200-k16.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">199</td>
+                <td align="center">16</td>
+                <td align="center">200</td>
+                <td align="center">1.00</td>
+                <td align="center"></td>
+                <td align="center"></td>
+            </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/M/M-n200-k17.vrp">M-n200-k17.vrp
+                    </a></td>
+                <td align="center">General</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">199</td>
+                <td align="center">17</td>
+                <td align="center">200</td>
+                <td align="center">0.94</td>
+                <td align="center">13.55</td>
+                <td align="center">1373</td>
+            </tr>
+		  </table>
+    
+<ul><font size="4" face="Arial Black">
+    <li><a NAME="V" href="ftp://branchandcut.org/pub/data/VRP/V/">Converted TSPLIB
+    Problems</a>
+    (<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-V.tgz">tar 
+    file</a>)(<a href="ftp://branchandcut.org/pub/data/VRP/Vrp-Set-V.zip">zip
+    file</a>)</li></font>
+</ul>
+
+<table border="2" cellpadding="4" width="100%">
+            <tr>
+                <th align="center" width="14%" bgcolor="#708090">Problem Instance</th>
+                <th align="center" width="10%" bgcolor="#708090">Demand Type</th>
+                <th align="center" width="10%" bgcolor="#708090">Distance Type</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Customers</th>
+                <th align="center" width="12%" bgcolor="#708090"># of Vehicles</th>
+                <th align="center" width="10%" bgcolor="#708090">Vehicle Capacity</th>
+                <th align="center" width="12%" bgcolor="#708090">Tightness (Demand/Capacity)</th>
+                <th align="center" width="8%" bgcolor="#708090">Gap %</th>
+                <th align="center" width="12%" bgcolor="#708090">Upper Bound</th>
+                <th align="center" width="18%" bgcolor="#708090">Optimal Solution</th>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/att-n48-k4.vrp">att-n48-k4.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Euc 2D</td>
+                <td align="center">47</td>
+                <td align="center">4</td>
+                <td align="center">15</td>
+                <td align="center">0.73</td>
+                <td align="center">0</td>
+                <td align="center">40002</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/att-n48-k4.opt">att-n48-k4.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/bayg-n29-k4.vrp">bayg-n29-k4.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">28</td>
+                <td align="center">4</td>
+                <td align="center">8</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">2050</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/bayg-n29-k4.opt">bayg-n29-k4.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/bays-n29-k5.vrp">bays-n29-k5.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">28</td>
+                <td align="center">5</td>
+                <td align="center">6</td>
+                <td align="center">0.93</td>
+                <td align="center">0</td>
+                <td align="center">2963</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/bays-n29-k5.opt">bays-n29-k5.opt
+                     </a></td>
+           </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/dantzig-n42-k4.vrp">dantzig-n42-k4.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">41</td>
+                <td align="center">4</td>
+                <td align="center">11</td>
+                <td align="center">0.93</td>
+                <td align="center">0</td>
+                <td align="center">1142</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/dantzig-n42-k4.opt">dantzig-n42-k4.opt
+                    </a></td>
+            </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/fri-n26-k3.vrp">fri-n26-k3.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">25</td>
+                <td align="center">3</td>
+                <td align="center">10</td>
+                <td align="center">0.83</td>
+                <td align="center">0</td>
+                <td align="center">1353</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/fri-n26-k3.opt">fri-n26-k3.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n17-k3.vrp">gr-n17-k3.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">16</td>
+                <td align="center">3</td>
+                <td align="center">6</td>
+                <td align="center">0.89</td>
+                <td align="center">0</td>
+                <td align="center">2685</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n17-k3.opt">gr-n17-k3.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n21-k3.vrp">gr-n21-k3.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">20</td>
+                <td align="center">3</td>
+                <td align="center">7</td>
+                <td align="center">0.95</td>
+                <td align="center">0</td>
+                <td align="center">3704</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n21-k3.opt">gr-n21-k3.opt
+                     </a></td>
+           </tr>
+             <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n24-k4.vrp">gr-n24-k4.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">23</td>
+                <td align="center">4</td>
+                <td align="center">7</td>
+                <td align="center">0.82</td>
+                <td align="center">0</td>
+                <td align="center">2053</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n24-k4.opt">gr-n24-k4.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n48-k3.vrp">gr-n48-k3.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">47</td>
+                <td align="center">3</td>
+                <td align="center">16</td>
+                <td align="center">0.98</td>
+                <td align="center">0</td>
+                <td align="center">5985</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/gr-n48-k3.opt">gr-n48-k3.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/hk-n48-k4.vrp">hk-n48-k4.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">47</td>
+                <td align="center">4</td>
+                <td align="center">15</td>
+                <td align="center">0.78</td>
+                <td align="center">0</td>
+                <td align="center">14749</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/hk-n48-k4.opt">hk-n48-k4.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/swiss-n42-k5.vrp">swiss-n42-k5.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Explicit</td>
+                <td align="center">41</td>
+                <td align="center">5</td>
+                <td align="center">9</td>
+                <td align="center">0.92</td>
+                <td align="center">0</td>
+                <td align="center">1668</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/swiss-n42-k5.opt">swiss-n42-k5.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/ulysses-n16-k3.vrp">ulysses-n16-k3.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Geo</td>
+                <td align="center">15</td>
+                <td align="center">3</td>
+                <td align="center">5</td>
+                <td align="center">1.00</td>
+                <td align="center">0</td>
+                <td align="center">7965</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/ulysses-n16-k3.opt">ulysses-n16-k3.opt
+                    </a></td>
+            </tr>
+            <tr>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/ulysses-n22-k4.vrp">ulysses-n22-k4.vrp
+                    </a></td>
+                <td align="center">Unit</td>
+                <td align="center">Geo</td>
+                <td align="center">21</td>
+                <td align="center">4</td>
+                <td align="center">6</td>
+                <td align="center">0.88</td>
+                <td align="center">0</td>
+                <td align="center">9179</td>
+                <td align="center"><a href="ftp://branchandcut.org/pub/data/VRP/V/ulysses-n22-k4.opt">ulysses-n22-k4.opt
+                    </a></td>
+            </tr>
+              </table>
+
+<hr>
+
+<p>This page maintained by Ted Ralphs (<a
+href="mailto:ted@branchandcut.org">ted@branchandcut.org</a>)</p>
+
+<p>Last updated October 3, 2003</p>
+
+<p>&nbsp;</p>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1452273-2";
+urchinTracker();
+</script>
+</body>
+</html>

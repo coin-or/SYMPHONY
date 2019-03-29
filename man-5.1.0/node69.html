@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Node Processing Module</TITLE>
+<META NAME="description" CONTENT="The Node Processing Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node70.html">
+<LINK REL="previous" HREF="node68.html">
+<LINK REL="up" HREF="node66.html">
+<LINK REL="next" HREF="node70.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1355"
+  HREF="node70.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1351"
+  HREF="node66.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1345"
+  HREF="node68.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1353"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1356"
+  HREF="node70.html">The Cut Generation Module</A>
+<B>Up:</B> <A NAME="tex2html1352"
+  HREF="node66.html">Modular Implementation</A>
+<B> Previous:</B> <A NAME="tex2html1346"
+  HREF="node68.html">The Tree Management Module</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00533300000000000000">
+The Node Processing Module</A>
+</H3>
+
+<P>
+The <SPAN  CLASS="textit">node processing</SPAN> (NP) module is the most complex and
+computationally intensive of the five processes. Its job is to perform
+the bounding and branching operations. These operations
+are, of course, central to the performance of the algorithm. Functions
+performed by the LP module are:
+
+<UL>
+<LI>Inform the tree manager when a new subproblem is needed.
+</LI>
+<LI>Receive a subproblem and process it in conjunction
+        with the cut generator and the cut pool.
+</LI>
+<LI>Decide which cuts should be sent to the global pool to
+        be made available to other NP modules.
+</LI>
+<LI>If necessary, choose a branching object and send its
+        description back to the tree manager.
+</LI>
+<LI>Perform the fathoming operation, including generating
+        variables. 
+</LI>
+</UL> 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-11-07</I>
+</ADDRESS>
+</BODY>
+</HTML>

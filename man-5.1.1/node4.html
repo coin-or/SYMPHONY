@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>What's New</TITLE>
+<META NAME="description" CONTENT="What's New">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node5.html">
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node5.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html440"
+  HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html436"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html430"
+  HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html438"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html441"
+  HREF="node5.html">A Brief History</A>
+<B>Up:</B> <A NAME="tex2html437"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html431"
+  HREF="node3.html">Introducing SYMPHONY 5.1.1</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00220000000000000000">
+What's New</A>
+</H1>
+
+<P>
+In SYMPHONY 5.0, we introduced a number of new features that give SYMPHONY
+some unique capabilities. These include the ability to solve biobjective
+integer programs, the ability to warms start the solution procedure, and the
+ability to perform basic sensitivity analyses. These capabilities have been
+further developed and enhanced in Version 5.1.1. Other new features and
+enhancements are listed below.
+
+<P>
+
+<UL>
+<LI>SYMPHONY now has an interactive optimizer that can be used through a
+command shell. In both the sequential and parallel configurations, the user
+can set parameters, load and solve instances interactively, and display
+results and statistics. For Windows users, this means that SYMPHONY can be
+invoked using the familiar procedure of ``double-clicking'' on the
+
+<FONT COLOR="#a52a2a"><TT>symphony.exe</TT></FONT> file in Windows Explorer.
+
+<P>
+</LI>
+<LI>SYMPHONY now supports automatic configuration using the new COIN-OR
+build system and the GNU autotools. Using the autotools, it is now possible to
+build SYMPHONY in most operating systems and with most common compilers
+without user intervention.
+
+<P>
+</LI>
+<LI>Both the distributed and shared memory parallel configurations are once
+  again fully implemented, tested, and supported. The user can now build and
+  execute custom SYMPHONY applications in parallel, as well as solving generic
+  MILPs in parallel "out of the box."
+
+<P>
+</LI>
+<LI>There are now additional options for warm starting. The user can trim the
+warm starting tree before starting to resolve a problem. More specifically,
+the user can decide to initiate warm starting with a predefined partition of
+the final branch-and-cut tree resulting from a previous solution procedure.
+This partition can include either a number of nodes created first during the
+solution procedure or all of the nodes above a given level of the tree.
+
+<P>
+</LI>
+<LI>The COIN-OR repository, the current host of SYMPHONY has
+  recently undergone some significant improvements of its own that have
+  resulted in improved services to users, detailed below. 
+
+<P>
+
+<UL>
+<LI>SYMPHONY has a new development Web site, where users can submit trouble
+  tickets, browse the source code interactively, and get up-to-date
+  information on development. The address of the new site is
+  <TT><A NAME="tex2html4"
+  HREF="https://projects.coin-or.org/SYMPHONY">https://projects.coin-or.org/SYMPHONY</A></TT>.
+
+<P>
+</LI>
+<LI>SYMPHONY is now hosted using subversion, a version control system with
+  features vastly improved over CVS, the previous hosting software. This has
+  required some reorganization and renaming of the header files.
+
+<P>
+</LI>
+<LI>SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
+  to improved procedures for producing stable releases, it will now be much
+  easier for us to determine the exact version of SYMPHONY and all other COIN
+  projects you are using when you report a bug.
+
+<P>
+</LI>
+<LI>SYMPHONY is now distributed with all COIN software needed to build a
+  complete solver. Previously, other COIN software packages had to be
+  downloaded and installed separately.
+
+<P>
+</LI>
+</UL>
+
+<P>
+</LI>
+</UL>
+
+<P>
+Two features have been deprecated and are no longer supported:
+
+<P>
+
+<UL>
+<LI>The native interfaces to OSL and CPLEX are now deprecated and no longer
+supported. These solvers can be called through the COIN-OR OSI interface.
+
+<P>
+</LI>
+<LI>Column generation functionality has also been officially deprecated. For
+now, there are a number of other software packages that offer better
+functionality than SYMPHONY for implementing branch and price algorithms.
+
+<P>
+</LI>
+</UL>
+
+<P>
+There were a few minor changes to the API from the previous version of
+SYMPHONY to version 5.1.1. 
+
+<P>
+
+<UL>
+<LI>First and foremost, the name of the main header file for SYMPHONY has
+been changed from 
+<FONT COLOR="#a52a2a"><TT>symphony_api.h</TT></FONT> to 
+<FONT COLOR="#a52a2a"><TT>symphony.h</TT></FONT> (though the
+former has been retained for backward compatibility purposes).
+
+<P>
+</LI>
+<LI>The user can now execute a primal heuristic in the
+<TT>
+<FONT COLOR="#000000"> user_is_feasible()</FONT></TT> callback and return the solution to SYMPHONY, which
+required the arguments of this function to be changed slightly.
+
+<P>
+</LI>
+<LI>Several new subroutines were added to the callable library API.
+
+<P>
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html440"
+  HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html436"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html430"
+  HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html438"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html441"
+  HREF="node5.html">A Brief History</A>
+<B>Up:</B> <A NAME="tex2html437"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html431"
+  HREF="node3.html">Introducing SYMPHONY 5.1.1</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-04</I>
+</ADDRESS>
+</BODY>
+</HTML>

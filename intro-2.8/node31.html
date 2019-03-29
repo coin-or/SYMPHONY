@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Maintaining and Scanning the Pool</TITLE>
+<META NAME="description" CONTENT="Maintaining and Scanning the Pool">
+<META NAME="keywords" CONTENT="symphony">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="symphony.css">
+<LINK REL="next" HREF="node32.html">
+<LINK REL="previous" HREF="node30.html">
+<LINK REL="up" HREF="node30.html">
+<LINK REL="next" HREF="node32.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html381"
+ HREF="node32.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html379"
+ HREF="node30.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html373"
+ HREF="node30.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html382"
+ HREF="node32.html">Using Multiple Pools</A>
+<B>Up:</B> <A NAME="tex2html380"
+ HREF="node30.html">The Cut Pool Process</A>
+<B> Previous:</B> <A NAME="tex2html374"
+ HREF="node30.html">The Cut Pool Process</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00055100000000000000">
+Maintaining and Scanning the Pool</A>
+</H3>
+
+<P>
+The cut pool's primary job is to receive a fractional solution from an
+LP process and return cuts from the pool that are violated by it. The
+cuts are stored along with two pieces of information--the level of
+the tree on which the cut was generated, known simply as the <EM>level</EM> of the cut, and the number of times it has been checked for
+violation since the last time it was actually found to be violated,
+known as the number of <EM>touches</EM>. The number of touches a cut has
+can be used as a simplistic measure of its effectiveness. Since the pool
+can get quite large, the user can choose to scan only cuts whose
+number of touches is below a specified threshold and/or cuts that were
+generated on a level at or above the current one in the tree. The idea
+behind this second criteria is to try to avoid checking cuts that were
+not generated ``nearby'' in the tree, as they are less likely to be
+effective. Any cut that was generated at a level in the tree that is
+below the level of the current node must have been generated in a
+different part of the tree. This is admittedly a naive method. 
+
+<P>
+On the other hand, the user may define her own measure of quality for
+each cut and that will be used instead. For example, the degree of
+violation is a simple example. This measure of quality must be
+computed by the user since the cut pool does not know anything about
+the packed cuts. The quality is recomputed every time the user checks
+the cut for violation and a running average is used as the final
+quality measure. The cuts in the pool are periodically sorted by this
+measure of quality and only the highest quality cuts are checked each
+time. All duplicate cuts, as well as all cuts whose number of touches
+has exceeded or quality is below a specified threshold are
+periodically purged from the pool to keep it as small as possible.
+
+<P>
+<HR>
+<A NAME="tex2html381"
+ HREF="node32.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html379"
+ HREF="node30.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html373"
+ HREF="node30.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A>   <A NAME="tex2html1"
+ HREF="symphony.html"><IMG
+ WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+ SRC="contents_motif.gif"
+ ALT="contents_motif.gif"></A>
+<BR>
+<B> Next:</B> <A NAME="tex2html382"
+ HREF="node32.html">Using Multiple Pools</A>
+<B>Up:</B> <A NAME="tex2html380"
+ HREF="node30.html">The Cut Pool Process</A>
+<B> Previous:</B> <A NAME="tex2html374"
+ HREF="node30.html">The Cut Pool Process</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-13</I>
+</ADDRESS>
+</BODY>
+</HTML>

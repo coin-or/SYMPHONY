@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Master Process parameters</TITLE>
+<META NAME="description" CONTENT="Master Process parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node139.html">
+<LINK REL="previous" HREF="node137.html">
+<LINK REL="up" HREF="node136.html">
+<LINK REL="next" HREF="node139.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html2061"
+  HREF="node139.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2057"
+  HREF="node136.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2051"
+  HREF="node137.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2059"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2062"
+  HREF="node139.html">Draw Graph parameters</A>
+<B>Up:</B> <A NAME="tex2html2058"
+  HREF="node136.html">SYMPHONY Parameters</A>
+<B> Previous:</B> <A NAME="tex2html2052"
+  HREF="node137.html">Global parameters</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000122000000000000000">
+Master Process parameters</A>
+</H2>
+<DL>
+<DT><STRONG><TT>M_verbosity</TT> - integer (0).</STRONG></DT>
+<DD><P>
+</DD>
+<DT><STRONG><TT>M_random_seed</TT> - integer (17).</STRONG></DT>
+<DD>A random seed just for the Master Process.
+
+<P>
+</DD>
+<DT><STRONG><TT>upper_bound</TT> - double (no upper bound).</STRONG></DT>
+<DD>This parameter is used if the user wants to artificially impose an
+upper bound (for instance if a solution of that value is already
+known).
+
+<P>
+<A NAME="upper_bound_estimate"></A></DD>
+<DT><STRONG><TT>upper_bound_estimate</TT> - double (no estimate).</STRONG></DT>
+<DD>This parameter is used if the user wants to provide an estimate of the
+optimal value which will help guide the search. This is used in
+conjunction with the diving strategy <A HREF="node140.html#diving_strategy"><TT>BEST_ESTIMATE</TT></A>.
+
+<P>
+</DD>
+<DT><STRONG><TT>tm_exe, dg_exe</TT> - strings (``tm'', ``dg'').</STRONG></DT>
+<DD>The name of the executable files of the TM and DG processes. Note that
+the TM executable name may have extensions that depend on the
+configuration of the modules, but the default is always set to the
+file name produced by the make file. If you change the name of the
+treemanager executable from the default, you must set this parameter
+to the new name.
+
+<P>
+</DD>
+<DT><STRONG><TT>tm_debug, dg_debug</TT> - boolean (both <TT>FALSE</TT>).</STRONG></DT>
+<DD>Whether these processes should be started under a debugger or not (see
+<A HREF="node67.html#debugging-PVM">9.7.2</A> for more details on this).
+
+<P>
+</DD>
+<DT><STRONG><TT>tm_machine</TT> - string (empty string).</STRONG></DT>
+<DD>On which processor of the virtual machine the TM should be run. Leaving this
+parameter as an empty string means arbitrary selection.
+
+<P>
+</DD>
+<DT><STRONG><TT>do_draw_graph</TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>Whether to start up the DG process or not (see Section <A HREF="node70.html#IGD">9.7.5</A> for
+an introduction to this).
+
+<P>
+</DD>
+<DT><STRONG><TT>do_branch_and_cut</TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>Whether to run the branch and cut algorithm or not. (Set this to <TT>FALSE</TT> to run the user's heuristics only.)
+
+<P>
+</DD>
+</DL>
+
+<P>
+<HR>
+<A NAME="tex2html2061"
+  HREF="node139.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2057"
+  HREF="node136.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2051"
+  HREF="node137.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2059"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html2062"
+  HREF="node139.html">Draw Graph parameters</A>
+<B>Up:</B> <A NAME="tex2html2058"
+  HREF="node136.html">SYMPHONY Parameters</A>
+<B> Previous:</B> <A NAME="tex2html2052"
+  HREF="node137.html">Global parameters</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

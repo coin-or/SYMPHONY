@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Developing an Application</TITLE>
+<META NAME="description" CONTENT="Developing an Application">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node54.html">
+<LINK REL="previous" HREF="node52.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node54.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html849"
+ HREF="node54.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html846"
+ HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html840"
+ HREF="node52.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html848"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html850"
+ HREF="node54.html">Configuring the Modules</A>
+<B>Up:</B> <A NAME="tex2html847"
+ HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html841"
+ HREF="node52.html">The LP Engine</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000911000000000000000">
+Developing an Application</A>
+</H2>
+
+<P>
+Once the user functions are filled in, all that remains is to compile
+the application. The distribution comes with two make files that
+facilitate this process. The primary make file resides in the root
+directory. The user make file resides in the user's subdirectory,
+initially called <TT>User/</TT>. There are a number of variables that must
+be set in the primary make file. Read the comments in the file <TT>SYMPHONY-2.8/Makefile</TT> to ensure that everything is set properly. The
+user make file shouldn't require much modification unless you add
+source files other than the ones included in the distribution or
+change their names.
+
+<P>
+When you are ready, type ``<TT>make</TT>'' to make the executables.
+ SYMPHONY will create three subdirectories--<TT>User/obj.*</TT>, <TT>User/bin.*</TT>, and <TT>User/dep.*</TT> where * is a number corresponding
+the current architecture (determined by the <TT>PVM_ARCH</TT>
+environment variable). Note that if you don't have PVM installed, you
+should either modify the make file appropriately (read the make file
+to see how to do this) or set the <TT>PVM_ARCH</TT> environment variable
+by hand. If your architecture is not be listed in the make file,
+edit it by following the example set by the architectures already
+included. Make sure to set the corresponding path variables properly.
+Be sure to also set the proper links from the <TT>$PVM_ROOT/bin/$PVM_ARCH</TT> as explained in the previous section
+if you are compiling a distributed version.
+
+<P>
+<HR>
+<A NAME="tex2html849"
+ HREF="node54.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html846"
+ HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html840"
+ HREF="node52.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html848"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html850"
+ HREF="node54.html">Configuring the Modules</A>
+<B>Up:</B> <A NAME="tex2html847"
+ HREF="node40.html">Developing Applications with SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html841"
+ HREF="node52.html">The LP Engine</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Parallel Configurations</TITLE>
+<META NAME="description" CONTENT="Parallel Configurations">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node94.html">
+<LINK REL="previous" HREF="node92.html">
+<LINK REL="up" HREF="node92.html">
+<LINK REL="next" HREF="node94.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1668"
+  HREF="node94.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1664"
+  HREF="node92.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1658"
+  HREF="node92.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1666"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1669"
+  HREF="node94.html">Inter-process Communication</A>
+<B>Up:</B> <A NAME="tex2html1665"
+  HREF="node92.html">Parallelizing BCP</A>
+<B> Previous:</B> <A NAME="tex2html1659"
+  HREF="node92.html">Parallelizing BCP</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00551000000000000000">
+Parallel Configurations</A>
+</H2>
+
+<P>
+SYMPHONY supports numerous configurations, ranging from completely
+sequential to fully parallel, allowing efficient execution in many
+different computational settings. As described in the previous
+section, there are five modules in the standard distributed
+configuration. Various subsets of these modules can be
+combined to form separate executables capable of communicating
+with each other across a network. When two or more modules are combined,
+they simply communicate through shared-memory instead of through
+message-passing. However, they are also forced to run in sequential
+fashion in this case, unless the user chooses to enable threading
+using an OpenMP compliant compiler (see next section). 
+
+<P>
+As an example, the default distributed configuration includes a
+separate executable for each module type, allowing full parallelism.
+However, if cut generation is fast and not memory-intensive,
+it may not be worthwhile to have the NP module and its associated cut
+generator work independently, as this increases communication
+overhead without much potential benefit. In this case, the cut
+generator functions can be called directly from the NP module,
+creating a single, more efficient executable.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2014-10-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

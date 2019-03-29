@@ -1,0 +1,438 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Reference</TITLE>
+<META NAME="description" CONTENT="Reference">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node261.html">
+<LINK REL="previous" HREF="node75.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node101.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1703"
+  HREF="node101.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1699"
+  HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1693"
+  HREF="node99.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1701"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1704"
+  HREF="node101.html">Callable Library C API</A>
+<B>Up:</B> <A NAME="tex2html1700"
+  HREF="man.html">SYMPHONY 5.0 User's Manual</A>
+<B> Previous:</B> <A NAME="tex2html1694"
+  HREF="node99.html">Other Resources</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00800000000000000000"></A>
+<A NAME="SYMPHONY-reference"></A>
+<BR>
+Reference
+</H1>
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html1705"
+  HREF="node101.html">Callable Library C API</A>
+<UL>
+<LI><A NAME="tex2html1706"
+  HREF="node102.html">Primary Interface Functions</A>
+<UL>
+<LI><A NAME="tex2html1707"
+  HREF="node103.html">sym_open_environment</A>
+<LI><A NAME="tex2html1708"
+  HREF="node104.html">sym_create_copy_environment</A>
+<LI><A NAME="tex2html1709"
+  HREF="node105.html">sym_parse_command_line</A>
+<LI><A NAME="tex2html1710"
+  HREF="node106.html">sym_find_initial_bounds</A>
+<LI><A NAME="tex2html1711"
+  HREF="node107.html">sym_load_problem</A>
+<LI><A NAME="tex2html1712"
+  HREF="node108.html">sym_explicit_load_problem</A>
+<LI><A NAME="tex2html1713"
+  HREF="node109.html">sym_solve</A>
+<LI><A NAME="tex2html1714"
+  HREF="node110.html">sym_warm_solve</A>
+<LI><A NAME="tex2html1715"
+  HREF="node111.html">sym_mc_solve</A>
+<LI><A NAME="tex2html1716"
+  HREF="node112.html">sym_create_permanent_cut_pools</A>
+<LI><A NAME="tex2html1717"
+  HREF="node113.html">sym_set_user_data</A>
+<LI><A NAME="tex2html1718"
+  HREF="node114.html">sym_close_environment</A>
+</UL>
+<LI><A NAME="tex2html1719"
+  HREF="node115.html">Parameter Query and Modification</A>
+<UL>
+<LI><A NAME="tex2html1720"
+  HREF="node116.html">sym_set_defaults</A>
+<LI><A NAME="tex2html1721"
+  HREF="node117.html">sym_set_int_param</A>
+<LI><A NAME="tex2html1722"
+  HREF="node118.html">sym_set_dbl_param</A>
+<LI><A NAME="tex2html1723"
+  HREF="node119.html">sym_set_str_param</A>
+<LI><A NAME="tex2html1724"
+  HREF="node120.html">sym_get_int_param</A>
+<LI><A NAME="tex2html1725"
+  HREF="node121.html">sym_get_dbl_param</A>
+<LI><A NAME="tex2html1726"
+  HREF="node122.html">sym_get_str_param</A>
+</UL>
+<LI><A NAME="tex2html1727"
+  HREF="node123.html">Solver Status Query Functions</A>
+<UL>
+<LI><A NAME="tex2html1728"
+  HREF="node124.html">sym_get_status</A>
+<LI><A NAME="tex2html1729"
+  HREF="node125.html">sym_is_proven_optimal</A>
+<LI><A NAME="tex2html1730"
+  HREF="node126.html">sym_is_proven_primal_infeasible</A>
+<LI><A NAME="tex2html1731"
+  HREF="node127.html">sym_is_iteration_limit_reached</A>
+<LI><A NAME="tex2html1732"
+  HREF="node128.html">sym_is_time_limit_reached</A>
+<LI><A NAME="tex2html1733"
+  HREF="node129.html">sym_is_target_gap_achieved</A>
+<LI><A NAME="tex2html1734"
+  HREF="node130.html">sym_is_abandoned</A>
+</UL>
+<LI><A NAME="tex2html1735"
+  HREF="node131.html">Data Query Functions</A>
+<UL>
+<LI><A NAME="tex2html1736"
+  HREF="node132.html">sym_create_copy_mip_desc</A>
+<LI><A NAME="tex2html1737"
+  HREF="node133.html">sym_get_num_cols</A>
+<LI><A NAME="tex2html1738"
+  HREF="node134.html">sym_get_num_rows</A>
+<LI><A NAME="tex2html1739"
+  HREF="node135.html">sym_get_num_elements</A>
+<LI><A NAME="tex2html1740"
+  HREF="node136.html">sym_get_col_lower</A>
+<LI><A NAME="tex2html1741"
+  HREF="node137.html">sym_get_col_upper</A>
+<LI><A NAME="tex2html1742"
+  HREF="node138.html">sym_get_row_sense</A>
+<LI><A NAME="tex2html1743"
+  HREF="node139.html">sym_get_rhs</A>
+<LI><A NAME="tex2html1744"
+  HREF="node140.html">sym_get_row_range</A>
+<LI><A NAME="tex2html1745"
+  HREF="node141.html">sym_get_row_lower</A>
+<LI><A NAME="tex2html1746"
+  HREF="node142.html">sym_get_row_upper</A>
+<LI><A NAME="tex2html1747"
+  HREF="node143.html">sym_get_obj_coeff</A>
+<LI><A NAME="tex2html1748"
+  HREF="node144.html">sym_get_obj2_coeff</A>
+<LI><A NAME="tex2html1749"
+  HREF="node145.html">sym_get_obj_sense</A>
+<LI><A NAME="tex2html1750"
+  HREF="node146.html">sym_is_continuous</A>
+<LI><A NAME="tex2html1751"
+  HREF="node147.html">sym_is_binary</A>
+<LI><A NAME="tex2html1752"
+  HREF="node148.html">sym_is_integer</A>
+<LI><A NAME="tex2html1753"
+  HREF="node149.html">sym_get_infinity</A>
+<LI><A NAME="tex2html1754"
+  HREF="node150.html">sym_get_col_solution</A>
+<LI><A NAME="tex2html1755"
+  HREF="node151.html">sym_get_row_activity</A>
+<LI><A NAME="tex2html1756"
+  HREF="node152.html">sym_get_obj_val</A>
+<LI><A NAME="tex2html1757"
+  HREF="node153.html">sym_get_primal_bound</A>
+<LI><A NAME="tex2html1758"
+  HREF="node154.html">sym_get_iteration_count</A>
+</UL>
+<LI><A NAME="tex2html1759"
+  HREF="node155.html">Data Modification Functions</A>
+<UL>
+<LI><A NAME="tex2html1760"
+  HREF="node156.html">sym_set_obj_coeff</A>
+<LI><A NAME="tex2html1761"
+  HREF="node157.html">sym_set_obj2_coeff</A>
+<LI><A NAME="tex2html1762"
+  HREF="node158.html">sym_set_col_lower</A>
+<LI><A NAME="tex2html1763"
+  HREF="node159.html">sym_set_col_upper</A>
+<LI><A NAME="tex2html1764"
+  HREF="node160.html">sym_set_row_lower</A>
+<LI><A NAME="tex2html1765"
+  HREF="node161.html">sym_set_row_upper</A>
+<LI><A NAME="tex2html1766"
+  HREF="node162.html">sym_set_row_type</A>
+<LI><A NAME="tex2html1767"
+  HREF="node163.html">sym_set_obj_sense</A>
+<LI><A NAME="tex2html1768"
+  HREF="node164.html">sym_set_col_solution</A>
+<LI><A NAME="tex2html1769"
+  HREF="node165.html">sym_set_primal_bound</A>
+<LI><A NAME="tex2html1770"
+  HREF="node166.html">sym_set_continuous</A>
+<LI><A NAME="tex2html1771"
+  HREF="node167.html">sym_set_integer</A>
+<LI><A NAME="tex2html1772"
+  HREF="node168.html">sym_set_col_names</A>
+<LI><A NAME="tex2html1773"
+  HREF="node169.html">sym_add_col</A>
+<LI><A NAME="tex2html1774"
+  HREF="node170.html">sym_add_row</A>
+<LI><A NAME="tex2html1775"
+  HREF="node171.html">sym_delete_cols</A>
+<LI><A NAME="tex2html1776"
+  HREF="node172.html">sym_delete_rows</A>
+</UL>
+<LI><A NAME="tex2html1777"
+  HREF="node173.html">Warm Starting Functions</A>
+<UL>
+<LI><A NAME="tex2html1778"
+  HREF="node174.html">sym_write_warm_start_desc</A>
+<LI><A NAME="tex2html1779"
+  HREF="node175.html">sym_read_warm_start</A>
+<LI><A NAME="tex2html1780"
+  HREF="node176.html">sym_delete_warm_start</A>
+<LI><A NAME="tex2html1781"
+  HREF="node177.html">sym_get_warm_start</A>
+<LI><A NAME="tex2html1782"
+  HREF="node178.html">sym_set_warm_start</A>
+<LI><A NAME="tex2html1783"
+  HREF="node179.html">sym_create_copy_warm_start</A>
+</UL>
+<LI><A NAME="tex2html1784"
+  HREF="node180.html">Sensitivity Analysis Functions</A>
+<UL>
+<LI><A NAME="tex2html1785"
+  HREF="node181.html">sym_get_lb_for_new_rhs</A>
+<LI><A NAME="tex2html1786"
+  HREF="node182.html">sym_get_ub_for_new_rhs</A>
+<LI><A NAME="tex2html1787"
+  HREF="node183.html">sym_get_lb_for_new_obj</A>
+<LI><A NAME="tex2html1788"
+  HREF="node184.html">sym_get_ub_for_new_obj</A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html1789"
+  HREF="node185.html">Callable Library C++ API</A>
+<LI><A NAME="tex2html1790"
+  HREF="node186.html">User Callback API</A>
+<UL>
+<LI><A NAME="tex2html1791"
+  HREF="node187.html">Master module callbacks</A>
+<UL>
+<LI><A NAME="tex2html1792"
+  HREF="node188.html">user_usage</A>
+<LI><A NAME="tex2html1793"
+  HREF="node189.html">user_initialize</A>
+<LI><A NAME="tex2html1794"
+  HREF="node190.html">user_readparams</A>
+<LI><A NAME="tex2html1795"
+  HREF="node191.html">user_io</A>
+<LI><A NAME="tex2html1796"
+  HREF="node192.html">user_init_draw_graph</A>
+<LI><A NAME="tex2html1797"
+  HREF="node193.html">user_start_heurs</A>
+<LI><A NAME="tex2html1798"
+  HREF="node194.html">user_initialize_root_node</A>
+<LI><A NAME="tex2html1799"
+  HREF="node195.html">user_receive_feasible_solution</A>
+<LI><A NAME="tex2html1800"
+  HREF="node196.html">user_send_lp_data</A>
+<LI><A NAME="tex2html1801"
+  HREF="node197.html">user_send_cg_data</A>
+<LI><A NAME="tex2html1802"
+  HREF="node198.html">user_send_cp_data</A>
+<LI><A NAME="tex2html1803"
+  HREF="node199.html">user_display_solution</A>
+<LI><A NAME="tex2html1804"
+  HREF="node200.html">user_send_feas_sol</A>
+<LI><A NAME="tex2html1805"
+  HREF="node201.html">user_process_own_messages</A>
+<LI><A NAME="tex2html1806"
+  HREF="node202.html">user_free_master</A>
+</UL>
+<LI><A NAME="tex2html1807"
+  HREF="node203.html">LP module callbacks</A>
+<UL>
+<LI><A NAME="tex2html1808"
+  HREF="node204.html">Data Structures</A>
+<UL>
+<LI><A NAME="tex2html1809"
+  HREF="node205.html">MIPdesc</A>
+</UL>
+<LI><A NAME="tex2html1810"
+  HREF="node206.html">MIPdesc</A>
+<UL>
+<LI><A NAME="tex2html1811"
+  HREF="node207.html">cut_data</A>
+</UL>
+<LI><A NAME="tex2html1812"
+  HREF="node208.html">cut_data</A>
+<UL>
+<LI><A NAME="tex2html1813"
+  HREF="node209.html">waiting_row</A>
+</UL>
+<LI><A NAME="tex2html1814"
+  HREF="node210.html">waiting_row</A>
+<UL>
+<LI><A NAME="tex2html1815"
+  HREF="node211.html">var_desc</A>
+</UL>
+<LI><A NAME="tex2html1816"
+  HREF="node212.html">var_desc</A>
+<LI><A NAME="tex2html1817"
+  HREF="node213.html">Function Descriptions</A>
+<LI><A NAME="tex2html1818"
+  HREF="node214.html">user_receive_lp_data</A>
+<LI><A NAME="tex2html1819"
+  HREF="node215.html">user_create_subproblem</A>
+<LI><A NAME="tex2html1820"
+  HREF="node216.html">user_is_feasible</A>
+<LI><A NAME="tex2html1821"
+  HREF="node217.html">user_send_feasible_solution</A>
+<LI><A NAME="tex2html1822"
+  HREF="node218.html">user_display_lp_solution</A>
+<LI><A NAME="tex2html1823"
+  HREF="node219.html">user_shall_we_branch</A>
+<LI><A NAME="tex2html1824"
+  HREF="node220.html">user_select_candidates</A>
+<LI><A NAME="tex2html1825"
+  HREF="node221.html">user_compare_candidates</A>
+<LI><A NAME="tex2html1826"
+  HREF="node222.html">user_select_child</A>
+<LI><A NAME="tex2html1827"
+  HREF="node223.html">user_print_branch_stat</A>
+<LI><A NAME="tex2html1828"
+  HREF="node224.html">user_add_to_desc</A>
+<LI><A NAME="tex2html1829"
+  HREF="node225.html">user_same_cuts</A>
+<LI><A NAME="tex2html1830"
+  HREF="node226.html">user_unpack_cuts</A>
+<LI><A NAME="tex2html1831"
+  HREF="node227.html">user_send_lp_solution</A>
+<LI><A NAME="tex2html1832"
+  HREF="node228.html">user_logical_fixing</A>
+<LI><A NAME="tex2html1833"
+  HREF="node229.html">user_generate_column</A>
+<LI><A NAME="tex2html1834"
+  HREF="node230.html">user_generate_cuts_in_lp</A>
+<LI><A NAME="tex2html1835"
+  HREF="node231.html">user_print_stat_on_cuts_added</A>
+<LI><A NAME="tex2html1836"
+  HREF="node232.html">user_purge_waiting_rows</A>
+<LI><A NAME="tex2html1837"
+  HREF="node233.html">user_free_lp</A>
+</UL>
+<LI><A NAME="tex2html1838"
+  HREF="node234.html">Cut generator module callbacks</A>
+<UL>
+<LI><A NAME="tex2html1839"
+  HREF="node235.html">user_receive_cg_data</A>
+<LI><A NAME="tex2html1840"
+  HREF="node236.html">user_receive_lp_solution_cg</A>
+<LI><A NAME="tex2html1841"
+  HREF="node237.html">user_find_cuts</A>
+<LI><A NAME="tex2html1842"
+  HREF="node238.html">user_check_validity_of_cut</A>
+<LI><A NAME="tex2html1843"
+  HREF="node239.html">user_free_cg</A>
+</UL>
+<LI><A NAME="tex2html1844"
+  HREF="node240.html">Cut pool module callbacks</A>
+<UL>
+<LI><A NAME="tex2html1845"
+  HREF="node241.html">user_receive_cp_data</A>
+<LI><A NAME="tex2html1846"
+  HREF="node242.html">user_receive_lp_solution_cp</A>
+<LI><A NAME="tex2html1847"
+  HREF="node243.html">user_prepare_to_check_cuts</A>
+<LI><A NAME="tex2html1848"
+  HREF="node244.html">user_check_cut</A>
+<LI><A NAME="tex2html1849"
+  HREF="node245.html">user_finished_checking_cuts</A>
+<LI><A NAME="tex2html1850"
+  HREF="node246.html">user_free_cp</A>
+</UL>
+<LI><A NAME="tex2html1851"
+  HREF="node247.html">Draw graph module callbacks</A>
+<UL>
+<LI><A NAME="tex2html1852"
+  HREF="node248.html">user_dg_process_message</A>
+<LI><A NAME="tex2html1853"
+  HREF="node249.html">user_dg_init_window</A>
+<LI><A NAME="tex2html1854"
+  HREF="node250.html">user_dg_free_window</A>
+<LI><A NAME="tex2html1855"
+  HREF="node251.html">user_interpret_text</A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html1856"
+  HREF="node252.html">Run-time Parameters</A>
+<UL>
+<LI><A NAME="tex2html1857"
+  HREF="node253.html">Global parameters</A>
+<LI><A NAME="tex2html1858"
+  HREF="node254.html">Master module parameters</A>
+<LI><A NAME="tex2html1859"
+  HREF="node255.html">Draw Graph parameters</A>
+<LI><A NAME="tex2html1860"
+  HREF="node256.html">Tree Manager parameters</A>
+<LI><A NAME="tex2html1861"
+  HREF="node257.html">LP parameters</A>
+<LI><A NAME="tex2html1862"
+  HREF="node258.html">Cut Generator Parameters</A>
+<LI><A NAME="tex2html1863"
+  HREF="node259.html">Cut Pool Parameters</A>
+<LI><A NAME="tex2html1864"
+  HREF="node260.html">C++ Interface/OSI Parameters</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

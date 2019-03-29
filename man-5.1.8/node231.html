@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>waiting_row</TITLE>
+<META NAME="description" CONTENT="waiting_row">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node233.html">
+<LINK REL="previous" HREF="node229.html">
+<LINK REL="up" HREF="node224.html">
+<LINK REL="next" HREF="node232.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3769"
+  HREF="node232.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3765"
+  HREF="node224.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3759"
+  HREF="node230.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3767"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3770"
+  HREF="node232.html">var_desc</A>
+<B>Up:</B> <A NAME="tex2html3766"
+  HREF="node224.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3760"
+  HREF="node230.html">waiting_row</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00732400000000000000"></A>
+<A NAME="waiting_row"></A>
+<BR>
+waiting_row
+</H3>
+
+<P>
+A closely related data structure is the <TT>waiting_row</TT>,
+essentially the ``unpacked'' form of a cut. There are six fields.
+
+<P>
+<DL>
+<DT><STRONG><TT>source_pid</TT> -</STRONG></DT>
+<DD>Used internally by SYMPHONY.
+
+<P>
+</DD>
+<DT><STRONG><TT>cut_data *cut</TT> -</STRONG></DT>
+<DD>Pointer to the cut from which the row was generated.
+
+<P>
+</DD>
+<DT><STRONG><TT>int nzcnt, *matind, *matval</TT> -</STRONG></DT>
+<DD>Fields describing the row. <TT>nzcnt</TT> is the number of nonzeros in
+the row, i.e., the length of the <TT>matind</TT> and <TT>matval</TT> arrays,
+which are the variable indices (wrt. the current LP relaxation) and
+nonzero coefficients in the row.
+
+<P>
+</DD>
+<DT><STRONG><TT>double violation</TT> -</STRONG></DT>
+<DD>If the constraint corresponding to the cut is violated, this value
+contains the degree of violation (the absolute value of the difference
+between the row activity level (i.e., lhs) and the right hand
+side). This value does not have to be set by the user.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html3771"
+  HREF="node232.html">var_desc</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-05-20</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>cut_data</TITLE>
+<META NAME="description" CONTENT="cut_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node48.html">
+<LINK REL="previous" HREF="node46.html">
+<LINK REL="up" HREF="node46.html">
+<LINK REL="next" HREF="node48.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html792"
+ HREF="node48.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html789"
+ HREF="node46.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html783"
+ HREF="node46.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html791"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html793"
+ HREF="node48.html">waiting_row</A>
+<B>Up:</B> <A NAME="tex2html790"
+ HREF="node46.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html784"
+ HREF="node46.html">Data Structures</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00032110000000000000">&#160;</A>
+<A NAME="cut_data">&#160;</A>
+<BR>
+cut_data
+</H4>
+
+<P>
+One of the few internally defined data structures that the user has to
+deal with frequently is the <TT>cut_data</TT> data structure, used to
+store the packed form of cuts. This structure has 8 fields listed
+below.
+<DL>
+<DT><STRONG><TT>int size</TT> -</STRONG>
+<DD>The size of the <TT>coef</TT> array.
+<DT><STRONG><TT>char *coef</TT> -</STRONG>
+<DD>An array containing the packed form of the
+cut, which is defined and constructed by the user. Given this packed
+form and a list of the variables active in the current relaxation, the
+user must be able to construct the corresponding constraint.
+<DT><STRONG><TT>double rhs</TT> -</STRONG>
+<DD>The right hand side of the constraint.
+<DT><STRONG><TT>double range</TT> -</STRONG>
+<DD>The range of the constraint. It is zero for
+a standard form constraint. Otherwise, the row activity level is
+limited to between <TT>rhs</TT> and 
+<!-- MATH: ${\tt rhs}+{\tt range}$ -->
+<IMG
+ WIDTH="99" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.gif"
+ ALT="${\tt rhs}+{\tt range}$">.
+<DT><STRONG><TT>char type</TT> -</STRONG>
+<DD>A user-defined type identifier that represents the
+general class that the cut belongs to.
+<DT><STRONG><TT>char sense</TT> -</STRONG>
+<DD>The sense of the constraint. Can be either 'L' 
+(<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img4.gif"
+ ALT="$\leq$">), 'E' (=), 'G' (<IMG
+ WIDTH="18" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img5.gif"
+ ALT="$\geq$">)
+or 'R' (ranged). This may be evident
+from the <TT>type</TT>.
+<DT><STRONG><TT>char branch</TT> -</STRONG>
+<DD>Determines whether the cut can be branched
+on or not. Possible initial values are <TT>DO_NOT_BRANCH_ON_THIS_ROW</TT>
+and <TT>ALLOWED_TO_BRANCH_ON</TT>.
+<DT><STRONG><TT>int name</TT> -</STRONG>
+<DD>Identifier used by  SYMPHONY. The user should not
+set this.
+</DL>
+<P>
+<HR>
+<A NAME="tex2html792"
+ HREF="node48.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html789"
+ HREF="node46.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html783"
+ HREF="node46.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html791"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html793"
+ HREF="node48.html">waiting_row</A>
+<B>Up:</B> <A NAME="tex2html790"
+ HREF="node46.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html784"
+ HREF="node46.html">Data Structures</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

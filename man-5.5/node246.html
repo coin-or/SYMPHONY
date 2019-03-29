@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_send_lp_solution</TITLE>
+<META NAME="description" CONTENT="user_send_lp_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node247.html">
+<LINK REL="previous" HREF="node245.html">
+<LINK REL="up" HREF="node222.html">
+<LINK REL="next" HREF="node247.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3941"
+  HREF="node247.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3937"
+  HREF="node222.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3931"
+  HREF="node245.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3939"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3942"
+  HREF="node247.html">user_logical_fixing</A>
+<B>Up:</B> <A NAME="tex2html3938"
+  HREF="node222.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3932"
+  HREF="node245.html">user_unpack_cuts</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION007322000000000000000"></A> 
+<A NAME="user_send_lp_solution"></A>
+<BR>
+user_send_lp_solution
+</H3>
+[cf]user_send_lp_solution 
+<PRE>
+int user_send_lp_solution(void *user, int varnum, var_desc **vars, 
+                          double *x, int where)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This function is only used in the case of parallel execution. 
+The user has the option to send the LP solution to either the cut pool
+or the cut generator in some user-defined form if desired. There are
+two default options--sending the indices and values for all nonzero
+variables (<TT>SEND_NONZEROS</TT>) and sending the indices and values
+for all fractional variables (<TT>SEND_FRACTIONS</TT>).
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int varnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>The number of variables currently in the LP
+relaxation. (The length of the <TT>*vars</TT> and <TT>x</TT> arrays.)</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>var_desc **vars</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>The variables currently in the LP relaxation.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *x</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>Values of the above variables.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int where</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=286>Where the solution is to be sent--<TT>LP_SOL_TO_CG</TT> or <TT>LP_SOL_TO_CP</TT>.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>Error. No message will be sent.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>User packed and sent the message.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>Regulated by the <TT>pack_lp_solution_default</TT>
+parameter, initially set to <TT>SEND_NOZEROS</TT>.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>SEND_NONZEROS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>Send user indices and values of variables
+at nonzero level.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>SEND_FRACTIONS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=316>Send user indices and values of variables
+at fractional level.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>fathom_branch()</TT> after an LP relaxation has
+been solved. The message is always sent to the cut generator (if there is
+one). The message is sent to the cut pool if a search tree node at the top of
+a chain is being processed (except at the root in the first phase), or if a
+given number (<TT>cut_pool_check_freq</TT>) of LP relaxations have
+been solved since the last check.
+
+<P>
+</DD>
+<DT><STRONG>Note:</STRONG></DT>
+<DD>
+
+<P>
+The wrapper automatically packs the level, index, and iteration number
+corresponding to the current LP solution within the current search
+tree node, as well as the objective value and upper bound in case the
+solution is sent to a cut generator. This data will be unpacked by
+SYMPHONY on the receiving end, the user will have to unpack there exactly
+what he has packed here.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3941"
+  HREF="node247.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3937"
+  HREF="node222.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3931"
+  HREF="node245.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3939"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3942"
+  HREF="node247.html">user_logical_fixing</A>
+<B>Up:</B> <A NAME="tex2html3938"
+  HREF="node222.html">LP module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3932"
+  HREF="node245.html">user_unpack_cuts</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2013-09-15</I>
+</ADDRESS>
+</BODY>
+</HTML>

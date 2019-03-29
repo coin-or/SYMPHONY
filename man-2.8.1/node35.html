@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Parallelizing BCP</TITLE>
+<META NAME="description" CONTENT="Parallelizing BCP">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node40.html">
+<LINK REL="previous" HREF="node21.html">
+<LINK REL="up" HREF="man.html">
+<LINK REL="next" HREF="node36.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html624"
+ HREF="node36.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html621"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html615"
+ HREF="node34.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html623"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html625"
+ HREF="node36.html">Details of the Parallel</A>
+<B>Up:</B> <A NAME="tex2html622"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html616"
+ HREF="node34.html">Using Multiple Pools</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00080000000000000000">&#160;</A>
+<A NAME="parallelizing">&#160;</A>
+<BR>
+Parallelizing BCP
+</H1>
+
+<P>
+Because of the clear partitioning of work that occurs when the
+branching operation generates new subproblems, branch and bound
+algorithms lend themselves well to parallelization. As a result, there
+is already a significant body of research on performing branch and
+bound in parallel environments. We again point the reader to the
+survey of parallel branch and bound algorithms by Gendron and Crainic
+[<A
+ HREF="node136.html#G&amp;C">14</A>], as well as other references such as [<A
+ HREF="node136.html#PICO">11</A>,<A
+ HREF="node136.html#G&amp;K">16</A>,<A
+ HREF="node136.html#R&amp;K">31</A>,<A
+ HREF="node136.html#K&amp;R">20</A>].
+
+<P>
+In parallel BCP, as in general branch and bound, there are two major
+sources of parallelism. First, it is clear that any number of
+subproblems on the current candidate list can be processed
+simultaneously. Once a subproblem has been added to the list, it can
+be properly processed before, during, or after the processing of any
+other subproblem. This is not to say that processing a particular node
+at a different point in the algorithm won't produce different
+results--it most certainly will--but the algorithm will terminate
+correctly in any case. The second major source of parallelism is to
+parallelize the processing of individual subproblems. By allowing
+separation to be performed in parallel with the solution of the linear
+programs, we can theoretically process a node in little more than the
+amount of time it takes to solve the sequence of LP relaxations. Both
+of these sources of parallelism can be easily exploited using the
+ SYMPHONY framework.
+
+<P>
+The most straightforward parallel implementation, which is the one we
+currently employ, is a master-slave model, in which there is a central
+manager responsible for partitioning the work and parceling it out to
+the various slave processes that perform the actual computation. The
+reason we chose this approach is because it allows memory-efficient
+data structures for sequential computation and yet is conceptually
+easy to parallelize. Unfortunately, this approach does have limited
+scalability. For further discussions on the scalibility of BCP algorithms and
+approaches to improving it, see [<A
+ HREF="node136.html#symphony1">21</A>] and [<A
+ HREF="node136.html#ALPS">22</A>].
+
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html626"
+ HREF="node36.html">Details of the Parallel Implementation</A>
+<UL>
+<LI><A NAME="tex2html627"
+ HREF="node37.html">Parallel Configurations</A>
+<LI><A NAME="tex2html628"
+ HREF="node38.html">Inter-process Communication</A>
+<LI><A NAME="tex2html629"
+ HREF="node39.html">Fault Tolerance</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+<A NAME="tex2html624"
+ HREF="node36.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html621"
+ HREF="man.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html615"
+ HREF="node34.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html623"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html625"
+ HREF="node36.html">Details of the Parallel</A>
+<B>Up:</B> <A NAME="tex2html622"
+ HREF="man.html">SYMPHONY 2.8 User's Manual </SUP></A>
+<B> Previous:</B> <A NAME="tex2html616"
+ HREF="node34.html">Using Multiple Pools</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

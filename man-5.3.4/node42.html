@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Display Menu</TITLE>
+<META NAME="description" CONTENT="Display Menu">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node43.html">
+<LINK REL="previous" HREF="node41.html">
+<LINK REL="up" HREF="node37.html">
+<LINK REL="next" HREF="node43.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html975"
+  HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html971"
+  HREF="node37.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html965"
+  HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html973"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html976"
+  HREF="node43.html">Sub Menu Browsing</A>
+<B>Up:</B> <A NAME="tex2html972"
+  HREF="node37.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A NAME="tex2html966"
+  HREF="node41.html">Set Menu</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00415000000000000000">
+Display Menu</A>
+</H2>
+
+<P>
+The 
+<FONT COLOR="#a52a2a"><TT>Display</TT></FONT> submenu is used to print out results and statistics of the
+solution process after a 
+<FONT COLOR="#a52a2a"><TT>solve</TT></FONT> call. To enter this submenu and see
+available options, type 
+<FONT COLOR="#a52a2a"><TT>display</TT></FONT> and then 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT> or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT>:
+
+<PRE>
+ SYMPHONY: display
+ Please type 'help'/'?' to see the display options!
+ SYMPHONY\Display: help
+
+ List of display options:
+
+ solution     : display the column values
+ obj          : display the objective value
+ stats        : display the statistics
+ parameter    : display the value of a parameter
+
+ back         : leave this menu
+ quit/exit    : leave the optimizer
+
+ SYMPHONY\Display:
+</PRE>
+Clearly, in order to display column solutions and the optimal solution value, 
+you need to type 
+<FONT COLOR="#a52a2a"><TT>solution</TT></FONT> and then 
+<FONT COLOR="#a52a2a"><TT>obj</TT></FONT>:
+
+<PRE>
+ SYMPHONY\Display: solution
+ Optimal Solution found!
+ +++++++++++++++++++++++++++++++++++++++++++++++
+ Nonzero column names and values in the solution
+ +++++++++++++++++++++++++++++++++++++++++++++++
+ COL00002      3.000
+ COL00006      1.000
+
+ SYMPHONY\Display: obj
+ Objective Value: -40.000000
+ SYMPHONY\Display:
+</PRE>
+You can also display the values of SYMPHONY's run-time parameters (see Section
+<A HREF="node273.html#params">6.4</A>) by moving into 
+<FONT COLOR="#a52a2a"><TT>parameters</TT></FONT> submenu: 
+
+<PRE>
+ SYMPHONY\Display: parameter
+ Please type 'help'/'?' to see the list of available parameters!
+ SYMPHONY\Display\Parameter:
+</PRE>
+For instance, in order to display the verbosity level, type 
+<FONT COLOR="#a52a2a"><TT>verbosity</TT></FONT>:
+
+<PRE>
+ SYMPHONY\Display\Parameter: verbosity 
+ The value of verbosity: 3
+ SYMPHONY\Display\Parameter:
+</PRE>
+As in Set submenu, typing 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT> or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT> will display only a subset of 
+available run-time parameters. However, you are allowed to display the value of
+any of the parameters given in Section <A HREF="node273.html#params">6.4</A>. 
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-05-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

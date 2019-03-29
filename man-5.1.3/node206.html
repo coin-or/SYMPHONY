@@ -1,0 +1,663 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Callable Library C++ API</TITLE>
+<META NAME="description" CONTENT="Callable Library C++ API">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node207.html">
+<LINK REL="previous" HREF="node118.html">
+<LINK REL="up" HREF="node117.html">
+<LINK REL="next" HREF="node207.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3365"
+  HREF="node207.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3361"
+  HREF="node117.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3355"
+  HREF="node205.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3363"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3366"
+  HREF="node207.html">User Callback API</A>
+<B>Up:</B> <A NAME="tex2html3362"
+  HREF="node117.html">Reference</A>
+<B> Previous:</B> <A NAME="tex2html3356"
+  HREF="node205.html">sym_get_ub_for_new_obj</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00720000000000000000"></A>
+<A NAME="C++_Interface"></A>
+<BR>
+Callable Library C++ API
+</H1><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">SYMPHONY's C++ interface is derived from COIN-OR's Open Solver Interface
+(OSI). The OSI methods are implemented simply as wrapped calls to the SYMPHONY
+C callable library just described. For instance, when an instance of the OSI
+interface class is constructed, a call is made to
+<TT>sym_open_environment()</TT> and a pointer to the environment is stored
+in the class and when the OSI object is destroyed,
+<TT>sym_close_environment</TT> is called to destroy the environment object. 
+Most subsequent calls within the class can then be made without
+any arguments. To fully support SYMPHONY's capabilities, we have 
+extended the OSI interface to include some other methods not in the base 
+class. For example, we added calls equivalent to our 
+<TT>sym_parse_command_line()</TT> and <TT>sym_find_initial_bounds()</TT>.
+Additionally, SYMPHONY has a warm start class derived from the CoinWarmStart 
+base class to support the new functionalities of the MILP warm starting such 
+as <TT>sym_get_warm_start</TT> and <TT>sym_set_warm_start</TT>. They are 
+also implemented as wrapped calls to the C interface library. 
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">In order to have the whole list of the methods and information 
+regarding their usage, see the OSI SYMPHONY interface and SYMPHONY warm start
+header files (<TT>OsiSymSolverInterface.hpp</TT> and 
+<TT>SymWarmStart.hpp</TT>). Here, we will give the table of the C library 
+equivalent calls of the C++ interface routines with brief descriptions:
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">15cm12cm
+</FONT></FONT><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT><FONT COLOR="#a52a2a"><B>C++ Interface</B><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT><FONT COLOR="#a52a2a"><B>C Interface</B><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT><FONT COLOR="#a52a2a"><B>Description</B></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+OsiSymSolverInterface </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_open_environment </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+create a new environment.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+loadProblem </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_load_problem </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+load the problem read trough an MPS or GMPL file</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+branchAndBound </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_solve/sym_warm_solve </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+solve the MILP problem from scratch or </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> from a warm start if loaded. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+resolve </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_warm_solve </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+re-solve the MILP problem after some modifications.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+initialSolve </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_solve </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+solve the MILP problem from scratch.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+multiCriteriaBranchAndBound </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_mc_solve </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+solve the multi criteria problem.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setInitialData </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_defaults </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the parameters to their defaults.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+parseCommandLine </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_parse_command_line </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+read the command line arguments.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+findInitialBounds </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_find_initial_bounds </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+find the initial bounds via the user defined heuristics.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+createPermanentCutPools </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_create_permanent_cut_pools </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+save the global cuts. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+loadProblem </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_explicit_load_problem </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+load the problem through a set of arrays. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getWarmStart </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_warm_start </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the warm start description.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setWarmStart </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_warm_start </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the warm start description. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">  
+getLbForNewRhs </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_lb_for_new_rhs </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+find a lower bound to the new rhs problem</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">  
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">using the post solution info.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getUbForNewRhs </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_lb_for_new_rhs </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+find an upper bound to the new rhs problem.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">using the post solution info.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getLbForNewObj </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_lb_for_new_rhs </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+find a lower bound to the new obj problem.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">using the post solution info.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getUbForNewObj </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_lb_for_new_rhs </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+find an upper bound to the new obj problem.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+</FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">using the post solution info.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+reset </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_close_environment </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+return the allocated memory.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setIntParam </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_int_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the integer type OSI parameter.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setSymParam(int) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_int_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the integer type SYMPHONY parameter.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setDblParam </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_dbl_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the double type OSI parameter.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setSymParam(double) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_dbl_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the double type SYMPHONY parameter.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setStrParam </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_str_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the string type OSI parameter.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setSymParam(string) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_str_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the string type SYMPHONY parameter.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getIntParam </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_int_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the value of the integer type OSI parameter. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getSymParam(int &amp;) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_int_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the value of the integer type SYMPHONY parameter. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getDblParam </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_dbl_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the value of the double type OSI parameter. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getSymParam(double &amp;) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_dbl_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the value of the double type SYMPHONY parameter. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getStrParam </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_str_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the value of the string type OSI parameter. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getSymParam(string &amp;) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_str_param </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the value of the string type SYMPHONY parameter. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isProvenOptimal </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_proven_optimal </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the problem status. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isProvenPrimalInfeasible </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_proven_primal_infeasible </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the problem status. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isPrimalObjectiveLimitReached </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_target_gap_achieved </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the problem status. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isIterationLimitReached </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_iteration_limit_reached </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the problem status. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isTimeLimitReached </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_time_limit_reached </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the problem status. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isTargetGapReached </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_target_gap_achieved </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the problem status. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getNumCols </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_num_cols </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the number of columns. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getNumRows </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_num_rows </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the number of rows. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getNumElements </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_num_elements </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the number of nonzero elements. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getColLower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_col_lower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the column lower bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getColUpper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_col_upper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the column upper bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getRowSense </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_row_sense </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the row senses. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getRightHandSide </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_rhs </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the rhs values. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getRowRange </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_row_range </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the row range values. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getRowLower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_row_lower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the row lower bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getRowUpper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_row_upper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the row upper bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getObjCoefficients </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_obj_coeff </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the objective function vector. </FONT></FONT></TD>
+</TR>
+</TABLE><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">15cm10.5cm
+</FONT></FONT><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"></FONT><FONT COLOR="#a52a2a"><B>C++ Interface</B><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT><FONT COLOR="#a52a2a"><B>C Interface</B><FONT COLOR="#a52a2a"> </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> </FONT></FONT><FONT COLOR="#a52a2a"><B>Description</B></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getObjSense </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_obj_sense </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the objective sense. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isContinuous </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_continuous </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the variable type.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isBinary </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_binary </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+query the variable type.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isInteger </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_integer </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+query the variable type.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isIntegerNonBinary </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+query the variable type.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+isFreeBinary </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_is_binary </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+query the variable type.</FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getMatrixByRow </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the constraint matrix by row oriented. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getMatrixByCol </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+get the constraint matrix by column oriented. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getInfinity </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the infinity definition of SYMPHONY. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getColSolution </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_col_solution </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the current best column solution. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getRowActivity </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_row_activity </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the current row activity. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getObjValue </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_obj_val </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+get the current best objective value. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getPrimalBound </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_primal_bound </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the primal upper bound. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getIterationCount </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_get_iteration_count </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+get the number of the analyzed tree nodes. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setObjCoeff </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_obj_coeff </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the objective function vector. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setObj2Coeff </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_obj2_coeff </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the second objective function vector. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setColLower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_col_lower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the column lower bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setColUpper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_col_upper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the column upper bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setRowLower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_row_lower </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the row lower bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setRowUpper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_row_upper </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the row upper bounds. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setRowType </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_row_type </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the row characteristics. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setObjSense </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_obj_sense </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the objective sense. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setColSolution </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_col_solution </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the current solution. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setContinuous </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_continuous </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the variable type. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setInteger </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_integer </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the variable type. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+setColName </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_set_col_names </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+set the column names. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+addCol </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_add_col </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+add columns to the constraint matrix. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+addRow </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_add_row </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+add rows to the constraint matrix. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+deleteCols </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_delete_cols </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+delete some columns from the constraint matrix. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+deleteRows </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_delete_rows </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+delete some rows from the constraint matrix. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+writeMps </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+write the current problem in MPS format. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+applyRowCut </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+add some row cuts. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+applyColCut </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> - </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+add some column cuts. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+SymWarmStart(warm_start_desc *) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_create_copy_warm_start </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+create a SYMPHONY warm start by copying the given one. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+SymWarmStart(char *) </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_read_warm_start </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+create a SYMPHONY warm start reading from file. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+getCopyOfWarmStartDesc </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_create_copy_warm_start </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+get the copy of the warm start structure. </FONT></FONT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">   
+writeToFile </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> sym_write_warm_start_desc </FONT></FONT></TD>
+<TD ALIGN="LEFT"><FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a"> 
+write the loaded warm start to a file. </FONT></FONT></TD>
+</TR>
+</TABLE><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3365"
+  HREF="node207.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3361"
+  HREF="node117.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3355"
+  HREF="node205.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3363"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3366"
+  HREF="node207.html">User Callback API</A>
+<B>Up:</B> <A NAME="tex2html3362"
+  HREF="node117.html">Reference</A>
+<B> Previous:</B> <A NAME="tex2html3356"
+  HREF="node205.html">sym_get_ub_for_new_obj</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

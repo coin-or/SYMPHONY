@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Modifying Problem Data.</TITLE>
+<META NAME="description" CONTENT="Modifying Problem Data.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node41.html">
+<LINK REL="up" HREF="node40.html">
+<LINK REL="next" HREF="node43.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html962"
+  HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html958"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html954"
+  HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html960"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html963"
+  HREF="node43.html">Bicriteria Solve</A>
+<B>Up:</B> <A NAME="tex2html959"
+  HREF="node40.html">Solve from Warm Start</A>
+<B> Previous:</B> <A NAME="tex2html955"
+  HREF="node41.html">Modifying Parameters.</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00521220000000000000">
+Modifying Problem Data.</A>
+</H4>
+
+<P>
+If the user modifies problem data in between calls to the solver, SYMPHONY
+must make corresponding modifications to the leaf nodes of the current search
+tree to allow execution of the algorithm to continue. In principle, any change
+to the original data that does not invalidate the subproblem warm start data,
+i.e., the basis information for the LP relaxation, can be
+accommodated. Currently, SYMPHONY can only handle modifications to the rim
+vectors of the original MILP. Methods for handling other modifications, such as
+the addition of columns or the modification of the constraint matrix itself,
+will be added in the future. To initialize the algorithm, each leaf node,
+regardless of its status after termination of the previous solve call, must be
+inserted into the queue of candidate nodes and reprocessed with the changed
+rim vectors. After this reprocessing, the computation can continue as usual.
+Optionally, the user can ``trim the tree'' before resolving. This consists of
+locating nodes whose descendants are all likely to be pruned in the resolve
+and eliminating those descendants in favor of processing the parent node
+itself. This ability could be extended to allow changes that invalidate the
+warm start data of some leaf nodes.
+
+<P>
+The ability to resolve after modifying problem data has a wide range of
+applications in practice. One obvious use is to allow dynamic modification of
+problem data during the solve procedure, or even after the procedure has been
+completed. Implementing such a solver is simply a matter of periodically
+stopping to check for user input describing a change to the problem. Another
+obvious application is in situations where it is known a priori that the user
+will be solving a sequence of very similar MILPs. This occurs, for instance,
+when implementing algorithms for multicriteria optimization, as we describe in
+Section <A HREF="node43.html#mc_solve">4.2.1</A>. One approach to this is to solve a given ``base
+problem'' (possibly limiting the size of the warm start tree), save the warm
+start information from the base problem and then start each subsequent call
+from this same checkpoint. Code for implementing this was shown in Figure
+<A HREF="node20.html#warm_start">3.3</A>. 
+
+<P>
+<HR>
+<A NAME="tex2html962"
+  HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html958"
+  HREF="node40.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html954"
+  HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html960"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html963"
+  HREF="node43.html">Bicriteria Solve</A>
+<B>Up:</B> <A NAME="tex2html959"
+  HREF="node40.html">Solve from Warm Start</A>
+<B> Previous:</B> <A NAME="tex2html955"
+  HREF="node41.html">Modifying Parameters.</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

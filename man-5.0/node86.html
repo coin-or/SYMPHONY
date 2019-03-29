@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Working with PVM.</TITLE>
+<META NAME="description" CONTENT="Working with PVM.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node87.html">
+<LINK REL="previous" HREF="node85.html">
+<LINK REL="up" HREF="node85.html">
+<LINK REL="next" HREF="node87.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1537"
+  HREF="node87.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1533"
+  HREF="node85.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1527"
+  HREF="node85.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1535"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1538"
+  HREF="node87.html">Communication with Shared Memory.</A>
+<B>Up:</B> <A NAME="tex2html1534"
+  HREF="node85.html">Unix Operating Systems</A>
+<B> Previous:</B> <A NAME="tex2html1528"
+  HREF="node85.html">Unix Operating Systems</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H4><A NAME="SECTION00771010000000000000"></A>
+<A NAME="PVM"></A>
+<BR>
+Working with PVM.
+</H4>
+To compile a distributed application, it is necessary to install PVM.
+The current version of PVM can be obtained at <TT><A NAME="tex2html26"
+  HREF="http://www.csm.ornl.gov/pvm/">http://www.csm.ornl.gov/pvm/</A></TT>. It should compile and install without
+any problem. You will have to make a few modifications to your <TT>.cshrc</TT> file, such as defining the <TT>PVM_ROOT</TT> environment
+variable, but this is all explained clearly in the PVM documentation.
+Note that all executables (or at least a link to them) must reside in
+the <TT>$PVM_ROOT/bin/$PVM_ARCH</TT> directory in order for parallel
+processes to be spawned correctly. The environment variable <TT>PVM_ARCH</TT> is set in your <TT>.cshrc</TT> file and contains a string
+representing the current architecture type. To run a parallel
+application, you must first start up the daemon on each of the
+machines you plan to use in the computation. How to do this is also
+explained in the PVM documentation.
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

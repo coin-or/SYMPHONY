@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_send_cp_data</TITLE>
+<META NAME="description" CONTENT="user_send_cp_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html731" HREF="node40.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html729" HREF="node26.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html723" HREF="node38.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html733" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html732" HREF="node40.html">user_display_solution</A>
+<B>Up:</B> <A NAME="tex2html730" HREF="node26.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html724" HREF="node38.html">user_send_cg_data</A>
+<BR> <P>
+<H3><A NAME="SECTION000311300000000000000">user_send_cp_data</A></H3>
+<P>
+<A NAME="user_send_cp_data">&#160;</A>
+<PRE>int user_pack_cp_data(void *user, void **user_cp)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user has to send all problem-specific data that will be needed by
+the cut pool in order to store and check cuts. This is one of the few
+places where the user will need to worry about the configuration of
+the modules. If either the tree manager, the LP, or the cut pool are
+running as a separate process(either <TT>COMPILE_IN_LP</TT>, <TT>
+COMPILE_IN_TM</TT>, or <TT>COMPILE_IN_CP</TT> are <TT>FALSE</TT> in the <TT>
+make</TT> file), then the data will be sent and received through
+message-passing. See <A HREF="node76.html#user_receive_cp_data"><TT>user_receive_cp_data()</TT></A> for more
+discussion. Otherwise, it can be copied over directly to the
+user-defined data structure for the CP. In the latter case, <TT>
+*user_cp</TT> is a pointer to the user-defined data structure for the CP
+that must be allocated and initialized. For a discussion of message
+passing in SYMPHONY, see Section <A HREF="node9.html#communication">1.5</A>. The code for the two
+cases is put in the same source file by use of <TT>#ifdef</TT>
+statements. See the comments in the code stub for this function for
+more details.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=640 HEIGHT=59 ALIGN=BOTTOM ALT="tabular753" SRC="img25.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=320 HEIGHT=39 ALIGN=BOTTOM ALT="tabular737" SRC="img23.gif"  > <P> 
+ </DL>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

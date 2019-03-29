@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using Multiple Pools</TITLE>
+<META NAME="description" CONTENT="Using Multiple Pools">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node91.html">
+<LINK REL="up" HREF="node90.html">
+<LINK REL="next" HREF="node93.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1659"
+  HREF="node93.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1655"
+  HREF="node90.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1651"
+  HREF="node91.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1657"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1660"
+  HREF="node93.html">Parallelizing BCP</A>
+<B>Up:</B> <A NAME="tex2html1656"
+  HREF="node90.html">The Cut Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1652"
+  HREF="node91.html">Maintaining and Scanning the</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00545200000000000000"></A>
+<A NAME="multi-cut-pools"></A>
+<BR>
+Using Multiple Pools
+</H3>
+
+<P>
+For several reasons, it may be desirable to have multiple cut pools.
+When there are multiple cut pools, each pool is initially assigned
+to a particular node in the search tree. After being assigned to that
+node, the pool services requests for cuts from that node and all
+of its descendants until such time as one of its descendants gets
+assigned to another cut pool. After that, it continues to
+serve all the descendants of its assigned node that are not assigned
+to other cut pools.
+
+<P>
+Initially, the first cut pool is assigned to the root node. All other cut
+pools are unassigned. During execution, when a new node is sent to be
+processed, the tree manager must determine which cut pool the node should be
+serviced by. The default is to use the same cut pool as its parent. However,
+if there is currently an idle cut pool process (either it has never been
+assigned to any node or all the descendants of its assigned node have been
+processed or reassigned), then that cut pool is assigned to this new node. All
+the cuts currently in the cut pool of its parent node are copied to the new
+pool to initialize it, after which the two pools operate independently on
+their respective subtrees. When generating cuts, the NP module sends the new
+cuts to the cut pool assigned to service the node during whose processing the
+cuts were generated.
+
+<P>
+The primary motivation behind the idea of multiple cut pools is
+two-fold. First, we want simply to limit the size of each pool as
+much as possible. By limiting the number of nodes that a cut pool has
+to service, the number of cuts in the pool will be similarly limited.
+This not only allows cut storage to spread over multiple processors,
+and hence increases the available memory, but at the same time, the
+efficiency with which the cut pool can be scanned for violated cuts is
+also increased. A secondary reason for maintaining multiple cut pools is
+that it allows us to limit the scanning of cuts to only those that
+were generated in the same subtree as the current search node. As
+described above, this helps focus the search and should increase the
+efficiency and effectiveness of the search. This idea also
+allows us to generate locally valid cuts, such as the classical
+Gomory cuts (see [<A
+ HREF="node282.html#nemwol88">28</A>]).
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1659"
+  HREF="node93.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1655"
+  HREF="node90.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1651"
+  HREF="node91.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1657"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1660"
+  HREF="node93.html">Parallelizing BCP</A>
+<B>Up:</B> <A NAME="tex2html1656"
+  HREF="node90.html">The Cut Management Module</A>
+<B> Previous:</B> <A NAME="tex2html1652"
+  HREF="node91.html">Maintaining and Scanning the</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-04</I>
+</ADDRESS>
+</BODY>
+</HTML>

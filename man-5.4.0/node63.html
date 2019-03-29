@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Variables</TITLE>
+<META NAME="description" CONTENT="Variables">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node64.html">
+<LINK REL="previous" HREF="node62.html">
+<LINK REL="up" HREF="node62.html">
+<LINK REL="next" HREF="node64.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1286"
+  HREF="node64.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1282"
+  HREF="node62.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1276"
+  HREF="node62.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1284"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1287"
+  HREF="node64.html">Constraints</A>
+<B>Up:</B> <A NAME="tex2html1283"
+  HREF="node62.html">Data Structures and Storage</A>
+<B> Previous:</B> <A NAME="tex2html1277"
+  HREF="node62.html">Data Structures and Storage</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00532100000000000000"></A>
+<A NAME="variables"></A>
+<BR>
+Variables
+</H3>
+
+<P>
+In SYMPHONY, problem variables are <EM>represented</EM> by a unique global
+index assigned to each variable by the user. This index represents
+each variable's position in a ``virtual'' global list known only to
+the user. The main requirement of this indexing scheme is that, given
+an index and a list of active cuts, the user must be able to generate
+the corresponding column to be added to the matrix. As an example, in
+problems where the variables correspond to the edges of an underlying
+graph, the index could be derived from a lexicographic ordering of the
+edges (when viewed as ordered pairs of nodes).
+
+<P>
+This indexing scheme provides a very compact representation, as well
+as a simple and effective means of moving variables in and out of the
+active set. However, it means that the user must have a priori
+knowledge of all problem variables and a method for indexing them. For
+combinatorial models such as the <EM>Traveling Salesman Problem</EM>,
+this does not present a problem. However, for some set partitioning
+models, for instance, the number of columns may not be known in
+advance. Even if the number of columns is known in advance, a viable
+indexing scheme may not be evident. Eliminating the indexing
+requirement by allowing variables to have abstract, user-defined
+representations (such as we do for cuts), would allow for more
+generality, but would also sacrifice some efficiency. A hybrid scheme,
+allowing the user to have both indexed and <EM>algorithmic</EM> variables
+(variables with user-defined representations) is planned for a future 
+version of SYMPHONY.
+
+<P>
+For efficiency, the problem variables can be divided into two sets, the
+<EM>base variables</EM> and the <EM>extra variables</EM>. The base variables
+are active in all subproblems, whereas the extra variables can be
+added and removed. There is no theoretical difference between
+base variables and extra variables; however, designating a well-chosen
+set of base variables can significantly increase efficiency. Because
+they can move in and out of the problem, maintaining extra variables
+requires additional bookkeeping and computation. If the user has
+reason to believe a priori that a variable is ``good'' or has a high
+probability of having a non-zero value in some optimal solution to the
+problem, then that variable should be designated as a base variable.
+It is up to the user to designate which variables should be active in
+the root subproblem. Typically, when column generation is used, only base 
+variables are active. Otherwise, all variables must be active in the 
+root node.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html1286"
+  HREF="node64.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1282"
+  HREF="node62.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1276"
+  HREF="node62.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1284"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1287"
+  HREF="node64.html">Constraints</A>
+<B>Up:</B> <A NAME="tex2html1283"
+  HREF="node62.html">Data Structures and Storage</A>
+<B> Previous:</B> <A NAME="tex2html1277"
+  HREF="node62.html">Data Structures and Storage</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-07-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

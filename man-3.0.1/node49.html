@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Microsoft Windows</TITLE>
+<META NAME="description" CONTENT="Microsoft Windows">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node48.html">
+<LINK REL="up" HREF="node47.html">
+<LINK REL="next" HREF="node50.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html849"
+  HREF="node50.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html845"
+  HREF="node47.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html841"
+  HREF="node48.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html847"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html850"
+  HREF="node50.html">Advanced Development</A>
+<B>Up:</B> <A NAME="tex2html846"
+  HREF="node47.html">Developing a New Application</A>
+<B> Previous:</B> <A NAME="tex2html842"
+  HREF="node48.html">Unix</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00093200000000000000">
+Microsoft Windows</A>
+</H3>
+
+<P>
+Developing a simple branch and bound solver can be done quite quickly using
+the template provided in the 
+<TT>SYMPHONY<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">Template<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$"></TT> directory. The
+simplest approach is to develop a sequential application, sharing a single
+user data structure among all the modules. Using this approach, an application
+can be developed by filling in only a few simple functions. Here are four
+simple steps to get up and running.
+
+<OL>
+<LI>First open the workspace <TT>SYMPHONY-3.0.1<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">WIN32<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">template.dsw</TT> and modify for your
+local setup, as described in Section <A HREF="node46.html#getting_strated_windows">8.2</A>. Note that
+you will also have to delete the file <TT>vrp.lib</TT> from the symphony
+project and add <TT>template.lib</TT>. It should build right away, although it
+won't run until modified as described below.
+
+<P>
+</LI>
+<LI>First, decide what run-time parameters you might need and what data has 
+to be stored to describe your instance. Edit the file
+<TT>Template<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">include<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">user.h</TT>, adding the appropriate
+fields to the <TT>user_parameter</TT> and <TT>user_problem</TT> structure to
+store the relevant values.
+
+<P>
+</LI>
+<LI>Now edit the file
+<TT>Template<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">Master<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">master_user.c</TT>. If you choose to 
+have all variables in the base set (a good starting point), the only function
+that really needs to be filled out initially is <TT>user_io()</TT>, where you
+can read in the instance data. Note that the name of the file to read the
+instance data from can be specified on the command line using the "-F" switch.
+Also, check out the function
+<TT>user_set_base()</TT>.
+
+<P>
+</LI>
+<LI>Edit the file <TT>Template<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">LP<IMG
+ WIDTH="13" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\backslash$">lp_user.c</TT>. The
+function <TT>user_create_lp()</TT> must be filled out. This is the most
+important function, as it sets up the initial LP relaxation in each search
+node.
+</LI>
+</OL>
+
+<P>
+Now build again and you have a working branch and bound solver! Next you can
+work on filling in more advanced functions and adding cutting planes. See the
+documentation for more information on this.
+
+<P>
+<HR>
+<A NAME="tex2html849"
+  HREF="node50.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html845"
+  HREF="node47.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html841"
+  HREF="node48.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html847"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html850"
+  HREF="node50.html">Advanced Development</A>
+<B>Up:</B> <A NAME="tex2html846"
+  HREF="node47.html">Developing a New Application</A>
+<B> Previous:</B> <A NAME="tex2html842"
+  HREF="node48.html">Unix</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-05-29</I>
+</ADDRESS>
+</BODY>
+</HTML>

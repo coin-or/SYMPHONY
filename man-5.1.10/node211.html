@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_readparams</TITLE>
+<META NAME="description" CONTENT="user_readparams">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node212.html">
+<LINK REL="previous" HREF="node210.html">
+<LINK REL="up" HREF="node208.html">
+<LINK REL="next" HREF="node212.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3504"
+  HREF="node212.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3500"
+  HREF="node208.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3494"
+  HREF="node210.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3502"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3505"
+  HREF="node212.html">user_io</A>
+<B>Up:</B> <A NAME="tex2html3501"
+  HREF="node208.html">Master module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3495"
+  HREF="node210.html">user_initialize</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00731300000000000000"></A>
+<A NAME="user_readparams"></A>
+<BR>
+user_readparams
+</H3>
+[cf]user_readparams
+<PRE>
+int user_readparams(void *user, char *filename, int argc, char **argv)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The user can optionally read in parameter settings from the file named 
+<TT>filename</TT>, specified on the command line using the <TT>-f</TT> switch. 
+The parameter file <TT>filename</TT> can contain both SYMPHONY's built-in
+parameters and user-defined parameters. If desired, the user can open this
+file for reading, scan the file for lines that contain user parameter settings
+and then read the parameter settings. A shell for doing this is set up in the
+in the file <TT>SYMPHONY-5.0/USER/user_master.c</TT>. Also, see the file
+<TT>Master/master_io.c</TT> to see how SYMPHONY does this. 
+<BR>
+<BR>
+The user can also parse the command line arguments for user
+settings. A shell for doing this is also set up in the file
+<TT>SYMPHONY-5.0/USER/user_master.c</TT>. Upper case letters are reserved for
+user-defined command line switches. The switch <TT>-H</TT> is reserved for help
+and calls the user's usage subroutine (see <A HREF="node209.html#user_usage"><TT>user_usage</TT></A>). If the user returns 
+`<TT>USER_DEFAULT</TT>', then SYMPHONY will look for the command-line switches 
+<TT>-F</TT> to specify the file name for reading in the model from either an 
+MPS or a GMPL/AMPL file or <TT>-L</TT> to specify the file name for reading in
+the model from an LP format file. The <TT>-D</TT> command-line switch is used
+to specify an additional data file for GMPL/AMPL models. If the <TT>-D</TT>
+option is not present, SYMPHONY assumes the file is an MPS file.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=281>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char *filename</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=281>The name of the parameter file.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. SYMPHONY stops.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User
+parameters were read successfully.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>SYMPHONY will read
+in the problem instance from either an MPS, LP, or GMPL/AMPL file. The
+command-line switches <TT>-F</TT>, <TT>-L</TT>, and <TT>-D</TT> (as
+appropriate) will be used to specify the model file.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3504"
+  HREF="node212.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3500"
+  HREF="node208.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3494"
+  HREF="node210.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3502"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3505"
+  HREF="node212.html">user_io</A>
+<B>Up:</B> <A NAME="tex2html3501"
+  HREF="node208.html">Master module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3495"
+  HREF="node210.html">user_initialize</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-10-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

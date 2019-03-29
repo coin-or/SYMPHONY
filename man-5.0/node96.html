@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Using the Interactive Graph Drawing Software</TITLE>
+<META NAME="description" CONTENT="Using the Interactive Graph Drawing Software">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node97.html">
+<LINK REL="previous" HREF="node95.html">
+<LINK REL="up" HREF="node91.html">
+<LINK REL="next" HREF="node97.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1659"
+  HREF="node97.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1655"
+  HREF="node91.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1649"
+  HREF="node95.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1657"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1660"
+  HREF="node97.html">Other Debugging Techniques</A>
+<B>Up:</B> <A NAME="tex2html1656"
+  HREF="node91.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1650"
+  HREF="node95.html">Checking the Validity of</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00785000000000000000"></A>
+<A NAME="IGD"></A>
+<BR>
+Using the <TT>Interactive Graph Drawing</TT> Software
+</H2>
+The Interactive Graph Drawing (IGD) software package is included with
+SYMPHONY and SYMPHONY facilitates its use through interfaces with the
+package. The package, which is a Tcl/Tk application, is extremely
+useful for developing and debugging applications involving graph-based
+problems. Given display coordinates for each node in the graph, IGD
+can display support graphs corresponding to fractional solutions with or
+without edge weights and node labels and weights, as well as other
+information. Furthermore, the user can interactively modify the graph
+by, for instance, moving the nodes apart to ``disentangle'' the
+edges. The user can also interactively enter violated cuts through the
+IGD interface.
+
+<P>
+To use IGD, you must have installed PVM since the drawing window runs
+as a separate application and communicates with the user's routines
+through message passing. To compile the graph drawing application,
+type ``<TT>make dg</TT>'' in the SYMPHONY root directory. The user
+routines in the file <TT>user_dg.c</TT> can be filled in, but it is not
+necessary to fill anything in for basic applications. 
+
+<P>
+After compiling <TT>dg</TT>, the user must write some subroutines that
+communicate with <TT>dg</TT> and cause the graph to be drawn.
+Regrettably, this is currently a little more complicated than it needs
+to be and is not well documented. However, by looking at the sample
+application, it should be possible to see how it is done. To
+enable graph drawing, put the line <TT>do_draw_graph 1</TT> into the
+parameter file or use the <TT>-d</TT> command line option. It can be difficult to
+get IGD to work. If you are interested in using it and cannot get it to work,
+feel free to contact me.
+
+<P>
+<HR>
+<A NAME="tex2html1659"
+  HREF="node97.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1655"
+  HREF="node91.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1649"
+  HREF="node95.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1657"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1660"
+  HREF="node97.html">Other Debugging Techniques</A>
+<B>Up:</B> <A NAME="tex2html1656"
+  HREF="node91.html">Debugging Your Application</A>
+<B> Previous:</B> <A NAME="tex2html1650"
+  HREF="node95.html">Checking the Validity of</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2004-11-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Building SYMPHONY Applications</TITLE>
+<META NAME="description" CONTENT="Building SYMPHONY Applications">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node23.html">
+<LINK REL="up" HREF="node19.html">
+<LINK REL="next" HREF="node27.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html747"
+  HREF="node27.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html743"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html739"
+  HREF="node25.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html745"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html748"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+<B>Up:</B> <A NAME="tex2html744"
+  HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A NAME="tex2html740"
+  HREF="node25.html">Distributed-memory architectures</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00322500000000000000"></A>
+<A NAME="build_appl_unix"></A>
+<BR>
+Building SYMPHONY Applications
+</H3>
+
+<P>
+There are a number of sample applications available as examples of how to do
+customized development with SYMPHONY. These include customized solvers for the
+matching problem, the set partitioning problem (simple and advanced versions),
+the vehicle routing and traveling salesman problems, the mixed postman
+problem, the multi-criteria knapsack problem, and the capacitated network
+routing problem. These applications are contained in the
+
+<FONT COLOR="#a52a2a"><TT>SYMPHONY/Applications/</TT></FONT> subdirectory in the distribution. There is also
+a white paper that guides the user through the development of the MATCH solver
+in the 
+<FONT COLOR="#a52a2a"><TT>SYMPHONY/Doc/</TT></FONT> directory. For detailed instructions on developing
+your own application with SYMPHONY, see Chapter <A HREF="node96.html#SYMPHONY-development">5</A>.
+
+<P>
+In order to compile SYMPHONY's applications in Unix-like environments, you
+must first compile a version of the callable library with hooks for the
+callback functions. 
+<PRE>
+ ./configure --with-application
+ make 
+ make install
+</PRE> This will create the application library called 
+<FONT COLOR="#a52a2a"><TT>libSymAppl</TT></FONT> to be used
+while building custom applications. Note that that the generic sequential
+library and executable will also be made and installed.
+
+<P>
+After building the library, go to one of the application subdirectories in the
+
+<FONT COLOR="#a52a2a"><TT>SYMPHONY/Applications/</TT></FONT> directory and type 
+<FONT COLOR="#a52a2a"><TT>make</TT></FONT> there to build
+the corresponding application. For more information, including the parallel
+configuration instructions, see the INSTALL file of the corresponding
+application.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html747"
+  HREF="node27.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html743"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html739"
+  HREF="node25.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html745"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html748"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+<B>Up:</B> <A NAME="tex2html744"
+  HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A NAME="tex2html740"
+  HREF="node25.html">Distributed-memory architectures</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-07-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

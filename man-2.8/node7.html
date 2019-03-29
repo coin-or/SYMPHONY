@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>User-written Functions</TITLE>
+<META NAME="description" CONTENT="User-written Functions">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node8.html">
+<LINK REL="previous" HREF="node6.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node8.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html247"
+ HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html244"
+ HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html238"
+ HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html246"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html248"
+ HREF="node8.html">Data Structures</A>
+<B>Up:</B> <A NAME="tex2html245"
+ HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html239"
+ HREF="node6.html">Source Files</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00025000000000000000">
+User-written Functions</A>
+</H2>
+
+<P>
+The majority of the user functions are called from either the master
+process or the LP process. For these two modules, user functions are
+invoked from so-called <EM>wrapper functions</EM> that provide the
+interface. Each wrapper function is named <TT>*_u()</TT> , where <TT>*</TT>
+is the name of the corresponding user function, and is defined in a
+file called <TT>*_wrapper.c</TT>. The wrapper function first collects
+the necessary data and hands it to the user by calling the user
+function. Based on the return value from the user, the wrapper then
+performs any necessary post-processing. Most user functions are
+designed so that the user can do as little or as much as she likes.
+Where it is feasible, there are default options that allow the user to
+do nothing if the default behavior is acceptable. This is not possible
+in all cases and the user must provide certain functions, such as
+separation.
+
+<P>
+In the next section, the user functions will be described in detail.
+The name of every user written function starts with <TT>user_</TT>.
+There are three kinds of arguments:
+<DL>
+<DT><STRONG>IN:</STRONG>
+<DD>An argument containing information that the user might need
+to perform the function.
+<DT><STRONG>OUT:</STRONG>
+<DD>A pointer to an argument in which the user should
+return a result (requested data, decision, etc.) of the function. 
+<DT><STRONG>INOUT:</STRONG>
+<DD>An argument which contains information the user might need,
+but also for which the user can change the value.
+</DL>The return values from each function are as follows:
+<DL>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><P>
+<TT> ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>Error in the user function. Printing an error message is
+the user's responsibility. Depending on the work the user function was
+supposed to do, the error might be ignored (and some default option
+used), or the process aborts.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><P>
+<TT> USER_AND_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The user implemented both the user function and
+post-processing (post-processing by  SYMPHONY will be skipped).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><P>
+<TT> USER_NO_PP</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The user implemented the user function only.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><P>
+<TT> DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The default option is going to be used (the default is one of
+the built-in options,  SYMPHONY decides which one to use based on initial parameter
+settings and the execution of the algorithm).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><P>
+<TT> built_in_option1 </TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT> built_in_option2 </TT> ...</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=311>The specified built-in option will be used.</TD>
+</TR>
+</TABLE>
+<P>
+<DT><STRONG>Notes:</STRONG>
+<DD>
+<UL>
+<BR>
+
+<P>
+<LI>Sometimes an output is optional. This will always be noted in the
+function descriptions.
+
+<P>
+<LI>If an array has to be returned (i.e., the argument is <TT>type
+**array</TT>) then (unless otherwise noted) the user has to allocate space
+for the array itself and set <TT>*array</TT> to be the array allocated.
+If an output array is optional then the user <EM>must not</EM> set <TT>*array</TT> for the array she is not going to fill up because this is how
+ SYMPHONY decides which optional arrays are filled up.
+
+<P>
+<LI>Some built-in options are implemented so that the user can invoke them
+directly from the user function. This might be useful if, for example,
+the user wants to use different built-in options at different stages
+of the algorithm, or if he wants to do the post-processing himself but
+does not want to implement the option itself.
+</UL>
+<P>
+</DL>
+<P>
+<HR>
+<A NAME="tex2html247"
+ HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html244"
+ HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html238"
+ HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html246"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html248"
+ HREF="node8.html">Data Structures</A>
+<B>Up:</B> <A NAME="tex2html245"
+ HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html239"
+ HREF="node6.html">Source Files</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2000-09-08</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>SYMPHONY Overview</TITLE>
+<META NAME="description" CONTENT="SYMPHONY Overview">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node21.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html478"
+  HREF="node21.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html474"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html470"
+  HREF="node19.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html476"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html479"
+  HREF="node21.html">Details of the Implementation</A>
+<B> Up:</B> <A NAME="tex2html475"
+  HREF="node8.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html471"
+  HREF="node19.html">The Cut Pool Module</A>
+ &nbsp <B>  <A NAME="tex2html477"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00064000000000000000"></A>
+<A NAME="symphony"></A>
+<BR>
+SYMPHONY Overview
+</H2>
+
+<P>
+Currently, SYMPHONY is what is known as a single-pool BCP algorithm.
+The term <EM>single-pool</EM> refers to the fact that there is a single
+central list of candidate subproblems to be processed, which is
+maintained by the tree manager. Most sequential implementations use
+such a single-pool scheme. However, other schemes may be used in
+parallel implementations. For a description of various types of
+parallel branch and bound, see [<A
+ HREF="node146.html#G_SPMamp_C">14</A>].
+
+<P>
+The master module begins by reading in the parameters and problem
+data. After initial I/O is completed, subroutines for finding an
+initial upper bound and constructing the root node are executed.
+During construction of the root node, the user must designate the
+initial set of active cuts and variables, after which the data for the
+root node are sent to the tree manager to initialize the list of
+candidate nodes. The tree manager in turn sets up the cut pool
+module(s), the linear programming module(s), and the cut generator
+module(s). All LP modules are marked as idle. The algorithm is now
+ready for execution.
+
+<P>
+In the steady state, the tree manager functions control the execution by
+maintaining the list of candidate subproblems and sending them to the
+LP modules as they become idle. The LP modules receive nodes from
+the tree manager, process them, branch (if required), and send back
+the identity of the chosen branching object to the tree manager, which
+in turn generates the children and places them on the list of
+candidates to be processed (see Section <A HREF="node26.html#branching">6.2.3</A> for a description 
+of the branching operation). A schematic summary of the algorithm is
+shown in Figure <A HREF="node14.html#overview">4</A>.
+
+<P>
+The preference ordering for processing nodes is a run-time parameter.
+Typically, the node with the smallest lower bound is chosen to be
+processed next since this strategy minimizes the overall size of the
+search tree. However, at times, it will be advantageous to <EM>dive</EM>
+down in the tree. The concepts of <EM>diving</EM> and <EM>search
+chains</EM>, introduced in Section <A HREF="node27.html#tree-management">6.3</A>, extend the basic
+``best-first'' approach.
+
+<P>
+We mentioned earlier that cuts and variables can be treated in a
+somewhat symmetric fashion. However, it should be clear by now
+that our current implementation favors the implementation of
+branch and cut algorithms, where the computational effort spent
+generating cuts dominates that of generating variables. Our methods of
+representation also clearly favor such problems. In a future version
+of the software, we plan to erase this bias by adding additional
+functionality for handling variable generation and storage. This is
+the approach already taken by of COIN/BCP [<A
+ HREF="node146.html#coin-or">8</A>]. For more
+discussion of the reasons for this bias and the differences between
+the treatment of cuts and variables, see Section <A HREF="node25.html#lp-relaxation">6.2.2</A>.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html478"
+  HREF="node21.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html474"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html470"
+  HREF="node19.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html476"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html479"
+  HREF="node21.html">Details of the Implementation</A>
+<B> Up:</B> <A NAME="tex2html475"
+  HREF="node8.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html471"
+  HREF="node19.html">The Cut Pool Module</A>
+ &nbsp <B>  <A NAME="tex2html477"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Ted Ralphs
+2002-10-23
+</ADDRESS>
+</BODY>
+</HTML>

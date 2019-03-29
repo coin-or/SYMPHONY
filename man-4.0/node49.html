@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Compiling the Distributed Version.</TITLE>
+<META NAME="description" CONTENT="Compiling the Distributed Version.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node48.html">
+<LINK REL="up" HREF="node45.html">
+<LINK REL="next" HREF="node50.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html937"
+  HREF="node50.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html933"
+  HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html929"
+  HREF="node48.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html935"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html938"
+  HREF="node50.html">Compiling the Sample Application</A>
+<B>Up:</B> <A NAME="tex2html934"
+  HREF="node45.html">Compiling the Sample Application</A>
+<B> Previous:</B> <A NAME="tex2html930"
+  HREF="node48.html">Compiling the Shared Memory</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00511400000000000000">
+Compiling the Distributed Version.</A>
+</H3>
+
+<P>
+Please note that the distributed-memory parallel version has not been tested
+in Version 4.0 and may be broken. Please let me know if you want to use it and
+I will get it working.
+
+<P>
+
+<UL>
+<LI>If you wish to compile a distributed version of the code, obtain
+and install the <EM><A NAME="tex2html15"
+  HREF="http://www.csm.ornl.gov/pvm/">Parallel Virtual
+Machine</A></EM> (PVM) software, available for free
+from Oak Ridge National Laboratories
+. 
+        See Section <A HREF="node68.html#PVM">4.2.7</A> for more notes on using PVM.
+
+<P>
+</LI>
+<LI>In <TT>SYMPHONY-4.0/Makefile</TT>, be sure to set the <TT>        COMM_PROTOCOL</TT> to <TT>PVM</TT>. Also, in
+        <TT>SYMPHONY-4.0/USER/Makefile</TT>, change one or more of <TT>        COMPILE_IN_TM</TT>, <TT>COMPILE_IN_LP</TT>, <TT>COMPILE_IN_CG</TT>, and
+        <TT>COMPILE_IN_CP</TT>, to <TT>FALSE</TT>, or you will end up with the
+        sequential version. Various combinations of these variables will give
+        you different configurations and different executables. See Section
+        <A HREF="node70.html#configuration">4.2.7</A> for more info on setting them. Also, be sure to
+        set the path variables in the makefile appropriately so that 
+	<TT>make</TT> can find the PVM library.
+
+<P>
+</LI>
+<LI>Type <TT>make</TT> in the <TT>SYMPHPONY-4.0/USER</TT> directory to
+        make the distributed libraries. As in Step 1 of the sequential
+        version, you may type <TT>make clean</TT> after making the
+        library. It should not have to remade again unless you modify
+        SYMPHONY's internal files.
+
+<P>
+</LI>
+<LI>After the SYMPHONY libraries, user code will be compiled and
+        required executables linked.
+
+<P>
+</LI>
+<LI>Make sure there are links from your
+        <TT>$PVM_ROOT/bin/$PVM_ARCH/</TT> directory to each of the
+        executables in the
+        <TT>SYMPHONY-4.0/USER/bin.$(ARCH)/$(LP_SOLVER)</TT> directory. 
+	This is required by PVM.
+
+<P>
+</LI>
+<LI>Start the PVM daemon by typing <TT>pvm</TT> on the command line
+        and then typing <TT>quit</TT>.
+
+<P>
+</LI>
+<LI>As above, test SYMPHONY using the sample MPS file called
+        <TT>sample.mps</TT> is included with the distribution. To specify the
+        file name, use the <TT>-F</TT> command-line option, i.e., type
+        <TT>bin.$(ARCH)/$(LP_SOLVER)/mip -F sample.mps</TT> in the
+        <TT>SYMPHONY-4.0/USER</TT> directory. To obtain more MPS data files
+        for further testing, download the MIPLIB library.
+
+<P>
+</LI>
+<LI>That's it! Now you are ready to develop your own application by
+        modifying the files in the <TT>SYMPHONY-4.0/USER</TT> directory and
+        it's subdirectories. See Section <A HREF="node57.html#development">4.2</A> for more
+        information.
+
+<P>
+</LI>
+</UL>
+
+<P>
+<HR>
+<A NAME="tex2html937"
+  HREF="node50.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html933"
+  HREF="node45.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html929"
+  HREF="node48.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html935"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html938"
+  HREF="node50.html">Compiling the Sample Application</A>
+<B>Up:</B> <A NAME="tex2html934"
+  HREF="node45.html">Compiling the Sample Application</A>
+<B> Previous:</B> <A NAME="tex2html930"
+  HREF="node48.html">Compiling the Shared Memory</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

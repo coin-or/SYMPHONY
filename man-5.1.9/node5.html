@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>A Brief History</TITLE>
+<META NAME="description" CONTENT="A Brief History">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node6.html">
+<LINK REL="previous" HREF="node4.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node6.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html451"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html447"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html441"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html449"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html452"
+  HREF="node6.html">Related Work</A>
+<B>Up:</B> <A NAME="tex2html448"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html442"
+  HREF="node4.html">What's New</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00230000000000000000"></A>
+<A NAME="history"></A>
+<BR>
+A Brief History
+</H1>
+
+<P>
+Since the inception of optimization as a recognized field of study in
+mathematics, researchers have been both intrigued and stymied by the
+difficulty of solving many of the most interesting classes of discrete
+optimization problems. Even combinatorial problems, though conceptually easy
+to model as integer programs, have long remained challenging to solve in
+practice. The last two decades have seen tremendous progress in our ability to
+solve large-scale discrete optimization problems. These advances have
+culminated in the approach that we now call <I>branch and cut</I>, a technique
+(see [<A
+ HREF="node282.html#Grotschel84cut">19</A>,<A
+ HREF="node282.html#padb:branc">29</A>,<A
+ HREF="node282.html#hoff:LP">20</A>]) which brings the computational
+tools of branch and bound algorithms together with the theoretical tools of
+polyhedral combinatorics. Indeed, in 1998, Applegate, Bixby, Chv&#225;tal, and
+Cook used this technique to solve a <EM>Traveling Salesman Problem</EM> instance
+with 13,509 cities, a full order of magnitude larger than what had been
+possible just a decade earlier [<A
+ HREF="node282.html#concorde">2</A>] and two orders of magnitude
+larger than the largest problem that had been solved up until 1978. This feat
+becomes even more impressive when one realizes that the number of variables in
+the standard formulation for this problem is approximately the <EM>square</EM> of
+the number of cities. Hence, we are talking about solving a problem with
+roughly <EM>100 million variables</EM>.
+
+<P>
+There are several reasons for this impressive progress. Perhaps the most
+important is the dramatic increase in available computing power over the last
+decade, both in terms of processor speed and memory. This increase in the
+power of hardware has subsequently facilitated the development of increasingly
+sophisticated software for optimization, built on a wealth of theoretical
+results. As software development has become a central theme of optimization
+research efforts, many theoretical results have been ``re-discovered'' in
+light of their new-found computational importance. Finally, the use of
+parallel computing has allowed researchers to further leverage their gains.
+
+<P>
+Because of the rapidly increasing sophistication of computational techniques,
+one of the main difficulties faced by researchers who wish to apply these
+techniques is the level of effort required to develop an efficient
+implementation. The inherent need for incorporating problem-dependent methods
+(most notably for dynamic generation of variables and cutting planes) has
+typically required the time-consuming development of custom implementations.
+Around 1993, this led to the development by two independent research groups of
+software libraries aimed at providing a generic framework that users could
+easily customize for use in a particular problem setting. One of these groups,
+headed by J&#252;nger and Thienel, eventually produced ABACUS (A Branch And CUt
+System) [<A
+ HREF="node282.html#abacus1">21</A>], while the other, headed by the authors, produced what
+was then known as COMPSys (Combinatorial Optimization Multi-processing
+System). After several revisions to enable more broad functionality, COMPSys
+became SYMPHONY (Single- or Multi-Process Optimization over Networks). A
+version of SYMPHONY written in C++, which we call COIN/BCP has also been
+produced at IBM under the COIN-OR project [<A
+ HREF="node282.html#coin-or">24</A>]. The COIN/BCP package
+takes substantially the same approach and has the same functionality as
+SYMPHONY, but has extended SYMPHONY's capabilities in some areas.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html451"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html447"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html441"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html449"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html452"
+  HREF="node6.html">Related Work</A>
+<B>Up:</B> <A NAME="tex2html448"
+  HREF="node2.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html442"
+  HREF="node4.html">What's New</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2008-10-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

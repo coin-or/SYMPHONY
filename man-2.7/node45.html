@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>cut_data</TITLE>
+<META NAME="description" CONTENT="cut_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html823" HREF="node46.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html821" HREF="node44.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html815" HREF="node44.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html825" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html824" HREF="node46.html">waiting_row</A>
+<B>Up:</B> <A NAME="tex2html822" HREF="node44.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html816" HREF="node44.html">Data Structures</A>
+<BR> <P>
+<H4><A NAME="SECTION00032110000000000000">cut_data</A></H4>
+<P>
+<A NAME="cut_data">&#160;</A>
+One of the few internally defined data structures that the user has to
+deal with frequently is the <TT>cut_data</TT> data structure, used to
+store the packed form of cuts. This structure has 8 fields listed
+below.
+<DL ><DT><STRONG><TT>int size</TT> -</STRONG>
+<DD> The size of the <TT>coef</TT> array.
+<DT><STRONG><TT>char *coef</TT> -</STRONG>
+<DD> An array containing the packed form of the
+cut, which is defined and constructed by the user. Given this packed
+form and a list of the variables active in the current relaxation, the
+user must be able to construct the corresponding constraint.
+<DT><STRONG><TT>double rhs</TT> -</STRONG>
+<DD> The right hand side of the constraint.
+<DT><STRONG><TT>double range</TT> -</STRONG>
+<DD> The range of the constraint. It is zero for
+a standard form constraint. Otherwise, the row activity level is
+limited to between <TT>rhs</TT> and  <IMG WIDTH=93 HEIGHT=22 ALIGN=MIDDLE ALT="tex2html_wrap_inline2622" SRC="img31.gif"  > .
+<DT><STRONG><TT>char type</TT> -</STRONG>
+<DD> A user-defined type identifier that represents the
+general class that the cut belongs to.
+<DT><STRONG><TT>char sense</TT> -</STRONG>
+<DD> The sense of the constraint. Can be either 'L' 
+( <IMG WIDTH=11 HEIGHT=24 ALIGN=MIDDLE ALT="tex2html_wrap_inline2624" SRC="img32.gif"  > ), 'E' (=), 'G' ( <IMG WIDTH=11 HEIGHT=24 ALIGN=MIDDLE ALT="tex2html_wrap_inline2628" SRC="img33.gif"  > ) or 'R' (ranged). This may be evident
+from the <TT>type</TT>.
+<DT><STRONG><TT>char branch</TT> -</STRONG>
+<DD> Determines whether the cut can be branched
+on or not. Possible initial values are <TT>DO_NOT_BRANCH_ON_THIS_ROW</TT>
+and <TT>ALLOWED_TO_BRANCH_ON</TT>.
+<DT><STRONG><TT>int name</TT> -</STRONG>
+<DD> Identifier used by SYMPHONY. The user should not
+set this.
+<P>
+ </DL><BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

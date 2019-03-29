@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Building in a Windows Terminal</TITLE>
+<META NAME="description" CONTENT="Building in a Windows Terminal">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node30.html">
+<LINK REL="previous" HREF="node28.html">
+<LINK REL="up" HREF="node27.html">
+<LINK REL="next" HREF="node30.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html784"
+  HREF="node30.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html780"
+  HREF="node27.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html774"
+  HREF="node28.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html782"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html785"
+  HREF="node30.html">Building with the NMAKE</A>
+<B>Up:</B> <A NAME="tex2html781"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A NAME="tex2html775"
+  HREF="node28.html">Building with the MSVC++</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00323200000000000000"></A>
+<A NAME="using_msdev"></A>
+<BR>
+Building in a Windows Terminal
+</H3>
+
+<P>
+These instructions are for MSVC++ Version 6. Instructions for other versions
+should be similar.
+
+<P>
+
+<UL>
+<LI>Open a command terminal (choose 
+<FONT COLOR="#a52a2a"><TT>Run</TT></FONT> on the Start menu and type
+
+<FONT COLOR="#a52a2a"><TT>cmd</TT></FONT> in the dialogue box). Go to the 
+<FONT COLOR="#a52a2a"><TT>Win32
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="\bgroup\color{Brown}$ \backslash$\egroup"></SPAN>
+</FONT>v6</TT></FONT>
+directory and type 
+
+<PRE>
+ msdev symphony.dsw /make all
+</PRE>
+This will create both the debug and release versions of SYMPHONY. If you 
+want to compile only one of them, type
+
+<PRE>
+ msdev symphony.dsw /make "all - debug"
+</PRE>
+or 
+
+<PRE>
+ msdev symphony.dsw /make "all - release"
+</PRE>
+For each command, the library 
+<FONT COLOR="#a52a2a"><TT>libSymphony.lib</TT></FONT> and the executable 
+
+<FONT COLOR="#a52a2a"><TT>symphony</TT></FONT> will be created in 
+<FONT COLOR="#a52a2a"><TT>Debug</TT></FONT> and/or 
+<FONT COLOR="#a52a2a"><TT>Release</TT></FONT>
+directories.  The library, together with the header files in 
+
+<FONT COLOR="#a52a2a"><TT>SYMPHONY
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="\bgroup\color{Brown}$ \backslash$\egroup"></SPAN>
+</FONT>include
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="\bgroup\color{Brown}$ \backslash$\egroup"></SPAN>
+</FONT></TT></FONT>, can then be 
+used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is 
+described in Section <A HREF="node44.html#callable_library">3.3</A>.
+
+<P>
+</LI>
+<LI>Test the executable by opening Windows Explorer and double-clicking
+on 
+<FONT COLOR="#a52a2a"><TT>symphony.exe</TT></FONT> in the
+
+<FONT COLOR="#a52a2a"><TT>Debug
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="13" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="\bgroup\color{Brown}$ \backslash$\egroup"></SPAN>
+</FONT></TT></FONT> subdirectory. This should open a Window in
+which the interactive solver will appear. Type 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT> or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT> to see
+a list of available commands or see Chapter
+<A HREF="node35.html#API-overview">3</A> for instructions on using the interactive solver.
+
+<P>
+</LI>
+<LI>If you modify the source code of SYMPHONY, type 
+
+<PRE>
+ msdev symphony.dsw /make all /rebuild
+</PRE>
+in order to clean and rebuild everything.
+</LI>
+</UL> 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html784"
+  HREF="node30.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html780"
+  HREF="node27.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html774"
+  HREF="node28.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html782"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html785"
+  HREF="node30.html">Building with the NMAKE</A>
+<B>Up:</B> <A NAME="tex2html781"
+  HREF="node27.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A NAME="tex2html775"
+  HREF="node28.html">Building with the MSVC++</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-11-07</I>
+</ADDRESS>
+</BODY>
+</HTML>

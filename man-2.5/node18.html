@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_readparams</TITLE>
+<META NAME="description" CONTENT="user_readparams">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html342" HREF="node19.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html340" HREF="node15.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html334" HREF="node17.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html343" HREF="node19.html">user_io</A>
+<B>Up:</B> <A NAME="tex2html341" HREF="node15.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html335" HREF="node17.html">user_free_master</A>
+<BR> <P>
+<H3><A NAME="SECTION00021300000000000000">user_readparams</A></H3>
+<P>
+<PRE>void user_readparams(void *user, char *filename)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user reads in parameters from the file named <TT>filename</TT>. The
+file <TT>filename</TT> is a file containing both built-in parameters and
+user parameters. The filename is given as a command line argument when
+starting the application and is then passed to the user. The user must
+open the file for reading, scan the file for lines that contain user
+parameters and then read the parameters in as appropriate. See the
+file <TT>Master/master_io.c</TT> to see how SYMPHONY does this.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=507 HEIGHT=38 ALIGN=BOTTOM ALT="tabular508" SRC="img8.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=405 HEIGHT=38 ALIGN=BOTTOM ALT="tabular510" SRC="img9.gif"  > <P> 
+ </DL>
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

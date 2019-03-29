@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_generate_column</TITLE>
+<META NAME="description" CONTENT="user_generate_column">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node127.html">
+<LINK REL="previous" HREF="node125.html">
+<LINK REL="up" HREF="node100.html">
+<LINK REL="next" HREF="node127.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html2067"
+  HREF="node127.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2063"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2057"
+  HREF="node125.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2065"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html2068"
+  HREF="node127.html">user_generate_cuts_in_lp</A>
+<B>Up:</B> <A NAME="tex2html2064"
+  HREF="node100.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html2058"
+  HREF="node125.html">user_logical_fixing</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION006122200000000000000">
+user_generate_column</A>
+</H3>
+<PRE>
+int user_generate_column(void *user, int generate_what, int cutnum, 
+                         cut_data **cuts, int prevind, int nextind, 
+                         int *real_nextind, double *colval, 
+                         int *colind, int *collen, double *obj,
+                         double *lb, double *ub)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+This function is called when pricing out the columns that are not
+already fixed and are not explicitly represented in the matrix. Only
+the user knows the explicit description of these columns. When a
+missing variable need to be priced, the user is asked to provide the
+corresponding column. SYMPHONY scans through the known variables in the
+order of their user indices. After testing a variable in the matrix
+(<TT>prevind</TT>), SYMPHONY asks the user if there are any missing variables
+to be priced before the next variable in the matrix (<TT>nextind</TT>).
+If there are missing variables before <TT>nextind</TT>, the user has to
+supply the user index of the real next variable (<TT>real_nextind</TT>)
+along with the corresponding column. Occasionally SYMPHONY asks the user to
+simply supply the column corresponding to <TT>nextind</TT>. The <TT>generate_what</TT> flag is used for making a distinction between the two
+cases: in the former case it is set to <TT>GENERATE_REAL_NEXTIND</TT>
+and in the latter it is set to <TT>GENERATE_NEXTIND</TT>.
+
+<P>
+
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>void *user</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int generate_what</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261><TT>GENERATE_NEXTIND</TT> or <TT>GENERATE_REAL_NEXTIND</TT> (see description above).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int cutnum</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>The number of added rows in the LP formulation
+(i.e., the total number of rows less the number of base constraints).
+This is the length of the <TT>**cuts</TT> array.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>cut_data **cuts</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Description of the cuts corresponding to
+the added rows of the current LP formulation. The user is supposed to
+know about the cuts corresponding to the base constraints.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int prevind</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>The last variable processed (<IMG
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img34.png"
+ ALT="$-1$"> if there was
+none) by SYMPHONY.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int nextind</TT></TD>
+<TD ALIGN="LEFT">IN</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>The next variable (<IMG
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img34.png"
+ ALT="$-1$"> if there are none)
+known to SYMPHONY.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *real_nextind</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Pointer to the user index of the next
+variable (<IMG
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img34.png"
+ ALT="$-1$"> if there is none).</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *colval</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Values of the nonzero entries in the
+column of the next variable. (Sufficient space is already allocated for this
+array.)</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *colind</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Row indices of the nonzero entries in the column.
+(Sufficient space is already allocated for this array.)</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>int *collen</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>The length of the <TT>colval</TT> and <TT>colind</TT> arrays.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *obj</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Objective coefficient corresponding to the
+next variable.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *lb</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Lower bound of the next variable.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>double *ub</TT></TD>
+<TD ALIGN="LEFT">OUT</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=261>Upper bound of the next variable.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE CELLPADDING=3>
+<TR><TD ALIGN="LEFT"><TT>USER_ERROR</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>Error. The LP process is aborted.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_SUCCESS</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>User filled out <TT>*real_nextind</TT> and
+generated its column if needed.</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>USER_DEFAULT</TT></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=301>No column generation is done.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><TT>price_all_vars()</TT> and <TT>restore_lp_feasibility()</TT>.
+
+<P>
+</DD>
+<DT><STRONG>Note:</STRONG></DT>
+<DD>
+
+<P>
+<TT>colval</TT>, <TT>colind</TT>, <TT>collen</TT> and <TT>obj</TT> do not need to
+be filled out if <TT>real_nextind</TT> is the same as <TT>nextind</TT> and <TT>generate_what</TT> is <TT>GENERATE_REAL_NEXTIND</TT>.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+<HR>
+<A NAME="tex2html2067"
+  HREF="node127.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html2063"
+  HREF="node100.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html2057"
+  HREF="node125.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html2065"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html2068"
+  HREF="node127.html">user_generate_cuts_in_lp</A>
+<B>Up:</B> <A NAME="tex2html2064"
+  HREF="node100.html">User-written functions of the</A>
+<B> Previous:</B> <A NAME="tex2html2058"
+  HREF="node125.html">user_logical_fixing</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,514 @@
+This is TeX, Version 3.14159 (C version 6.1) (format=latex 97.9.25)  11 FEB 2000 13:48
+**images.tex
+(images.tex
+LaTeX2e <1997/06/01>
+Babel <v3.6h> and hyphenation patterns for american, french, german, spanish, l
+oaded.
+
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/article.cls
+Document Class: article 1997/06/16 v1.3v Standard LaTeX document class
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/size11.clo
+File: size11.clo 1997/06/16 v1.3v Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+\headwidth=\skip43
+(/home/tkr/BB-2.5/Doc2/html.sty
+Package: html 1996/02/01 v1.0 hypertext commands for latex2html (nd, hs)
+\c@lpart=\count87
+\c@lchapter=\count88
+\c@lsection=\count89
+\c@lsubsection=\count90
+\c@lsubsubsection=\count91
+\c@lparagraph=\count92
+\c@lsubparagraph=\count93
+\c@lsubsubparagraph=\count94
+\c@lequation=\count95
+)
+\lthtmlwrite=\write3
+\sizebox=\box26
+(images.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 127.
+LaTeX Font Info:    ... okay on input line 127.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 127.
+LaTeX Font Info:    ... okay on input line 127.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 127.
+LaTeX Font Info:    ... okay on input line 127.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 127.
+LaTeX Font Info:    ... okay on input line 127.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 127.
+LaTeX Font Info:    ... okay on input line 127.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 127.
+LaTeX Font Info:    ... okay on input line 127.
+[1
+
+
+]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 142.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 142.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 142.
+
+Overfull \hbox (1.30746pt too wide) in paragraph at lines 142--162
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 142--162
+
+ []
+
+[2
+
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 171.
+
+(/opt/site/teTeX-0.4pl8/teTeX/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1997/06/16 v2.5e Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 171.
+latex2htmlSize :tex2html_wrap_inline2100: 9.01828pt::0.0pt.
+[3
+
+] [4
+
+] [5
+
+]
+Overfull \hbox (0.67982pt too wide) in paragraph at lines 198--203
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 198--203
+
+ []
+
+[6
+
+] [7
+
+] [8
+
+] [9
+
+] [10
+
+] [11
+
+] [12
+
+] [13
+
+] [14
+
+] [15
+
+]
+Overfull \hbox (14.03232pt too wide) in paragraph at lines 285--301
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 285--301
+
+ []
+
+[16
+
+]
+Overfull \hbox (2.45633pt too wide) in paragraph at lines 304--311
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 304--311
+
+ []
+
+[17
+
+]
+Overfull \hbox (2.45633pt too wide) in paragraph at lines 315--322
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 315--322
+
+ []
+
+[18
+
+]
+Overfull \hbox (0.15993pt too wide) in paragraph at lines 325--333
+[][]  
+ []
+
+[19
+
+] [20
+
+] [21
+
+]
+Overfull \hbox (9.39958pt too wide) in paragraph at lines 360--366
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 360--366
+
+ []
+
+[22
+
+] [23
+
+]
+Overfull \hbox (9.39958pt too wide) in paragraph at lines 378--384
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 378--384
+
+ []
+
+[24
+
+]
+Overfull \hbox (9.39958pt too wide) in paragraph at lines 388--394
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 388--394
+
+ []
+
+[25
+
+] [26
+
+] [27
+
+] [28
+
+]
+latex2htmlSize :tex2html_wrap_inline2102: 6.69167pt::2.43333pt.
+[29
+
+]
+latex2htmlSize :tex2html_wrap_inline2104: 6.96387pt::1.48888pt.
+[30
+
+]
+latex2htmlSize :tex2html_wrap_inline2108: 6.96387pt::1.48888pt.
+[31
+
+] [32
+
+] [33
+
+]
+Overfull \hbox (0.67982pt too wide) in paragraph at lines 461--465
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 461--465
+
+ []
+
+[34
+
+] [35
+
+]
+latex2htmlSize :tex2html_wrap_inline2126: 8.8943pt::0.0pt.
+[36
+
+]
+latex2htmlSize :tex2html_wrap_inline2128: 7.4181pt::0.0pt.
+[37
+
+] [38
+
+] [39
+
+] [40
+
+] [41
+
+]
+Overfull \hbox (2.17589pt too wide) in paragraph at lines 566--580
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 566--580
+
+ []
+
+[42
+
+]
+Underfull \hbox (badness 2828) in paragraph at lines 586--588
+[]\OT1/cmr/m/n/10.95 Regulated by the pa-ram-e-ter \OT1/cmtt/m/n/10.95 is[]feas
+ible[]default\OT1/cmr/m/n/10.95 , but set to
+ []
+
+
+Overfull \hbox (2.27373pt too wide) in paragraph at lines 583--592
+[][]  
+ []
+
+[43
+
+] [44
+
+]
+Overfull \hbox (0.77766pt too wide) in paragraph at lines 610--619
+[][]  
+ []
+
+[45
+
+] [46
+
+]
+Overfull \hbox (1.13672pt too wide) in paragraph at lines 640--655
+[][]  
+ []
+
+[47
+
+]
+
+LaTeX Warning: Reference `cut-data-description' on page 48 undefined on input l
+ine 670.
+
+
+LaTeX Warning: Reference `cut-data-description' on page 48 undefined on input l
+ine 675.
+
+[48
+
+]
+Overfull \hbox (0.3584pt too wide) in paragraph at lines 681--702
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 681--702
+
+ []
+
+[49
+
+] [50
+
+]
+Overfull \hbox (7.62091pt too wide) in paragraph at lines 718--730
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 718--730
+
+ []
+
+[51
+
+] [52
+
+]
+Overfull \hbox (0.83678pt too wide) in paragraph at lines 746--765
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 746--765
+
+ []
+
+[53
+
+] [54
+
+]
+Overfull \hbox (3.05194pt too wide) in paragraph at lines 783--797
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 783--797
+
+ []
+
+[55
+
+] [56
+
+] [57
+
+] [58
+
+] [59
+
+] [60
+
+] [61
+
+] [62
+
+] [63
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 904--905
+[]\OT1/cmr/m/n/10.95 Where the so-lu-tion is to be sent---\OT1/cmtt/m/n/10.95 L
+P[]SOL[]TO[]CG \OT1/cmr/m/n/10.95 or
+ []
+
+[64
+
+]
+Overfull \hbox (1.27536pt too wide) in paragraph at lines 910--921
+[][]  
+ []
+
+[65
+
+]
+Overfull \hbox (2.53394pt too wide) in paragraph at lines 925--936
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 925--936
+
+ []
+
+[66
+
+] [67
+
+] [68
+
+] [69
+
+] [70
+
+] [71
+
+] [72
+
+] [73
+
+]
+latex2htmlSize :tex2html_wrap_inline2150: 8.86255pt::0.0pt.
+[74
+
+] [75
+
+] [76
+
+]
+Overfull \hbox (0.67982pt too wide) in paragraph at lines 1070--1074
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1070--1074
+
+ []
+
+[77
+
+] [78
+
+] [79
+
+] [80
+
+]
+Overfull \hbox (0.67982pt too wide) in paragraph at lines 1102--1107
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1102--1107
+
+ []
+
+[81
+
+] [82
+
+] [83
+
+] [84
+
+] [85
+
+] [86
+
+] [87
+
+] [88
+
+] [89
+
+]
+Underfull \hbox (badness 2529) in paragraph at lines 1197--1199
+[]\OT1/cmr/m/n/10.95 The num-ber of nonzero/fractional vari-ables de-scribed in
+
+ []
+
+[90
+
+] [91
+
+]
+Overfull \hbox (3.03363pt too wide) in paragraph at lines 1216--1227
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1216--1227
+
+ []
+
+[92
+
+] [93
+
+] (images.aux)
+
+LaTeX Warning: There were undefined references.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 388 strings out of 10878
+ 3979 string characters out of 71682
+ 49717 words of memory out of 262141
+ 3337 multiletter control sequences out of 9500
+ 7492 words of font info for 28 fonts, out of 150000 for 255
+ 15 hyphenation exceptions out of 607
+ 21i,10n,21p,237b,211s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on images.dvi (93 pages, 45312 bytes).

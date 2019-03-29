@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>user_usage</TITLE>
+<META NAME="description" CONTENT="user_usage">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node210.html">
+<LINK REL="previous" HREF="node208.html">
+<LINK REL="up" HREF="node208.html">
+<LINK REL="next" HREF="node210.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3482"
+  HREF="node210.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3478"
+  HREF="node208.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3472"
+  HREF="node208.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3480"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3483"
+  HREF="node210.html">user_initialize</A>
+<B>Up:</B> <A NAME="tex2html3479"
+  HREF="node208.html">Master module callbacks</A>
+<B> Previous:</B> <A NAME="tex2html3473"
+  HREF="node208.html">Master module callbacks</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00731100000000000000"></A>
+<A NAME="user_usage"></A>
+<BR>
+user_usage
+</H3>
+[cf]user_usage
+<PRE>
+void user_usage()
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+SYMPHONY's command-line switches are all lower case letters. The user can use
+any upper case letter (except 'H' and as specified below) for command line
+switches to control user-defined parameter settings without the use of a
+parameter file. The function <TT>
+<FONT COLOR="#000000"> user_usage()</FONT></TT> can optionally print out
+usage information for the user-defined command line switches. The command line
+switch <TT>-H</TT> automatically calls the user's usage subroutine. The switch
+<TT>-h</TT> prints SYMPHONY's own usage information. In its default configuration, the
+command-line switch <TT>-F</TT> is used to specify the file in which the
+instance data is contained (either an MPS file or an GMPL/AMPL file). The
+<TT>-D</TT> switch is used to specify the data file if an GMPL/AMPL file is
+being read in (see the README file). The <TT>-L</TT> switch is used to specify
+the data file if a file in LP format is being read in
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2016-02-19</I>
+</ADDRESS>
+</BODY>
+</HTML>

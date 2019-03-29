@@ -1,0 +1,603 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>LP parameters</TITLE>
+<META NAME="description" CONTENT="LP parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node279.html">
+<LINK REL="previous" HREF="node277.html">
+<LINK REL="up" HREF="node273.html">
+<LINK REL="next" HREF="node279.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4343"
+  HREF="node279.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4339"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4333"
+  HREF="node277.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4341"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4344"
+  HREF="node279.html">Cut Generator Parameters</A>
+<B>Up:</B> <A NAME="tex2html4340"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4334"
+  HREF="node277.html">Tree Manager parameters</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00745000000000000000">
+LP parameters</A>
+</H2>
+
+<P>
+<DL>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> LP_verbosity</FONT></TT> - integer (0).</STRONG></DT>
+<DD>[p]LP Parameters!LP_verbosity
+Verbosity level of the LP module.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> set_obj_upper_lim</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!set_obj_upper_lim
+Whether to stop solving the LP relaxation when it's optimal value is
+provably higher than the global upper bound. There are some advantages
+to continuing the solution process anyway. For instance, this results
+in the highest possible lower bound. On the other hand, if the matrix
+is full, this node will be pruned anyway and the rest of the
+computation is pointless. This option should be set at <TT>FALSE</TT> for
+column generation since the LP dual values may not be reliable otherwise.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> try_to_recover_from_error</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!try_to_recover_from_error
+Indicates what should be done in case the LP solver is unable to solve
+a particular LP relaxation because of numerical problems. It is
+possible to recover from this situation but further results may be
+suspect. On the other hand, the entire solution process can be
+abandoned.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> problem_type</FONT></TT> - integer (<TT>ZERO_ONE_PROBLEM</TT>{0}).</STRONG></DT>
+<DD>[p]LP Parameters!problem_type
+The type of problem being solved. Other values are <TT>INTEGER_PROBLEM</TT>{1} or <TT>MIXED_INTEGER_PROBLEM</TT>{2}.
+(Caution: The mixed-integer option is not well tested.)
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> cut_pool_check_frequency</FONT></TT> - integer (10).</STRONG></DT>
+<DD>[p]LP Parameters!cut_pool_check_frequency
+The number of iterations between sending LP solutions to the cut pool
+to find violated cuts. It is not advisable to check the cut pool too
+frequently as the cut pool module can get bogged down and the LP
+solution generally do not change that drastically from one iteration
+to the next anyway.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> not_fixed_storage_size</FONT></TT> - integer (2048).</STRONG></DT>
+<DD>[p]LP Parameters!not_fixed_storage_size
+The <EM>not fixed list</EM> is a partial list of indices of variables not
+in the matrix that have not been fixed by reduced cost. Keeping this
+list allows SYMPHONY to avoid repricing variables (an expensive operation)
+that are not in the matrix because they have already been permanently
+fixed. When this array reaches its maximum size, no more variable
+indices can be stored. It is therefore advisable to keep the maximum
+size of this array as large as possible, given memory limitations.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_non_dual_feas_to_add_min</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_non_dual_feas_to_add_max</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_non_dual_feas_to_add_frac</FONT></TT> 
+- integer, integer, double (20, 200, .05).</STRONG></DT>
+<DD>[p]LP Parameters!max_non_dual_feas_to_add_min
+[p]LP Parameters!max_non_dual_feas_to_add_frac
+These three parameters determine the maximum number of
+non-dual-feasible columns that can be added in any one iteration
+after pricing. This maximum is set to the indicated
+fraction of the current number of active columns unless this numbers
+exceeds the given maximum or is less than the given minimum, in which
+case, it is set to the max or min, respectively.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_not_fixable_to_add_min</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_not_fixable_to_add_max</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_not_fixable_to_add_frac</FONT></TT> - integer, integer, double (100,
+500, .1) </STRONG></DT>
+<DD>[p]LP Parameters!max_not_fixable_to_add_max
+[p]LP Parameters!max_not_fixable_to_add_frac
+As above, these three parameters determine the maximum number of new
+columns to be added to the problem because they cannot be priced out.
+These variables are only added when trying to restore infeasibility
+and usually, this does not require many variables anyway.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> mat_col_compress_num, mat_col_compress_ratio</FONT></TT> - integer,
+double (50, .05).</STRONG></DT>
+<DD>[p]LP Parameters!mat_col_compress_num
+[p]LP Parameters!mat_col_compress_ratio
+Determines when the matrix should be physically compressed. This only
+happens when the number of columns is high enough to make it
+``worthwhile.'' The matrix is physically compressed when the number of
+deleted columns exceeds either an absolute number <EM>and</EM> a specified
+fraction of the current number of active columns.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> mat_row_compress_num, mat_row_compress_ratio</FONT></TT> - integer,
+double (20, .05).</STRONG></DT>
+<DD>[p]LP Parameters!mat_row_compress_num
+[p]LP Parameters!mat_row_compress_ratio
+Same as above except for rows.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> tailoff_gap_backsteps, tailoff_gap_frac</FONT></TT> - integer, double
+(2, .99).</STRONG></DT>
+<DD>[p]LP Parameters!tailoff_gap_backsteps
+[p]LP Parameters!tailoff_gap_frac
+Determines when tailoff is detected in the LP module.
+Tailoff is reported if the average ratio of the current gap to the
+previous iteration's gap over the last <TT>
+<FONT COLOR="#000000"> tailoff_gap_backsteps</FONT></TT>
+iterations wasn't at least <TT>
+<FONT COLOR="#000000"> tailoff_gap_frac</FONT></TT>.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> tailoff_obj_backsteps, tailoff_obj_frac</FONT></TT> - integer, double
+(2, .99).</STRONG></DT>
+<DD>[p]LP Parameters!tailoff_obj_backsteps
+[p]LP Parameters!tailoff_obj_frac
+Same as above, only the ratio is taken with respect to the change in
+objective function values instead of the change in the gap.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> ineff_cnt_to_delete</FONT></TT> - integer (0).</STRONG></DT>
+<DD>[p]LP Parameters!ineff_cnt_to_delete
+Determines after how many iterations of being deemed ineffective a
+constraint is removed from the current relaxation.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> eff_cnt_before_cutpool</FONT></TT> - integer (3).</STRONG></DT>
+<DD>[p]LP Parameters!eff_cnt_before_cutpool
+Determines after how many iterations of being deemed effective each
+cut will be sent to the global pool.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> ineffective_constraints</FONT></TT> - integer
+(<TT>BASIC_SLACKS_ARE_INEFFECTIVE</TT>{2}).</STRONG></DT>
+<DD>[p]LP Parameters!ineffective_constraints
+Determines under what condition a constraint is deemed ineffective in
+the current relaxation. Other possible values are <TT>NO_CONSTRAINT_IS_INEFFECTIVE</TT>{0},  <TT>NONZERO_SLACKS_ARE_INEFFECTIVE</TT>{1}, and 
+<BR><TT>ZERO_DUAL_VALUES_ARE_INEFFECTIVE</TT>{3}.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> base_constraints_always_effective</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!base_constraints_always_effective
+Determines whether the base constraints can ever be removed from the
+relaxation. In some case, removing the base constraints from the
+problem can be disastrous depending on the assumptions made by the cut
+generator.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> branch_on_cuts</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!branch_on_cuts
+This informs the framework whether the user plans on branching on cuts
+or not. If so, there is additional bookkeeping to be done, such as
+maintaining a pool of slack cuts to be used for branching. Therefore,
+the user should not set this flag unless he actually plans on using
+this feature.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> discard_slack_cuts</FONT></TT> - integer (<TT>DISCARD_SLACKS_BEFORE_NEW_ITERATION</TT>{0}).</STRONG></DT>
+<DD>[p]LP Parameters!discard_slack_cuts
+Determines when the pool of slack cuts is discarded. The other option
+is <TT>DISCARD_SLACKS_WHEN_STARTING_NEW_NODE</TT>{1}.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> first_lp_first_cut_time_out</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> first_lp_all_cuts_time_out</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> later_lp_first_cut_time_out</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> later_lp_all_cuts_time_out</FONT></TT> -
+double (0, 0, 5, 1).</STRONG></DT>
+<DD>[p]LP Parameters!first_lp_first_cut_time_out
+[p]LP Parameters!first_lp_all_cuts_time_out
+[p]LP Parameters!later_lp_first_cut_time_out
+[p]LP Parameters!later_lp_all_cuts_time_out
+The next group of parameters determines when the LP should give up
+waiting for cuts from the cut generator and start to solve the
+relaxation in its current form or possibly branch if necessary. There
+are two factors that contribute to determining this timeout. First
+is whether this is the first LP in the search node of whether it is a
+later LP. Second is whether any cuts have been added already in this
+iteration. The four timeout parameters correspond to the four possible
+combinations of these two variables.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> no_cut_timeout</FONT></TT> - </STRONG></DT>
+<DD>[p]LP Parameters!no_cut_timeout
+This keyword does not have an associated value. If this keyword
+appears on a line by itself or with a value, this tells the framework
+not to time out while waiting for cuts. This is useful for debugging
+since it enables runs with a single LP module to be duplicated.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> all_cut_timeout</FONT></TT> - double (no default).</STRONG></DT>
+<DD>[p]LP Parameters!all_cut_timeout
+This keyword tells the framework to set all of the above timeout
+parameters to the value indicated.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_cut_num_per_iter</FONT></TT> - integer (20).</STRONG></DT>
+<DD>[p]LP Parameters!max_cut_num_per_iter
+The maximum number of cuts that can be added to the LP in an
+iteration. The remaining cuts stay in the local pool to be added in
+subsequent iterations, if they are strong enough.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> do_reduced_cost_fixing</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!do_reduced_cost_fixing
+Whether or not to attempt to fix variables by reduced cost. This
+option is highly recommended
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> gap_as_ub_frac, gap_as_last_gap_frac</FONT></TT> - double (.1, .7).</STRONG></DT>
+<DD>[p]LP Parameters!gap_as_ub_frac
+[p]LP Parameters!gap_as_last_gap_frac
+Determines when reduced cost fixing should be attempted. It is only
+done when the gap is within the fraction <TT>
+<FONT COLOR="#000000"> gap_as_ub_frac</FONT></TT> of the upper
+bound or when the gap has decreased by the fraction 
+<TT>
+<FONT COLOR="#000000"> gap_as_last_gap_frac</FONT></TT> since the last time variables were fixed.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> do_logical_fixing</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!do_logical_fixing
+Determines whether the user's logical fixing routine should be used.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> fixed_to_ub_before_logical_fixing</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> fixed_to_ub_frac_before_logical_fixing</FONT></TT> - 
+<B>integer, double (1, .01)</B>.</STRONG></DT>
+<DD>[p]LP Parameters!fixed_to_ub_before_logical_fixing
+[p]LP Parameters!fixed_to_ub_frac_before_logical_fixing
+Determines when logical fixing should be attempted. It will be called
+only when a certain absolute number <EM>and</EM> a certain number of variables
+have been fixed to their upper bounds by reduced cost. This is because
+it is typically only after fixing variables to their upper bound that
+other variables can be logically fixed.
+
+<P>
+<A NAME="strong_branching"></A></DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_presolve_iter</FONT></TT> - integer (10).</STRONG></DT>
+<DD>[p]LP Parameters!max_presolve_iter
+Number of simplex iterations to be performed in the pre-solve for
+strong branching.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> strong_branching_cand_num_max</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> strong_branching_cand_num_min</FONT></TT>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> strong_branching_red_ratio</FONT></TT> -
+<B>integer (10, 5, 1)</B>.</STRONG></DT>
+<DD>[p]LP Parameters!strong_branching_cand_num_max
+[p]LP Parameters!strong_branching_cand_num_min
+[p]LP Parameters!strong_branching_red_ratio
+These three parameters together determine the number of strong
+branching candidates to be used by default. In the root node,
+<TT>
+<FONT COLOR="#000000"> strong_branching_cand_num_max</FONT></TT> candidates are used. On each
+succeeding level, this number is reduced by the number 
+<TT>
+<FONT COLOR="#000000"> strong_branching_red_ratio</FONT></TT> multiplied by the square of the level.
+This continues until the number of candidates is reduced to 
+<TT>
+<FONT COLOR="#000000"> strong_branching_cand_num_min</FONT></TT> and then that number of candidates
+is used in all lower levels of the tree.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> is_feasible_default</FONT></TT> - integer (<TT>TEST_INTEGRALITY</TT>{1}).</STRONG></DT>
+<DD>[p]LP Parameters!is_feasible_default
+Determines the default test to be used to determine feasibility. This
+parameter is provided so that the user can change the default behavior
+without recompiling. The only other option is <TT>TEST_ZERO_ONE</TT>{0}.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> send_feasible_solution_default</FONT></TT> - integer 
+(<TT>SEND_NONZEROS</TT>{0}).</STRONG></DT>
+<DD>[p]LP Parameters!send_feasible_solution_default
+Determines the form in which to send the feasible solution. This
+parameter is provided so that the user can change the default behavior
+without recompiling. This is currently the only option.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> send_lp_solution_default</FONT></TT> - integer (<TT>SEND_NONZEROS</TT>{0}).</STRONG></DT>
+<DD>[p]LP Parameters!send_lp_solution_default
+Determines the default form in which to send the LP solution to the
+cut generator and cut pool. This
+parameter is provided so that the user can change the default behavior
+without recompiling. The other option is <TT>SEND_FRACTIONS</TT>{1}.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> display_solution_default</FONT></TT> - integer (<TT>DISP_NOTHING</TT>{0}).</STRONG></DT>
+<DD>[p]LP Parameters!display_solution_default
+Determines how to display the current LP solution if desired.
+See the description of <A HREF="node220.html#user_display_solution"><TT>user_display_solution()</TT></A> for other
+possible values. This parameter is provided so that
+the user can change the default behavior without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> shall_we_branch_default</FONT></TT> - integer 
+(<TT>USER__BRANCH_IF_MUST</TT>{2}).</STRONG></DT>
+<DD>[p]LP Parameters!shall_we_branch_default
+Determines the default branching behavior. Other values are <TT>USER__DO_NOT_BRANCH</TT>{0} (not recommended as a default), <TT>USER__DO_BRANCH</TT>{1} (also not recommended as a default), and <TT>USER__BRANCH_IF_TAILOFF</TT>{3}. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> select_candidates_default</FONT></TT> - integer (<TT>USER__CLOSE_TO_HALF_AND_EXPENSIVE</TT>{10}).</STRONG></DT>
+<DD>[p]LP Parameters!select_candidates_default
+Determines the default rule for selecting strong branching candidates.
+Other values are <TT>USER__CLOSE_TO_HALF</TT>{10} and 
+<TT>USER__CLOSE_TO_ONE_AND_CHEAP</TT>{12}. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> compare_candidates_default</FONT></TT> - integer 
+(<TT>HIGHEST_LOW_OBJ</TT>{2}).</STRONG></DT>
+<DD>[p]LP Parameters!compare_candidates_default
+Determines the default rule for comparing candidates. See the
+description of <A HREF="node242.html#user_compare_candidates"><TT>user_compare_candidates()</TT></A> for other values. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> select_child_default</FONT></TT> - integer 
+(<TT>PREFER_LOWER_OBJ_VALUE</TT>{0}).</STRONG></DT>
+<DD>[p]LP Parameters!select_child_default
+Determines the default rule for selecting the child to be processed
+next. For other possible values, see the description <A HREF="node243.html#user_select_child">
+<TT>user_select_child()</TT></A>. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> mc_find_supported_solutions</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!mc_find_supported_solutions
+By default, <TT>sym_mc_solve</TT> routine will find all the non-dominated 
+solutions if the problem to be solved is 
+a bicriteria problem. However, if the user plans to find only the supported 
+solutions, then, this parameter has to be set before 
+calling <TT>sym_mc_solve</TT> routine. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> mc_rho</FONT></TT> - double (<TT>0.00001</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!mc_rho
+The value used in augmented Chebyshev norm during the bicriteria 
+solution procedure.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_cuts</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_cuts
+Whether or not to generate cuts using COIN's cut generation library. 
+Note that, to use CGL cuts, OSI interface has to be used and moreover the 
+corresponding flags have to be set during installation. See the makefile for 
+more details.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_gomory_cuts</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_gomory_cuts
+Whether or not to generate Gomory cuts using COIN's cut generation library. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_knapsack_cuts</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_knapsack_cuts
+Whether or not to generate knapsack cover cuts using COIN's cut generation 
+library. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_oddhole_cuts</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_oddhole_cuts
+Whether or not to generate generalized odd hole cuts using COIN's cut 
+generation library. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_probing_cuts</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_probing_cuts
+Whether or not to generate probing cuts using COIN's cut generation library. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_clique_cuts</FONT></TT> - boolean (<TT>TRUE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_clique_cuts
+Whether or not to generate clique cuts using COIN's cut generation library. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_flow_and_cover_cuts</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_flow_and_cover_cuts
+Whether or not to generate flow and cover cuts using COIN's cut generation 
+library. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_rounding_cuts</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_rounding_cuts
+Whether or not to generate simple rounding cuts using COIN's cut generation 
+library. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> generate_cgl_lift_and_project_cuts</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]LP Parameters!generate_cgl_lift_and_project_cuts
+Whether or not to generate lift-and-project cuts using COIN's cut generation 
+library. 
+
+<P>
+</DD>
+</DL>
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html4343"
+  HREF="node279.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4339"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4333"
+  HREF="node277.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4341"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html4344"
+  HREF="node279.html">Cut Generator Parameters</A>
+<B>Up:</B> <A NAME="tex2html4340"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4334"
+  HREF="node277.html">Tree Manager parameters</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-12-21</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Source Files</TITLE>
+<META NAME="description" CONTENT="Source Files">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html127" HREF="node4.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html125" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html119" HREF="node2.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A> <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html128" HREF="node4.html">User-written Functions</A>
+<B>Up:</B> <A NAME="tex2html126" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html120" HREF="node2.html">Getting Started</A>
+<BR> <P>
+<H2><A NAME="SECTION00012000000000000000">Source Files</A></H2>
+<P>
+The easiest way to get oriented is to examine the organization of the
+source files. When you unpack the SYMPHONY distribution, you will notice
+that the source files are organized along the lines of the modules.
+There is a separate directory for each module--master (<TT>Master</TT>),
+tree manager (<TT>TreeManager</TT>), cut generator (<TT>CutGen</TT>), cut
+pool (<TT>CutPool</TT>), and LP solver (<TT>LP</TT>). In addition there is a
+directory called <TT>DrawGraph</TT> and a directory called <TT>Common</TT>
+that also contain source files. The <TT>DrawGraph</TT> directory provides
+an interface from SYMPHONY to the <EM>Interactive Graph Drawing</EM>
+software package developed my Marta Es&#246;. This is an excellent
+utility for graphical display and debugging. It is currently not
+documented in this manual. The <TT>Common</TT> directory contains source
+code for functions used by multiple modules.
+<P>
+Within each module's directory, there is a primary source file
+containing the function <TT>main()</TT> (named <TT>*.c</TT> where * is the
+module name), a source file containing functions related to
+inter-process communication (named <TT>*_proccomm.c</TT>) and a file
+containing general subroutines used by the module (named <TT>
+*_func.c</TT>). The master is the exception and is organized slightly
+differently. The LP process source code is further subdivided due to
+sheer volume.
+<P>
+The <TT>include</TT> directory contains the header files. Corresponding
+to each module, there are three header files, one containing internal
+data structures and function prototypes associated with the module
+(named <TT>*.h</TT> where * is the module name), one containing the data
+structures for storing the parameters (these are also used by the
+master process), and the third containing the function prototypes for
+the user functions (name <TT>*_u.h</TT>). By looking at the header files, you
+should get a general idea of how things are laid out.
+<P>
+In addition to the subdirectories corresponding to each module, there
+is are subdirectories corresponding to applications. The sample
+application is contained in the directory <TT>Vrp/</TT>. The files
+containing function stubs that can be filled in to create a new
+application are contained in the directory <TT>User/</TT>. There is one
+file for each module, initially called <TT>User/*/*_user.c</TT>. The
+primary thing that you, as the user, need to understand to build an
+application is how to fill in these stubs. That is what the second
+section of this manual is about.
+<P>
+<HR><A NAME="tex2html127" HREF="node4.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html125" HREF="node1.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html119" HREF="node2.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A>   <A NAME="tex2html1" HREF="man.html"> <IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="external" SRC="contents_motif.gif"  > </A><BR>
+<B> Next:</B> <A NAME="tex2html128" HREF="node4.html">User-written Functions</A>
+<B>Up:</B> <A NAME="tex2html126" HREF="node1.html">Introduction</A>
+<B> Previous:</B> <A NAME="tex2html120" HREF="node2.html">Getting Started</A>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Fri Feb 11 13:47:59 CST 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

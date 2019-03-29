@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002 (1.62) JA patch-1.4
+patched version by:  Kenshi Muto, Debian Project.
+LaTeX2HTML 2002 (1.62),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Inter-process Communication for Distributed Computing</TITLE>
+<META NAME="description" CONTENT="Inter-process Communication for Distributed Computing">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002 JA patch-1.4">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node64.html">
+<LINK REL="previous" HREF="node60.html">
+<LINK REL="up" HREF="node57.html">
+<LINK REL="next" HREF="node64.html">
+</HEAD>
+
+<BODY >
+
+<A NAME="tex2html1125"
+  HREF="node64.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1121"
+  HREF="node57.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1115"
+  HREF="node62.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1123"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1126"
+  HREF="node64.html">The LP Engine</A>
+<B>Up:</B> <A NAME="tex2html1122"
+  HREF="node57.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html1116"
+  HREF="node62.html">User-defined Data Structures</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00524000000000000000"></A>
+<A NAME="communication"></A>
+<BR>
+Inter-process Communication for Distributed Computing
+</H2>
+While the implementation of SYMPHONY strives to shield the user from having to
+know anything about communications protocols or the specifics of inter-process
+communication, it may be necessary for the user to pass information from one
+module to another in order to implement a parallel application. For instance,
+the user may want to pass data describing the problem instance to the LP
+process after reading them in from a file in the master process. For the
+purpose of passing user data from the master process to other processes, a
+customization function called
+<TT>user_send_*_data()</TT> is provided in the master module, along with a
+corresponding function called <TT>user_receive_*_data()</TT> in the module
+<TT>*</TT>. These two functions work in tandem to transport the user's data
+from the maser, where it can be read in from a file, to the proper module for
+processing. There are also a number of other tandem pairs of <I>send</I> and
+<I>receive</I> functions that are used to transport user data from place to
+place.
+
+<P>
+All data are sent in the form of arrays of either type <TT>char</TT>, <TT>int</TT>,
+or <TT>double</TT>, or as strings. To send an array, the user has simply to
+invoke the function <TT>send_XXX_array(XXX *array, int length)</TT> where
+<TT>XXX</TT> is one of the previously listed types. To receive that array,
+there is a corresponding function called <TT>receive_?_array(?  *array, int
+length)</TT>. When receiving an array, the user must first allocate the
+appropriate amount of memory. In cases where variable length arrays need to be
+passed, the user must first pass the length of the array (as a separate array
+of length one) and then the array itself. In the receive function, this allows
+the length to be received first so that the proper amount of space can be
+allocated before receiving the array itself. Note that data must be received
+in exactly the same order as it was passed, as data is read linearly into and
+out of the message buffer. The easiest way to ensure this is done properly is
+to simply copy the send statements into the receive function and change the
+function names. It may then be necessary to add some allocation statements in
+between the receive function calls.
+
+<P>
+<HR>
+<A NAME="tex2html1125"
+  HREF="node64.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1121"
+  HREF="node57.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1115"
+  HREF="node62.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1123"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html1126"
+  HREF="node64.html">The LP Engine</A>
+<B>Up:</B> <A NAME="tex2html1122"
+  HREF="node57.html">Advanced Development</A>
+<B> Previous:</B> <A NAME="tex2html1116"
+  HREF="node62.html">User-defined Data Structures</A>
+
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2003-10-16</I>
+</ADDRESS>
+</BODY>
+</HTML>

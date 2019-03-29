@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_find_cuts</TITLE>
+<META NAME="description" CONTENT="user_find_cuts">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html1132" HREF="node74.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html1130" HREF="node69.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html1124" HREF="node72.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html1134" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html1133" HREF="node74.html">user_check_validity_of_cut</A>
+<B>Up:</B> <A NAME="tex2html1131" HREF="node69.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html1125" HREF="node72.html">user_free_cg</A>
+<BR> <P>
+<H3><A NAME="SECTION00033400000000000000">user_find_cuts</A></H3>
+<P>
+<PRE>int user_find_cuts(void *user, int varnum, int iter_num, int level,
+		    int index, double objval, int *indices, double *values,
+		    double ub, double lpetol, int *cutnum)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user can generate cuts based on the current LP solution stored in
+<TT>soln</TT>. Cuts found need to be sent back to the LP by calling the
+<TT>cg_send_cut(<A HREF="node45.html#cut_data">cut_data</A> *new_cut)</TT> function.
+The argument of this function is a pointer to the cut to be sent. See
+Section
+<A HREF="node43.html#userwrittenlp">2.2</A> for a description of this data structure. If the
+user wants the cut to be added to the cut pool in case it proves to be
+effective in the LP, then <TT>new_cut-&gt;name</TT> should be set to <TT>
+CUT__SEND_TO_CP</TT>. Otherwise, it should be set to <TT>
+CUT__DO_NOT_SEND_TO_CP</TT>.<BR> 
+<BR> 
+The only output of this function is the number of cuts generated and this
+value is returned in the last argument.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=641 HEIGHT=293 ALIGN=BOTTOM ALT="tabular1805" SRC="img84.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=365 HEIGHT=38 ALIGN=BOTTOM ALT="tabular1807" SRC="img85.gif"  > <P>
+<P>
+<DT><STRONG>Invoked from:</STRONG>
+<DD> Whenever an LP solution is received.
+<P>
+ </DL>
+<P>
+<A NAME="user_check_validity_of_cut">&#160;</A>
+<BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

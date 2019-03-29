@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Set Menu</TITLE>
+<META NAME="description" CONTENT="Set Menu">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node42.html">
+<LINK REL="previous" HREF="node40.html">
+<LINK REL="up" HREF="node37.html">
+<LINK REL="next" HREF="node42.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html963"
+  HREF="node42.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html959"
+  HREF="node37.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html953"
+  HREF="node40.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html961"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html964"
+  HREF="node42.html">Display Menu</A>
+<B>Up:</B> <A NAME="tex2html960"
+  HREF="node37.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A NAME="tex2html954"
+  HREF="node40.html">Main Menu</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00414000000000000000"></A><A NAME="set_menu"></A>
+<BR>
+Set Menu
+</H2>
+The 
+<FONT COLOR="#a52a2a"><TT>Set</TT></FONT> submenu is used to set SYMPHONY's run-time parameters. To enter
+this submenu, type 
+<FONT COLOR="#a52a2a"><TT>set</TT></FONT>: 
+<PRE>
+SYMPHONY: set
+Please type 'help'/'?' to see the list of parameters!
+SYMPHONY\Set:
+</PRE>
+You can override the default value of a parameter by typing the name of 
+the parameter. You will then be prompted 
+to enter the new value of that parameter. For instance, in order to 
+display more outputs during the solution process, you need to set the 
+
+<FONT COLOR="#a52a2a"><TT>verbosity</TT></FONT> parameter (set to -1 by default for the interactive shell 
+routines) to a nonnegative integer: 
+
+<PRE>
+SYMPHONY\Set: verbosity
+Value of the parameter: 3
+Setting verbosity to: 3
+SYMPHONY\Set:
+</PRE> 
+A confirmation message will also be displayed. Note that typing 
+<FONT COLOR="#a52a2a"><TT>help</TT></FONT>
+or 
+<FONT COLOR="#a52a2a"><TT>?</TT></FONT> displays only a subset of the most commonly used run-time
+parameters. However, you are allowed to set any of the parameters given in
+Section <A HREF="node273.html#params">6.4</A>. Additionally, you can set the values of parameters using
+a parameter file as an input. In such a file, the new value of each parameter
+must follow the name of that parameter. For instance, suppose that the
+
+<FONT COLOR="#a52a2a"><TT>my_param</TT></FONT> file consists of the following lines:
+<PRE>
+ verbosity 3
+ node_selection_rule 3
+ time_limit 100
+</PRE>
+Then, type 
+<FONT COLOR="#a52a2a"><TT>param_file</TT></FONT> to be prompted to read in the parameter file: 
+
+<PRE>
+ SYMPHONY\Set: param_file
+ Name of the parameter file: my_param
+ Setting verbosity to: 3
+ Setting node_selection_rule to: 3
+ Setting time_limit to: 100
+ SYMPHONY\Set:
+</PRE>
+At this point, you can return to the main menu by typing 
+<FONT COLOR="#a52a2a"><TT>back</TT></FONT>,  
+load an instance and solve it with updated run-time parameters. 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html963"
+  HREF="node42.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html959"
+  HREF="node37.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html953"
+  HREF="node40.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html961"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html964"
+  HREF="node42.html">Display Menu</A>
+<B>Up:</B> <A NAME="tex2html960"
+  HREF="node37.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A NAME="tex2html954"
+  HREF="node40.html">Main Menu</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2011-05-30</I>
+</ADDRESS>
+</BODY>
+</HTML>

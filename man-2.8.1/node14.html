@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Modular Implementation</TITLE>
+<META NAME="description" CONTENT="Modular Implementation">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="man.css">
+<LINK REL="next" HREF="node20.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node15.html">
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" >
+
+<A NAME="tex2html379"
+ HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<A NAME="tex2html376"
+ HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif.gif"></A> 
+<A NAME="tex2html370"
+ HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif.gif"></A> 
+<A NAME="tex2html378"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html380"
+ HREF="node15.html">The Master Module</A>
+<B>Up:</B> <A NAME="tex2html377"
+ HREF="node8.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A NAME="tex2html371"
+ HREF="node13.html">Search Tree</A>
+<BR> <P>
+
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00063000000000000000">
+Modular Implementation</A>
+</H2>
+
+<P>
+SYMPHONY's functions are grouped into five independent computational
+modules. This modular implementation not only facilitates code
+maintenance, but also allows easy and highly configurable
+parallelization. Depending on the computational setting, the modules
+can be compiled as either (1) a single sequential code, (2) a
+multi-threaded shared-memory parallel code, or (3) separate processes
+running in distributed fashion over a network. The modules pass data
+to each other either through shared memory (in the case of sequential
+computation or shared-memory parallelism) or through a message-passing
+protocol defined in a separate communications API (in the case of
+distributed execution). an schematic overview of the modules is
+presented in Figure <A HREF="node14.html#overview">4</A>. In the remainder of the section,
+we describe the modularization scheme and the implementation of each
+module in a sequential environment. 
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="overview">&#160;</A><A NAME="428">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 4:</STRONG>
+Schematic overview of the branch, cut, and price algorithm</CAPTION>
+<TR><TD><IMG
+ WIDTH="671" HEIGHT="861"
+ SRC="img16.gif"
+ ALT="\begin{figure}\centering
+\psfig{figure=/home/tkr/Papers/pics/pbandc.eps}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+<BR> <HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html381"
+ HREF="node15.html">The Master Module</A>
+<LI><A NAME="tex2html382"
+ HREF="node16.html">The Tree Manager Module</A>
+<LI><A NAME="tex2html383"
+ HREF="node17.html">The Linear Programming Module</A>
+<LI><A NAME="tex2html384"
+ HREF="node18.html">The Cut Generator Module</A>
+<LI><A NAME="tex2html385"
+ HREF="node19.html">The Cut Pool Module</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2001-12-02</I>
+</ADDRESS>
+</BODY>
+</HTML>

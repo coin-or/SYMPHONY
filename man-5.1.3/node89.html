@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Cut Generation Module</TITLE>
+<META NAME="description" CONTENT="The Cut Generation Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node90.html">
+<LINK REL="previous" HREF="node85.html">
+<LINK REL="up" HREF="node74.html">
+<LINK REL="next" HREF="node90.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html1625"
+  HREF="node90.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1621"
+  HREF="node74.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1615"
+  HREF="node88.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1623"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html1626"
+  HREF="node90.html">The Cut Management Module</A>
+<B>Up:</B> <A NAME="tex2html1622"
+  HREF="node74.html">Details of the Implementation</A>
+<B> Previous:</B> <A NAME="tex2html1616"
+  HREF="node88.html">The Two-Phase Algorithm</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00544000000000000000">
+The Cut Generation Module</A>
+</H2><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">To implement the cut generator process, the user must provide a
+function that accepts an LP solution and returns cuts violated by that
+solution to the NP module. In parallel configurations, each cut is
+returned immediately to the NP module, rather than being passed back
+as a group once the function exits. This allows the LP to begin adding
+cuts and solving the current relaxation before the cut generator is
+finished if desired. Parameters controlling if and when the LP should
+begin solving the relaxation before the cut generator is finished can
+be set by the user.
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"><FONT COLOR="#a52a2a">SYMPHONY now generates generic cutting planes using the Cut Generator Library,
+also available from 
+<A NAME="tex2html26"
+  HREF="https://projects.coin-or.org/Cgl">COIN</A>
+.
+The CGL can be used to generate cuts in cases where problem-specific cutting
+planes are not available or not implemented yet. 
+</FONT></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<BR> <HR>
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>

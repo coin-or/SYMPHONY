@@ -1,0 +1,493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Callable Library C++ API</TITLE>
+<META NAME="description" CONTENT="Callable Library C++ API">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node207.html">
+<LINK REL="previous" HREF="node118.html">
+<LINK REL="up" HREF="node117.html">
+<LINK REL="next" HREF="node207.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html3365"
+  HREF="node207.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3361"
+  HREF="node117.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3355"
+  HREF="node205.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3363"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html3366"
+  HREF="node207.html">User Callback API</A>
+<B>Up:</B> <A NAME="tex2html3362"
+  HREF="node117.html">Reference</A>
+<B> Previous:</B> <A NAME="tex2html3356"
+  HREF="node205.html">sym_get_ub_for_new_obj</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00720000000000000000"></A>
+<A NAME="C++_Interface"></A>
+<BR>
+Callable Library C++ API
+</H1>
+
+<P>
+SYMPHONY's C++ interface is derived from COIN-OR's Open Solver Interface
+(OSI). The OSI methods are implemented simply as wrapped calls to the SYMPHONY
+C callable library just described. For instance, when an instance of the OSI
+interface class is constructed, a call is made to
+<TT>sym_open_environment()</TT> and a pointer to the environment is stored
+in the class and when the OSI object is destroyed,
+<TT>sym_close_environment</TT> is called to destroy the environment object. 
+Most subsequent calls within the class can then be made without
+any arguments. To fully support SYMPHONY's capabilities, we have 
+extended the OSI interface to include some other methods not in the base 
+class. For example, we added calls equivalent to our 
+<TT>sym_parse_command_line()</TT> and <TT>sym_find_initial_bounds()</TT>.
+Additionally, SYMPHONY has a warm start class derived from the CoinWarmStart 
+base class to support the new functionalities of the MILP warm starting such 
+as <TT>sym_get_warm_start</TT> and <TT>sym_set_warm_start</TT>. They are 
+also implemented as wrapped calls to the C interface library. 
+
+<P>
+In order to have the whole list of the methods and information 
+regarding their usage, see the OSI SYMPHONY interface and SYMPHONY warm start
+header files (<TT>OsiSymSolverInterface.hpp</TT> and 
+<TT>SymWarmStart.hpp</TT>). Here, we will give the table of the C library 
+equivalent calls of the C++ interface routines with brief descriptions:
+
+<P>
+
+<P>
+15cm12cm
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><B>C++ Interface</B></TD>
+<TD ALIGN="LEFT"><B>C Interface</B></TD>
+<TD ALIGN="LEFT"><B>Description</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">OsiSymSolverInterface</TD>
+<TD ALIGN="LEFT">sym_open_environment</TD>
+<TD ALIGN="LEFT">create a new environment.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">loadProblem</TD>
+<TD ALIGN="LEFT">sym_load_problem</TD>
+<TD ALIGN="LEFT">load the problem read trough an MPS or GMPL file</TD>
+</TR>
+<TR><TD ALIGN="LEFT">branchAndBound</TD>
+<TD ALIGN="LEFT">sym_solve/sym_warm_solve</TD>
+<TD ALIGN="LEFT">solve the MILP problem from scratch or</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">from a warm start if loaded.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">resolve</TD>
+<TD ALIGN="LEFT">sym_warm_solve</TD>
+<TD ALIGN="LEFT">re-solve the MILP problem after some modifications.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">initialSolve</TD>
+<TD ALIGN="LEFT">sym_solve</TD>
+<TD ALIGN="LEFT">solve the MILP problem from scratch.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">multiCriteriaBranchAndBound</TD>
+<TD ALIGN="LEFT">sym_mc_solve</TD>
+<TD ALIGN="LEFT">solve the multi criteria problem.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setInitialData</TD>
+<TD ALIGN="LEFT">sym_set_defaults</TD>
+<TD ALIGN="LEFT">set the parameters to their defaults.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">parseCommandLine</TD>
+<TD ALIGN="LEFT">sym_parse_command_line</TD>
+<TD ALIGN="LEFT">read the command line arguments.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">findInitialBounds</TD>
+<TD ALIGN="LEFT">sym_find_initial_bounds</TD>
+<TD ALIGN="LEFT">find the initial bounds via the user defined heuristics.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">createPermanentCutPools</TD>
+<TD ALIGN="LEFT">sym_create_permanent_cut_pools</TD>
+<TD ALIGN="LEFT">save the global cuts.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">loadProblem</TD>
+<TD ALIGN="LEFT">sym_explicit_load_problem</TD>
+<TD ALIGN="LEFT">load the problem through a set of arrays.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getWarmStart</TD>
+<TD ALIGN="LEFT">sym_get_warm_start</TD>
+<TD ALIGN="LEFT">get the warm start description.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setWarmStart</TD>
+<TD ALIGN="LEFT">sym_set_warm_start</TD>
+<TD ALIGN="LEFT">set the warm start description.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getLbForNewRhs</TD>
+<TD ALIGN="LEFT">sym_get_lb_for_new_rhs</TD>
+<TD ALIGN="LEFT">find a lower bound to the new rhs problem</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">using the post solution info.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getUbForNewRhs</TD>
+<TD ALIGN="LEFT">sym_get_lb_for_new_rhs</TD>
+<TD ALIGN="LEFT">find an upper bound to the new rhs problem.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">using the post solution info.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getLbForNewObj</TD>
+<TD ALIGN="LEFT">sym_get_lb_for_new_rhs</TD>
+<TD ALIGN="LEFT">find a lower bound to the new obj problem.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">using the post solution info.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getUbForNewObj</TD>
+<TD ALIGN="LEFT">sym_get_lb_for_new_rhs</TD>
+<TD ALIGN="LEFT">find an upper bound to the new obj problem.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT">using the post solution info.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">reset</TD>
+<TD ALIGN="LEFT">sym_close_environment</TD>
+<TD ALIGN="LEFT">return the allocated memory.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setIntParam</TD>
+<TD ALIGN="LEFT">sym_set_int_param</TD>
+<TD ALIGN="LEFT">set the integer type OSI parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setSymParam(int)</TD>
+<TD ALIGN="LEFT">sym_set_int_param</TD>
+<TD ALIGN="LEFT">set the integer type SYMPHONY parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setDblParam</TD>
+<TD ALIGN="LEFT">sym_set_dbl_param</TD>
+<TD ALIGN="LEFT">set the double type OSI parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setSymParam(double)</TD>
+<TD ALIGN="LEFT">sym_set_dbl_param</TD>
+<TD ALIGN="LEFT">set the double type SYMPHONY parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setStrParam</TD>
+<TD ALIGN="LEFT">sym_set_str_param</TD>
+<TD ALIGN="LEFT">set the string type OSI parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setSymParam(string)</TD>
+<TD ALIGN="LEFT">sym_set_str_param</TD>
+<TD ALIGN="LEFT">set the string type SYMPHONY parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getIntParam</TD>
+<TD ALIGN="LEFT">sym_get_int_param</TD>
+<TD ALIGN="LEFT">get the value of the integer type OSI parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getSymParam(int &amp;)</TD>
+<TD ALIGN="LEFT">sym_get_int_param</TD>
+<TD ALIGN="LEFT">get the value of the integer type SYMPHONY parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getDblParam</TD>
+<TD ALIGN="LEFT">sym_get_dbl_param</TD>
+<TD ALIGN="LEFT">get the value of the double type OSI parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getSymParam(double &amp;)</TD>
+<TD ALIGN="LEFT">sym_get_dbl_param</TD>
+<TD ALIGN="LEFT">get the value of the double type SYMPHONY parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getStrParam</TD>
+<TD ALIGN="LEFT">sym_get_str_param</TD>
+<TD ALIGN="LEFT">get the value of the string type OSI parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getSymParam(string &amp;)</TD>
+<TD ALIGN="LEFT">sym_get_str_param</TD>
+<TD ALIGN="LEFT">get the value of the string type SYMPHONY parameter.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isProvenOptimal</TD>
+<TD ALIGN="LEFT">sym_is_proven_optimal</TD>
+<TD ALIGN="LEFT">query the problem status.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isProvenPrimalInfeasible</TD>
+<TD ALIGN="LEFT">sym_is_proven_primal_infeasible</TD>
+<TD ALIGN="LEFT">query the problem status.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isPrimalObjectiveLimitReached</TD>
+<TD ALIGN="LEFT">sym_is_target_gap_achieved</TD>
+<TD ALIGN="LEFT">query the problem status.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isIterationLimitReached</TD>
+<TD ALIGN="LEFT">sym_is_iteration_limit_reached</TD>
+<TD ALIGN="LEFT">query the problem status.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isTimeLimitReached</TD>
+<TD ALIGN="LEFT">sym_is_time_limit_reached</TD>
+<TD ALIGN="LEFT">query the problem status.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isTargetGapReached</TD>
+<TD ALIGN="LEFT">sym_is_target_gap_achieved</TD>
+<TD ALIGN="LEFT">query the problem status.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getNumCols</TD>
+<TD ALIGN="LEFT">sym_get_num_cols</TD>
+<TD ALIGN="LEFT">get the number of columns.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getNumRows</TD>
+<TD ALIGN="LEFT">sym_get_num_rows</TD>
+<TD ALIGN="LEFT">get the number of rows.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getNumElements</TD>
+<TD ALIGN="LEFT">sym_get_num_elements</TD>
+<TD ALIGN="LEFT">get the number of nonzero elements.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getColLower</TD>
+<TD ALIGN="LEFT">sym_get_col_lower</TD>
+<TD ALIGN="LEFT">get the column lower bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getColUpper</TD>
+<TD ALIGN="LEFT">sym_get_col_upper</TD>
+<TD ALIGN="LEFT">get the column upper bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getRowSense</TD>
+<TD ALIGN="LEFT">sym_get_row_sense</TD>
+<TD ALIGN="LEFT">get the row senses.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getRightHandSide</TD>
+<TD ALIGN="LEFT">sym_get_rhs</TD>
+<TD ALIGN="LEFT">get the rhs values.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getRowRange</TD>
+<TD ALIGN="LEFT">sym_get_row_range</TD>
+<TD ALIGN="LEFT">get the row range values.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getRowLower</TD>
+<TD ALIGN="LEFT">sym_get_row_lower</TD>
+<TD ALIGN="LEFT">get the row lower bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getRowUpper</TD>
+<TD ALIGN="LEFT">sym_get_row_upper</TD>
+<TD ALIGN="LEFT">get the row upper bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getObjCoefficients</TD>
+<TD ALIGN="LEFT">sym_get_obj_coeff</TD>
+<TD ALIGN="LEFT">get the objective function vector.</TD>
+</TR>
+</TABLE>
+
+<P>
+
+<P>
+15cm10.5cm
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><B>C++ Interface</B></TD>
+<TD ALIGN="LEFT"><B>C Interface</B></TD>
+<TD ALIGN="LEFT"><B>Description</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">getObjSense</TD>
+<TD ALIGN="LEFT">sym_get_obj_sense</TD>
+<TD ALIGN="LEFT">get the objective sense.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isContinuous</TD>
+<TD ALIGN="LEFT">sym_is_continuous</TD>
+<TD ALIGN="LEFT">query the variable type.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isBinary</TD>
+<TD ALIGN="LEFT">sym_is_binary</TD>
+<TD ALIGN="LEFT">query the variable type.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isInteger</TD>
+<TD ALIGN="LEFT">sym_is_integer</TD>
+<TD ALIGN="LEFT">query the variable type.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isIntegerNonBinary</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">query the variable type.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">isFreeBinary</TD>
+<TD ALIGN="LEFT">sym_is_binary</TD>
+<TD ALIGN="LEFT">query the variable type.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getMatrixByRow</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">get the constraint matrix by row oriented.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getMatrixByCol</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">get the constraint matrix by column oriented.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getInfinity</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">get the infinity definition of SYMPHONY.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getColSolution</TD>
+<TD ALIGN="LEFT">sym_get_col_solution</TD>
+<TD ALIGN="LEFT">get the current best column solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getRowActivity</TD>
+<TD ALIGN="LEFT">sym_get_row_activity</TD>
+<TD ALIGN="LEFT">get the current row activity.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getObjValue</TD>
+<TD ALIGN="LEFT">sym_get_obj_val</TD>
+<TD ALIGN="LEFT">get the current best objective value.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getPrimalBound</TD>
+<TD ALIGN="LEFT">sym_get_primal_bound</TD>
+<TD ALIGN="LEFT">get the primal upper bound.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getIterationCount</TD>
+<TD ALIGN="LEFT">sym_get_iteration_count</TD>
+<TD ALIGN="LEFT">get the number of the analyzed tree nodes.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setObjCoeff</TD>
+<TD ALIGN="LEFT">sym_set_obj_coeff</TD>
+<TD ALIGN="LEFT">set the objective function vector.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setObj2Coeff</TD>
+<TD ALIGN="LEFT">sym_set_obj2_coeff</TD>
+<TD ALIGN="LEFT">set the second objective function vector.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setColLower</TD>
+<TD ALIGN="LEFT">sym_set_col_lower</TD>
+<TD ALIGN="LEFT">set the column lower bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setColUpper</TD>
+<TD ALIGN="LEFT">sym_set_col_upper</TD>
+<TD ALIGN="LEFT">set the column upper bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setRowLower</TD>
+<TD ALIGN="LEFT">sym_set_row_lower</TD>
+<TD ALIGN="LEFT">set the row lower bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setRowUpper</TD>
+<TD ALIGN="LEFT">sym_set_row_upper</TD>
+<TD ALIGN="LEFT">set the row upper bounds.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setRowType</TD>
+<TD ALIGN="LEFT">sym_set_row_type</TD>
+<TD ALIGN="LEFT">set the row characteristics.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setObjSense</TD>
+<TD ALIGN="LEFT">sym_set_obj_sense</TD>
+<TD ALIGN="LEFT">set the objective sense.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setColSolution</TD>
+<TD ALIGN="LEFT">sym_set_col_solution</TD>
+<TD ALIGN="LEFT">set the current solution.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setContinuous</TD>
+<TD ALIGN="LEFT">sym_set_continuous</TD>
+<TD ALIGN="LEFT">set the variable type.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setInteger</TD>
+<TD ALIGN="LEFT">sym_set_integer</TD>
+<TD ALIGN="LEFT">set the variable type.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">setColName</TD>
+<TD ALIGN="LEFT">sym_set_col_names</TD>
+<TD ALIGN="LEFT">set the column names.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">addCol</TD>
+<TD ALIGN="LEFT">sym_add_col</TD>
+<TD ALIGN="LEFT">add columns to the constraint matrix.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">addRow</TD>
+<TD ALIGN="LEFT">sym_add_row</TD>
+<TD ALIGN="LEFT">add rows to the constraint matrix.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">deleteCols</TD>
+<TD ALIGN="LEFT">sym_delete_cols</TD>
+<TD ALIGN="LEFT">delete some columns from the constraint matrix.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">deleteRows</TD>
+<TD ALIGN="LEFT">sym_delete_rows</TD>
+<TD ALIGN="LEFT">delete some rows from the constraint matrix.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">writeMps</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">write the current problem in MPS format.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">applyRowCut</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">add some row cuts.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">applyColCut</TD>
+<TD ALIGN="LEFT">-</TD>
+<TD ALIGN="LEFT">add some column cuts.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">SymWarmStart(warm_start_desc *)</TD>
+<TD ALIGN="LEFT">sym_create_copy_warm_start</TD>
+<TD ALIGN="LEFT">create a SYMPHONY warm start by copying the given one.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">SymWarmStart(char *)</TD>
+<TD ALIGN="LEFT">sym_read_warm_start</TD>
+<TD ALIGN="LEFT">create a SYMPHONY warm start reading from file.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">getCopyOfWarmStartDesc</TD>
+<TD ALIGN="LEFT">sym_create_copy_warm_start</TD>
+<TD ALIGN="LEFT">get the copy of the warm start structure.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">writeToFile</TD>
+<TD ALIGN="LEFT">sym_write_warm_start_desc</TD>
+<TD ALIGN="LEFT">write the loaded warm start to a file.</TD>
+</TR>
+</TABLE>
+
+<P>
+
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html3365"
+  HREF="node207.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html3361"
+  HREF="node117.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html3355"
+  HREF="node205.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html3363"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html3366"
+  HREF="node207.html">User Callback API</A>
+<B>Up:</B> <A NAME="tex2html3362"
+  HREF="node117.html">Reference</A>
+<B> Previous:</B> <A NAME="tex2html3356"
+  HREF="node205.html">sym_get_ub_for_new_obj</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2006-12-11</I>
+</ADDRESS>
+</BODY>
+</HTML>

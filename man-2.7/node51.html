@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>user_get_upper_bounds</TITLE>
+<META NAME="description" CONTENT="user_get_upper_bounds">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="man.css">
+</HEAD>
+<BODY LANG="EN" bgcolor="#FFFFFF" text="#000000">
+ <A NAME="tex2html887" HREF="node52.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="./next_motif.gif"></A> <A NAME="tex2html885" HREF="node43.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="./up_motif.gif"></A> <A NAME="tex2html879" HREF="node50.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="./previous_motif.gif"></A> <A NAME="tex2html889" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="./contents_motif.gif"></A>   <A HREF=http://www.branchandcut.org/SYMPHONY>Back to SYMPHONY Home Page</A><BR>
+<B> Next:</B> <A NAME="tex2html888" HREF="node52.html">user_is_feasible</A>
+<B>Up:</B> <A NAME="tex2html886" HREF="node43.html">User-written functions of the </A>
+<B> Previous:</B> <A NAME="tex2html880" HREF="node50.html">user_create_lp</A>
+<BR> <P>
+<H3><A NAME="SECTION00032500000000000000">user_get_upper_bounds</A></H3>
+<P>
+<PRE>int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)</PRE>
+<P>
+<DL ><DT><STRONG>Description:</STRONG>
+<DD>
+<P>
+The user has to return the upper bounds of the variables whose user indices
+are given. Note that space for <TT>ub</TT> is already allocated when this
+function is invoked. There is no post-processing. The default is to set all
+the upper bounds to 1.
+<P>
+<DT><STRONG>Arguments:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=566 HEIGHT=81 ALIGN=BOTTOM ALT="tabular1545" SRC="img42.gif"  > <P>
+<P>
+<DT><STRONG>Return values:</STRONG>
+<DD>
+<P>
+<P> <IMG WIDTH=421 HEIGHT=59 ALIGN=BOTTOM ALT="tabular1547" SRC="img43.gif"  > <P>
+<P>
+<DT><STRONG>Wrapper invoked from:</STRONG>
+<DD> <TT>add_col_set()</TT> (when SYMPHONY adds columns
+after pricing out) and from <TT>create_lp_u()</TT> (when SYMPHONY has to get the
+bounds on the extra variables in the new active node).
+<P>
+<DT><STRONG>Note:</STRONG>
+<DD>
+<P>
+Only the upper bounds for extra variables are ever asked for since the
+array of bounds for the base variables is always maintained. Lower
+bounds for the extra variables must be zero and hence there is no
+corresponding function for lower bounds.
+<P>
+ </DL><BR> <HR>
+<P><ADDRESS>
+<I>Ted Ralphs <BR>
+Thu Jun  8 12:44:45 CDT 2000</I>
+</ADDRESS>
+</BODY>
+</HTML>

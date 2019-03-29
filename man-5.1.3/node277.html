@@ -1,0 +1,515 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Tree Manager parameters</TITLE>
+<META NAME="description" CONTENT="Tree Manager parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node278.html">
+<LINK REL="previous" HREF="node276.html">
+<LINK REL="up" HREF="node273.html">
+<LINK REL="next" HREF="node278.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation">
+<A NAME="tex2html4332"
+  HREF="node278.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4328"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4322"
+  HREF="node276.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4330"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>   <A HREF=http://projects.coin-or.org/SYMPHONY>Back to SYMPHONY Home Page</A>
+<BR>
+<B> Next:</B> <A NAME="tex2html4333"
+  HREF="node278.html">LP parameters</A>
+<B>Up:</B> <A NAME="tex2html4329"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4323"
+  HREF="node276.html">Draw Graph parameters</A>
+<BR> <P>
+</DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00744000000000000000"></A>
+<A NAME="tm_params"></A>
+<BR>
+Tree Manager parameters
+</H2><FONT COLOR="#a52a2a"></FONT><DL>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> TM_verbosity</FONT></TT> - integer (0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!TM_verbosity
+The verbosity of the TM module.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> lp_exe, cg_exe, cp_exe</FONT></TT> - strings (``lp'', ``cg'',
+``cp'').</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!lp_exe
+[p]Tree Manager Pramaters!cg_exe
+[p]Tree Manager Pramaters!cp_exe
+The name of the LP, CG, and CP module binaries. Note: when running in
+parallel using PVM, these executables (or links to them) must reside
+in the <TT>
+<FONT COLOR="#000000"> PVM_ROOT/bin/PVM_ARCH/</FONT></TT> directory. Also, be sure to note
+that the executable names may have extensions that depend on the
+configuration of the modules, but the defaults will always be set to
+the name that the makefile produces.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> lp_debug, cg_debug, cp_debug</FONT></TT> - boolean (all <TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!lp_debug
+[p]Tree Manager Pramaters!cg_debug
+[p]Tree Manager Pramaters!cp_debug
+Whether the modules should be started under a debugger or not.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_active_nodes</FONT></TT> - integer (1).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!max_active_nodes
+The maximum number of active search tree nodes--equal to the number of
+LP and CG tandems to be started up.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> max_cp_num</FONT></TT> - integer (0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!max_cp_num
+The maximum number of cut pools to be used.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> lp_mach_num, cg_mach_num, cp_mach_num</FONT></TT> - integers
+(all 0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!lp_mach_num
+[p]Tree Manager Pramaters!cg_mach_num
+[p]Tree Manager Pramaters!cp_mach_num
+The number of processors in the virtual machine to run LP (CG, CP)
+processes. If this value is 0 then the processes will be assigned to
+processors in round-robin order. Otherwise the next <TT>
+<FONT COLOR="#000000"> xx_mach_num</FONT></TT> lines
+describe the processors where the LP (CG, CP) modules must run. The
+keyword - value pairs on these lines must be <B>TM_xx_machine</B> and the
+name or IP address of a processor (the processor names need not be distinct).
+In this case the actual processes are assigned in a round robin fashion to the
+processors on this list.
+<BR>
+<BR>
+This feature is useful if a specific software package is needed for
+some module, but that software is not licensed for every node of the
+virtual machine or if a certain process must run on a certain type of
+machine due to resource requirements.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> use_cg</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!use_cg
+Whether to use a cut generator or not. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> TM_random_seed</FONT></TT> - integer (17).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!TM_random_seed
+The random seed used in the TM.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> unconditional_dive_frac</FONT></TT> - double (0.0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!unconditional_dive_frac
+The fraction of the nodes on which SYMPHONY randomly dives
+unconditionally into one of the children.
+
+<P>
+<A NAME="diving_strategy"></A></DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> diving_strategy</FONT></TT> - integer (<TT>BEST_ESTIMATE</TT>{0}).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!diving_strategy
+The strategy employed when deciding whether to dive or not. 
+<BR>
+<BR>
+The <TT>BEST_ESTIMATE</TT>{0} strategy continues to dive until the
+lower bound in the child to be dived into exceeds the parameter
+<A HREF="node275.html#upper_bound_estimate"><TT>upper_bound_estimate</TT></A>, which is 
+given by the user. 
+<BR>
+<BR>
+The <TT>COMP_BEST_K</TT>{1} strategy computes the average lower bound
+on the best <A HREF="#diving"><TT>diving_k</TT></A> search tree nodes and
+decides to dive if
+the lower bound of the child to be dived into does not exceed this
+average by more than the fraction <A HREF="#diving"><TT>diving_threshold</TT></A>.
+
+<BR>
+<BR>
+The <TT>COMP_BEST_K_GAP</TT>{2} strategy takes the size of the gap
+into account when deciding whether to dive. After the average lower
+bound of the best <A HREF="#diving"><TT>diving_k</TT></A> nodes is computed, 
+the gap between
+this average lower bound and the current upper bound is computed.
+Diving only occurs if the difference between the computed average
+lower bound and the lower bound of the child to be dived into is at
+most the fraction <A HREF="#diving"><TT>diving_threshold</TT></A> of the gap.
+<BR>
+<BR>
+Note that fractional diving settings can override these strategies.
+See <A HREF="#fractional_diving">below</A>.
+
+<P>
+<A NAME="diving"></A></DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> diving_k, diving_threshold</FONT></TT> - integer, double (1, 0.05).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!diving_k
+[p]Tree Manager Pramaters!diving_threshold
+See above.
+
+<P>
+<A NAME="fractional_diving"></A></DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> fractional_diving_ratio, fractional_diving_num</FONT></TT> -
+integer (0.02, 0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!fractional_diving_ratio
+[p]Tree Manager Pramaters!fractional_diving_num
+
+<P>
+Diving occurs automatically if the number of fractional variables in
+the child to be dived into is less than <TT>
+<FONT COLOR="#000000"> fractional_diving_num</FONT></TT>
+or the fraction of total variables that are fractional is less than <TT>fractional_diving_ratio</TT>. This overrides the other diving rules.
+Note that in order for this option to work, the code must be compiled
+with <TT>FRACTIONAL_BRANCHING</TT> defined. This is the default. See the
+makefile for more details.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> node_selection_rule</FONT></TT> - integer (<TT>LOWEST_LP_FIRST</TT>{0}).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!node_selection_rule
+The rule for selecting the next search tree node to be processed. This rule
+selects the one with lowest lower bound. Other possible values are: <TT>HIGHEST_LP_FIRST</TT>{1}, <TT>BREADTH_FIRST_SEARCH</TT>{2} and <TT>DEPTH_FIRST_SEARCH</TT>{3}.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> load_balance_level</FONT></TT></STRONG></DT>
+<DD>- integer (-1).] 
+[p]Tree Manager Pramaters!load_balance_level
+A naive attempt at load balancing on problems where significant time
+is spent in the root node, contributing to a lack of parallel
+speed-up. Only a prescribed number of iterations (<TT>load_balance_iter</TT>) are performed in the root node (and in each
+subsequent node on
+a level less than or equal to <TT>
+<FONT COLOR="#000000"> load_balance_level</FONT></TT>) before
+branching is forced in order to provide additional subproblems for the
+idle processors to work on. This doesn't work well in general.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> load_balance_iter</FONT></TT></STRONG></DT>
+<DD>- integer (-1).] 
+[p]Tree Manager Pramaters!load_balance_iter
+Works in tandem with the <TT>
+<FONT COLOR="#000000"> load_balance_level</FONT></TT> to attempt some
+simple load balancing. See the above description.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> keep_description_of_pruned</FONT></TT> - integer (<TT>DISCARD</TT>{0}).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!keep_description_of_pruned
+Whether to keep the description of pruned search tree nodes or not.
+The reasons to do this are (1) if the user wants to write out a proof
+of optimality using the logging function, (2) for debugging, or (3) to
+get a visual picture of the tree using the software VBCTOOL.
+Otherwise, keeping the pruned nodes around just takes up memory. 
+
+<P>
+There are three options if it is desired to keep some description of
+the pruned nodes around. First, their full description can be written
+out to disk and freed from memory (<TT>KEEP_ON_DISK_FULL</TT>{1}). There
+is not really too much you can do with this kind of file, but
+theoretically, it contains a full record of the solution process and
+could be used to provide a certificate of optimality (if we were using
+exact arithmetic) using an independent verifier. In this case, the
+line following <TT>
+<FONT COLOR="#000000"> keep_description_of_pruned</FONT></TT> should be a line
+containing the keyword <TT>
+<FONT COLOR="#000000"> pruned_node_file_name</FONT></TT> with its
+corresponding value being the name of a file to which a description of
+the pruned nodes can be written. The file does not need to exist and
+will be over-written if it does exist.
+
+<P>
+If you have the software VBCTOOL, then
+you can alternatively just write out the information VBCTOOL needs to
+display the tree (<TT>KEEP_ON_DISK_VBC_TOOL</TT>{2}). 
+
+<P>
+Finally, the user can set the value to of this parameter to <TT>KEEP_IN_MEMORY</TT>{2}, in which case all pruned nodes will be kept in
+memory and written out to the regular log file if that option is
+chosen. This is really only useful for debugging. Otherwise, pruned
+nodes should be flushed.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> keep_warm_start</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!keep_warm_start
+Turning this parameter on will have exactly the same impact with 
+setting the <TT>
+<FONT COLOR="#000000"> keep_description_of_pruned</FONT></TT> to 
+<TT>KEEP_IN_MEMORY</TT>{2}. This will allow SYMPHONY to keep all the
+necessary information obtained from the branching tree of the original 
+problem to be able to warm start after a parameter or problem data 
+modification. Thus, if it is intended to warm start later, the user 
+should set this parameter before solving the original problem.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> warm_start_node_limit</FONT></TT> - integer (<TT>SYM_INFINITY</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!warm_start_node_limit
+Setting this parameter will start the warm start routine using only the 
+first <TT>
+<FONT COLOR="#000000"> warm_start_node_limit</FONT></TT> nodes generated during the 
+previous solve procedure. The rest of the tree will be trimmed. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> warm_start_node_ratio</FONT></TT> - double (<TT>0.0</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!warm_start_node_ratio
+Setting this parameter will start the warm start routine using only the 
+first <TT>
+<FONT COLOR="#000000"> warm_start_node_ratio</FONT></TT>% of the nodes generated during the 
+previous solve procedure. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> warm_start_node_level</FONT></TT> - integer (<TT>SYM_INFINITY</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!warm_start_node_level
+Setting this parameter will start the warm start routine using all the
+nodes above the level <TT>
+<FONT COLOR="#000000"> warm_start_node_level</FONT></TT> of the 
+tree generated during the previous solve procedure. The rest of the tree 
+will be trimmed. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> warm_start_node_level_ratio</FONT></TT> - double (<TT>0.0</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!warm_start_node_level_ratio
+Setting this parameter will start the warm start routine using all the
+nodes above the level <TT>
+<FONT COLOR="#000000"> warm_start_node_level</FONT></TT>% of the 
+warm start tree depth. The rest of the tree will be trimmed
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> logging</FONT></TT> - integer (<TT>NO_LOGGING</TT>{0}).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!logging
+Whether or not to write out the state of the search tree and all other
+necessary data to disk periodically in order to allow a warm start in
+the case of a system crash or to allow periodic viewing with VBCTOOL.
+
+<P>
+If the value of this parameter is set to <TT>FULL_LOGGING</TT>{1},
+then all information needed to warm start the calculation will written
+out periodically. The next two lines of the parameter file following
+should contain the keywords <TT>
+<FONT COLOR="#000000"> tree_log_file_name</FONT></TT> and <TT>cut_log_file_name</TT> along with corresponding file names as values.
+These will be the files used to record the search tree and related
+data and the list of cuts needed to reconstruct the tree.
+
+<P>
+If the value of the parameter is set to <TT>VBC_TOOL</TT>{2}, then
+only the information VBCTOOL needs to display the tree will be
+logged. This is not really a very useful option since a ``live'' picture
+of the tree can be obtained using the <TT>
+<FONT COLOR="#000000"> vbc_emulation</FONT></TT> parameter
+described below.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> logging_interval</FONT></TT> - integer (1800).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!logging_interval
+Interval (in seconds) between writing out the above log files.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> warm_start</FONT></TT> - boolean (0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!warm_start
+Used to allow the tree manager to make a warm start by reading in
+previously written log files. If this option is set, then the two line
+following must start with the keywords <TT>warm_start_tree_file_name</TT> and <TT>
+<FONT COLOR="#000000"> warm_start_cut_file_name</FONT></TT>
+and include the appropriate file names as the corresponding values.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> vbc_emulation</FONT></TT></STRONG></DT>
+<DD>- integer (<TT>NO_VBC_EMULATION</TT>{0}).] 
+[p]Tree Manager Pramaters!vbc_emulation
+Determines whether or not to employ the VBCTOOL emulation mode. If
+one of these modes is chosen, then the tree will be displayed in
+``real time'' using the VBCTOOL Software. When using the option <TT>VBC_EMULATION_LIVE</TT>{2} and piping the output directly to VBCTOOL, the
+tree will be displayed as it is constructed, with color coding
+indicating the status of each node. With <TT>VBC_EMULATION_FILE</TT>{1} selected, a log file will be produced which
+can later be read into VBCTOOL to produce an emulation of the
+solution process at any desired speed. If <TT>VBC_EMULATION_FILE</TT>
+is selected, the the following line should contain the keyword <TT>vbc_emulation_file_name</TT> along with the corresponding file name
+for a value.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> price_in_root</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!price_in_root
+Whether to price out variables in the root node before the second
+phase starts (called <EM>repricing the root</EM>). 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> trim_search_tree</FONT></TT> - boolean (<TT>FALSE</TT>).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!trim_search_tree
+Whether to trim the search tree before the second phase starts or not. Useful
+only if there are two phases. (It is very useful then.)
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> colgen_in_first_phase, colgen_in_second_phase</FONT></TT> -
+integers (both 4).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!colgen_in_first_phase 
+[p]Tree Manager Pramaters!colgen_in_second_phase 
+These parameters determine if and when to do
+column generation in the first and second phase of the algorithm. The
+value of each parameter is obtained by setting the last four bits.
+The last two bits refer to what to do when attempting to prune a node.
+If neither of the last two bits are set, then we don't do
+anything--we just prune it. If only the last bit is set, then we
+simply save the node for the second phase without doing any column
+generation (yet). If only the second to last bit is set, then we do
+column generation immediately and resolve if any new columns are
+found. The next two higher bits determine whether or not to do column
+generation before branching. If only the third lowest bit is set, then no
+column generation occurs before branching. If only the fourth lowest bit is
+set, then column generation is attempted before branching. The default
+is not to generate columns before branching or fathoming, which
+corresponds to only the third lowest bit being set, resulting in a
+default value of 4.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> time_limit</FONT></TT> - double (-1.0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!time_limit
+Number of seconds of wall-clock time allowed for solution. When this
+time limit is reached, the solution process will stop and the best
+solution found to that point, along with other relevant data, will be
+output. A time limit less than 0.0 means there is no limit.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> node_limit</FONT></TT> - integer (-1).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!node_limit
+Number of nodes allowed to be analyzed during the solution. When this
+node limit is reached, the solution process will stop and the best
+solution found to that point, along with other relevant data, will be
+output. A node limit less than 0 means there is no limit. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> gap_limit</FONT></TT> - double (-1.0).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!gap_limit
+Target gap limit allowed for solution. When the gap between the lower and 
+the upper bound reaches this point, the solution process will stop and the 
+best solution found to that point, along with other relevant data, will be
+output. A gap limit less than 0 means there is no limit.
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> find_first_feasible</FONT></TT> - boolean (FALSE).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!find_first_feasible
+Whether to stop after finding the first feasible solution or not. 
+
+<P>
+</DD>
+<DT><STRONG><TT>
+<FONT COLOR="#000000"> sensitivity_analysis</FONT></TT> - boolean (FALSE).</STRONG></DT>
+<DD>[p]Tree Manager Pramaters!sensitivity_analysis
+If the user wants to do the rudimentary sensitivity analysis, which will 
+give a lower bound for the problem modified by the right hand side, then, 
+this parameter has to be set before solving the original problem. If it 
+is set, SYMPHONY will keep the necessary information from the solution 
+processes of the original problem to be able to do the sensitivity analysis 
+later.  
+
+<P>
+</DD>
+</DL><FONT COLOR="#a52a2a"></FONT>
+<P>
+<FONT COLOR="#a52a2a"></FONT>
+<DIV CLASS="navigation"><HR>
+<A NAME="tex2html4332"
+  HREF="node278.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html4328"
+  HREF="node273.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html4322"
+  HREF="node276.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html4330"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html4333"
+  HREF="node278.html">LP parameters</A>
+<B>Up:</B> <A NAME="tex2html4329"
+  HREF="node273.html">Run-time Parameters</A>
+<B> Previous:</B> <A NAME="tex2html4323"
+  HREF="node276.html">Draw Graph parameters</A>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Ted Ralphs <BR>
+2007-03-24</I>
+</ADDRESS>
+</BODY>
+</HTML>
