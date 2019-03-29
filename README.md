@@ -36,7 +36,7 @@ https://github.com/coin-or/SYMPHONY/wiki
 
 The on-line version of the manual is available here:
 
-http://github.coin-or.io/SYMPHONY/man-5.6/
+http://coin-or.github.io/SYMPHONY/man-5.6/
 
 What follows is a very brief summary of
 installation and usage. Please see the documentation for more details.
