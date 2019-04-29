@@ -40,8 +40,8 @@ install:
 
 build_script:
   - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew"
-  - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER/COIN; ./coinbrew fetch %APPVEYOR_PROJECT_NAME% --no-prompt --skip-update --no-third-party"
-  - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER/COIN; export PATH=$ADD_PATH:$PATH; ./coinbrew build %APPVEYOR_PROJECT_NAME% --no-prompt --no-third-party --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --verbosity=2 --test"
+  - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; ./coinbrew fetch %APPVEYOR_PROJECT_NAME% --no-prompt --skip-update --no-third-party"
+  - C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; export PATH=$ADD_PATH:$PATH; ./coinbrew build %APPVEYOR_PROJECT_NAME% --no-prompt --no-third-party --build=x86_64-w64-mingw32 $HOST_ARCH_ARG --verbosity=2 --test"
 
 after_build:
   - 7z a %APPVEYOR_PROJECT_NAME%-%VERSION%-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\build\bin
