@@ -583,7 +583,7 @@ OPENMP_ATOMIC_UPDATE
             }
 #else
 	    if (!check_tailoff(p) || (p->par.cuts_strong_branch &&
-				      p->tm->cpp[p->cut_pool]->cuts_to_add > 0)) {
+				      p->tm->cpp[p->cut_pool]->cuts_to_add_num > 0)) {
             if ((cut_term = receive_cuts(p, first_in_loop,
                         no_more_cuts_count)) >=0 ){
                cuts += cut_term;
