@@ -34,7 +34,11 @@ If you have downloaded a source distribution, LaTex source for the full document
 
 https://github.com/coin-or/SYMPHONY/wiki
 
-The on-line version of the manual is available here:
+The PDF version of the manual is available here:
+
+https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.17-Manual.pdf
+
+An on-line version that is for a slightly earlier release is here:
 
 http://coin-or.github.io/SYMPHONY/man-5.6/
 
