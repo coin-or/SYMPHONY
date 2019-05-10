@@ -10,34 +10,46 @@ and is freely redistributable. All source code and documentation is Copyright
 
 [![Build status](https://ci.appveyor.com/api/projects/status/220ltxwv2w2ac51s/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/symphony/branch/master)
 
+## CITE
+
+[![DOI](https://zenodo.org/badge/23689820.svg)](https://zenodo.org/badge/latestdoi/23689820)
+
 ## DOWNLOAD
 
 [ ![Download](https://api.bintray.com/packages/coin-or/download/SYMPHONY/images/download.svg?version=5.6) ](https://bintray.com/coin-or/download/SYMPHONY/5.6)
 
-Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/SYMPHONY) 
+Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/SYMPHONY). Binaries can also be installed on specific platforms, as follows. 
 
-## CITE
+ * *Linux*: On Debian, SYMPHONY is available in the package `coinor-symphony` and can be installed with apt. On Fedora, SYMPHONY is available in the package `coin-or-SYMPHONY`. Pre-compiled binaries are also available on [BinTray](http://bintray.com/coin-or/download/SYMPHONY) and as part of the [COIN-OR Optimization Suite](https://www.coin-or.org/download/binary/OptimizationSuite/).
+ * *Windows*: The easiest way to get SYMPHONY on Windows is to download binaries from [BinTray](http://bintray.com/coin-or/download/SYMPHONY) or just use the Windows installer for the [COIN Optimization Suite](http://www.coin-or.org/download/binary/OptimizationSuite), which provides Visual Studio compatible libraries and binaries (these are slightly out of date, however). 
+ * *OS X*: The easiest way to get SYMPHONY on OSX is through Homebrew. It can be installed with
+   * `brew tap coin-or-tools/coinor`
+   * `brew install symphony`.
 
-[![DOI](https://zenodo.org/badge/23689820.svg)](https://zenodo.org/badge/latestdoi/23689820)
+Due to license incompatibilities, pre-compiled binaries lack some functionality and are not available for the distributed parallel version of SYMPHONY. If binaries are not available for your platform for the latest version and you would like to request them to be built and posted, feel free to let us know on the mailing list or by opening an [issue](https://github.com/coin-or/SYMPHONY/newissue).
 
 # DOCUMENTATION
 
 If you have downloaded a source distribution, LaTex source for the full documentation is available in the SYMPHONY/Doc/ subdirectory. Quick start guides and pointers to other on-line documentation can be found at the project Wiki:
 
-https://projects.coin-or.org/SYMPHONY
+https://github.com/coin-or/SYMPHONY/wiki
 
-The on-line version of the manual is available here:
+The PDF version of the manual is available here:
 
-http://www.coin-or.org/SYMPHONY/man-5.6/
+https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.17-Manual.pdf
 
-What follows is a very brief and possibly out-of-date quick summary of
+An on-line version that is for a slightly earlier release is here:
+
+http://coin-or.github.io/SYMPHONY/man-5.6/
+
+What follows is a very brief summary of
 installation and usage. Please see the documentation for more details.
 
-## INSTALLATION
+## BUILDING FROM SOURCE
 
 If you downloaded a source distribution and would like instructions on
 building SYMPHONY or you downloaded a binary distribution and would like to
-know how to install it, please see the INSTALL file.
+know how to install it, please see the [INSTALL](https://github.com/coin-or/SYMPHONY/blob/master/INSTALL.md) file.
 
 ## USING SYMPHONY
 
@@ -217,12 +229,13 @@ that fixes the problem.
 See the Depdencies file for a list of the external COIN-OR libraries on which
 SYMPHONY depends.
 
+### BUG REPORTS
+
+To report a bug please file a ticket at 
+
+https://github.com/coin-or/SYMPHONY/issues/new
+
 ## SUPPORT
-
-### LIST SERVE
-
-There is a list serve for SYMPHONY users. To subscribe, go to 
-http://list.coin-or.org/mailman/listinfo/coin-symphony 
 
 ### AUTHORS
 
@@ -230,14 +243,6 @@ SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and Laci Ladanyi
 (ladanyi@us.ibm.com). Menal Guzelsoy (menal.guzelsoy@gmail.com) and Ashutosh
 Mahajan (amahajan@iitb.ac.in.edu) have been instrumental in development since
 version 5.0.
-
-### BUG REPORTS
-
-To report a bug please file a ticket at 
-
-https://projects.coin-or.org/SYMPHONY/newticket
-
-Please note the version of SYMPHONY you are using when filing the ticket.
 
 ### ACKNOWLEDGEMENTS
 

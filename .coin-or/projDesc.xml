@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type = "text/xsl" href = "http://www.coin-or.org/projects/autoGen.xsl"?>
+<projectData xmlns="coin-or.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="coin-or.org  http://www.coin-or.org/projects/autoGen.xsd">
+
+	<projectBasics>
+
+		<projectName>  SYMPHONY</projectName>
+
+		<projectDescription> SYMPHONY is an open-source generic MILP
+		            solver, callable library, and extensible framework
+		            for implementing customized solvers for
+		            mixed-integer linear programs (MILPs). SYMPHONY
+		            can be built in various sequential and parallel
+		            configurations for either distributed or shared
+		            memory architectures and can be used "out of the
+		            box" as a solver for generic mixed-integer linear
+		            programs or customized through a wide variety of
+		            user callback functions and control parameters.
+		            SYMPHONY has a number of advanced capabilities
+		            stemming from the research projects discussed
+		            above, including the ability to solve
+		            multi-objective MILPs, the ability to warm start
+		            its solution procedure, and the ability to perform
+		            basic sensitivity analyses. SYMPHONY has has been
+		            deployed in a variety of application areas,
+		            including computational biology, wireless
+		            telecommunications, supply chain management,
+		            transportation services, and air
+		            transportation.
+		</projectDescription>
+		<projectShortDescription>
+		  A callable library for solving mixed-integer linear programs.
+		</projectShortDescription>
+
+		<projectManager>Ted Ralphs, ted at lehigh dot edu </projectManager>
+
+		<projectHomePage> https://projects.coin-or.org/SYMPHONY</projectHomePage>
+
+		<projectLicense>Eclipse Public License 1.0</projectLicense>
+		<projectLicenseURL>http://www.opensource.org/licenses/eclipse-1.0</projectLicenseURL>
+
+		<coinLinkedProjects>  
+		     <coinProject>
+		           <repoName>BuildTools</repoName>
+		     </coinProject>
+		     <coinProject>
+		           <repoName>CoinUtils</repoName>
+		     </coinProject>
+		     <coinProject>
+		           <repoName>Cgl</repoName>
+		     </coinProject>
+                     <coinProject>
+		           <repoName>Osi</repoName>
+		     </coinProject>
+                     <coinProject>
+		           <repoName>Clp</repoName>
+		     </coinProject>
+		</coinLinkedProjects>
+	
+		<otherLinkedPackages>
+		
+		     <otherPackage>
+		          <packageName>Glpk</packageName>
+			  <packageURL>http://www.gnu.org/software/glpk/</packageURL>
+			  <requiredOrOptional>Optional</requiredOrOptional>
+		     </otherPackage>
+                     <otherPackage>
+		          <packageName>GNU Readline</packageName>
+                          <packageURL/>
+                          <requiredOrOptional>Optional</requiredOrOptional>
+                     </otherPackage>
+                     <otherPackage>
+		          <packageName>GNU History</packageName>
+                          <packageURL/>
+                          <requiredOrOptional>Optional</requiredOrOptional>
+                     </otherPackage>
+		      <otherPackage>
+			      <packageName>BLAS
+			      </packageName>
+			      <packageURL>
+			      http://www.netlib.org/blas
+			      </packageURL>
+			      <requiredOrOptional>Required (any implementation)
+			      </requiredOrOptional>
+		      </otherPackage>
+		      <otherPackage>
+			      <packageName>Lapack
+			      </packageName>
+			      <packageURL>
+			      http://www.netlib.org/lapack
+			      </packageURL>
+			      <requiredOrOptional>Optional (any implementation)
+			      </requiredOrOptional>
+		      </otherPackage>
+		</otherLinkedPackages>
+
+		<projectLanguage>C</projectLanguage>
+
+		<developmentStatus>
+
+			<activityStatus>Active</activityStatus>
+
+			<maturityLevel>5</maturityLevel>
+			<!-- DO NOT USE stableVersionNumber or releaseNumber unless
+			     you need to override the automated version tracking
+			     system.
+
+			<stableVersionNumber>5.2</stableVersionNumber>
+
+			<releaseNumber>5.2.1</releaseNumber>
+		        -->
+
+		</developmentStatus>
+
+		<testedPlatforms>
+
+                     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+			   <compiler>MSVC++/cl</compiler>
+                     </platform>
+                     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+                           <compiler>CYGWIN/cl</compiler>
+                     </platform>
+		     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+			   <compiler>CYGWIN/gcc</compiler>
+                     </platform>
+                     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+			   <compiler>MSys/gcc</compiler>
+		     </platform>
+                     <platform>
+                           <operatingSystem>Linux</operatingSystem>
+			   <compiler>gcc</compiler>
+		     </platform>
+		     <platform>
+                          <operatingSystem>OSX</operatingSystem>
+			  <compiler>gcc</compiler>
+                     </platform>
+		     <platform>
+		          <operatingSystem>Solarix X86</operatingSystem>
+			  <compiler>gcc</compiler>
+		     </platform>
+		     <platform>
+		          <operatingSystem>Solarix X86</operatingSystem>
+			  <compiler>sunpro</compiler>
+                      </platform>
+
+		</testedPlatforms>
+
+		<projectCategories>
+
+		      <category>
+		           Optimization deterministic linear discrete
+		      </category>
+		</projectCategories>
+
+	</projectBasics>
+
+	<leftMenuLinks>  
+	        <documentation>http://www.coin-or.org/SYMPHONY/man-5.1</documentation>
+		<sourceCodeDownload>http://www.coin-or.org/download/source/SYMPHONY</sourceCodeDownload>
+		<binaryDownload>http://www.coin-or.org/download/binary/SYMPHONY</binaryDownload>
+		<mailingList>http://list.coin-or.org/mailman/listinfo/coin-symphony</mailingList>
+	</leftMenuLinks>
+
+    </projectData>

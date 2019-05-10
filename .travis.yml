@@ -1,49 +1,49 @@
 language: cpp
 env:
-  global: 
-    - secure: "KXrNrSs66/J5fb8pRYTUhIjEiXizlZ7p0xVROPla+GWfwyLJIAiswbwYOBpR1kSTn51E+j6j14UWL36GC31TK5WXRJoWoyVXi1RH+zZfvESAwqI6OmhzTWQd84fyXJ+vx5Yg0qEhPGH0HFGaNrpAvsBtr8lmsoLgocEaMikqxQ8="
-    
+  global:
+  - secure: Bl88qfPPVlkCO8Is0afwzdinu4xbt90fg1rNfz9azf+S/N1hdAynmcW3XgYQk6YlR/JR3w1VifKDzcEP/9abpBU8ITg3iz7LFDlpDuMt/7KYIrfgZbpoQlkhSe4xMIQxUeCnNRdwPQ4GndcZx00TvniCcIAX3WdYfsU1kcAi66inV2CVrbDxEiIrSQvcvzCVK594egwveMz9VO6ptNQCJWr8xNdU0S0BEQzMoGucINED8oLApdaYpbaUMErTfNBCsv2fRz8w58dHhkRpdCVm3Xx/A6rU9aTvsREWtPkXaBPWOH7QH4MftnNjySkNqK3czbfh+s/g4iaKNtyVRaELt4sdXZo898Jl2RttuS8IRFQWJjTc+NdgggdikVoxFmSgM4UkL04w6tKowcY2drLzkQG1Z5iEC9UnFAGaa1dloHWsTHjMdSkMkx65ZZw0jjFzYfChciZZ0mog8j9h4mdZ5xk336kWkWopEtWQvBTYbfHM2HajocvtVo+CU0P0dwNxcW2RCfnwQBNJKAQQYI/ysq9U6QCFYQaD+P71RQ/S0zkSyv7yZ8oBqcjBbvycistQZ5EVJp3IjFLSIATz8mrrFtYkYp1b4M9nu884funenf2Gbln18L7A/GXnZ/4BU9K9GxAe1CyOzBrDtUQ0ftTmzWljSE4mC2EjsGpEtYLvTZM=
 matrix:
   include:
-    - os: linux
-      addons:
-        apt:
-          packages:
-            - gfortran
-    - os: osx 
-      osx_image: xcode10
-      env: OSX=10.13
-      compiler: clang
-    - os: osx 
-      osx_image: xcode9.2
-      env: OSX=10.12
-      compiler: clang
-    - os: osx
-      osx_image: xcode8
-      env: OSX=10.11
-      compiler: clang
-    - os: osx
-      osx_image: beta-xcode6.2
-      env: OSX=10.9
-      compiler: clang
+  - os: linux
+    addons:
+      apt:
+        packages:
+        - gfortran
+  - os: osx
+    osx_image: xcode10
+    env: OSX=10.13
+    compiler: clang
+  - os: osx
+    osx_image: xcode9.2
+    env: OSX=10.12
+    compiler: clang
+  - os: osx
+    osx_image: xcode8
+    env: OSX=10.11
+    compiler: clang
   allow_failures:
-    - os: osx
-
+  - os: osx
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then  export PLATFORM=osx$OSX-x86_64-clang`clang -dumpversion`; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; brew link --overwrite gcc; gfortran --version; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PLATFORM=linux-x86_64-gcc`gcc -dumpversion`; fi
-  - git clone https://github.com/coin-or/COIN-OR-OptimizationSuite COIN
-  - cd COIN
-  - export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
-  - bash ./coin.install.sh fetch --no-prompt --main-proj=$PROJECT > /dev/null
-
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then  export PLATFORM=osx$OSX-x86_64-clang`clang
+  -dumpversion`; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; brew
+  link --overwrite gcc; gfortran --version; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PLATFORM=linux-x86_64-gcc`gcc
+  -dumpversion`; fi
+- cd ..
+- wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
+- export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
+- bash ./coinbrew fetch $PROJECT --no-prompt --skip-update > /dev/null
 script:
-  - bash ./coin.install.sh build --no-prompt --main-proj=$PROJECT --verbosity=2 --test
-
+- bash ./coinbrew build $PROJECT --no-prompt --verbosity=2 --test
 after_script:
-  - if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=trunk; else export VERSION=`echo $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
-  - export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
-  - echo $TGZ_FILE
-  - tar -czvf $TGZ_FILE build/lib/* build/bin/* build/include/* build/share/* $PROJECT/README.md $PROJECT/INSTALL $PROJECT/LICENSE $PROJECT/$PROJECT/AUTHORS
-  - curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/download/$PROJECT/$VERSION/$TGZ_FILE
+- if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=master; else export VERSION=`echo
+  $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
+- export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
+- echo $TGZ_FILE
+- cp $PROJECT/README.md $PROJECT/INSTALL.md $PROJECT/LICENSE $PROJECT/$PROJECT/AUTHORS
+  build
+- cd build
+- tar -czvf $TGZ_FILE lib/* bin/* include/* share/* README.md INSTALL LICENSE AUTHORS
+- curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1"
+  https://api.bintray.com/content/coin-or/download/$PROJECT/$VERSION/$TGZ_FILE
