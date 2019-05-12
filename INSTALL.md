@@ -4,7 +4,7 @@ These instructions are for building and installing SYMPHONY from source. For
 instructions on how to obtain pre-built binaries, please see the README file.
 The instructions here are for the standard build. For a more detailed
 explanation of the build options and for building in parallel, see the
-SYMPHONY [manual](
+SYMPHONY [manual](https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.17-Manual.pdf).
 
 IMPORTANT: The build instructions have changed significantly. In most case,
 you do not need to clone this repository first! Please follow the instructions
@@ -18,17 +18,17 @@ fetch the source for SYMPHONY and all its dependencies. *You do not need to
 clone SYMPHONY first, just do the following!* Open a terminal and execute
 
 ```
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 ```
 
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the `COIN-OR-OptimizationSuite`
+(including dependencies), execute the script in the `coinbrew`
 subdirectory. To execute the script, do
 
 ```
-cd COIN-OR-OptimizationSuite
-chmod u+x coin.install.sh
-./coin.install.sh
+cd coinbrew
+chmod u+x coinbrew
+./coinbrew
 ```
 
 (Note: The `chmod` command is only needed if the execute permission is not
@@ -38,31 +38,29 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
+./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1
+./coinbrew install --main-proj=SYMPHONY
 ```
-
+Note that is no prefix is specified, the package will be installed in the build 
+directory and no separate install step is necessary. 
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-debug
+./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
 
 ```
-./coin/install.sh --help
+./coinbrew --help
 ```
 
 The above procedures will build all required dependencies and SYMPHONY itself.
-Afterwards, the binaries will be installed in the directory `Mibs/build/bin`
-and the libraries in the directory `SYMPHONY/build/lib`. If you wish to
-install in a different directory, such as `/usr/local`, then run the command
-
-```
-./coin.install.sh install --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir
-```
+Afterwards, the binaries will be installed in the directory `/path/to/install/dir/bin`
+and the libraries in the directory `/path/to/install/dir/lib`. 
 
 After installation, you will also need to add `/path/to/install/dir/bin` to your
 `PATH` variable in your `.bashrc` and also add `/path/to/install/dir/lib`
@@ -75,13 +73,14 @@ GCC compilers. The first step is to install either
    * [Msys2](https://msys2.github.io/)
    * [CYGWIN](http://cygwin.org/)
    * [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+Bash and the gcc compilers also come with the [Anaconda Python distribution](https://www.anaconda.com/distribution/)
 
 If you don't already have CYGWIN installed and don't want to fool around with
 WSL (which is a great option if you already know your way around Unix), it is
 recommended to use MSys2, since it provides a minimal toolset that is easy to
 install. To get MSys2, either download the installer
 [here](https://msys2.github.io/) or download and unzip MSys2 base from
-[here](http://kent.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20150512.tar.xz) 
+[here](http://kent.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20190512.tar.xz) 
 (this is an out-of-date version, there may be a better place to get an archive
 version). 
 
@@ -96,48 +95,49 @@ type
 ```
 bash
 pacman -S make wget tar patch dos2unix diffutils git svn
-```
-
-To obtain the source code, the first step is to get the installer that will then
-fetch the source for SYMPHONY and all its dependencies. *You do not need to
-clone SYMPHONY first, just do the following!* Open a terminal and execute
-
-```
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 ```
 
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the `COIN-OR-OptimizationSuite`
+(including dependencies), execute the script in the `coinbrew`
 subdirectory. To execute the script, do
 
 ```
-cd COIN-OR-OptimizationSuite
-chmod u+x coi.install.sh
-./coin.install.sh
+cd coinbrew
+chmod u+x coinbrew
+./coinbrew
 ```
 
 (Note: The `chmod` command is only needed if the execute permission is not
 automatically set by git on cloning). Once you run the script,
-you will be prompted interactively to select a project to fetch and build. the
+you will be prompted interactively to select a project to fetch and build. The
 rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
+./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1
+./coinbrew install --main-proj=SYMPHONY
 ```
+Note that is no prefix is specified, the package will be installed in the build 
+directory and no separate install step is necessary. 
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-debug
+./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
 
 ```
-./coin/install.sh --help
+./coinbrew --help
 ```
+
+The above procedures will build all required dependencies and SYMPHONY itself.
+Afterwards, the binaries will be installed in the directory `C:\path\to\install\dir\bin`
+and the libraries in the directory `C:\path\to\install\dir\lib`. 
 
 To use the resulting binaries and/or libraries, you will need to add the
 full path of the directory `build\bin` to your Windows executable
@@ -157,7 +157,7 @@ free). Then follow all the steps above, but replace the `build` command
 with
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-msvc
+./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1 --enable-msvc
 ```
 
 ## BUILDING WITH the MSVC++ IDE
@@ -287,66 +287,51 @@ do
 brew install gcc wget svn git
 ```
 
-To obtain the source code, the first step is to get the installer that will then
+To obtain
+the source code, the first step is to get the installer that will then
 fetch the source for SYMPHONY and all its dependencies. *You do not need to
 clone SYMPHONY first, just do the following!* Open a terminal and execute
 
 ```
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 ```
 
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the `COIN-OR-OptimizationSuite`
+(including dependencies), execute the script in the `coinbrew`
 subdirectory. To execute the script, do
 
 ```
-cd COIN-OR-OptimizationSuite
-chmod u+x coi.install.sh
-./coin.install.sh
+cd coinbrew
+chmod u+x coinbrew
+./coinbrew
 ```
 
 (Note: The `chmod` command is only needed if the execute permission is not
 automatically set by git on cloning). Once you run the script,
-you will be prompted interactively to select a project to fetch and build. the
+you will be prompted interactively to select a project to fetch and build. The
 rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
+./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1
+./coinbrew install --main-proj=SYMPHONY
 ```
-
-With this setup, `clang` will be used for compiling C++ by default and
-`gfortran` will be used for Fortran. Since `clang` uses the GNU standard
-library, `gfortran` is compatible.
-
-If you want to use the `gcc` compiler provided by Homebrew, then replace the
-`build` command above with
-
-```
-./coin.install.sh build --no-prompt --main-proj=SYMPHONY CC=gcc-5 CXX=g++-5
-```
-
+Note that is no prefix is specified, the package will be installed in the build 
+directory and no separate install step is necessary. 
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-debug
+./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
 
 ```
-./coin/install.sh --help
+./coinbrew --help
 ```
-
-If you wish to install in a different directory, such as `/usr/local`, then run
-the command
-
-```
-./coin.install.sh install --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir
-```
-
 After installation, you will also need to add `/path/to/install/dir/bin` to your
 `PATH` variable in your `.bashrc` and also add `/path/to/install/dir/lib`
 to your `DYLD_LIBRARY_PATH` if you want to link to COIN libraries. 
