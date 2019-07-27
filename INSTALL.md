@@ -38,9 +38,9 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1
+./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -49,7 +49,7 @@ build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
@@ -115,9 +115,9 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1
-./coinbrew install --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew build --no-prompt SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1
+./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -126,7 +126,7 @@ build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1 --enable-debug
+./coinbrew build --no-prompt SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
@@ -313,9 +313,9 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1
+./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -324,7 +324,7 @@ build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
