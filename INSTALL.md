@@ -38,9 +38,9 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1
+./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -49,7 +49,7 @@ build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
@@ -115,9 +115,9 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1
-./coinbrew install --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew build --no-prompt SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1
+./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -126,7 +126,7 @@ build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1 --enable-debug
+./coinbrew build --no-prompt SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
@@ -160,7 +160,7 @@ with
 ./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1 --enable-msvc
 ```
 
-## BUILDING WITH the MSVC++ IDE
+#### BUILDING WITH the MSVC++ IDE
 
 These instructions are for MSVC++ Version 10. Instructions for other versions
 should be similar. '''The MSVC++ are not regularly tested so please let us
@@ -189,12 +189,12 @@ the corresponding executable.
 Without Debugging.` and then type `help` or `?` to see a list of
 available commands.
 
-## BUILDING WITH VISUAL STUDIO FROM COMMAND LINE (deprecated)
+#### BUILDING WITH VISUAL STUDIO FROM COMMAND LINE (deprecated)
   
 These instructions are for MSVC++ Version 10. Instructions for other versions
 should be similar.
 
-1. Open a command line terminal. Go to 'SYMPHONY/MSVisualStudio/v10'
+1. Open a command line terminal. Go to `SYMPHONY/MSVisualStudio/v10`
 directory and type
 
 ```
@@ -237,7 +237,7 @@ devenv symphony.sln /Rebuild "Debug|Win32"
 
 in order to clean and rebuild everything.
 
-## BUILDING WITH THE NMAKE Utility (deprecated)
+#### BUILDING WITH THE NMAKE Utility (deprecated)
 
 Note: the `sym.mak` file is no longer maintained, but may work.
 
@@ -280,15 +280,15 @@ build COIN-OR, but it's missing some things. For examples, the latest versions
 of OS X come with the `clang` compiler but no Fortran compiler. You may also
 be missing the `wget` utility and `subversion` and `git` clients (needed for
 obtaining source code). The easiest way to get these missing utilitites is to
-install Homebrew (see http://brew.sh). After installation, open a terminal and
+install [Homebrew](https://brew.sh). After installation, open a terminal and
 do
 
 ```
 brew install gcc wget svn git
+brew tap coin-or-tools/coinor
+brew install symphony
 ```
-
-To obtain
-the source code, the first step is to get the installer that will then
+To obtain the source code, the first step is to get the installer that will then
 fetch the source for SYMPHONY and all its dependencies. *You do not need to
 clone SYMPHONY first, just do the following!* Open a terminal and execute
 
@@ -313,9 +313,9 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt --main-proj=SYMPHONY --main-proj-version=stable/5.6
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install --main-proj=SYMPHONY
+./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1
+./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -324,7 +324,7 @@ build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coinbrew build --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
 ```
 
 To get help with additional options available in running the script, do
