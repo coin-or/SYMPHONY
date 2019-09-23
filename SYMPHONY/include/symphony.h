@@ -187,6 +187,11 @@ typedef struct MIPDESC MIPdesc;
 typedef struct WARM_START_DESC warm_start_desc;
 typedef struct SYM_ENVIRONMENT sym_environment;
 
+#ifdef __cplusplus
+extern "C" // Export C names when in C
+{
+#endif
+   
 /*===========================================================================*/
 /*===================== Interface functions (master.c) ======================*/
 /*===========================================================================*/
@@ -324,5 +329,9 @@ sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
 int sym_test PROTO((sym_environment *env, int argc, char **argv,
 		    int *test_status));
+
+#ifdef __cplusplus
+} // end extern "C"
+#endif
 
 #endif
