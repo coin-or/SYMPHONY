@@ -23,7 +23,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2019 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -2734,6 +2734,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+dos2unix = @dos2unix@
 exec_prefix = @exec_prefix@
 have_autoconf = @have_autoconf@
 have_automake = @have_automake@
