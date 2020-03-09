@@ -32,19 +32,14 @@ libOsiSym_la_SOURCES = \
 	SymWarmStart.cpp SymWarmStart.hpp
 
 # List all additionally required libraries
-if DEPENDENCY_LINKING
-libOsiSym_la_LIBADD = $(SYMPHONYLIB_LIBS) ../libSym.la
-endif
+libOsiSym_la_LIBADD = ../libSym.la
 
 # This is for libtool (on Windows)
 libOsiSym_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../include` $(COINDEPEND_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+AM_CPPFLAGS = -DOSISYMPHONY_BUILD -I`$(CYGPATH_W) $(srcdir)/../../include` $(SYMPHONYLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -52,8 +47,14 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+includecoindir = $(pkgincludedir)
 includecoin_HEADERS = \
 	OsiSymSolverInterface.hpp \
 	OsiSymSolverParameters.hpp \
 	SymWarmStart.hpp
+
+install-exec-local:
+	$(install_sh_DATA) config_osisym.h $(DESTDIR)$(includecoindir)/OsiSymConfig.h
+
+uninstall-local:
+	rm -f $(DESTDIR)$(includecoindir)/OsiSymConfig.h

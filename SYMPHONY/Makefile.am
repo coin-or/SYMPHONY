@@ -78,31 +78,6 @@ uninstall-local: uninstall-doc
 .PHONY: test unitTest ptest punitTest
 
 ########################################################################
-#                  Installation of the addlibs file                    #
-########################################################################
-
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = symphony.pc symphony-app.pc osi-sym.pc
-
-addlibsdir = $(DESTDIR)$(datadir)/coin/doc/SYMPHONY
-
-install-data-hook:
-	@$(mkdir_p) "$(addlibsdir)"
-if COIN_HAS_PKGCONFIG
-	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@:$(DESTDIR)$(pkgconfiglibdir) \
-	$(PKG_CONFIG) --libs symphony > $(addlibsdir)/sym_addlibs.txt
-else
-if COIN_CXX_IS_CL
-	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@" > $(addlibsdir)/sym_addlibs.txt
-else
-	echo -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@ > $(addlibsdir)/sym_addlibs.txt
-endif
-endif
-
-uninstall-hook:
-	rm -f $(addlibsdir)/sym_addlibs.txt
-
-########################################################################
 #                         Maintainer Stuff                             #
 ########################################################################
 

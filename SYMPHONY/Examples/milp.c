@@ -16,18 +16,38 @@
 
 #include "symphony.h"
   
-int main(int argc, char **argv)
-{    
-     
-   sym_environment *env = sym_open_environment();
-   
-   sym_parse_command_line(env, argc, argv);
-   
-   sym_load_problem(env);
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
 
-   sym_solve(env);
-   
-   sym_close_environment(env);
-   
-   return(0);
-}  
+int main() {
+  sym_environment *Symphony = sym_open_environment();
+  int NumCols = 1, NumRows = 1;
+  int *ColStart = (int *)malloc(2 * sizeof(int));
+  ColStart[0] = 0, ColStart[1] = 1;
+  int *RowIdx = (int *)malloc(1 * sizeof(int));
+  RowIdx[0] = 0;
+  double *Values = (double *)malloc(1 * sizeof(double));
+  Values[0] = 1.0;
+  double *ColLB = (double *)malloc(1 * sizeof(double));
+  ColLB[0] = 0.0;
+  double *ColUB = (double *)malloc(1 * sizeof(double));
+  ColUB[0] = 1.0;
+  char *IsInt = (char *)malloc(1 * sizeof(char));
+  IsInt[0] = 1;
+  double *ObjFunction = (double *)malloc(1 * sizeof(double));
+  ObjFunction[0] = 1.0;
+  char *RowConstraints = (char *)malloc(1 * sizeof(char));
+  RowConstraints[0] = 'G';
+  double *RowRHS = (double *)malloc(1 * sizeof(double));
+  RowRHS[0] = 1.0;
+  if (sym_explicit_load_problem(Symphony, NumCols, NumRows, ColStart, RowIdx,
+                                Values, ColLB, ColUB, IsInt, ObjFunction,
+                                NULL, RowConstraints, RowRHS, NULL,
+                                false) != FUNCTION_TERMINATED_NORMALLY) {
+    exit(EXIT_FAILURE);
+  }
+  printf("Solving problem...\n");
+  sym_solve(Symphony);
+  printf("Problem solved!\n");
+}

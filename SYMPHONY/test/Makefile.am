@@ -28,7 +28,6 @@ SYMPCPPFLAGS =
 APPLCPPFLAGS =
 SYMPALLLDADD =
 LDADD = $(OSITESTS_LIBS) $(SYMPHONYLIB_LIBS)
-DEPENDENCIES = $(OSITESTS_DEPENDENCIES) $(SYMPHONYLIB_DEPENDENCIES)
 ALLLDADD =
 
 LIBS =
@@ -80,10 +79,6 @@ else
 SYMPLIB += $(SYMLIB)
 endif
 
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
-		   -I`$(CYGPATH_W) $(top_builddir)/include` \
-		   -I`$(CYGPATH_W) $(top_srcdir)/src/OsiSym`
-
 TestLDADD = $(LDADD)
 TestLINK = 
 if COIN_CXX_IS_CL
@@ -130,7 +125,7 @@ check_files:
 
 else
   MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
-  
+
 check_files:
 	if test -r $(top_srcdir)/miplib3; then \
 	  echo "MIBLIB3 directory found..."; \

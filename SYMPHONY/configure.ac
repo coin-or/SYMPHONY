@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[trunk],[symphony@list.coin-or.org])
+AC_INIT([SYMPHONY],[trunk],[https://github.com/coin-or/SYMPHONY/issues/new],[coin-or-symphony],[https://github.com/coin-or/SYMPHONY])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -44,74 +44,68 @@ AC_COPYRIGHT([
 # whether the package is actually there
 AC_CONFIG_SRCDIR(include/symphony.h)
 
-# Where should everything be installed by default?  Here, we want it
-# to be installed directly in 'bin', 'lib', 'include' subdirectories
-# of the directory where configure is run.  The default would be
-# /usr/local.
-AC_PREFIX_DEFAULT([`pwd`])
+# Do some initialization work (version numbers, change prefix default, ...)
+
+AC_COIN_INITIALIZE(SYMPHONY)
 
 #############################################################################
 #                         Standard build tool stuff                         #
 #############################################################################
 
-# Get the system type
-AC_CANONICAL_BUILD
-
-# If this project depends on external projects, the Externals file in
-# the source root directory contains definition of where to find those
-# externals.  The following macro ensures that those externals are
-# retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT(SYMPHONY)
-
-# Check if user wants to produce debugging code
-AC_COIN_DEBUG_COMPILE(SYMPHONY)
-
 # Get the name of the C++ compiler and appropriate compiler options
+
 AC_COIN_PROG_CXX
-#AC_LIBTOOL_LANG_CXX_CONFIG
-AC_LANG_PUSH(C++)
+AC_PROG_CC
 
-# Initialize automake and libtool
-AC_COIN_INIT_AUTO_TOOLS
+# Initialize libtool
 
-# Get the EXEXT variable for CYGWIN
-AC_EXEEXT
+AC_COIN_PROG_LIBTOOL
 
-# Check if user wants to use readline library
-AC_COIN_CHECK_GNU_READLINE
-AM_CONDITIONAL(COIN_HAS_READLINE,
-               [test $coin_has_readline = yes])
+# set RPATH_FLAGS to the compiler link flags required to hardcode location
+# of the shared objects (expanded_libdir is set somewhere in configure before)
+# (use in examples Makefile)
+AC_COIN_RPATH_FLAGS([$expanded_libdir])
 
 #############################################################################
-#                              COIN components                              #
+#                   Math headers                                            #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils osi], [SymphonyLib])
-if test $coin_has_coindepend != yes ; then
-  AC_MSG_ERROR([Required package CoinUtils or Osi not available.])
-fi
+# Check for cmath/math.h, cfloat/float.h, cieeefp/ieeefp.h
 
-AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp],  [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(DyLP, [osi-dylp], [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Vol,  [osi-vol],  [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Cgl,  [cgl],      [SymphonyLib])
-
-AC_COIN_CHECK_PACKAGE(OsiTests, [osi-unittests])
-AC_COIN_CHECK_PACKAGE(Sample,   [coindatasample])
-AC_COIN_CHECK_PACKAGE(Netlib,   [coindatanetlib])
-AC_COIN_CHECK_PACKAGE(Miplib3,  [coindatamiplib3])
+AC_COIN_CHECK_MATH_HDRS
 
 #############################################################################
-#                            Third party solvers                            #
+#                    COIN-OR components                                     #
 #############################################################################
 
-# Check which third party solvers are available
-AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Glpk, [osi-glpk],   [SymphonyLib]) 
-#AC_COIN_CHECK_PACKAGE(Grb,  [osi-gurobi], [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Msk,  [osi-mosek],  [SymphonyLib])
-#AC_COIN_CHECK_PACKAGE(Spx,  [osi-soplex], [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Xpr,  [osi-xpress], [SymphonyLib])
+m4_foreach_w([myvar],[CoinUtils Osi Cgl Clp],
+  [ AC_COIN_CHK_PKG(myvar,[SymphonyLib])
+    if test $coin_has_[]m4_tolower(myvar) != yes ; then
+      AC_MSG_ERROR([Required package myvar is not available.])
+    fi
+  ])
+
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-clp])
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-dylp])
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-vol])
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-cplex])
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-glpk])
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-mosek])
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-xpress])
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-unittests])
+
+# Data Packages
+
+AC_COIN_CHK_PKG(OsiTests,[CbcUnitTest],[osi-unittests])
+AC_COIN_CHK_PKG(Sample,,[coindatasample],,dataonly)
+AC_COIN_CHK_PKG(Netlib,,[coindatanetlib],,dataonly)
+AC_COIN_CHK_PKG(Miplib3,,[coindatamiplib3],,dataonly)
+
+# Optional package for command line edit support
+
+AC_COIN_CHK_GNU_READLINE([SymphonyLib])
+
+AC_COIN_FINALIZE_FLAGS([SymphonyLib])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -184,6 +178,8 @@ AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
 test $coin_has_spx = yes])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
 test $coin_has_xpr = yes])
+
+AM_CONDITIONAL(COIN_CXX_IS_CL,[test $CC = cl])
 
 #############################################################################
 #                       Add the options                                     #
@@ -590,44 +586,45 @@ dnl AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 #                       Parallel configuration                              #
 #############################################################################
 
-AC_COIN_CHECK_USER_LIBRARY([Pvm], [PVM], [pvm3.h], [pvm_gettid])
-AC_ARG_WITH([pvm],
-[AC_HELP_STRING([--with-pvm],
-                [compile in distributed parallel mode (assuming that 
-		pvm is installed and the variable PVM_ROOT is 
-		defined.)])],
-		[find_pvm=$withval],[find_pvm=no])
+AC_COIN_CHK_LIB(PVM, [SymphonyLib], [-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3], [-I$PVM_ROOT/include], [], [pvm_gettid])
+#AC_COIN_CHECK_USER_LIBRARY([Pvm], [PVM], [pvm3.h], [pvm_gettid])
+#AC_ARG_WITH([pvm],
+#[AC_HELP_STRING([--with-pvm],
+#                [compile in distributed parallel mode (assuming that 
+#		pvm is installed and the variable PVM_ROOT is 
+#		defined.)])],
+#		[find_pvm=$withval],[find_pvm=no])
 
-if test x"$find_pvm" = xyes; then 
-    if test x"$coin_has_pvm" != xyes; then 
-        m4_ifvaln([pvm3.h],
-                  [AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
-                  [pvm_header=yes])],
-                  [])
-	m4_ifvaln([pvm_gettid],
-                  [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
-                   pvm_link=no
-                   AC_LANG_PUSH(C)
-                   AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
-                   AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],[[pvm_gettid()]])],
-                                  [AC_MSG_RESULT(yes)
-                                   pvm_link=yes
-                                   break],
-                                  [AC_MSG_RESULT(no)])
-                   AC_LANG_POP(C)])
-    fi
+#if test x"$find_pvm" = xyes; then 
+#    if test x"$coin_has_pvm" != xyes; then 
+#        m4_ifvaln([pvm3.h],
+#                  [AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
+#                  [pvm_header=yes])],
+#                  [])
+#	m4_ifvaln([pvm_gettid],
+#                  [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
+#                   pvm_link=no
+#                   AC_LANG_PUSH(C)
+#                   AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
+#                   AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],[[pvm_gettid()]])],
+#                                  [AC_MSG_RESULT(yes)
+#                                   pvm_link=yes
+#                                   break],
+#                                  [AC_MSG_RESULT(no)])
+#                   AC_LANG_POP(C)])
+#    fi
 
-    if test x"$pvm_header" != xyes; then
-       AC_MSG_ERROR([Cannot find the pvm header files either in system path or 
-in PVM_ROOT path:$PVM_ROOT])
-    fi
-    if test x"$pvm_link" != xyes ; then
-       AC_MSG_ERROR([Cannot find PVM library in system paths or in PVM_ROOT path:$PVM_ROOT])
-    fi
-    if test $pvm_link == yes && test $pvm_header == yes; then
-       coin_has_pvm=yes
-    fi
-fi
+#    if test x"$pvm_header" != xyes; then
+#       AC_MSG_ERROR([Cannot find the pvm header files either in system path or 
+#in PVM_ROOT path:$PVM_ROOT])
+#    fi
+#    if test x"$pvm_link" != xyes ; then
+#       AC_MSG_ERROR([Cannot find PVM library in system paths or in PVM_ROOT path:$PVM_ROOT])
+#    fi
+#    if test $pvm_link == yes && test $pvm_header == yes; then
+#       coin_has_pvm=yes
+#    fi
+#fi
 
 #---------------------------------------------------------------------------#
 
@@ -840,20 +837,6 @@ else
   SYM_OPENMP_LIBS=
 fi
 
-#############################################################################
-#                       Other third party software                          #
-#############################################################################
-
-# Ampl Solver library
-#AC_COIN_HAS_ASL
-
-##############################################################################
-#                   VPATH links for example input files                      #
-##############################################################################
-
-# In case this is a VPATH configuration we need to make sure that the
-# input files for the examples are available in the VPATH directory.
-
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
@@ -936,9 +919,7 @@ AC_CONFIG_FILES([Makefile
 		 Applications/VRP/Makefile
 		 symphony.pc
 		 symphony-app.pc
-		 symphony-uninstalled.pc
-		 osi-sym.pc:src/OsiSym/osi-sym.pc.in
-		 osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in])
+		 osi-sym.pc:src/OsiSym/osi-sym.pc.in])
 
 AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/CNRP/README
