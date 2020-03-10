@@ -18,14 +18,21 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+include BuildTools/Makemain.inc
+
 ########################################################################
 #                          Subdirectories                              #
 ########################################################################
 
 SUBDIRS = src
 
-# Don't do src/OsiSym recursively, since src/OsiSym/libOsiSym depends on src/libSym
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = symphony.pc symphony-app.pc
+
+# Don't do src/OsiSym recursively, since src/OsiSym/libOsiSym depends on
+# src/libSym
 SUBDIRS += src/OsiSym
+pkgconfiglib_DATA += osi-sym.pc
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
@@ -84,6 +91,6 @@ uninstall-local: uninstall-doc
 CLEANFILES =
 
 # Files that are generated and should be cleaned with make distclean
+
 DISTCLEANFILES =
 
-include BuildTools/Makemain.inc

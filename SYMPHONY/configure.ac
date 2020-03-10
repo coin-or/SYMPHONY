@@ -950,7 +950,7 @@ AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/VRP/sample.vrp])
 
 # Here put the location and name of the configuration header file
-AC_CONFIG_HEADER([include/config.h include/config_sym.h])
+AC_CONFIG_HEADER([include/config.h include/config_sym.h include/config_osisym.h])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE

@@ -54,7 +54,7 @@ includecoin_HEADERS = \
 	SymWarmStart.hpp
 
 install-exec-local:
-	$(install_sh_DATA) config_osisym.h $(DESTDIR)$(includecoindir)/OsiSymConfig.h
+	$(install_sh_DATA) ../../include/config_osisym.h $(DESTDIR)$(includecoindir)/OsiSymConfig.h
 
 uninstall-local:
 	rm -f $(DESTDIR)$(includecoindir)/OsiSymConfig.h

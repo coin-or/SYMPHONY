@@ -23288,7 +23288,7 @@ ac_config_links="$ac_config_links Applications/VRP/sample.vrp:Applications/VRP/s
 
 
 # Here put the location and name of the configuration header file
-ac_config_headers="$ac_config_headers include/config.h include/config_sym.h"
+ac_config_headers="$ac_config_headers include/config.h include/config_sym.h include/config_osisym.h"
 
 
 # Finally, we let configure write all the output...
@@ -24669,6 +24669,7 @@ do
     "Applications/VRP/sample.vrp") CONFIG_LINKS="$CONFIG_LINKS Applications/VRP/sample.vrp:Applications/VRP/sample.vrp" ;;
     "include/config.h") CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;
     "include/config_sym.h") CONFIG_HEADERS="$CONFIG_HEADERS include/config_sym.h" ;;
+    "include/config_osisym.h") CONFIG_HEADERS="$CONFIG_HEADERS include/config_osisym.h" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
