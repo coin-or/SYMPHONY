@@ -727,6 +727,8 @@ GLPK_LP_SOLVER_FALSE
 GLPK_LP_SOLVER_TRUE
 CLP_LP_SOLVER_FALSE
 CLP_LP_SOLVER_TRUE
+SYMUNITTEST_CFLAGS_NOPC
+SYMUNITTEST_LFLAGS_NOPC
 SYMPHONYLIB_CFLAGS_NOPC
 SYMPHONYLIB_LFLAGS_NOPC
 COIN_HAS_READLINE_FALSE
@@ -21792,6 +21794,53 @@ $as_echo "$as_me: adding \"${SYMPHONYLIB_PCFILES}\"" >&6;}
 $as_echo "$as_me: SYMPHONYLIB_LFLAGS: \"${SYMPHONYLIB_LFLAGS}\"" >&6;}
         { $as_echo "$as_me:${as_lineno-$LINENO}: SYMPHONYLIB_CFLAGS: \"${SYMPHONYLIB_CFLAGS}\"" >&5
 $as_echo "$as_me: SYMPHONYLIB_CFLAGS: \"${SYMPHONYLIB_CFLAGS}\"" >&6;}
+      fi
+     if test "$BUILDTOOLS_DEBUG" = 1 ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: FINALIZE_FLAGS for SymUnitTest:" >&5
+$as_echo "$as_me: FINALIZE_FLAGS for SymUnitTest:" >&6;}
+      fi
+      SYMUNITTEST_LFLAGS_NOPC=$SYMUNITTEST_LFLAGS
+
+      SYMUNITTEST_CFLAGS_NOPC=$SYMUNITTEST_CFLAGS
+
+      if test -n "${SYMUNITTEST_PCFILES}" ; then
+        temp_CFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --cflags ${SYMUNITTEST_PCFILES}`
+        temp_LFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --libs ${SYMUNITTEST_PCFILES}`
+        SYMUNITTEST_CFLAGS="$temp_CFLAGS ${SYMUNITTEST_CFLAGS}"
+        SYMUNITTEST_LFLAGS="$temp_LFLAGS ${SYMUNITTEST_LFLAGS}"
+      fi
+
+      # setup XYZ_EXPORT symbol for library users
+      libexport_attribute=
+      if test "$enable_shared" = yes ; then
+        case $build_os in
+          cygwin* | mingw* | msys* | cegcc* )
+            libexport_attribute="__declspec(dllimport)"
+            if test "$enable_static" = yes ; then
+              as_fn_error $? "Cannot do DLL and static LIB builds simultaneously. Do not add --enable-static without --disable-shared." "$LINENO" 5
+            fi
+          ;;
+        esac
+      fi
+
+cat >>confdefs.h <<_ACEOF
+#define SYMUNITTEST_EXPORT $libexport_attribute
+_ACEOF
+
+
+# Define BUILDTOOLS_DEBUG to enable debugging output
+
+      if test "$BUILDTOOLS_DEBUG" = 1 ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: SYMUNITTEST_LFLAGS_NOPC: \"${SYMUNITTEST_LFLAGS_NOPC}\"" >&5
+$as_echo "$as_me: SYMUNITTEST_LFLAGS_NOPC: \"${SYMUNITTEST_LFLAGS_NOPC}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: SYMUNITTEST_CFLAGS_NOPC: \"${SYMUNITTEST_CFLAGS_NOPC}\"" >&5
+$as_echo "$as_me: SYMUNITTEST_CFLAGS_NOPC: \"${SYMUNITTEST_CFLAGS_NOPC}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: adding \"${SYMUNITTEST_PCFILES}\"" >&5
+$as_echo "$as_me: adding \"${SYMUNITTEST_PCFILES}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: SYMUNITTEST_LFLAGS: \"${SYMUNITTEST_LFLAGS}\"" >&5
+$as_echo "$as_me: SYMUNITTEST_LFLAGS: \"${SYMUNITTEST_LFLAGS}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: SYMUNITTEST_CFLAGS: \"${SYMUNITTEST_CFLAGS}\"" >&5
+$as_echo "$as_me: SYMUNITTEST_CFLAGS: \"${SYMUNITTEST_CFLAGS}\"" >&6;}
       fi
 
 

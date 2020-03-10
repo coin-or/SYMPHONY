@@ -22,7 +22,7 @@ AUTOMAKE_OPTIONS = foreign
 #                         unitTest for Symphony                        #
 ########################################################################
 
-AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS)
+AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(SYMUNITTEST_CFLAGS) $(SYMPHONYLIB_CFLAGS)
 
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(top_srcdir)/include` \
                -I`$(CYGPATH_W) $(top_builddir)/include` \
@@ -62,7 +62,7 @@ unitTest_SOURCES = \
 
 unitTest_CPPFLAGS = $(AM_CPPFLAGS) 
 unitTest_LDADD = ../src/libSym.la ../src/OsiSym/libOsiSym.la \
-	$(OSITESTS_LFLAGS)
+	$(SYMUNITTEST_LFLAGS)
 
 if COIN_HAS_MIPLIB3
   MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`

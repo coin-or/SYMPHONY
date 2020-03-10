@@ -130,7 +130,9 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_unitTest_OBJECTS = unitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
 	unitTest-unitTestSym.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
-unitTest_DEPENDENCIES = ../src/libSym.la ../src/OsiSym/libOsiSym.la
+am__DEPENDENCIES_1 =
+unitTest_DEPENDENCIES = ../src/libSym.la ../src/OsiSym/libOsiSym.la \
+	$(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -291,7 +293,9 @@ SYMPHONYLIB_LFLAGS_NOPC = @SYMPHONYLIB_LFLAGS_NOPC@
 SYMPHONYLIB_PCFILES = @SYMPHONYLIB_PCFILES@
 SYMSRCDIR = @SYMSRCDIR@
 SYMUNITTEST_CFLAGS = @SYMUNITTEST_CFLAGS@
+SYMUNITTEST_CFLAGS_NOPC = @SYMUNITTEST_CFLAGS_NOPC@
 SYMUNITTEST_LFLAGS = @SYMUNITTEST_LFLAGS@
+SYMUNITTEST_LFLAGS_NOPC = @SYMUNITTEST_LFLAGS_NOPC@
 SYMUNITTEST_PCFILES = @SYMUNITTEST_PCFILES@
 SYM_OPENMP_FLAGS = @SYM_OPENMP_FLAGS@
 SYM_OPENMP_LIBS = @SYM_OPENMP_LIBS@
@@ -359,7 +363,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 #                         unitTest for Symphony                        #
 ########################################################################
-AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(OSITESTS_CFLAGS) \
+AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(SYMUNITTEST_CFLAGS) \
 	$(SYMPHONYLIB_CFLAGS) -I`$(CYGPATH_W) $(top_srcdir)/include` \
 	-I`$(CYGPATH_W) $(top_builddir)/include` -I`$(CYGPATH_W) \
 	$(top_srcdir)/src/OsiSym` $(am__append_1) $(am__append_2) \
@@ -370,7 +374,7 @@ unitTest_SOURCES = \
 
 unitTest_CPPFLAGS = $(AM_CPPFLAGS) 
 unitTest_LDADD = ../src/libSym.la ../src/OsiSym/libOsiSym.la \
-	$(OSITESTS_LFLAGS)
+	$(SYMUNITTEST_LFLAGS)
 
 @COIN_HAS_MIPLIB3_FALSE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
 @COIN_HAS_MIPLIB3_TRUE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`

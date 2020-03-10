@@ -104,7 +104,7 @@ AC_COIN_CHK_PKG(Miplib3,,[coindatamiplib3],,dataonly)
 
 AC_COIN_CHK_GNU_READLINE([SymphonyLib])
 
-AC_COIN_FINALIZE_FLAGS([SymphonyLib])
+AC_COIN_FINALIZE_FLAGS([SymphonyLib SymUnitTest])
 
 #############################################################################
 #                      Check for the LP solver                              #

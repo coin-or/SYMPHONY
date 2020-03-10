@@ -143,3 +143,6 @@
 
 /* Release version number of project. */
 #undef SYMPHONY_VERSION_RELEASE
+
+/* Library Visibility Attribute */
+#undef SYMUNITTEST_EXPORT
