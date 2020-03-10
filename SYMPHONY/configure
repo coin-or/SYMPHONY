@@ -742,9 +742,21 @@ COIN_HAS_SAMPLE_FALSE
 COIN_HAS_SAMPLE_TRUE
 COIN_HAS_OSITESTS_FALSE
 COIN_HAS_OSITESTS_TRUE
-CBCUNITTEST_PCFILES
-CBCUNITTEST_CFLAGS
-CBCUNITTEST_LFLAGS
+SYMUNITTEST_PCFILES
+SYMUNITTEST_CFLAGS
+SYMUNITTEST_LFLAGS
+COIN_HAS_OSIXPR_FALSE
+COIN_HAS_OSIXPR_TRUE
+COIN_HAS_OSIMSK_FALSE
+COIN_HAS_OSIMSK_TRUE
+COIN_HAS_OSIGLPK_FALSE
+COIN_HAS_OSIGLPK_TRUE
+COIN_HAS_OSICPX_FALSE
+COIN_HAS_OSICPX_TRUE
+COIN_HAS_OSIVOL_FALSE
+COIN_HAS_OSIVOL_TRUE
+COIN_HAS_OSIDYLP_FALSE
+COIN_HAS_OSIDYLP_TRUE
 COIN_HAS_OSICLP_FALSE
 COIN_HAS_OSICLP_TRUE
 COIN_HAS_CLP_FALSE
@@ -927,6 +939,24 @@ with_clp_cflags
 with_osiclp
 with_osiclp_lflags
 with_osiclp_cflags
+with_osidylp
+with_osidylp_lflags
+with_osidylp_cflags
+with_osivol
+with_osivol_lflags
+with_osivol_cflags
+with_osicpx
+with_osicpx_lflags
+with_osicpx_cflags
+with_osiglpk
+with_osiglpk_lflags
+with_osiglpk_cflags
+with_osimsk
+with_osimsk_lflags
+with_osimsk_cflags
+with_osixpr
+with_osixpr_lflags
+with_osixpr_cflags
 with_ositests
 with_ositests_lflags
 with_ositests_cflags
@@ -1694,6 +1724,60 @@ Optional Packages:
   --with-osiclp-lflags    Linker flags for OsiClp appropriate for your
                           environment. (Most often, -l specs for libraries.)
   --with-osiclp-cflags    Compiler flags for OsiClp appropriate for your
+                          environment. (Most often, -I specs for header file
+                          directories.)
+  --with-osidylp          Use OsiDyLP. If an argument is given, 'yes' is
+                          equivalent to --with-osidylp, 'no' is
+                          equivalent to --without-osidylp. Any other argument
+                          is applied as for --with-osidylp-lflags
+  --with-osidylp-lflags   Linker flags for OsiDyLP appropriate for your
+                          environment. (Most often, -l specs for libraries.)
+  --with-osidylp-cflags   Compiler flags for OsiDyLP appropriate for your
+                          environment. (Most often, -I specs for header file
+                          directories.)
+  --with-osivol           Use OsiVol. If an argument is given, 'yes' is
+                          equivalent to --with-osivol, 'no' is
+                          equivalent to --without-osivol. Any other argument
+                          is applied as for --with-osivol-lflags
+  --with-osivol-lflags    Linker flags for OsiVol appropriate for your
+                          environment. (Most often, -l specs for libraries.)
+  --with-osivol-cflags    Compiler flags for OsiVol appropriate for your
+                          environment. (Most often, -I specs for header file
+                          directories.)
+  --with-osicpx           Use OsiCpx. If an argument is given, 'yes' is
+                          equivalent to --with-osicpx, 'no' is
+                          equivalent to --without-osicpx. Any other argument
+                          is applied as for --with-osicpx-lflags
+  --with-osicpx-lflags    Linker flags for OsiCpx appropriate for your
+                          environment. (Most often, -l specs for libraries.)
+  --with-osicpx-cflags    Compiler flags for OsiCpx appropriate for your
+                          environment. (Most often, -I specs for header file
+                          directories.)
+  --with-osiglpk          Use OsiGlpk. If an argument is given, 'yes' is
+                          equivalent to --with-osiglpk, 'no' is
+                          equivalent to --without-osiglpk. Any other argument
+                          is applied as for --with-osiglpk-lflags
+  --with-osiglpk-lflags   Linker flags for OsiGlpk appropriate for your
+                          environment. (Most often, -l specs for libraries.)
+  --with-osiglpk-cflags   Compiler flags for OsiGlpk appropriate for your
+                          environment. (Most often, -I specs for header file
+                          directories.)
+  --with-osimsk           Use OsiMsk. If an argument is given, 'yes' is
+                          equivalent to --with-osimsk, 'no' is
+                          equivalent to --without-osimsk. Any other argument
+                          is applied as for --with-osimsk-lflags
+  --with-osimsk-lflags    Linker flags for OsiMsk appropriate for your
+                          environment. (Most often, -l specs for libraries.)
+  --with-osimsk-cflags    Compiler flags for OsiMsk appropriate for your
+                          environment. (Most often, -I specs for header file
+                          directories.)
+  --with-osixpr           Use OsiXpr. If an argument is given, 'yes' is
+                          equivalent to --with-osixpr, 'no' is
+                          equivalent to --without-osixpr. Any other argument
+                          is applied as for --with-osixpr-lflags
+  --with-osixpr-lflags    Linker flags for OsiXpr appropriate for your
+                          environment. (Most often, -l specs for libraries.)
+  --with-osixpr-cflags    Compiler flags for OsiXpr appropriate for your
                           environment. (Most often, -I specs for header file
                           directories.)
   --with-ositests         Use OsiTests. If an argument is given, 'yes' is
@@ -19033,8 +19117,8 @@ $as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
 
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiClp" >&5
-$as_echo_n "checking for package OsiClp... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiDyLP" >&5
+$as_echo_n "checking for package OsiDyLP... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
 
@@ -19045,11 +19129,11 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 
 # Check to see if the user has set an override to skip this primary.
 
-  coin_has_osiclp=noInfo
+  coin_has_osidylp=noInfo
   if test x"$COIN_SKIP_PROJECTS" != x ; then
     for pkg in $COIN_SKIP_PROJECTS ; do
-      if test "$pkg" = "$osiclp" ; then
-        coin_has_osiclp=skipping
+      if test "$pkg" = "$osidylp" ; then
+        coin_has_osidylp=skipping
       fi
     done
   fi
@@ -19058,28 +19142,28 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 # options according to the cmdopts parameter. Then invoke FIND_PRIM_PKG to do
 # the heavy lifting.
 
-  if test "$coin_has_osiclp" != skipping ; then
+  if test "$coin_has_osidylp" != skipping ; then
 
 
 
 
-# Check whether --with-osiclp was given.
-if test "${with_osiclp+set}" = set; then :
-  withval=$with_osiclp;
+# Check whether --with-osidylp was given.
+if test "${with_osidylp+set}" = set; then :
+  withval=$with_osidylp;
 fi
 
 
 
-# Check whether --with-osiclp-lflags was given.
-if test "${with_osiclp_lflags+set}" = set; then :
-  withval=$with_osiclp_lflags;
+# Check whether --with-osidylp-lflags was given.
+if test "${with_osidylp_lflags+set}" = set; then :
+  withval=$with_osidylp_lflags;
 fi
 
 
 
-# Check whether --with-osiclp-cflags was given.
-if test "${with_osiclp_cflags+set}" = set; then :
-  withval=$with_osiclp_cflags;
+# Check whether --with-osidylp-cflags was given.
+if test "${with_osidylp_cflags+set}" = set; then :
+  withval=$with_osidylp_cflags;
 fi
 
 
@@ -19092,30 +19176,30 @@ fi
 
 # Initialize variables for the primary package.
 
-  coin_has_osiclp=noInfo
-  osiclp_lflags=
-  osiclp_cflags=
-  osiclp_data=
-  osiclp_pcfiles=
+  coin_has_osidylp=noInfo
+  osidylp_lflags=
+  osidylp_cflags=
+  osidylp_data=
+  osidylp_pcfiles=
 
 # --with-prim is always present. If the client specified dataonly, its value
 # is assigned to prim_data.
 
-  withval="$with_osiclp"
+  withval="$with_osidylp"
   if test -n "$withval" ; then
     case "$withval" in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osidylp=skipping
         ;;
       yes )
-        coin_has_osiclp=requested
+        coin_has_osidylp=requested
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osidylp=build
         ;;
       * )
-        coin_has_osiclp=yes
-        osiclp_lflags="$withval"
+        coin_has_osidylp=yes
+        osidylp_lflags="$withval"
         ;;
     esac
   fi
@@ -19124,29 +19208,29 @@ fi
 # specified dataonly. Specifying --with-prim=no overrides the individual
 # options for libs and cflags.
 
-  if test "$coin_has_osiclp" != skipping ; then
-       withval="$with_osiclp_lflags"
+  if test "$coin_has_osidylp" != skipping ; then
+       withval="$with_osidylp_lflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify linker flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_lflags="$withval"
+             coin_has_osidylp=yes
+             osidylp_lflags="$withval"
              ;;
          esac
        fi
 
-       withval="$with_osiclp_cflags"
+       withval="$with_osidylp_cflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify compiler flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_cflags="$withval"
+             coin_has_osidylp=yes
+             osidylp_cflags="$withval"
              ;;
          esac
        fi
@@ -19167,16 +19251,16 @@ fi
 # Otherwise, the default must be yes or build; consider the package requested.
 # A default action we don't recognise defaults to yes.
 
-  if test "$coin_has_osiclp" = noInfo ; then
+  if test "$coin_has_osidylp" = noInfo ; then
     case $dflt_action in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osidylp=skipping
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osidylp=build
         ;;
       * )
-        coin_has_osiclp=requested
+        coin_has_osidylp=requested
         ;;
     esac
   fi
@@ -19186,7 +19270,7 @@ fi
 # well, hope that the user knows their system and prim can be used with no
 # additional flags.
 
-  case $coin_has_osiclp in
+  case $coin_has_osidylp in
     requested | build )
       if test -n "$PKG_CONFIG" -a "osi-dylp" != skip ; then
         pcfile="osi-dylp"
@@ -19195,28 +19279,28 @@ fi
 
   if test -n "$PKG_CONFIG" ; then
     if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
-      OSICLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
-      coin_has_osiclp=yes
-           osiclp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
-           osiclp_pcfiles="$pcfile"
+      OSIDYLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_osidylp=yes
+           osidylp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
+           osidylp_pcfiles="$pcfile"
     else
-      OSICLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
-      coin_has_osiclp=no
+      OSIDYLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_osidylp=no
     fi
   else
-    as_fn_error $? "\"Cannot check for existence of module osiclp without pkgconf\"" "$LINENO" 5
+    as_fn_error $? "\"Cannot check for existence of module osidylp without pkgconf\"" "$LINENO" 5
   fi
 
       else
-        coin_has_osiclp=no
+        coin_has_osidylp=no
         # AC_MSG_WARN([skipped check via pkgconf as no pkgconf available])
       fi
       ;;
     skipping | yes )
       ;;
     * )
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&5
-$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&2;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osidylp\" in COIN_FIND_PRIM_PKG" >&5
+$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osidylp\" in COIN_FIND_PRIM_PKG" >&2;}
       ;;
   esac
 
@@ -19228,55 +19312,55 @@ $as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_P
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
   if test "$BUILDTOOLS_DEBUG" = 1 ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&5
-$as_echo "$as_me: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiclp'" >&5
-$as_echo "$as_me: Collected values for package 'osiclp'" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_lflags is \"$osiclp_lflags\"" >&5
-$as_echo "$as_me: osiclp_lflags is \"$osiclp_lflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_cflags is \"$osiclp_cflags\"" >&5
-$as_echo "$as_me: osiclp_cflags is \"$osiclp_cflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_data is \"$osiclp_data\"" >&5
-$as_echo "$as_me: osiclp_data is \"$osiclp_data\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&5
-$as_echo "$as_me: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osidylp: \"$coin_has_osidylp\"" >&5
+$as_echo "$as_me: FIND_PRIM_PKG result for osidylp: \"$coin_has_osidylp\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osidylp'" >&5
+$as_echo "$as_me: Collected values for package 'osidylp'" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osidylp_lflags is \"$osidylp_lflags\"" >&5
+$as_echo "$as_me: osidylp_lflags is \"$osidylp_lflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osidylp_cflags is \"$osidylp_cflags\"" >&5
+$as_echo "$as_me: osidylp_cflags is \"$osidylp_cflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osidylp_data is \"$osidylp_data\"" >&5
+$as_echo "$as_me: osidylp_data is \"$osidylp_data\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osidylp_pcfiles is \"$osidylp_pcfiles\"" >&5
+$as_echo "$as_me: osidylp_pcfiles is \"$osidylp_pcfiles\"" >&6;}
   fi
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp" >&5
-$as_echo "$coin_has_osiclp" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osidylp" >&5
+$as_echo "$coin_has_osidylp" >&6; }
   else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp due to COIN_SKIP_PROJECTS" >&5
-$as_echo "$coin_has_osiclp due to COIN_SKIP_PROJECTS" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osidylp due to COIN_SKIP_PROJECTS" >&5
+$as_echo "$coin_has_osidylp due to COIN_SKIP_PROJECTS" >&6; }
   fi
 
 # Possibilities are `yes', 'no', or `skipping'. Normalise to `yes' or `no'.
 
-  if test "$coin_has_osiclp" != yes ; then
-    coin_has_osiclp=no
+  if test "$coin_has_osidylp" != yes ; then
+    coin_has_osidylp=no
   fi
 
 # Create an automake conditional COIN_HAS_PRIM.
 
-   if test $coin_has_osiclp = yes; then
-  COIN_HAS_OSICLP_TRUE=
-  COIN_HAS_OSICLP_FALSE='#'
+   if test $coin_has_osidylp = yes; then
+  COIN_HAS_OSIDYLP_TRUE=
+  COIN_HAS_OSIDYLP_FALSE='#'
 else
-  COIN_HAS_OSICLP_TRUE='#'
-  COIN_HAS_OSICLP_FALSE=
+  COIN_HAS_OSIDYLP_TRUE='#'
+  COIN_HAS_OSIDYLP_FALSE=
 fi
 
 
 # If we've located the package, define preprocessor symbol COIN_HAS_PRIM and
 # augment the necessary variables for the client packages.
 
-  if test $coin_has_osiclp = yes ; then
+  if test $coin_has_osidylp = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define COIN_HAS_OSIDYLP 1" >>confdefs.h
 
-    if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
-       SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
-       SYMPHONYLIB_CFLAGS="$osiclp_cflags $SYMPHONYLIB_CFLAGS"
+    if test -n "$osidylp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osidylp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
+       SYMPHONYLIB_LFLAGS="$osidylp_lflags $SYMPHONYLIB_LFLAGS"
+       SYMPHONYLIB_CFLAGS="$osidylp_cflags $SYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -19287,8 +19371,8 @@ $as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
 
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiClp" >&5
-$as_echo_n "checking for package OsiClp... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiVol" >&5
+$as_echo_n "checking for package OsiVol... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
 
@@ -19299,11 +19383,11 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 
 # Check to see if the user has set an override to skip this primary.
 
-  coin_has_osiclp=noInfo
+  coin_has_osivol=noInfo
   if test x"$COIN_SKIP_PROJECTS" != x ; then
     for pkg in $COIN_SKIP_PROJECTS ; do
-      if test "$pkg" = "$osiclp" ; then
-        coin_has_osiclp=skipping
+      if test "$pkg" = "$osivol" ; then
+        coin_has_osivol=skipping
       fi
     done
   fi
@@ -19312,28 +19396,28 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 # options according to the cmdopts parameter. Then invoke FIND_PRIM_PKG to do
 # the heavy lifting.
 
-  if test "$coin_has_osiclp" != skipping ; then
+  if test "$coin_has_osivol" != skipping ; then
 
 
 
 
-# Check whether --with-osiclp was given.
-if test "${with_osiclp+set}" = set; then :
-  withval=$with_osiclp;
+# Check whether --with-osivol was given.
+if test "${with_osivol+set}" = set; then :
+  withval=$with_osivol;
 fi
 
 
 
-# Check whether --with-osiclp-lflags was given.
-if test "${with_osiclp_lflags+set}" = set; then :
-  withval=$with_osiclp_lflags;
+# Check whether --with-osivol-lflags was given.
+if test "${with_osivol_lflags+set}" = set; then :
+  withval=$with_osivol_lflags;
 fi
 
 
 
-# Check whether --with-osiclp-cflags was given.
-if test "${with_osiclp_cflags+set}" = set; then :
-  withval=$with_osiclp_cflags;
+# Check whether --with-osivol-cflags was given.
+if test "${with_osivol_cflags+set}" = set; then :
+  withval=$with_osivol_cflags;
 fi
 
 
@@ -19346,30 +19430,30 @@ fi
 
 # Initialize variables for the primary package.
 
-  coin_has_osiclp=noInfo
-  osiclp_lflags=
-  osiclp_cflags=
-  osiclp_data=
-  osiclp_pcfiles=
+  coin_has_osivol=noInfo
+  osivol_lflags=
+  osivol_cflags=
+  osivol_data=
+  osivol_pcfiles=
 
 # --with-prim is always present. If the client specified dataonly, its value
 # is assigned to prim_data.
 
-  withval="$with_osiclp"
+  withval="$with_osivol"
   if test -n "$withval" ; then
     case "$withval" in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osivol=skipping
         ;;
       yes )
-        coin_has_osiclp=requested
+        coin_has_osivol=requested
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osivol=build
         ;;
       * )
-        coin_has_osiclp=yes
-        osiclp_lflags="$withval"
+        coin_has_osivol=yes
+        osivol_lflags="$withval"
         ;;
     esac
   fi
@@ -19378,29 +19462,29 @@ fi
 # specified dataonly. Specifying --with-prim=no overrides the individual
 # options for libs and cflags.
 
-  if test "$coin_has_osiclp" != skipping ; then
-       withval="$with_osiclp_lflags"
+  if test "$coin_has_osivol" != skipping ; then
+       withval="$with_osivol_lflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify linker flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_lflags="$withval"
+             coin_has_osivol=yes
+             osivol_lflags="$withval"
              ;;
          esac
        fi
 
-       withval="$with_osiclp_cflags"
+       withval="$with_osivol_cflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify compiler flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_cflags="$withval"
+             coin_has_osivol=yes
+             osivol_cflags="$withval"
              ;;
          esac
        fi
@@ -19421,16 +19505,16 @@ fi
 # Otherwise, the default must be yes or build; consider the package requested.
 # A default action we don't recognise defaults to yes.
 
-  if test "$coin_has_osiclp" = noInfo ; then
+  if test "$coin_has_osivol" = noInfo ; then
     case $dflt_action in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osivol=skipping
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osivol=build
         ;;
       * )
-        coin_has_osiclp=requested
+        coin_has_osivol=requested
         ;;
     esac
   fi
@@ -19440,7 +19524,7 @@ fi
 # well, hope that the user knows their system and prim can be used with no
 # additional flags.
 
-  case $coin_has_osiclp in
+  case $coin_has_osivol in
     requested | build )
       if test -n "$PKG_CONFIG" -a "osi-vol" != skip ; then
         pcfile="osi-vol"
@@ -19449,28 +19533,28 @@ fi
 
   if test -n "$PKG_CONFIG" ; then
     if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
-      OSICLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
-      coin_has_osiclp=yes
-           osiclp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
-           osiclp_pcfiles="$pcfile"
+      OSIVOL_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_osivol=yes
+           osivol_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
+           osivol_pcfiles="$pcfile"
     else
-      OSICLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
-      coin_has_osiclp=no
+      OSIVOL_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_osivol=no
     fi
   else
-    as_fn_error $? "\"Cannot check for existence of module osiclp without pkgconf\"" "$LINENO" 5
+    as_fn_error $? "\"Cannot check for existence of module osivol without pkgconf\"" "$LINENO" 5
   fi
 
       else
-        coin_has_osiclp=no
+        coin_has_osivol=no
         # AC_MSG_WARN([skipped check via pkgconf as no pkgconf available])
       fi
       ;;
     skipping | yes )
       ;;
     * )
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&5
-$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&2;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osivol\" in COIN_FIND_PRIM_PKG" >&5
+$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osivol\" in COIN_FIND_PRIM_PKG" >&2;}
       ;;
   esac
 
@@ -19482,55 +19566,55 @@ $as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_P
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
   if test "$BUILDTOOLS_DEBUG" = 1 ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&5
-$as_echo "$as_me: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiclp'" >&5
-$as_echo "$as_me: Collected values for package 'osiclp'" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_lflags is \"$osiclp_lflags\"" >&5
-$as_echo "$as_me: osiclp_lflags is \"$osiclp_lflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_cflags is \"$osiclp_cflags\"" >&5
-$as_echo "$as_me: osiclp_cflags is \"$osiclp_cflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_data is \"$osiclp_data\"" >&5
-$as_echo "$as_me: osiclp_data is \"$osiclp_data\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&5
-$as_echo "$as_me: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osivol: \"$coin_has_osivol\"" >&5
+$as_echo "$as_me: FIND_PRIM_PKG result for osivol: \"$coin_has_osivol\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osivol'" >&5
+$as_echo "$as_me: Collected values for package 'osivol'" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osivol_lflags is \"$osivol_lflags\"" >&5
+$as_echo "$as_me: osivol_lflags is \"$osivol_lflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osivol_cflags is \"$osivol_cflags\"" >&5
+$as_echo "$as_me: osivol_cflags is \"$osivol_cflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osivol_data is \"$osivol_data\"" >&5
+$as_echo "$as_me: osivol_data is \"$osivol_data\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osivol_pcfiles is \"$osivol_pcfiles\"" >&5
+$as_echo "$as_me: osivol_pcfiles is \"$osivol_pcfiles\"" >&6;}
   fi
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp" >&5
-$as_echo "$coin_has_osiclp" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osivol" >&5
+$as_echo "$coin_has_osivol" >&6; }
   else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp due to COIN_SKIP_PROJECTS" >&5
-$as_echo "$coin_has_osiclp due to COIN_SKIP_PROJECTS" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osivol due to COIN_SKIP_PROJECTS" >&5
+$as_echo "$coin_has_osivol due to COIN_SKIP_PROJECTS" >&6; }
   fi
 
 # Possibilities are `yes', 'no', or `skipping'. Normalise to `yes' or `no'.
 
-  if test "$coin_has_osiclp" != yes ; then
-    coin_has_osiclp=no
+  if test "$coin_has_osivol" != yes ; then
+    coin_has_osivol=no
   fi
 
 # Create an automake conditional COIN_HAS_PRIM.
 
-   if test $coin_has_osiclp = yes; then
-  COIN_HAS_OSICLP_TRUE=
-  COIN_HAS_OSICLP_FALSE='#'
+   if test $coin_has_osivol = yes; then
+  COIN_HAS_OSIVOL_TRUE=
+  COIN_HAS_OSIVOL_FALSE='#'
 else
-  COIN_HAS_OSICLP_TRUE='#'
-  COIN_HAS_OSICLP_FALSE=
+  COIN_HAS_OSIVOL_TRUE='#'
+  COIN_HAS_OSIVOL_FALSE=
 fi
 
 
 # If we've located the package, define preprocessor symbol COIN_HAS_PRIM and
 # augment the necessary variables for the client packages.
 
-  if test $coin_has_osiclp = yes ; then
+  if test $coin_has_osivol = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define COIN_HAS_OSIVOL 1" >>confdefs.h
 
-    if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
-       SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
-       SYMPHONYLIB_CFLAGS="$osiclp_cflags $SYMPHONYLIB_CFLAGS"
+    if test -n "$osivol_pcfiles" ; then SYMPHONYLIB_PCFILES="$osivol_pcfiles $SYMPHONYLIB_PCFILES" ; fi
+       SYMPHONYLIB_LFLAGS="$osivol_lflags $SYMPHONYLIB_LFLAGS"
+       SYMPHONYLIB_CFLAGS="$osivol_cflags $SYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -19541,8 +19625,8 @@ $as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
 
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiClp" >&5
-$as_echo_n "checking for package OsiClp... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiCpx" >&5
+$as_echo_n "checking for package OsiCpx... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
 
@@ -19553,11 +19637,11 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 
 # Check to see if the user has set an override to skip this primary.
 
-  coin_has_osiclp=noInfo
+  coin_has_osicpx=noInfo
   if test x"$COIN_SKIP_PROJECTS" != x ; then
     for pkg in $COIN_SKIP_PROJECTS ; do
-      if test "$pkg" = "$osiclp" ; then
-        coin_has_osiclp=skipping
+      if test "$pkg" = "$osicpx" ; then
+        coin_has_osicpx=skipping
       fi
     done
   fi
@@ -19566,28 +19650,28 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 # options according to the cmdopts parameter. Then invoke FIND_PRIM_PKG to do
 # the heavy lifting.
 
-  if test "$coin_has_osiclp" != skipping ; then
+  if test "$coin_has_osicpx" != skipping ; then
 
 
 
 
-# Check whether --with-osiclp was given.
-if test "${with_osiclp+set}" = set; then :
-  withval=$with_osiclp;
+# Check whether --with-osicpx was given.
+if test "${with_osicpx+set}" = set; then :
+  withval=$with_osicpx;
 fi
 
 
 
-# Check whether --with-osiclp-lflags was given.
-if test "${with_osiclp_lflags+set}" = set; then :
-  withval=$with_osiclp_lflags;
+# Check whether --with-osicpx-lflags was given.
+if test "${with_osicpx_lflags+set}" = set; then :
+  withval=$with_osicpx_lflags;
 fi
 
 
 
-# Check whether --with-osiclp-cflags was given.
-if test "${with_osiclp_cflags+set}" = set; then :
-  withval=$with_osiclp_cflags;
+# Check whether --with-osicpx-cflags was given.
+if test "${with_osicpx_cflags+set}" = set; then :
+  withval=$with_osicpx_cflags;
 fi
 
 
@@ -19600,30 +19684,30 @@ fi
 
 # Initialize variables for the primary package.
 
-  coin_has_osiclp=noInfo
-  osiclp_lflags=
-  osiclp_cflags=
-  osiclp_data=
-  osiclp_pcfiles=
+  coin_has_osicpx=noInfo
+  osicpx_lflags=
+  osicpx_cflags=
+  osicpx_data=
+  osicpx_pcfiles=
 
 # --with-prim is always present. If the client specified dataonly, its value
 # is assigned to prim_data.
 
-  withval="$with_osiclp"
+  withval="$with_osicpx"
   if test -n "$withval" ; then
     case "$withval" in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osicpx=skipping
         ;;
       yes )
-        coin_has_osiclp=requested
+        coin_has_osicpx=requested
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osicpx=build
         ;;
       * )
-        coin_has_osiclp=yes
-        osiclp_lflags="$withval"
+        coin_has_osicpx=yes
+        osicpx_lflags="$withval"
         ;;
     esac
   fi
@@ -19632,29 +19716,29 @@ fi
 # specified dataonly. Specifying --with-prim=no overrides the individual
 # options for libs and cflags.
 
-  if test "$coin_has_osiclp" != skipping ; then
-       withval="$with_osiclp_lflags"
+  if test "$coin_has_osicpx" != skipping ; then
+       withval="$with_osicpx_lflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify linker flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_lflags="$withval"
+             coin_has_osicpx=yes
+             osicpx_lflags="$withval"
              ;;
          esac
        fi
 
-       withval="$with_osiclp_cflags"
+       withval="$with_osicpx_cflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify compiler flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_cflags="$withval"
+             coin_has_osicpx=yes
+             osicpx_cflags="$withval"
              ;;
          esac
        fi
@@ -19675,16 +19759,16 @@ fi
 # Otherwise, the default must be yes or build; consider the package requested.
 # A default action we don't recognise defaults to yes.
 
-  if test "$coin_has_osiclp" = noInfo ; then
+  if test "$coin_has_osicpx" = noInfo ; then
     case $dflt_action in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osicpx=skipping
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osicpx=build
         ;;
       * )
-        coin_has_osiclp=requested
+        coin_has_osicpx=requested
         ;;
     esac
   fi
@@ -19694,7 +19778,7 @@ fi
 # well, hope that the user knows their system and prim can be used with no
 # additional flags.
 
-  case $coin_has_osiclp in
+  case $coin_has_osicpx in
     requested | build )
       if test -n "$PKG_CONFIG" -a "osi-cplex" != skip ; then
         pcfile="osi-cplex"
@@ -19703,28 +19787,28 @@ fi
 
   if test -n "$PKG_CONFIG" ; then
     if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
-      OSICLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
-      coin_has_osiclp=yes
-           osiclp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
-           osiclp_pcfiles="$pcfile"
+      OSICPX_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_osicpx=yes
+           osicpx_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
+           osicpx_pcfiles="$pcfile"
     else
-      OSICLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
-      coin_has_osiclp=no
+      OSICPX_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_osicpx=no
     fi
   else
-    as_fn_error $? "\"Cannot check for existence of module osiclp without pkgconf\"" "$LINENO" 5
+    as_fn_error $? "\"Cannot check for existence of module osicpx without pkgconf\"" "$LINENO" 5
   fi
 
       else
-        coin_has_osiclp=no
+        coin_has_osicpx=no
         # AC_MSG_WARN([skipped check via pkgconf as no pkgconf available])
       fi
       ;;
     skipping | yes )
       ;;
     * )
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&5
-$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&2;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osicpx\" in COIN_FIND_PRIM_PKG" >&5
+$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osicpx\" in COIN_FIND_PRIM_PKG" >&2;}
       ;;
   esac
 
@@ -19736,55 +19820,55 @@ $as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_P
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
   if test "$BUILDTOOLS_DEBUG" = 1 ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&5
-$as_echo "$as_me: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiclp'" >&5
-$as_echo "$as_me: Collected values for package 'osiclp'" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_lflags is \"$osiclp_lflags\"" >&5
-$as_echo "$as_me: osiclp_lflags is \"$osiclp_lflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_cflags is \"$osiclp_cflags\"" >&5
-$as_echo "$as_me: osiclp_cflags is \"$osiclp_cflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_data is \"$osiclp_data\"" >&5
-$as_echo "$as_me: osiclp_data is \"$osiclp_data\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&5
-$as_echo "$as_me: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osicpx: \"$coin_has_osicpx\"" >&5
+$as_echo "$as_me: FIND_PRIM_PKG result for osicpx: \"$coin_has_osicpx\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osicpx'" >&5
+$as_echo "$as_me: Collected values for package 'osicpx'" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osicpx_lflags is \"$osicpx_lflags\"" >&5
+$as_echo "$as_me: osicpx_lflags is \"$osicpx_lflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osicpx_cflags is \"$osicpx_cflags\"" >&5
+$as_echo "$as_me: osicpx_cflags is \"$osicpx_cflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osicpx_data is \"$osicpx_data\"" >&5
+$as_echo "$as_me: osicpx_data is \"$osicpx_data\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osicpx_pcfiles is \"$osicpx_pcfiles\"" >&5
+$as_echo "$as_me: osicpx_pcfiles is \"$osicpx_pcfiles\"" >&6;}
   fi
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp" >&5
-$as_echo "$coin_has_osiclp" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osicpx" >&5
+$as_echo "$coin_has_osicpx" >&6; }
   else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp due to COIN_SKIP_PROJECTS" >&5
-$as_echo "$coin_has_osiclp due to COIN_SKIP_PROJECTS" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osicpx due to COIN_SKIP_PROJECTS" >&5
+$as_echo "$coin_has_osicpx due to COIN_SKIP_PROJECTS" >&6; }
   fi
 
 # Possibilities are `yes', 'no', or `skipping'. Normalise to `yes' or `no'.
 
-  if test "$coin_has_osiclp" != yes ; then
-    coin_has_osiclp=no
+  if test "$coin_has_osicpx" != yes ; then
+    coin_has_osicpx=no
   fi
 
 # Create an automake conditional COIN_HAS_PRIM.
 
-   if test $coin_has_osiclp = yes; then
-  COIN_HAS_OSICLP_TRUE=
-  COIN_HAS_OSICLP_FALSE='#'
+   if test $coin_has_osicpx = yes; then
+  COIN_HAS_OSICPX_TRUE=
+  COIN_HAS_OSICPX_FALSE='#'
 else
-  COIN_HAS_OSICLP_TRUE='#'
-  COIN_HAS_OSICLP_FALSE=
+  COIN_HAS_OSICPX_TRUE='#'
+  COIN_HAS_OSICPX_FALSE=
 fi
 
 
 # If we've located the package, define preprocessor symbol COIN_HAS_PRIM and
 # augment the necessary variables for the client packages.
 
-  if test $coin_has_osiclp = yes ; then
+  if test $coin_has_osicpx = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define COIN_HAS_OSICPX 1" >>confdefs.h
 
-    if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
-       SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
-       SYMPHONYLIB_CFLAGS="$osiclp_cflags $SYMPHONYLIB_CFLAGS"
+    if test -n "$osicpx_pcfiles" ; then SYMPHONYLIB_PCFILES="$osicpx_pcfiles $SYMPHONYLIB_PCFILES" ; fi
+       SYMPHONYLIB_LFLAGS="$osicpx_lflags $SYMPHONYLIB_LFLAGS"
+       SYMPHONYLIB_CFLAGS="$osicpx_cflags $SYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -19795,8 +19879,8 @@ $as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
 
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiClp" >&5
-$as_echo_n "checking for package OsiClp... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiGlpk" >&5
+$as_echo_n "checking for package OsiGlpk... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
 
@@ -19807,11 +19891,11 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 
 # Check to see if the user has set an override to skip this primary.
 
-  coin_has_osiclp=noInfo
+  coin_has_osiglpk=noInfo
   if test x"$COIN_SKIP_PROJECTS" != x ; then
     for pkg in $COIN_SKIP_PROJECTS ; do
-      if test "$pkg" = "$osiclp" ; then
-        coin_has_osiclp=skipping
+      if test "$pkg" = "$osiglpk" ; then
+        coin_has_osiglpk=skipping
       fi
     done
   fi
@@ -19820,28 +19904,28 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 # options according to the cmdopts parameter. Then invoke FIND_PRIM_PKG to do
 # the heavy lifting.
 
-  if test "$coin_has_osiclp" != skipping ; then
+  if test "$coin_has_osiglpk" != skipping ; then
 
 
 
 
-# Check whether --with-osiclp was given.
-if test "${with_osiclp+set}" = set; then :
-  withval=$with_osiclp;
+# Check whether --with-osiglpk was given.
+if test "${with_osiglpk+set}" = set; then :
+  withval=$with_osiglpk;
 fi
 
 
 
-# Check whether --with-osiclp-lflags was given.
-if test "${with_osiclp_lflags+set}" = set; then :
-  withval=$with_osiclp_lflags;
+# Check whether --with-osiglpk-lflags was given.
+if test "${with_osiglpk_lflags+set}" = set; then :
+  withval=$with_osiglpk_lflags;
 fi
 
 
 
-# Check whether --with-osiclp-cflags was given.
-if test "${with_osiclp_cflags+set}" = set; then :
-  withval=$with_osiclp_cflags;
+# Check whether --with-osiglpk-cflags was given.
+if test "${with_osiglpk_cflags+set}" = set; then :
+  withval=$with_osiglpk_cflags;
 fi
 
 
@@ -19854,30 +19938,30 @@ fi
 
 # Initialize variables for the primary package.
 
-  coin_has_osiclp=noInfo
-  osiclp_lflags=
-  osiclp_cflags=
-  osiclp_data=
-  osiclp_pcfiles=
+  coin_has_osiglpk=noInfo
+  osiglpk_lflags=
+  osiglpk_cflags=
+  osiglpk_data=
+  osiglpk_pcfiles=
 
 # --with-prim is always present. If the client specified dataonly, its value
 # is assigned to prim_data.
 
-  withval="$with_osiclp"
+  withval="$with_osiglpk"
   if test -n "$withval" ; then
     case "$withval" in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osiglpk=skipping
         ;;
       yes )
-        coin_has_osiclp=requested
+        coin_has_osiglpk=requested
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osiglpk=build
         ;;
       * )
-        coin_has_osiclp=yes
-        osiclp_lflags="$withval"
+        coin_has_osiglpk=yes
+        osiglpk_lflags="$withval"
         ;;
     esac
   fi
@@ -19886,29 +19970,29 @@ fi
 # specified dataonly. Specifying --with-prim=no overrides the individual
 # options for libs and cflags.
 
-  if test "$coin_has_osiclp" != skipping ; then
-       withval="$with_osiclp_lflags"
+  if test "$coin_has_osiglpk" != skipping ; then
+       withval="$with_osiglpk_lflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify linker flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_lflags="$withval"
+             coin_has_osiglpk=yes
+             osiglpk_lflags="$withval"
              ;;
          esac
        fi
 
-       withval="$with_osiclp_cflags"
+       withval="$with_osiglpk_cflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify compiler flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_cflags="$withval"
+             coin_has_osiglpk=yes
+             osiglpk_cflags="$withval"
              ;;
          esac
        fi
@@ -19929,16 +20013,16 @@ fi
 # Otherwise, the default must be yes or build; consider the package requested.
 # A default action we don't recognise defaults to yes.
 
-  if test "$coin_has_osiclp" = noInfo ; then
+  if test "$coin_has_osiglpk" = noInfo ; then
     case $dflt_action in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osiglpk=skipping
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osiglpk=build
         ;;
       * )
-        coin_has_osiclp=requested
+        coin_has_osiglpk=requested
         ;;
     esac
   fi
@@ -19948,7 +20032,7 @@ fi
 # well, hope that the user knows their system and prim can be used with no
 # additional flags.
 
-  case $coin_has_osiclp in
+  case $coin_has_osiglpk in
     requested | build )
       if test -n "$PKG_CONFIG" -a "osi-glpk" != skip ; then
         pcfile="osi-glpk"
@@ -19957,28 +20041,28 @@ fi
 
   if test -n "$PKG_CONFIG" ; then
     if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
-      OSICLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
-      coin_has_osiclp=yes
-           osiclp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
-           osiclp_pcfiles="$pcfile"
+      OSIGLPK_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_osiglpk=yes
+           osiglpk_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
+           osiglpk_pcfiles="$pcfile"
     else
-      OSICLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
-      coin_has_osiclp=no
+      OSIGLPK_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_osiglpk=no
     fi
   else
-    as_fn_error $? "\"Cannot check for existence of module osiclp without pkgconf\"" "$LINENO" 5
+    as_fn_error $? "\"Cannot check for existence of module osiglpk without pkgconf\"" "$LINENO" 5
   fi
 
       else
-        coin_has_osiclp=no
+        coin_has_osiglpk=no
         # AC_MSG_WARN([skipped check via pkgconf as no pkgconf available])
       fi
       ;;
     skipping | yes )
       ;;
     * )
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&5
-$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&2;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiglpk\" in COIN_FIND_PRIM_PKG" >&5
+$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiglpk\" in COIN_FIND_PRIM_PKG" >&2;}
       ;;
   esac
 
@@ -19990,55 +20074,55 @@ $as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_P
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
   if test "$BUILDTOOLS_DEBUG" = 1 ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&5
-$as_echo "$as_me: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiclp'" >&5
-$as_echo "$as_me: Collected values for package 'osiclp'" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_lflags is \"$osiclp_lflags\"" >&5
-$as_echo "$as_me: osiclp_lflags is \"$osiclp_lflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_cflags is \"$osiclp_cflags\"" >&5
-$as_echo "$as_me: osiclp_cflags is \"$osiclp_cflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_data is \"$osiclp_data\"" >&5
-$as_echo "$as_me: osiclp_data is \"$osiclp_data\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&5
-$as_echo "$as_me: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiglpk: \"$coin_has_osiglpk\"" >&5
+$as_echo "$as_me: FIND_PRIM_PKG result for osiglpk: \"$coin_has_osiglpk\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiglpk'" >&5
+$as_echo "$as_me: Collected values for package 'osiglpk'" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osiglpk_lflags is \"$osiglpk_lflags\"" >&5
+$as_echo "$as_me: osiglpk_lflags is \"$osiglpk_lflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osiglpk_cflags is \"$osiglpk_cflags\"" >&5
+$as_echo "$as_me: osiglpk_cflags is \"$osiglpk_cflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osiglpk_data is \"$osiglpk_data\"" >&5
+$as_echo "$as_me: osiglpk_data is \"$osiglpk_data\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osiglpk_pcfiles is \"$osiglpk_pcfiles\"" >&5
+$as_echo "$as_me: osiglpk_pcfiles is \"$osiglpk_pcfiles\"" >&6;}
   fi
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp" >&5
-$as_echo "$coin_has_osiclp" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiglpk" >&5
+$as_echo "$coin_has_osiglpk" >&6; }
   else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp due to COIN_SKIP_PROJECTS" >&5
-$as_echo "$coin_has_osiclp due to COIN_SKIP_PROJECTS" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiglpk due to COIN_SKIP_PROJECTS" >&5
+$as_echo "$coin_has_osiglpk due to COIN_SKIP_PROJECTS" >&6; }
   fi
 
 # Possibilities are `yes', 'no', or `skipping'. Normalise to `yes' or `no'.
 
-  if test "$coin_has_osiclp" != yes ; then
-    coin_has_osiclp=no
+  if test "$coin_has_osiglpk" != yes ; then
+    coin_has_osiglpk=no
   fi
 
 # Create an automake conditional COIN_HAS_PRIM.
 
-   if test $coin_has_osiclp = yes; then
-  COIN_HAS_OSICLP_TRUE=
-  COIN_HAS_OSICLP_FALSE='#'
+   if test $coin_has_osiglpk = yes; then
+  COIN_HAS_OSIGLPK_TRUE=
+  COIN_HAS_OSIGLPK_FALSE='#'
 else
-  COIN_HAS_OSICLP_TRUE='#'
-  COIN_HAS_OSICLP_FALSE=
+  COIN_HAS_OSIGLPK_TRUE='#'
+  COIN_HAS_OSIGLPK_FALSE=
 fi
 
 
 # If we've located the package, define preprocessor symbol COIN_HAS_PRIM and
 # augment the necessary variables for the client packages.
 
-  if test $coin_has_osiclp = yes ; then
+  if test $coin_has_osiglpk = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define COIN_HAS_OSIGLPK 1" >>confdefs.h
 
-    if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
-       SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
-       SYMPHONYLIB_CFLAGS="$osiclp_cflags $SYMPHONYLIB_CFLAGS"
+    if test -n "$osiglpk_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiglpk_pcfiles $SYMPHONYLIB_PCFILES" ; fi
+       SYMPHONYLIB_LFLAGS="$osiglpk_lflags $SYMPHONYLIB_LFLAGS"
+       SYMPHONYLIB_CFLAGS="$osiglpk_cflags $SYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -20049,8 +20133,8 @@ $as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
 
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiClp" >&5
-$as_echo_n "checking for package OsiClp... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiMsk" >&5
+$as_echo_n "checking for package OsiMsk... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
 
@@ -20061,11 +20145,11 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 
 # Check to see if the user has set an override to skip this primary.
 
-  coin_has_osiclp=noInfo
+  coin_has_osimsk=noInfo
   if test x"$COIN_SKIP_PROJECTS" != x ; then
     for pkg in $COIN_SKIP_PROJECTS ; do
-      if test "$pkg" = "$osiclp" ; then
-        coin_has_osiclp=skipping
+      if test "$pkg" = "$osimsk" ; then
+        coin_has_osimsk=skipping
       fi
     done
   fi
@@ -20074,28 +20158,28 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 # options according to the cmdopts parameter. Then invoke FIND_PRIM_PKG to do
 # the heavy lifting.
 
-  if test "$coin_has_osiclp" != skipping ; then
+  if test "$coin_has_osimsk" != skipping ; then
 
 
 
 
-# Check whether --with-osiclp was given.
-if test "${with_osiclp+set}" = set; then :
-  withval=$with_osiclp;
+# Check whether --with-osimsk was given.
+if test "${with_osimsk+set}" = set; then :
+  withval=$with_osimsk;
 fi
 
 
 
-# Check whether --with-osiclp-lflags was given.
-if test "${with_osiclp_lflags+set}" = set; then :
-  withval=$with_osiclp_lflags;
+# Check whether --with-osimsk-lflags was given.
+if test "${with_osimsk_lflags+set}" = set; then :
+  withval=$with_osimsk_lflags;
 fi
 
 
 
-# Check whether --with-osiclp-cflags was given.
-if test "${with_osiclp_cflags+set}" = set; then :
-  withval=$with_osiclp_cflags;
+# Check whether --with-osimsk-cflags was given.
+if test "${with_osimsk_cflags+set}" = set; then :
+  withval=$with_osimsk_cflags;
 fi
 
 
@@ -20108,30 +20192,30 @@ fi
 
 # Initialize variables for the primary package.
 
-  coin_has_osiclp=noInfo
-  osiclp_lflags=
-  osiclp_cflags=
-  osiclp_data=
-  osiclp_pcfiles=
+  coin_has_osimsk=noInfo
+  osimsk_lflags=
+  osimsk_cflags=
+  osimsk_data=
+  osimsk_pcfiles=
 
 # --with-prim is always present. If the client specified dataonly, its value
 # is assigned to prim_data.
 
-  withval="$with_osiclp"
+  withval="$with_osimsk"
   if test -n "$withval" ; then
     case "$withval" in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osimsk=skipping
         ;;
       yes )
-        coin_has_osiclp=requested
+        coin_has_osimsk=requested
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osimsk=build
         ;;
       * )
-        coin_has_osiclp=yes
-        osiclp_lflags="$withval"
+        coin_has_osimsk=yes
+        osimsk_lflags="$withval"
         ;;
     esac
   fi
@@ -20140,29 +20224,29 @@ fi
 # specified dataonly. Specifying --with-prim=no overrides the individual
 # options for libs and cflags.
 
-  if test "$coin_has_osiclp" != skipping ; then
-       withval="$with_osiclp_lflags"
+  if test "$coin_has_osimsk" != skipping ; then
+       withval="$with_osimsk_lflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify linker flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_lflags="$withval"
+             coin_has_osimsk=yes
+             osimsk_lflags="$withval"
              ;;
          esac
        fi
 
-       withval="$with_osiclp_cflags"
+       withval="$with_osimsk_cflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify compiler flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_cflags="$withval"
+             coin_has_osimsk=yes
+             osimsk_cflags="$withval"
              ;;
          esac
        fi
@@ -20183,16 +20267,16 @@ fi
 # Otherwise, the default must be yes or build; consider the package requested.
 # A default action we don't recognise defaults to yes.
 
-  if test "$coin_has_osiclp" = noInfo ; then
+  if test "$coin_has_osimsk" = noInfo ; then
     case $dflt_action in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osimsk=skipping
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osimsk=build
         ;;
       * )
-        coin_has_osiclp=requested
+        coin_has_osimsk=requested
         ;;
     esac
   fi
@@ -20202,7 +20286,7 @@ fi
 # well, hope that the user knows their system and prim can be used with no
 # additional flags.
 
-  case $coin_has_osiclp in
+  case $coin_has_osimsk in
     requested | build )
       if test -n "$PKG_CONFIG" -a "osi-mosek" != skip ; then
         pcfile="osi-mosek"
@@ -20211,28 +20295,28 @@ fi
 
   if test -n "$PKG_CONFIG" ; then
     if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
-      OSICLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
-      coin_has_osiclp=yes
-           osiclp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
-           osiclp_pcfiles="$pcfile"
+      OSIMSK_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_osimsk=yes
+           osimsk_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
+           osimsk_pcfiles="$pcfile"
     else
-      OSICLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
-      coin_has_osiclp=no
+      OSIMSK_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_osimsk=no
     fi
   else
-    as_fn_error $? "\"Cannot check for existence of module osiclp without pkgconf\"" "$LINENO" 5
+    as_fn_error $? "\"Cannot check for existence of module osimsk without pkgconf\"" "$LINENO" 5
   fi
 
       else
-        coin_has_osiclp=no
+        coin_has_osimsk=no
         # AC_MSG_WARN([skipped check via pkgconf as no pkgconf available])
       fi
       ;;
     skipping | yes )
       ;;
     * )
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&5
-$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&2;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osimsk\" in COIN_FIND_PRIM_PKG" >&5
+$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osimsk\" in COIN_FIND_PRIM_PKG" >&2;}
       ;;
   esac
 
@@ -20244,55 +20328,55 @@ $as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_P
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
   if test "$BUILDTOOLS_DEBUG" = 1 ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&5
-$as_echo "$as_me: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiclp'" >&5
-$as_echo "$as_me: Collected values for package 'osiclp'" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_lflags is \"$osiclp_lflags\"" >&5
-$as_echo "$as_me: osiclp_lflags is \"$osiclp_lflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_cflags is \"$osiclp_cflags\"" >&5
-$as_echo "$as_me: osiclp_cflags is \"$osiclp_cflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_data is \"$osiclp_data\"" >&5
-$as_echo "$as_me: osiclp_data is \"$osiclp_data\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&5
-$as_echo "$as_me: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osimsk: \"$coin_has_osimsk\"" >&5
+$as_echo "$as_me: FIND_PRIM_PKG result for osimsk: \"$coin_has_osimsk\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osimsk'" >&5
+$as_echo "$as_me: Collected values for package 'osimsk'" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osimsk_lflags is \"$osimsk_lflags\"" >&5
+$as_echo "$as_me: osimsk_lflags is \"$osimsk_lflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osimsk_cflags is \"$osimsk_cflags\"" >&5
+$as_echo "$as_me: osimsk_cflags is \"$osimsk_cflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osimsk_data is \"$osimsk_data\"" >&5
+$as_echo "$as_me: osimsk_data is \"$osimsk_data\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osimsk_pcfiles is \"$osimsk_pcfiles\"" >&5
+$as_echo "$as_me: osimsk_pcfiles is \"$osimsk_pcfiles\"" >&6;}
   fi
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp" >&5
-$as_echo "$coin_has_osiclp" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osimsk" >&5
+$as_echo "$coin_has_osimsk" >&6; }
   else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp due to COIN_SKIP_PROJECTS" >&5
-$as_echo "$coin_has_osiclp due to COIN_SKIP_PROJECTS" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osimsk due to COIN_SKIP_PROJECTS" >&5
+$as_echo "$coin_has_osimsk due to COIN_SKIP_PROJECTS" >&6; }
   fi
 
 # Possibilities are `yes', 'no', or `skipping'. Normalise to `yes' or `no'.
 
-  if test "$coin_has_osiclp" != yes ; then
-    coin_has_osiclp=no
+  if test "$coin_has_osimsk" != yes ; then
+    coin_has_osimsk=no
   fi
 
 # Create an automake conditional COIN_HAS_PRIM.
 
-   if test $coin_has_osiclp = yes; then
-  COIN_HAS_OSICLP_TRUE=
-  COIN_HAS_OSICLP_FALSE='#'
+   if test $coin_has_osimsk = yes; then
+  COIN_HAS_OSIMSK_TRUE=
+  COIN_HAS_OSIMSK_FALSE='#'
 else
-  COIN_HAS_OSICLP_TRUE='#'
-  COIN_HAS_OSICLP_FALSE=
+  COIN_HAS_OSIMSK_TRUE='#'
+  COIN_HAS_OSIMSK_FALSE=
 fi
 
 
 # If we've located the package, define preprocessor symbol COIN_HAS_PRIM and
 # augment the necessary variables for the client packages.
 
-  if test $coin_has_osiclp = yes ; then
+  if test $coin_has_osimsk = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define COIN_HAS_OSIMSK 1" >>confdefs.h
 
-    if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
-       SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
-       SYMPHONYLIB_CFLAGS="$osiclp_cflags $SYMPHONYLIB_CFLAGS"
+    if test -n "$osimsk_pcfiles" ; then SYMPHONYLIB_PCFILES="$osimsk_pcfiles $SYMPHONYLIB_PCFILES" ; fi
+       SYMPHONYLIB_LFLAGS="$osimsk_lflags $SYMPHONYLIB_LFLAGS"
+       SYMPHONYLIB_CFLAGS="$osimsk_cflags $SYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -20303,8 +20387,8 @@ $as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
 
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiClp" >&5
-$as_echo_n "checking for package OsiClp... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiXpr" >&5
+$as_echo_n "checking for package OsiXpr... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
 
@@ -20315,11 +20399,11 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 
 # Check to see if the user has set an override to skip this primary.
 
-  coin_has_osiclp=noInfo
+  coin_has_osixpr=noInfo
   if test x"$COIN_SKIP_PROJECTS" != x ; then
     for pkg in $COIN_SKIP_PROJECTS ; do
-      if test "$pkg" = "$osiclp" ; then
-        coin_has_osiclp=skipping
+      if test "$pkg" = "$osixpr" ; then
+        coin_has_osixpr=skipping
       fi
     done
   fi
@@ -20328,28 +20412,28 @@ $as_echo_n "checking for package OsiClp... " >&6; }
 # options according to the cmdopts parameter. Then invoke FIND_PRIM_PKG to do
 # the heavy lifting.
 
-  if test "$coin_has_osiclp" != skipping ; then
+  if test "$coin_has_osixpr" != skipping ; then
 
 
 
 
-# Check whether --with-osiclp was given.
-if test "${with_osiclp+set}" = set; then :
-  withval=$with_osiclp;
+# Check whether --with-osixpr was given.
+if test "${with_osixpr+set}" = set; then :
+  withval=$with_osixpr;
 fi
 
 
 
-# Check whether --with-osiclp-lflags was given.
-if test "${with_osiclp_lflags+set}" = set; then :
-  withval=$with_osiclp_lflags;
+# Check whether --with-osixpr-lflags was given.
+if test "${with_osixpr_lflags+set}" = set; then :
+  withval=$with_osixpr_lflags;
 fi
 
 
 
-# Check whether --with-osiclp-cflags was given.
-if test "${with_osiclp_cflags+set}" = set; then :
-  withval=$with_osiclp_cflags;
+# Check whether --with-osixpr-cflags was given.
+if test "${with_osixpr_cflags+set}" = set; then :
+  withval=$with_osixpr_cflags;
 fi
 
 
@@ -20362,30 +20446,30 @@ fi
 
 # Initialize variables for the primary package.
 
-  coin_has_osiclp=noInfo
-  osiclp_lflags=
-  osiclp_cflags=
-  osiclp_data=
-  osiclp_pcfiles=
+  coin_has_osixpr=noInfo
+  osixpr_lflags=
+  osixpr_cflags=
+  osixpr_data=
+  osixpr_pcfiles=
 
 # --with-prim is always present. If the client specified dataonly, its value
 # is assigned to prim_data.
 
-  withval="$with_osiclp"
+  withval="$with_osixpr"
   if test -n "$withval" ; then
     case "$withval" in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osixpr=skipping
         ;;
       yes )
-        coin_has_osiclp=requested
+        coin_has_osixpr=requested
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osixpr=build
         ;;
       * )
-        coin_has_osiclp=yes
-        osiclp_lflags="$withval"
+        coin_has_osixpr=yes
+        osixpr_lflags="$withval"
         ;;
     esac
   fi
@@ -20394,29 +20478,29 @@ fi
 # specified dataonly. Specifying --with-prim=no overrides the individual
 # options for libs and cflags.
 
-  if test "$coin_has_osiclp" != skipping ; then
-       withval="$with_osiclp_lflags"
+  if test "$coin_has_osixpr" != skipping ; then
+       withval="$with_osixpr_lflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify linker flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_lflags="$withval"
+             coin_has_osixpr=yes
+             osixpr_lflags="$withval"
              ;;
          esac
        fi
 
-       withval="$with_osiclp_cflags"
+       withval="$with_osixpr_cflags"
        if test -n "$withval" ; then
          case "$withval" in
            build | no | yes )
              as_fn_error $? "\"$withval\" is not valid here; please specify compiler flags appropriate for your environment." "$LINENO" 5
              ;;
            * )
-             coin_has_osiclp=yes
-             osiclp_cflags="$withval"
+             coin_has_osixpr=yes
+             osixpr_cflags="$withval"
              ;;
          esac
        fi
@@ -20437,16 +20521,16 @@ fi
 # Otherwise, the default must be yes or build; consider the package requested.
 # A default action we don't recognise defaults to yes.
 
-  if test "$coin_has_osiclp" = noInfo ; then
+  if test "$coin_has_osixpr" = noInfo ; then
     case $dflt_action in
       no )
-        coin_has_osiclp=skipping
+        coin_has_osixpr=skipping
         ;;
       build )
-        coin_has_osiclp=build
+        coin_has_osixpr=build
         ;;
       * )
-        coin_has_osiclp=requested
+        coin_has_osixpr=requested
         ;;
     esac
   fi
@@ -20456,7 +20540,7 @@ fi
 # well, hope that the user knows their system and prim can be used with no
 # additional flags.
 
-  case $coin_has_osiclp in
+  case $coin_has_osixpr in
     requested | build )
       if test -n "$PKG_CONFIG" -a "osi-xpress" != skip ; then
         pcfile="osi-xpress"
@@ -20465,28 +20549,28 @@ fi
 
   if test -n "$PKG_CONFIG" ; then
     if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
-      OSICLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
-      coin_has_osiclp=yes
-           osiclp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
-           osiclp_pcfiles="$pcfile"
+      OSIXPR_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_osixpr=yes
+           osixpr_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
+           osixpr_pcfiles="$pcfile"
     else
-      OSICLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
-      coin_has_osiclp=no
+      OSIXPR_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_osixpr=no
     fi
   else
-    as_fn_error $? "\"Cannot check for existence of module osiclp without pkgconf\"" "$LINENO" 5
+    as_fn_error $? "\"Cannot check for existence of module osixpr without pkgconf\"" "$LINENO" 5
   fi
 
       else
-        coin_has_osiclp=no
+        coin_has_osixpr=no
         # AC_MSG_WARN([skipped check via pkgconf as no pkgconf available])
       fi
       ;;
     skipping | yes )
       ;;
     * )
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&5
-$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&2;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osixpr\" in COIN_FIND_PRIM_PKG" >&5
+$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osixpr\" in COIN_FIND_PRIM_PKG" >&2;}
       ;;
   esac
 
@@ -20498,309 +20582,55 @@ $as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_P
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
   if test "$BUILDTOOLS_DEBUG" = 1 ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&5
-$as_echo "$as_me: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiclp'" >&5
-$as_echo "$as_me: Collected values for package 'osiclp'" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_lflags is \"$osiclp_lflags\"" >&5
-$as_echo "$as_me: osiclp_lflags is \"$osiclp_lflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_cflags is \"$osiclp_cflags\"" >&5
-$as_echo "$as_me: osiclp_cflags is \"$osiclp_cflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_data is \"$osiclp_data\"" >&5
-$as_echo "$as_me: osiclp_data is \"$osiclp_data\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&5
-$as_echo "$as_me: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osixpr: \"$coin_has_osixpr\"" >&5
+$as_echo "$as_me: FIND_PRIM_PKG result for osixpr: \"$coin_has_osixpr\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osixpr'" >&5
+$as_echo "$as_me: Collected values for package 'osixpr'" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osixpr_lflags is \"$osixpr_lflags\"" >&5
+$as_echo "$as_me: osixpr_lflags is \"$osixpr_lflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osixpr_cflags is \"$osixpr_cflags\"" >&5
+$as_echo "$as_me: osixpr_cflags is \"$osixpr_cflags\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osixpr_data is \"$osixpr_data\"" >&5
+$as_echo "$as_me: osixpr_data is \"$osixpr_data\"" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: osixpr_pcfiles is \"$osixpr_pcfiles\"" >&5
+$as_echo "$as_me: osixpr_pcfiles is \"$osixpr_pcfiles\"" >&6;}
   fi
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp" >&5
-$as_echo "$coin_has_osiclp" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osixpr" >&5
+$as_echo "$coin_has_osixpr" >&6; }
   else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp due to COIN_SKIP_PROJECTS" >&5
-$as_echo "$coin_has_osiclp due to COIN_SKIP_PROJECTS" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osixpr due to COIN_SKIP_PROJECTS" >&5
+$as_echo "$coin_has_osixpr due to COIN_SKIP_PROJECTS" >&6; }
   fi
 
 # Possibilities are `yes', 'no', or `skipping'. Normalise to `yes' or `no'.
 
-  if test "$coin_has_osiclp" != yes ; then
-    coin_has_osiclp=no
+  if test "$coin_has_osixpr" != yes ; then
+    coin_has_osixpr=no
   fi
 
 # Create an automake conditional COIN_HAS_PRIM.
 
-   if test $coin_has_osiclp = yes; then
-  COIN_HAS_OSICLP_TRUE=
-  COIN_HAS_OSICLP_FALSE='#'
+   if test $coin_has_osixpr = yes; then
+  COIN_HAS_OSIXPR_TRUE=
+  COIN_HAS_OSIXPR_FALSE='#'
 else
-  COIN_HAS_OSICLP_TRUE='#'
-  COIN_HAS_OSICLP_FALSE=
+  COIN_HAS_OSIXPR_TRUE='#'
+  COIN_HAS_OSIXPR_FALSE=
 fi
 
 
 # If we've located the package, define preprocessor symbol COIN_HAS_PRIM and
 # augment the necessary variables for the client packages.
 
-  if test $coin_has_osiclp = yes ; then
+  if test $coin_has_osixpr = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define COIN_HAS_OSIXPR 1" >>confdefs.h
 
-    if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
-       SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
-       SYMPHONYLIB_CFLAGS="$osiclp_cflags $SYMPHONYLIB_CFLAGS"
-
-
-# Finally, set up PRIM_DATA, unless the user specified nodata.
-
-
-  fi
-
-
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for package OsiClp" >&5
-$as_echo_n "checking for package OsiClp... " >&6; }
-
-# Make sure the necessary variables exist for each client package.
-
-
-
-
-
-
-# Check to see if the user has set an override to skip this primary.
-
-  coin_has_osiclp=noInfo
-  if test x"$COIN_SKIP_PROJECTS" != x ; then
-    for pkg in $COIN_SKIP_PROJECTS ; do
-      if test "$pkg" = "$osiclp" ; then
-        coin_has_osiclp=skipping
-      fi
-    done
-  fi
-
-# If we're not skipping this primary, define and process the command line
-# options according to the cmdopts parameter. Then invoke FIND_PRIM_PKG to do
-# the heavy lifting.
-
-  if test "$coin_has_osiclp" != skipping ; then
-
-
-
-
-# Check whether --with-osiclp was given.
-if test "${with_osiclp+set}" = set; then :
-  withval=$with_osiclp;
-fi
-
-
-
-# Check whether --with-osiclp-lflags was given.
-if test "${with_osiclp_lflags+set}" = set; then :
-  withval=$with_osiclp_lflags;
-fi
-
-
-
-# Check whether --with-osiclp-cflags was given.
-if test "${with_osiclp_cflags+set}" = set; then :
-  withval=$with_osiclp_cflags;
-fi
-
-
-
-
-
-
-
-  dflt_action=yes
-
-# Initialize variables for the primary package.
-
-  coin_has_osiclp=noInfo
-  osiclp_lflags=
-  osiclp_cflags=
-  osiclp_data=
-  osiclp_pcfiles=
-
-# --with-prim is always present. If the client specified dataonly, its value
-# is assigned to prim_data.
-
-  withval="$with_osiclp"
-  if test -n "$withval" ; then
-    case "$withval" in
-      no )
-        coin_has_osiclp=skipping
-        ;;
-      yes )
-        coin_has_osiclp=requested
-        ;;
-      build )
-        coin_has_osiclp=build
-        ;;
-      * )
-        coin_has_osiclp=yes
-        osiclp_lflags="$withval"
-        ;;
-    esac
-  fi
-
-# --with-prim-libs and --with-prim-cflags are present unless the client
-# specified dataonly. Specifying --with-prim=no overrides the individual
-# options for libs and cflags.
-
-  if test "$coin_has_osiclp" != skipping ; then
-       withval="$with_osiclp_lflags"
-       if test -n "$withval" ; then
-         case "$withval" in
-           build | no | yes )
-             as_fn_error $? "\"$withval\" is not valid here; please specify linker flags appropriate for your environment." "$LINENO" 5
-             ;;
-           * )
-             coin_has_osiclp=yes
-             osiclp_lflags="$withval"
-             ;;
-         esac
-       fi
-
-       withval="$with_osiclp_cflags"
-       if test -n "$withval" ; then
-         case "$withval" in
-           build | no | yes )
-             as_fn_error $? "\"$withval\" is not valid here; please specify compiler flags appropriate for your environment." "$LINENO" 5
-             ;;
-           * )
-             coin_has_osiclp=yes
-             osiclp_cflags="$withval"
-             ;;
-         esac
-       fi
-     fi
-
-# --with-prim-data will be present unless the client specified nodata.
-# Specifying --with-prim=no overrides the individual option for data.
-
-
-
-# At this point, coin_has_prim can be one of noInfo (no user options
-# specified), skipping (user said no), requested or build (user said yes
-# or build and gave no further guidance), or yes (user specified one or
-# more --with-prim options). If we're already at yes or skipping, we're
-# done looking.
-
-# If there are no user options (noInfo) and the default is no, we're skipping.
-# Otherwise, the default must be yes or build; consider the package requested.
-# A default action we don't recognise defaults to yes.
-
-  if test "$coin_has_osiclp" = noInfo ; then
-    case $dflt_action in
-      no )
-        coin_has_osiclp=skipping
-        ;;
-      build )
-        coin_has_osiclp=build
-        ;;
-      * )
-        coin_has_osiclp=requested
-        ;;
-    esac
-  fi
-
-# Now coin_has_prim can be one of skipping, yes, requested, or build. For
-# requested or build, try pkgconf, if it's available. If it's not available,
-# well, hope that the user knows their system and prim can be used with no
-# additional flags.
-
-  case $coin_has_osiclp in
-    requested | build )
-      if test -n "$PKG_CONFIG" -a "osi-unittests" != skip ; then
-        pcfile="osi-unittests"
-
-
-
-  if test -n "$PKG_CONFIG" ; then
-    if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
-      OSICLP_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
-      coin_has_osiclp=yes
-           osiclp_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
-           osiclp_pcfiles="$pcfile"
-    else
-      OSICLP_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
-      coin_has_osiclp=no
-    fi
-  else
-    as_fn_error $? "\"Cannot check for existence of module osiclp without pkgconf\"" "$LINENO" 5
-  fi
-
-      else
-        coin_has_osiclp=no
-        # AC_MSG_WARN([skipped check via pkgconf as no pkgconf available])
-      fi
-      ;;
-    skipping | yes )
-      ;;
-    * )
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&5
-$as_echo "$as_me: WARNING: Unexpected status \"$coin_has_osiclp\" in COIN_FIND_PRIM_PKG" >&2;}
-      ;;
-  esac
-
-# The final value of coin_has_prim will be yes, no, or skipping. No means
-# we looked (with pkgconfig) and didn't find anything. Skipping means the
-# user said `don't use.' Yes means we have something, from the user or
-# from pkgconfig. Note that we haven't run a useability test!
-
-# Define BUILDTOOLS_DEBUG to enable debugging output
-
-  if test "$BUILDTOOLS_DEBUG" = 1 ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&5
-$as_echo "$as_me: FIND_PRIM_PKG result for osiclp: \"$coin_has_osiclp\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Collected values for package 'osiclp'" >&5
-$as_echo "$as_me: Collected values for package 'osiclp'" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_lflags is \"$osiclp_lflags\"" >&5
-$as_echo "$as_me: osiclp_lflags is \"$osiclp_lflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_cflags is \"$osiclp_cflags\"" >&5
-$as_echo "$as_me: osiclp_cflags is \"$osiclp_cflags\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_data is \"$osiclp_data\"" >&5
-$as_echo "$as_me: osiclp_data is \"$osiclp_data\"" >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&5
-$as_echo "$as_me: osiclp_pcfiles is \"$osiclp_pcfiles\"" >&6;}
-  fi
-
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp" >&5
-$as_echo "$coin_has_osiclp" >&6; }
-  else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $coin_has_osiclp due to COIN_SKIP_PROJECTS" >&5
-$as_echo "$coin_has_osiclp due to COIN_SKIP_PROJECTS" >&6; }
-  fi
-
-# Possibilities are `yes', 'no', or `skipping'. Normalise to `yes' or `no'.
-
-  if test "$coin_has_osiclp" != yes ; then
-    coin_has_osiclp=no
-  fi
-
-# Create an automake conditional COIN_HAS_PRIM.
-
-   if test $coin_has_osiclp = yes; then
-  COIN_HAS_OSICLP_TRUE=
-  COIN_HAS_OSICLP_FALSE='#'
-else
-  COIN_HAS_OSICLP_TRUE='#'
-  COIN_HAS_OSICLP_FALSE=
-fi
-
-
-# If we've located the package, define preprocessor symbol COIN_HAS_PRIM and
-# augment the necessary variables for the client packages.
-
-  if test $coin_has_osiclp = yes ; then
-
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
-
-    if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
-       SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
-       SYMPHONYLIB_CFLAGS="$osiclp_cflags $SYMPHONYLIB_CFLAGS"
+    if test -n "$osixpr_pcfiles" ; then SYMPHONYLIB_PCFILES="$osixpr_pcfiles $SYMPHONYLIB_PCFILES" ; fi
+       SYMPHONYLIB_LFLAGS="$osixpr_lflags $SYMPHONYLIB_LFLAGS"
+       SYMPHONYLIB_CFLAGS="$osixpr_cflags $SYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -21055,9 +20885,9 @@ fi
 
 $as_echo "#define COIN_HAS_OSITESTS 1" >>confdefs.h
 
-    if test -n "$ositests_pcfiles" ; then CBCUNITTEST_PCFILES="$ositests_pcfiles $CBCUNITTEST_PCFILES" ; fi
-       CBCUNITTEST_LFLAGS="$ositests_lflags $CBCUNITTEST_LFLAGS"
-       CBCUNITTEST_CFLAGS="$ositests_cflags $CBCUNITTEST_CFLAGS"
+    if test -n "$ositests_pcfiles" ; then SYMUNITTEST_PCFILES="$ositests_pcfiles $SYMUNITTEST_PCFILES" ; fi
+       SYMUNITTEST_LFLAGS="$ositests_lflags $SYMUNITTEST_LFLAGS"
+       SYMUNITTEST_CFLAGS="$ositests_cflags $SYMUNITTEST_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -23470,32 +23300,28 @@ if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
   as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
-  as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
+if test -z "${COIN_HAS_OSIDYLP_TRUE}" && test -z "${COIN_HAS_OSIDYLP_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_HAS_OSIDYLP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
-  as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
+if test -z "${COIN_HAS_OSIVOL_TRUE}" && test -z "${COIN_HAS_OSIVOL_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_HAS_OSIVOL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
-  as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
+if test -z "${COIN_HAS_OSICPX_TRUE}" && test -z "${COIN_HAS_OSICPX_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_HAS_OSICPX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
-  as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
+if test -z "${COIN_HAS_OSIGLPK_TRUE}" && test -z "${COIN_HAS_OSIGLPK_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_HAS_OSIGLPK\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
-  as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
+if test -z "${COIN_HAS_OSIMSK_TRUE}" && test -z "${COIN_HAS_OSIMSK_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_HAS_OSIMSK\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
-  as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${COIN_HAS_OSICLP_TRUE}" && test -z "${COIN_HAS_OSICLP_FALSE}"; then
-  as_fn_error $? "conditional \"COIN_HAS_OSICLP\" was never defined.
+if test -z "${COIN_HAS_OSIXPR_TRUE}" && test -z "${COIN_HAS_OSIXPR_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_HAS_OSIXPR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COIN_HAS_OSITESTS_TRUE}" && test -z "${COIN_HAS_OSITESTS_FALSE}"; then

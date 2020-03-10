@@ -22,20 +22,11 @@ AUTOMAKE_OPTIONS = foreign
 #                         unitTest for Symphony                        #
 ########################################################################
 
-AM_CPPFLAGS = $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS)
-SYMCPPFLAGS =
-SYMPCPPFLAGS =
-APPLCPPFLAGS =
-SYMPALLLDADD =
-LDADD = $(OSITESTS_LIBS) $(SYMPHONYLIB_LIBS)
-ALLLDADD =
+AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS)
 
-LIBS =
-SYMLIB = 
-SYMPLIB = 
-
-# Add include files
-AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
+AM_CPPFLAGS += -I`$(CYGPATH_W) $(top_srcdir)/include` \
+               -I`$(CYGPATH_W) $(top_builddir)/include` \
+               -I`$(CYGPATH_W) $(top_srcdir)/src/OsiSym`
 
 # List all additionally required solver and Osi libraries
 
@@ -63,60 +54,15 @@ endif
 #                            Additional Definitions                    #
 ########################################################################
 
-ALLLDADD += $(LDADD)
-SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
-SYMLIB += ../src/libSym.la ../src/OsiSym/libOsiSym.la
-
-SYMPCPPFLAGS += $(AM_CPPFLAGS) $(SYMPDEFS)
-SYMPALLLDADD += $(ALLLDADD)
-
-if SYM_PARALLEL
-SYMPCPPFLAGS += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-SYMPALLLDADD += -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
-	-lgpvm3 -lpvm3
-SYMPLIB += ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
-else
-SYMPLIB += $(SYMLIB)
-endif
-
-TestLDADD = $(LDADD)
-TestLINK = 
-if COIN_CXX_IS_CL
-TestLINK += cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
-	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
-	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
-	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
-	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
-	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
-	$(LIBTOOL) \
-	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-TestLDADD += OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
-	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
-	OsiSymSolverInterfaceTest.$(OBJEXT) unitTestSym.$(OBJEXT)
-else 
-TestLINK += $(CXXLINK)
-endif
-
-noinst_PROGRAMS = unitTest punitTest
+noinst_PROGRAMS = unitTest 
 
 unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-punitTest_SOURCES = \
-	OsiSymSolverInterfaceTest.cpp \
-	unitTestSym.cpp
-
-unitTest_CPPFLAGS = $(SYMCPPFLAGS) $(OSIUNITTEST_CFLAGS)
-unitTest_LDADD = $(SYMLIB) $(ALLLDADD) $(OSIUNITTEST_LIBS)
-unitTest_DEPENDENCIES = $(SYMLIB) $(DEPENDENCIES)
-unitTest_LINK = $(TestLINK)
-
-punitTest_CPPFLAGS = $(SYMPCPPFLAGS) $(OSIUNITTEST_CFLAGS)
-punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD) $(OSIUNITTEST_LIBS)
-punitTest_DEPENDENCIES = $(SYMPLIB) $(DEPENDENCIES)
-
+unitTest_CPPFLAGS = $(AM_CPPFLAGS) 
+unitTest_LDADD = ../src/libSym.la ../src/OsiSym/libOsiSym.la \
+	$(OSITESTS_LFLAGS)
 
 if COIN_HAS_MIPLIB3
   MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`
@@ -167,13 +113,7 @@ test: unitTest$(EXEEXT)
 fulltest: check_files unitTest$(EXEEXT)
 	./unitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
 
-ptest: punitTest$(EXEEXT)
-	./punitTest$(EXEEXT) -miplib3Dir= $(unittestflags)
-
-pfulltest: check_files punitTest$(EXEEXT)
-	./punitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
-
-.PHONY: test ptest fulltest pfulltest check_files
+.PHONY: test fulltest check_files
 
 ########################################################################
 #                          Cleaning stuff                              #

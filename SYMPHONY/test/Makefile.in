@@ -111,30 +111,9 @@ host_triplet = @host@
 @GLPK_LP_SOLVER_TRUE@am__append_3 = -D__OSI_GLPK__
 @SOPLEX_LP_SOLVER_TRUE@am__append_4 = -D__OSI_SOPLEX__
 @XPRESS_LP_SOLVER_TRUE@am__append_5 = -D__OSI_XPRESS__
-@SYM_PARALLEL_TRUE@am__append_6 = -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-@SYM_PARALLEL_TRUE@am__append_7 = -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
-@SYM_PARALLEL_TRUE@	-lgpvm3 -lpvm3
-
-@SYM_PARALLEL_TRUE@am__append_8 = ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
-@SYM_PARALLEL_FALSE@am__append_9 = $(SYMLIB)
-@COIN_CXX_IS_CL_TRUE@am__append_10 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
-@COIN_CXX_IS_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
-@COIN_CXX_IS_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
-@COIN_CXX_IS_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
-@COIN_CXX_IS_CL_TRUE@	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
-@COIN_CXX_IS_CL_TRUE@	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
-@COIN_CXX_IS_CL_TRUE@	$(LIBTOOL) \
-@COIN_CXX_IS_CL_TRUE@	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
-@COIN_CXX_IS_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-
-@COIN_CXX_IS_CL_TRUE@am__append_11 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
-@COIN_CXX_IS_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
-@COIN_CXX_IS_CL_TRUE@	OsiSymSolverInterfaceTest.$(OBJEXT) unitTestSym.$(OBJEXT)
-
-@COIN_CXX_IS_CL_FALSE@am__append_12 = $(CXXLINK)
-noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
-@COIN_HAS_NETLIB_TRUE@am__append_13 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
-@COIN_HAS_SAMPLE_TRUE@am__append_14 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
+noinst_PROGRAMS = unitTest$(EXEEXT)
+@COIN_HAS_NETLIB_TRUE@am__append_6 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
+@COIN_HAS_SAMPLE_TRUE@am__append_7 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -148,20 +127,14 @@ CONFIG_HEADER = $(top_builddir)/include/config.h \
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_punitTest_OBJECTS = punitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
-	punitTest-unitTestSym.$(OBJEXT)
-punitTest_OBJECTS = $(am_punitTest_OBJECTS)
-am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
-@SYM_PARALLEL_TRUE@am__DEPENDENCIES_3 = $(PVM_ROOT)/lib/$(ARCH)`
-am__DEPENDENCIES_4 = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3)
+am_unitTest_OBJECTS = unitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
+	unitTest-unitTestSym.$(OBJEXT)
+unitTest_OBJECTS = $(am_unitTest_OBJECTS)
+unitTest_DEPENDENCIES = ../src/libSym.la ../src/OsiSym/libOsiSym.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_unitTest_OBJECTS = unitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
-	unitTest-unitTestSym.$(OBJEXT)
-unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -178,8 +151,6 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade =  \
-	./$(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Po \
-	./$(DEPDIR)/punitTest-unitTestSym.Po \
 	./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po \
 	./$(DEPDIR)/unitTest-unitTestSym.Po
 am__mv = mv -f
@@ -201,7 +172,7 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(punitTest_SOURCES) $(unitTest_SOURCES)
+SOURCES = $(unitTest_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -238,9 +209,6 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CBCUNITTEST_CFLAGS = @CBCUNITTEST_CFLAGS@
-CBCUNITTEST_LFLAGS = @CBCUNITTEST_LFLAGS@
-CBCUNITTEST_PCFILES = @CBCUNITTEST_PCFILES@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -275,7 +243,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
-LIBS = 
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -322,6 +290,9 @@ SYMPHONYLIB_LFLAGS = @SYMPHONYLIB_LFLAGS@
 SYMPHONYLIB_LFLAGS_NOPC = @SYMPHONYLIB_LFLAGS_NOPC@
 SYMPHONYLIB_PCFILES = @SYMPHONYLIB_PCFILES@
 SYMSRCDIR = @SYMSRCDIR@
+SYMUNITTEST_CFLAGS = @SYMUNITTEST_CFLAGS@
+SYMUNITTEST_LFLAGS = @SYMUNITTEST_LFLAGS@
+SYMUNITTEST_PCFILES = @SYMUNITTEST_PCFILES@
 SYM_OPENMP_FLAGS = @SYM_OPENMP_FLAGS@
 SYM_OPENMP_LIBS = @SYM_OPENMP_LIBS@
 TMEXT = @TMEXT@
@@ -388,43 +359,22 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 #                         unitTest for Symphony                        #
 ########################################################################
-
-# Add include files
-AM_CPPFLAGS = $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS) \
-	-DCOIN_HAS_SYMPHONY $(am__append_1) $(am__append_2) \
+AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(OSITESTS_CFLAGS) \
+	$(SYMPHONYLIB_CFLAGS) -I`$(CYGPATH_W) $(top_srcdir)/include` \
+	-I`$(CYGPATH_W) $(top_builddir)/include` -I`$(CYGPATH_W) \
+	$(top_srcdir)/src/OsiSym` $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4) $(am__append_5)
-SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)
-SYMPCPPFLAGS = $(AM_CPPFLAGS) $(SYMPDEFS) $(am__append_6)
-APPLCPPFLAGS = 
-SYMPALLLDADD = $(ALLLDADD) $(am__append_7)
-LDADD = $(OSITESTS_LIBS) $(SYMPHONYLIB_LIBS)
-
-########################################################################
-#                            Additional Definitions                    #
-########################################################################
-ALLLDADD = $(LDADD)
-SYMLIB = ../src/libSym.la ../src/OsiSym/libOsiSym.la
-SYMPLIB = $(am__append_8) $(am__append_9)
-TestLDADD = $(LDADD) $(am__append_11)
-TestLINK = $(am__append_10) $(am__append_12)
 unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-punitTest_SOURCES = \
-	OsiSymSolverInterfaceTest.cpp \
-	unitTestSym.cpp
+unitTest_CPPFLAGS = $(AM_CPPFLAGS) 
+unitTest_LDADD = ../src/libSym.la ../src/OsiSym/libOsiSym.la \
+	$(OSITESTS_LFLAGS)
 
-unitTest_CPPFLAGS = $(SYMCPPFLAGS) $(OSIUNITTEST_CFLAGS)
-unitTest_LDADD = $(SYMLIB) $(ALLLDADD) $(OSIUNITTEST_LIBS)
-unitTest_DEPENDENCIES = $(SYMLIB) $(DEPENDENCIES)
-unitTest_LINK = $(TestLINK)
-punitTest_CPPFLAGS = $(SYMPCPPFLAGS) $(OSIUNITTEST_CFLAGS)
-punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD) $(OSIUNITTEST_LIBS)
-punitTest_DEPENDENCIES = $(SYMPLIB) $(DEPENDENCIES)
 @COIN_HAS_MIPLIB3_FALSE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
 @COIN_HAS_MIPLIB3_TRUE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`
-unittestflags = $(am__append_13) $(am__append_14)
+unittestflags = $(am__append_6) $(am__append_7)
 testFILES = air03 air04 air05 bell3a blend2 cap6000 dcmulti dsbmip \
      egout enigma fiber fixnet6 flugpl gen gesa2 gesa2_o \
      gesa3 gesa3_o gt2 khb05250 l152lav lseu misc03 misc06 \
@@ -483,13 +433,9 @@ clean-noinstPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-punitTest$(EXEEXT): $(punitTest_OBJECTS) $(punitTest_DEPENDENCIES) $(EXTRA_punitTest_DEPENDENCIES) 
-	@rm -f punitTest$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(punitTest_OBJECTS) $(punitTest_LDADD) $(LIBS)
-
 unitTest$(EXEEXT): $(unitTest_OBJECTS) $(unitTest_DEPENDENCIES) $(EXTRA_unitTest_DEPENDENCIES) 
 	@rm -f unitTest$(EXEEXT)
-	$(AM_V_GEN)$(unitTest_LINK) $(unitTest_OBJECTS) $(unitTest_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(unitTest_OBJECTS) $(unitTest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -497,8 +443,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/punitTest-unitTestSym.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unitTest-unitTestSym.Po@am__quote@ # am--include-marker
 
@@ -531,34 +475,6 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
-
-punitTest-OsiSymSolverInterfaceTest.o: OsiSymSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT punitTest-OsiSymSolverInterfaceTest.o -MD -MP -MF $(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Tpo -c -o punitTest-OsiSymSolverInterfaceTest.o `test -f 'OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSymSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Tpo $(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='OsiSymSolverInterfaceTest.cpp' object='punitTest-OsiSymSolverInterfaceTest.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o punitTest-OsiSymSolverInterfaceTest.o `test -f 'OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSymSolverInterfaceTest.cpp
-
-punitTest-OsiSymSolverInterfaceTest.obj: OsiSymSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT punitTest-OsiSymSolverInterfaceTest.obj -MD -MP -MF $(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Tpo -c -o punitTest-OsiSymSolverInterfaceTest.obj `if test -f 'OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Tpo $(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='OsiSymSolverInterfaceTest.cpp' object='punitTest-OsiSymSolverInterfaceTest.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o punitTest-OsiSymSolverInterfaceTest.obj `if test -f 'OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`
-
-punitTest-unitTestSym.o: unitTestSym.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT punitTest-unitTestSym.o -MD -MP -MF $(DEPDIR)/punitTest-unitTestSym.Tpo -c -o punitTest-unitTestSym.o `test -f 'unitTestSym.cpp' || echo '$(srcdir)/'`unitTestSym.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/punitTest-unitTestSym.Tpo $(DEPDIR)/punitTest-unitTestSym.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='unitTestSym.cpp' object='punitTest-unitTestSym.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o punitTest-unitTestSym.o `test -f 'unitTestSym.cpp' || echo '$(srcdir)/'`unitTestSym.cpp
-
-punitTest-unitTestSym.obj: unitTestSym.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT punitTest-unitTestSym.obj -MD -MP -MF $(DEPDIR)/punitTest-unitTestSym.Tpo -c -o punitTest-unitTestSym.obj `if test -f 'unitTestSym.cpp'; then $(CYGPATH_W) 'unitTestSym.cpp'; else $(CYGPATH_W) '$(srcdir)/unitTestSym.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/punitTest-unitTestSym.Tpo $(DEPDIR)/punitTest-unitTestSym.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='unitTestSym.cpp' object='punitTest-unitTestSym.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o punitTest-unitTestSym.obj `if test -f 'unitTestSym.cpp'; then $(CYGPATH_W) 'unitTestSym.cpp'; else $(CYGPATH_W) '$(srcdir)/unitTestSym.cpp'; fi`
 
 unitTest-OsiSymSolverInterfaceTest.o: OsiSymSolverInterfaceTest.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.o -MD -MP -MF $(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f 'OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSymSolverInterfaceTest.cpp
@@ -686,9 +602,7 @@ clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Po
-	-rm -f ./$(DEPDIR)/punitTest-unitTestSym.Po
-	-rm -f ./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po
+		-rm -f ./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po
 	-rm -f ./$(DEPDIR)/unitTest-unitTestSym.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -735,9 +649,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Po
-	-rm -f ./$(DEPDIR)/punitTest-unitTestSym.Po
-	-rm -f ./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po
+		-rm -f ./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po
 	-rm -f ./$(DEPDIR)/unitTest-unitTestSym.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
@@ -803,13 +715,7 @@ test: unitTest$(EXEEXT)
 fulltest: check_files unitTest$(EXEEXT)
 	./unitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
 
-ptest: punitTest$(EXEEXT)
-	./punitTest$(EXEEXT) -miplib3Dir= $(unittestflags)
-
-pfulltest: check_files punitTest$(EXEEXT)
-	./punitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
-
-.PHONY: test ptest fulltest pfulltest check_files
+.PHONY: test fulltest check_files
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

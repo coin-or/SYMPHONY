@@ -86,17 +86,16 @@ m4_foreach_w([myvar],[CoinUtils Osi Cgl Clp],
   ])
 
 AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-clp])
-AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-dylp])
-AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-vol])
-AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-cplex])
-AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-glpk])
-AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-mosek])
-AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-xpress])
-AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-unittests])
+AC_COIN_CHK_PKG(OsiDyLP,[SymphonyLib],[osi-dylp])
+AC_COIN_CHK_PKG(OsiVol,[SymphonyLib],[osi-vol])
+AC_COIN_CHK_PKG(OsiCpx,[SymphonyLib],[osi-cplex])
+AC_COIN_CHK_PKG(OsiGlpk,[SymphonyLib],[osi-glpk])
+AC_COIN_CHK_PKG(OsiMsk,[SymphonyLib],[osi-mosek])
+AC_COIN_CHK_PKG(OsiXpr,[SymphonyLib],[osi-xpress])
 
 # Data Packages
 
-AC_COIN_CHK_PKG(OsiTests,[CbcUnitTest],[osi-unittests])
+AC_COIN_CHK_PKG(OsiTests,[SymUnitTest],[osi-unittests])
 AC_COIN_CHK_PKG(Sample,,[coindatasample],,dataonly)
 AC_COIN_CHK_PKG(Netlib,,[coindatanetlib],,dataonly)
 AC_COIN_CHK_PKG(Miplib3,,[coindatamiplib3],,dataonly)
