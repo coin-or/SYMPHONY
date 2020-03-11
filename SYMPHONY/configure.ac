@@ -90,8 +90,11 @@ AC_COIN_CHK_PKG(OsiDyLP,[SymphonyLib],[osi-dylp])
 AC_COIN_CHK_PKG(OsiVol,[SymphonyLib],[osi-vol])
 AC_COIN_CHK_PKG(OsiCpx,[SymphonyLib],[osi-cplex])
 AC_COIN_CHK_PKG(OsiGlpk,[SymphonyLib],[osi-glpk])
-AC_COIN_CHK_PKG(OsiMsk,[SymphonyLib],[osi-mosek])
+AC_COIN_CHK_PKG(OsiSpx,[SymphonyLib],[osi-soplex])
 AC_COIN_CHK_PKG(OsiXpr,[SymphonyLib],[osi-xpress])
+AC_COIN_CHK_PKG(OsiGrb,[SymphonyLib],[osi-gurobi])
+
+AC_COIN_CHK_PKG(Glpk,[SymphonyLib],,[build])
 
 # Data Packages
 
@@ -126,21 +129,29 @@ case $sym_lp_solver in
          found_package=false
      fi
    ;;
-   glpk)
-     AC_MSG_RESULT(Glpk)
-     if test $coin_has_glpk = false; then 
+   dylp)
+    AC_MSG_RESULT(DyLP) 
+     if [test $coin_has_dylp = unavailable]; \
+     then
          found_package=false
      fi
-   ;; 
+   ;;
+   vol)
+    AC_MSG_RESULT(Vol) 
+     if [test $coin_has_vol = unavailable]; \
+     then
+         found_package=false
+     fi
+   ;;
    cplex)
      AC_MSG_RESULT(Cplex)
      if test $coin_has_cpx = false; then 
          found_package=false
      fi
    ;; 
-   osl)
-         AC_MSG_RESULT(Osl)
-     if test $coin_has_osl = false; then 
+   glpk)
+     AC_MSG_RESULT(Glpk)
+     if test $coin_has_glpk = false; then 
          found_package=false
      fi
    ;; 
@@ -156,6 +167,12 @@ case $sym_lp_solver in
          found_package=false
      fi
    ;; 
+   gurobi)
+         AC_MSG_RESULT(Gurobi)
+     if test $coin_has_grb = false; then 
+         found_package=false
+     fi
+   ;; 
   *)
     AC_MSG_ERROR(Unknown LP solver!)
   ;;
@@ -167,16 +184,20 @@ fi
 
 AM_CONDITIONAL(CLP_LP_SOLVER,[test $sym_lp_solver = clp &&
 test $coin_has_clp = yes])
-AM_CONDITIONAL(GLPK_LP_SOLVER,[test $sym_lp_solver = glpk &&
-test $coin_has_glpk = yes])
-AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
-test $coin_has_osl = yes])
+AM_CONDITIONAL(DYLP_LP_SOLVER,[test $sym_lp_solver = dylp &&
+test $coin_has_dylp = yes])
+AM_CONDITIONAL(VOL_LP_SOLVER,[test $sym_lp_solver = vol &&
+test $coin_has_vol = yes])
 AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex &&
 test $coin_has_cpx = yes])
+AM_CONDITIONAL(GLPK_LP_SOLVER,[test $sym_lp_solver = glpk &&
+test $coin_has_glpk = yes])
 AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
 test $coin_has_spx = yes])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
 test $coin_has_xpr = yes])
+AM_CONDITIONAL(GRB_LP_SOLVER,[test $sym_lp_solver = gurobi &&
+test $coin_has_grb = yes])
 
 AM_CONDITIONAL(COIN_CXX_IS_CL,[test $CC = cl])
 

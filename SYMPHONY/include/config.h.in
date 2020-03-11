@@ -9,6 +9,9 @@
 /* Define to 1 if CoinUtils is available. */
 #undef COIN_HAS_COINUTILS
 
+/* Define to 1 if Glpk is available. */
+#undef COIN_HAS_GLPK
+
 /* Define to 1 if Miplib3 is available. */
 #undef COIN_HAS_MIPLIB3
 
@@ -30,8 +33,11 @@
 /* Define to 1 if OsiGlpk is available. */
 #undef COIN_HAS_OSIGLPK
 
-/* Define to 1 if OsiMsk is available. */
-#undef COIN_HAS_OSIMSK
+/* Define to 1 if OsiGrb is available. */
+#undef COIN_HAS_OSIGRB
+
+/* Define to 1 if OsiSpx is available. */
+#undef COIN_HAS_OSISPX
 
 /* Define to 1 if OsiTests is available. */
 #undef COIN_HAS_OSITESTS
