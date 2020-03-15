@@ -289,14 +289,23 @@ if SIGHANDLER
 AM_CPPFLAGS += -DSIGHANDLER
 endif
 
-AM_CPPFLAGS += $(SYMDEFS)
+AM_CPPFLAGS += $(SYMDEFS) 
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(top_srcdir)/include` \
                -I`$(CYGPATH_W) $(top_builddir)/include` \
                -I`$(CYGPATH_W) $(top_srcdir)/Applications/USER/include`
 
+if SYM_PARALLEL
+PCPPFLAGS = $(AM_CPPFLAGS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+PLDADD = -lgpvm3 -lpvm3
+APPLPCPPFLAGS = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
+endif
+
+APPLCPPFLAGS = $(AM_CPP_FLAGS) -DUSE_SYM_APPLICATION
+
 # Compile everything with g++
 CC = $(CXX)
 CCLD = $(CXX)
+CXXLD = $(CXX)
 
 ########################################################################
 #                               libSym                                 #
@@ -304,7 +313,6 @@ CCLD = $(CXX)
 
 lib_LTLIBRARIES = libSym.la libSymApplStubs.la
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
-libSym_la_CPPFLAGS = -DSYMPHONY_BUILD $(SYMPHONYLIB_CFLAGS) $(AM_CPPFLAGS)
 libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS)
 
 ########################################################################
@@ -313,7 +321,6 @@ libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS)
 
 bin_PROGRAMS = symphony
 symphony_SOURCES = $(MASTER_MAIN_SRC) symphony.h
-symphony_CPPFLAGS = $(SYMPHONYLIB_CFLAGS) $(AM_CPPFLAGS)
 symphony_LDADD = libSym.la 
 
 ########################################################################
@@ -322,7 +329,6 @@ symphony_LDADD = libSym.la
 
 libSymApplStubs_la_SOURCES  = $(SYMINCFILES) $(USER_APPL_DIR)/include/user.h
 libSymApplStubs_la_SOURCES += $(USER_APPL_STUBS_SRC)
-libSymApplStubs_la_CPPFLAGS = $(SYMPHONYLIB_CFLAGS) $(AM_CPPFLAGS)
 
 rename_obj:
 	mv main.obj symphony-main.obj
