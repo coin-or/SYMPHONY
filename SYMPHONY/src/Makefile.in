@@ -120,29 +120,45 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @COIN_CXX_IS_CL_TRUE@am__append_1 = ../include/sym_win32_time.h
-@CLP_LP_SOLVER_TRUE@am__append_2 = -D__OSI_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_3 = -D__OSI_CPLEX__
-@GLPK_LP_SOLVER_TRUE@am__append_4 = -D__OSI_GLPK__
-@GLPK_LP_SOLVER_FALSE@@USE_GMPL_TRUE@am__append_5 = -DUSE_GLPMPL
-@SOPLEX_LP_SOLVER_TRUE@am__append_6 = -D__OSI_SOPLEX__
-@XPRESS_LP_SOLVER_TRUE@am__append_7 = -D__OSI_XPRESS__
+@PSEUDO_COSTS_TRUE@am__append_2 = LP/lp_pseudo_branch.c
+@PSEUDO_COSTS_FALSE@am__append_3 = LP/lp_branch.c
+@SYM_COMPILE_IN_LP_TRUE@am__append_4 = LP/lp_solver.c LP/lp_varfunc.c \
+@SYM_COMPILE_IN_LP_TRUE@	LP/lp_rowfunc.c LP/lp_genfunc.c \
+@SYM_COMPILE_IN_LP_TRUE@	LP/lp_proccomm.c LP/lp_wrapper.c \
+@SYM_COMPILE_IN_LP_TRUE@	LP/lp_free.c
+@PSEUDO_COSTS_TRUE@@SYM_COMPILE_IN_LP_TRUE@am__append_5 = LP/lp_pseudo_branch.c
+@PSEUDO_COSTS_FALSE@@SYM_COMPILE_IN_LP_TRUE@am__append_6 = LP/lp_branch.c
+@SYM_COMPILE_IN_CG_TRUE@@SYM_COMPILE_IN_LP_TRUE@am__append_7 = CutGen/cg_func.c CutGen/cg_wrapper.c
+@SYM_COMPILE_IN_LP_FALSE@am__append_8 = LP/lp_solver.c
+@SYM_COMPILE_IN_CP_TRUE@am__append_9 = CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c
+@SYM_COMPILE_IN_TM_TRUE@am__append_10 = $(TM_SRC)
+@PSEUDO_COSTS_TRUE@am__append_11 = LP/lp_pseudo_branch.c
+@PSEUDO_COSTS_FALSE@am__append_12 = LP/lp_branch.c
+@SYM_COMPILE_IN_CG_TRUE@am__append_13 = CutGen/cg_func.c CutGen/cg_wrapper.c
+@SYM_COMPILE_IN_LP_TRUE@am__append_14 = $(QSORT_SRC)
+@CLP_LP_SOLVER_TRUE@am__append_15 = -D__OSI_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_16 = -D__OSI_CPLEX__
+@GLPK_LP_SOLVER_TRUE@am__append_17 = -D__OSI_GLPK__
+@GLPK_LP_SOLVER_FALSE@@USE_GMPL_TRUE@am__append_18 = -DUSE_GLPMPL
+@SOPLEX_LP_SOLVER_TRUE@am__append_19 = -D__OSI_SOPLEX__
+@XPRESS_LP_SOLVER_TRUE@am__append_20 = -D__OSI_XPRESS__
 
 ########################################################################
 #                            Additional Definitions                    #
 ########################################################################
-@COIN_HAS_READLINE_TRUE@am__append_8 = -DHAS_READLINE
-@SENSITIVITY_ANALYSIS_TRUE@am__append_9 = -DSENSITIVITY_ANALYSIS
-@USE_CGL_CUTS_TRUE@am__append_10 = -DUSE_CGL_CUTS
-@ROOT_NODE_ONLY_TRUE@am__append_11 = -DROOT_NODE_ONLY
-@COMPILE_FRAC_BRANCHING_TRUE@am__append_12 = -DCOMPILE_FRAC_BRANCHING
-@DO_TESTS_TRUE@am__append_13 = -DDO_TESTS
-@TM_BASIS_TESTS_TRUE@am__append_14 = -DTM_BASIS_TESTS
-@TRACE_PATH_TRUE@am__append_15 = -DTRACE_PATH
-@CHECK_CUT_VALIDITY_TRUE@am__append_16 = -DCHECK_CUT_VALIDITY
-@STATISTICS_TRUE@am__append_17 = -DSTATISTICS
-@PSEUDO_COSTS_TRUE@am__append_18 = -DPSEUDO_COSTS
-@DRAWGRAPH_TRUE@am__append_19 = 
-@SIGHANDLER_TRUE@am__append_20 = -DSIGHANDLER
+@COIN_HAS_READLINE_TRUE@am__append_21 = -DHAS_READLINE
+@SENSITIVITY_ANALYSIS_TRUE@am__append_22 = -DSENSITIVITY_ANALYSIS
+@USE_CGL_CUTS_TRUE@am__append_23 = -DUSE_CGL_CUTS
+@ROOT_NODE_ONLY_TRUE@am__append_24 = -DROOT_NODE_ONLY
+@COMPILE_FRAC_BRANCHING_TRUE@am__append_25 = -DCOMPILE_FRAC_BRANCHING
+@DO_TESTS_TRUE@am__append_26 = -DDO_TESTS
+@TM_BASIS_TESTS_TRUE@am__append_27 = -DTM_BASIS_TESTS
+@TRACE_PATH_TRUE@am__append_28 = -DTRACE_PATH
+@CHECK_CUT_VALIDITY_TRUE@am__append_29 = -DCHECK_CUT_VALIDITY
+@STATISTICS_TRUE@am__append_30 = -DSTATISTICS
+@PSEUDO_COSTS_TRUE@am__append_31 = -DPSEUDO_COSTS
+@DRAWGRAPH_TRUE@am__append_32 = 
+@SIGHANDLER_TRUE@am__append_33 = -DSIGHANDLER
 bin_PROGRAMS = symphony$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -198,37 +214,48 @@ am__objects_4 = Master/libSym_la-master.lo \
 	Master/libSym_la-master_io.lo Master/libSym_la-master_func.lo \
 	Master/libSym_la-master_prep.lo \
 	Master/libSym_la-master_prep_base.lo \
-	Master/libSym_la-master_prep_sr.lo \
-	TreeManager/libSym_la-tm_func.lo \
-	TreeManager/libSym_la-tm_proccomm.lo LP/libSym_la-lp_solver.lo \
-	LP/libSym_la-lp_varfunc.lo LP/libSym_la-lp_rowfunc.lo \
-	LP/libSym_la-lp_genfunc.lo LP/libSym_la-lp_branch.lo \
+	Master/libSym_la-master_prep_sr.lo
+am__objects_5 = TreeManager/libSym_la-tm_func.lo \
+	TreeManager/libSym_la-tm_proccomm.lo
+@PSEUDO_COSTS_TRUE@am__objects_6 = LP/libSym_la-lp_pseudo_branch.lo
+@PSEUDO_COSTS_FALSE@am__objects_7 = LP/libSym_la-lp_branch.lo
+am__objects_8 = LP/libSym_la-lp_solver.lo LP/libSym_la-lp_varfunc.lo \
+	LP/libSym_la-lp_rowfunc.lo LP/libSym_la-lp_genfunc.lo \
 	LP/libSym_la-lp_proccomm.lo LP/libSym_la-lp_wrapper.lo \
-	LP/libSym_la-lp.lo LP/libSym_la-lp_free.lo \
-	LP/libSym_la-lp_sp.lo LP/libSym_la-lp_heuristics.lo \
-	CutGen/libSym_la-cg_func.lo CutGen/libSym_la-cg_wrapper.lo \
-	CutPool/libSym_la-cp_proccomm.lo CutPool/libSym_la-cp_func.lo \
-	CutPool/libSym_la-cp_wrapper.lo Common/libSym_la-sym_qsort.lo \
-	Common/libSym_la-timemeas.lo Common/libSym_la-proccomm.lo \
-	Common/libSym_la-pack_cut.lo Common/libSym_la-pack_array.lo
-am_libSym_la_OBJECTS = $(am__objects_3) $(am__objects_4)
+	LP/libSym_la-lp_free.lo LP/libSym_la-lp_sp.lo \
+	LP/libSym_la-lp_heuristics.lo $(am__objects_6) \
+	$(am__objects_7)
+am__objects_9 = CutGen/libSym_la-cg_func.lo \
+	CutGen/libSym_la-cg_wrapper.lo
+am__objects_10 = CutPool/libSym_la-cp_proccomm.lo \
+	CutPool/libSym_la-cp_func.lo CutPool/libSym_la-cp_wrapper.lo
+am__objects_11 = Common/libSym_la-timemeas.lo
+am__objects_12 = Common/libSym_la-sym_qsort.lo
+am__objects_13 = Common/libSym_la-proccomm.lo
+am__objects_14 = Common/libSym_la-pack_cut.lo
+am__objects_15 = Common/libSym_la-pack_array.lo
+am__objects_16 = $(am__objects_4) $(am__objects_5) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
+	$(am__objects_15)
+am_libSym_la_OBJECTS = $(am__objects_3) $(am__objects_16)
 libSym_la_OBJECTS = $(am_libSym_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 libSymApplStubs_la_LIBADD =
-am__objects_5 =  \
+am__objects_17 =  \
 	$(USER_APPL_DIR)/Master/libSymApplStubs_la-user_master.lo \
 	$(USER_APPL_DIR)/LP/libSymApplStubs_la-user_lp.lo \
 	$(USER_APPL_DIR)/LP/libSymApplStubs_la-user_lp_branch.lo \
 	$(USER_APPL_DIR)/CutGen/libSymApplStubs_la-user_cg.lo \
 	$(USER_APPL_DIR)/CutPool/libSymApplStubs_la-user_cp.lo \
 	$(USER_APPL_DIR)/DrawGraph/libSymApplStubs_la-user_dg.lo
-am_libSymApplStubs_la_OBJECTS = $(am__objects_3) $(am__objects_5)
+am_libSymApplStubs_la_OBJECTS = $(am__objects_3) $(am__objects_17)
 libSymApplStubs_la_OBJECTS = $(am_libSymApplStubs_la_OBJECTS)
-am__objects_6 = Master/symphony-main.$(OBJEXT)
-am_symphony_OBJECTS = $(am__objects_6)
+am__objects_18 = Master/symphony-main.$(OBJEXT)
+am_symphony_OBJECTS = $(am__objects_18)
 symphony_OBJECTS = $(am_symphony_OBJECTS)
 symphony_DEPENDENCIES = libSym.la
 AM_V_P = $(am__v_P_@AM_V@)
@@ -262,12 +289,12 @@ am__depfiles_remade = $(USER_APPL_DIR)/CutGen/$(DEPDIR)/libSymApplStubs_la-user_
 	CutPool/$(DEPDIR)/libSym_la-cp_func.Plo \
 	CutPool/$(DEPDIR)/libSym_la-cp_proccomm.Plo \
 	CutPool/$(DEPDIR)/libSym_la-cp_wrapper.Plo \
-	LP/$(DEPDIR)/libSym_la-lp.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_branch.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_free.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_genfunc.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_heuristics.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_proccomm.Plo \
+	LP/$(DEPDIR)/libSym_la-lp_pseudo_branch.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_rowfunc.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_solver.Plo \
 	LP/$(DEPDIR)/libSym_la-lp_sp.Plo \
@@ -491,7 +518,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
 pkgdocdir = $(docdir)
 
 # doxydocdir is the top-level directory for doxygen documentation. It holds
@@ -538,19 +565,64 @@ SYMHEADERS = ../include/sym_constants.h ../include/sym_macros.h \
 
 #Add SymConfig.h
 SYMINCFILES = ../include/SymConfig.h ../include/OsiSymConfig.h $(SYMHEADERS)
-MAIN_SRC = Master/main.c
+SYM_MASTER_SRC = Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c Master/master_prep.c Master/master_prep_base.c Master/master_prep_sr.c 
 
-#SRC += DrawGraph/draw_graph.c
-SRC = Master/master.c Master/master_wrapper.c Master/master_io.c \
-	Master/master_func.c Master/master_prep.c \
-	Master/master_prep_base.c Master/master_prep_sr.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_branch.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
-	LP/lp_sp.c LP/lp_heuristics.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/sym_qsort.c Common/timemeas.c \
-	Common/proccomm.c Common/pack_cut.c Common/pack_array.c
+MASTER_SRC = $(SYM_MASTER_SRC) $(am__append_8) $(am__append_10)
+MASTER_MAIN_SRC = Master/main.c
+DG_SRC = DrawGraph/draw_graph.c
+SYM_TM_SRC = TreeManager/tm_func.c TreeManager/tm_proccomm.c
+@SYM_COMPILE_IN_TM_FALSE@TM_SRC = TreeManager/treemanager.c \
+@SYM_COMPILE_IN_TM_FALSE@	TreeManager/tm_func.c \
+@SYM_COMPILE_IN_TM_FALSE@	TreeManager/tm_proccomm.c \
+@SYM_COMPILE_IN_TM_FALSE@	$(am__append_4) $(am__append_5) \
+@SYM_COMPILE_IN_TM_FALSE@	$(am__append_6) $(am__append_7) \
+@SYM_COMPILE_IN_TM_FALSE@	$(am__append_9)
+@SYM_COMPILE_IN_TM_TRUE@TM_SRC = TreeManager/tm_func.c \
+@SYM_COMPILE_IN_TM_TRUE@	TreeManager/tm_proccomm.c \
+@SYM_COMPILE_IN_TM_TRUE@	$(am__append_4) $(am__append_5) \
+@SYM_COMPILE_IN_TM_TRUE@	$(am__append_6) $(am__append_7) \
+@SYM_COMPILE_IN_TM_TRUE@	$(am__append_9)
+SYM_LP_SRC = LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_sp.c LP/lp_heuristics.c $(am__append_2) $(am__append_3)
+SYM_CG_SRC = CutGen/cg_func.c CutGen/cg_wrapper.c
+SYM_CP_SRC = CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c
+LP_SRC = LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c \
+	LP/lp_free.c LP/lp_sp.c LP/lp_heuristics.c $(am__append_11) \
+	$(am__append_12) $(am__append_13)
+CP_SRC = CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c
+
+CG_SRC = CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c
+
+QSORT_SRC = Common/sym_qsort.c 
+TIME_SRC = Common/timemeas.c
+PROCCOMM_SRC = Common/proccomm.c
+PACKCUT_SRC = Common/pack_cut.c
+PACKARRAY_SRC = Common/pack_array.c
+BB_SRC = $(MASTER_SRC) $(DG_SRC) $(TM_SRC) $(LP_SRC) $(CP_SRC) $(CG_SRC) \
+	 $(QSORT_SRC) $(TIME_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
+	 $(PACKARRAY_SRC) 
+
+ALL_SRC = $(BB_SRC)
+ALL_SYM_MASTER = $(SYM_MASTER_SRC) $(SYM_TM_SRC) $(SYM_LP_SRC) $(SYM_CG_SRC) \
+	$(SYM_CP_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
+	$(PACKARRAY_SRC) 
+
+ALL_MASTER = $(MASTER_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) \
+	$(PACKCUT_SRC) $(PACKARRAY_SRC)
+ALL_LP = $(LP_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) \
+	$(PACKCUT_SRC) $(PACKARRAY_SRC)
+ALL_TM = $(TM_SRC) $(TIME_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
+	$(PACKARRAY_SRC) $(am__append_14)
+ALL_CG = $(CG_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) \
+	$(PACKCUT_SRC)
+ALL_CP = $(CP_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) \
+	$(PACKCUT_SRC)
+MAIN_SRC = $(MASTER_MAIN_SRC)
 USER_APPL_DIR = ../Applications/USER/src/
 USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
 	$(USER_APPL_DIR)/LP/user_lp.c \
@@ -563,13 +635,13 @@ USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
 ########################################################################
 #                           Common Flags                               #
 ########################################################################
-AM_CPPFLAGS = -DSYMPHONY_BUILD $(SYMPHONYLIB_CFLAGS) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5) \
-	$(am__append_6) $(am__append_7) $(am__append_8) \
-	$(am__append_9) $(am__append_10) $(am__append_11) \
-	$(am__append_12) $(am__append_13) $(am__append_14) \
-	$(am__append_15) $(am__append_16) $(am__append_17) \
-	$(am__append_18) $(am__append_19) $(am__append_20) $(SYMDEFS) \
+AM_CPPFLAGS = -DSYMPHONY_BUILD $(SYMPHONYLIB_CFLAGS) $(am__append_15) \
+	$(am__append_16) $(am__append_17) $(am__append_18) \
+	$(am__append_19) $(am__append_20) $(am__append_21) \
+	$(am__append_22) $(am__append_23) $(am__append_24) \
+	$(am__append_25) $(am__append_26) $(am__append_27) \
+	$(am__append_28) $(am__append_29) $(am__append_30) \
+	$(am__append_31) $(am__append_32) $(am__append_33) $(SYMDEFS) \
 	-I`$(CYGPATH_W) $(top_srcdir)/include` -I`$(CYGPATH_W) \
 	$(top_builddir)/include` -I`$(CYGPATH_W) \
 	$(top_srcdir)/Applications/USER/include`
@@ -579,10 +651,10 @@ CCLD = $(CXX)
 #                               libSym                                 #
 ########################################################################
 lib_LTLIBRARIES = libSym.la libSymApplStubs.la
-libSym_la_SOURCES = $(SYMINCFILES) $(SRC)
+libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
 libSym_la_CPPFLAGS = -DSYMPHONY_BUILD $(SYMPHONYLIB_CFLAGS) $(AM_CPPFLAGS)
 libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS)
-symphony_SOURCES = $(MAIN_SRC) symphony.h
+symphony_SOURCES = $(MASTER_MAIN_SRC) symphony.h
 symphony_CPPFLAGS = $(SYMPHONYLIB_CFLAGS) $(AM_CPPFLAGS)
 symphony_LDADD = libSym.la 
 
@@ -763,17 +835,18 @@ LP/libSym_la-lp_rowfunc.lo: LP/$(am__dirstamp) \
 	LP/$(DEPDIR)/$(am__dirstamp)
 LP/libSym_la-lp_genfunc.lo: LP/$(am__dirstamp) \
 	LP/$(DEPDIR)/$(am__dirstamp)
-LP/libSym_la-lp_branch.lo: LP/$(am__dirstamp) \
-	LP/$(DEPDIR)/$(am__dirstamp)
 LP/libSym_la-lp_proccomm.lo: LP/$(am__dirstamp) \
 	LP/$(DEPDIR)/$(am__dirstamp)
 LP/libSym_la-lp_wrapper.lo: LP/$(am__dirstamp) \
 	LP/$(DEPDIR)/$(am__dirstamp)
-LP/libSym_la-lp.lo: LP/$(am__dirstamp) LP/$(DEPDIR)/$(am__dirstamp)
 LP/libSym_la-lp_free.lo: LP/$(am__dirstamp) \
 	LP/$(DEPDIR)/$(am__dirstamp)
 LP/libSym_la-lp_sp.lo: LP/$(am__dirstamp) LP/$(DEPDIR)/$(am__dirstamp)
 LP/libSym_la-lp_heuristics.lo: LP/$(am__dirstamp) \
+	LP/$(DEPDIR)/$(am__dirstamp)
+LP/libSym_la-lp_pseudo_branch.lo: LP/$(am__dirstamp) \
+	LP/$(DEPDIR)/$(am__dirstamp)
+LP/libSym_la-lp_branch.lo: LP/$(am__dirstamp) \
 	LP/$(DEPDIR)/$(am__dirstamp)
 CutGen/$(am__dirstamp):
 	@$(MKDIR_P) CutGen
@@ -803,9 +876,9 @@ Common/$(am__dirstamp):
 Common/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) Common/$(DEPDIR)
 	@: > Common/$(DEPDIR)/$(am__dirstamp)
-Common/libSym_la-sym_qsort.lo: Common/$(am__dirstamp) \
-	Common/$(DEPDIR)/$(am__dirstamp)
 Common/libSym_la-timemeas.lo: Common/$(am__dirstamp) \
+	Common/$(DEPDIR)/$(am__dirstamp)
+Common/libSym_la-sym_qsort.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 Common/libSym_la-proccomm.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
@@ -918,12 +991,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@CutPool/$(DEPDIR)/libSym_la-cp_func.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@CutPool/$(DEPDIR)/libSym_la-cp_proccomm.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@CutPool/$(DEPDIR)/libSym_la-cp_wrapper.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_branch.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_free.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_genfunc.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_heuristics.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_proccomm.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_pseudo_branch.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_rowfunc.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_solver.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@LP/$(DEPDIR)/libSym_la-lp_sp.Plo@am__quote@ # am--include-marker
@@ -1061,13 +1134,6 @@ LP/libSym_la-lp_genfunc.lo: LP/lp_genfunc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o LP/libSym_la-lp_genfunc.lo `test -f 'LP/lp_genfunc.c' || echo '$(srcdir)/'`LP/lp_genfunc.c
 
-LP/libSym_la-lp_branch.lo: LP/lp_branch.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT LP/libSym_la-lp_branch.lo -MD -MP -MF LP/$(DEPDIR)/libSym_la-lp_branch.Tpo -c -o LP/libSym_la-lp_branch.lo `test -f 'LP/lp_branch.c' || echo '$(srcdir)/'`LP/lp_branch.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) LP/$(DEPDIR)/libSym_la-lp_branch.Tpo LP/$(DEPDIR)/libSym_la-lp_branch.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='LP/lp_branch.c' object='LP/libSym_la-lp_branch.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o LP/libSym_la-lp_branch.lo `test -f 'LP/lp_branch.c' || echo '$(srcdir)/'`LP/lp_branch.c
-
 LP/libSym_la-lp_proccomm.lo: LP/lp_proccomm.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT LP/libSym_la-lp_proccomm.lo -MD -MP -MF LP/$(DEPDIR)/libSym_la-lp_proccomm.Tpo -c -o LP/libSym_la-lp_proccomm.lo `test -f 'LP/lp_proccomm.c' || echo '$(srcdir)/'`LP/lp_proccomm.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) LP/$(DEPDIR)/libSym_la-lp_proccomm.Tpo LP/$(DEPDIR)/libSym_la-lp_proccomm.Plo
@@ -1081,13 +1147,6 @@ LP/libSym_la-lp_wrapper.lo: LP/lp_wrapper.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='LP/lp_wrapper.c' object='LP/libSym_la-lp_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o LP/libSym_la-lp_wrapper.lo `test -f 'LP/lp_wrapper.c' || echo '$(srcdir)/'`LP/lp_wrapper.c
-
-LP/libSym_la-lp.lo: LP/lp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT LP/libSym_la-lp.lo -MD -MP -MF LP/$(DEPDIR)/libSym_la-lp.Tpo -c -o LP/libSym_la-lp.lo `test -f 'LP/lp.c' || echo '$(srcdir)/'`LP/lp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) LP/$(DEPDIR)/libSym_la-lp.Tpo LP/$(DEPDIR)/libSym_la-lp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='LP/lp.c' object='LP/libSym_la-lp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o LP/libSym_la-lp.lo `test -f 'LP/lp.c' || echo '$(srcdir)/'`LP/lp.c
 
 LP/libSym_la-lp_free.lo: LP/lp_free.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT LP/libSym_la-lp_free.lo -MD -MP -MF LP/$(DEPDIR)/libSym_la-lp_free.Tpo -c -o LP/libSym_la-lp_free.lo `test -f 'LP/lp_free.c' || echo '$(srcdir)/'`LP/lp_free.c
@@ -1109,6 +1168,20 @@ LP/libSym_la-lp_heuristics.lo: LP/lp_heuristics.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='LP/lp_heuristics.c' object='LP/libSym_la-lp_heuristics.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o LP/libSym_la-lp_heuristics.lo `test -f 'LP/lp_heuristics.c' || echo '$(srcdir)/'`LP/lp_heuristics.c
+
+LP/libSym_la-lp_pseudo_branch.lo: LP/lp_pseudo_branch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT LP/libSym_la-lp_pseudo_branch.lo -MD -MP -MF LP/$(DEPDIR)/libSym_la-lp_pseudo_branch.Tpo -c -o LP/libSym_la-lp_pseudo_branch.lo `test -f 'LP/lp_pseudo_branch.c' || echo '$(srcdir)/'`LP/lp_pseudo_branch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) LP/$(DEPDIR)/libSym_la-lp_pseudo_branch.Tpo LP/$(DEPDIR)/libSym_la-lp_pseudo_branch.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='LP/lp_pseudo_branch.c' object='LP/libSym_la-lp_pseudo_branch.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o LP/libSym_la-lp_pseudo_branch.lo `test -f 'LP/lp_pseudo_branch.c' || echo '$(srcdir)/'`LP/lp_pseudo_branch.c
+
+LP/libSym_la-lp_branch.lo: LP/lp_branch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT LP/libSym_la-lp_branch.lo -MD -MP -MF LP/$(DEPDIR)/libSym_la-lp_branch.Tpo -c -o LP/libSym_la-lp_branch.lo `test -f 'LP/lp_branch.c' || echo '$(srcdir)/'`LP/lp_branch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) LP/$(DEPDIR)/libSym_la-lp_branch.Tpo LP/$(DEPDIR)/libSym_la-lp_branch.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='LP/lp_branch.c' object='LP/libSym_la-lp_branch.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o LP/libSym_la-lp_branch.lo `test -f 'LP/lp_branch.c' || echo '$(srcdir)/'`LP/lp_branch.c
 
 CutGen/libSym_la-cg_func.lo: CutGen/cg_func.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT CutGen/libSym_la-cg_func.lo -MD -MP -MF CutGen/$(DEPDIR)/libSym_la-cg_func.Tpo -c -o CutGen/libSym_la-cg_func.lo `test -f 'CutGen/cg_func.c' || echo '$(srcdir)/'`CutGen/cg_func.c
@@ -1145,19 +1218,19 @@ CutPool/libSym_la-cp_wrapper.lo: CutPool/cp_wrapper.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o CutPool/libSym_la-cp_wrapper.lo `test -f 'CutPool/cp_wrapper.c' || echo '$(srcdir)/'`CutPool/cp_wrapper.c
 
-Common/libSym_la-sym_qsort.lo: Common/sym_qsort.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Common/libSym_la-sym_qsort.lo -MD -MP -MF Common/$(DEPDIR)/libSym_la-sym_qsort.Tpo -c -o Common/libSym_la-sym_qsort.lo `test -f 'Common/sym_qsort.c' || echo '$(srcdir)/'`Common/sym_qsort.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Common/$(DEPDIR)/libSym_la-sym_qsort.Tpo Common/$(DEPDIR)/libSym_la-sym_qsort.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Common/sym_qsort.c' object='Common/libSym_la-sym_qsort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_la-sym_qsort.lo `test -f 'Common/sym_qsort.c' || echo '$(srcdir)/'`Common/sym_qsort.c
-
 Common/libSym_la-timemeas.lo: Common/timemeas.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Common/libSym_la-timemeas.lo -MD -MP -MF Common/$(DEPDIR)/libSym_la-timemeas.Tpo -c -o Common/libSym_la-timemeas.lo `test -f 'Common/timemeas.c' || echo '$(srcdir)/'`Common/timemeas.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Common/$(DEPDIR)/libSym_la-timemeas.Tpo Common/$(DEPDIR)/libSym_la-timemeas.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Common/timemeas.c' object='Common/libSym_la-timemeas.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_la-timemeas.lo `test -f 'Common/timemeas.c' || echo '$(srcdir)/'`Common/timemeas.c
+
+Common/libSym_la-sym_qsort.lo: Common/sym_qsort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Common/libSym_la-sym_qsort.lo -MD -MP -MF Common/$(DEPDIR)/libSym_la-sym_qsort.Tpo -c -o Common/libSym_la-sym_qsort.lo `test -f 'Common/sym_qsort.c' || echo '$(srcdir)/'`Common/sym_qsort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Common/$(DEPDIR)/libSym_la-sym_qsort.Tpo Common/$(DEPDIR)/libSym_la-sym_qsort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Common/sym_qsort.c' object='Common/libSym_la-sym_qsort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_la-sym_qsort.lo `test -f 'Common/sym_qsort.c' || echo '$(srcdir)/'`Common/sym_qsort.c
 
 Common/libSym_la-proccomm.lo: Common/proccomm.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Common/libSym_la-proccomm.lo -MD -MP -MF Common/$(DEPDIR)/libSym_la-proccomm.Tpo -c -o Common/libSym_la-proccomm.lo `test -f 'Common/proccomm.c' || echo '$(srcdir)/'`Common/proccomm.c
@@ -1408,12 +1481,12 @@ distclean: distclean-am
 	-rm -f CutPool/$(DEPDIR)/libSym_la-cp_func.Plo
 	-rm -f CutPool/$(DEPDIR)/libSym_la-cp_proccomm.Plo
 	-rm -f CutPool/$(DEPDIR)/libSym_la-cp_wrapper.Plo
-	-rm -f LP/$(DEPDIR)/libSym_la-lp.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_branch.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_free.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_genfunc.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_heuristics.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_proccomm.Plo
+	-rm -f LP/$(DEPDIR)/libSym_la-lp_pseudo_branch.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_rowfunc.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_solver.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_sp.Plo
@@ -1491,12 +1564,12 @@ maintainer-clean: maintainer-clean-am
 	-rm -f CutPool/$(DEPDIR)/libSym_la-cp_func.Plo
 	-rm -f CutPool/$(DEPDIR)/libSym_la-cp_proccomm.Plo
 	-rm -f CutPool/$(DEPDIR)/libSym_la-cp_wrapper.Plo
-	-rm -f LP/$(DEPDIR)/libSym_la-lp.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_branch.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_free.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_genfunc.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_heuristics.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_proccomm.Plo
+	-rm -f LP/$(DEPDIR)/libSym_la-lp_pseudo_branch.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_rowfunc.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_solver.Plo
 	-rm -f LP/$(DEPDIR)/libSym_la-lp_sp.Plo
