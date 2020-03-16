@@ -328,6 +328,8 @@ lib_LTLIBRARIES = $(WHATTOINSTALLLIBS)
 
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
 libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_la_LDFLAGS = -rpath $(libdir)
+libSym_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 # List all source files for this library, including headers
 libSym_m_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
@@ -362,7 +364,6 @@ libSym_tm_lp_cg_la_CPPFLAGS = $(PCPPFLAGS)
 libSym_tm_lp_cg_cp_la_CPPFLAGS = $(PCPPFLAGS) 
 libSym_tm_cp_la_CPPFLAGS = $(PCPPFLAGS) 
 
-# List all additionally required libraries
 libSym_m_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 libSym_m_tm_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 libSym_m_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
@@ -378,6 +379,22 @@ libSym_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 libSym_tm_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 libSym_tm_lp_cg_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 libSym_tm_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+
+libSym_m_la_LDFLAGS = -rpath $(libdir)
+libSym_m_tm_la_LDFLAGS = -rpath $(libdir)
+libSym_m_tm_lp_la_LDFLAGS = -rpath $(libdir)
+libSym_m_tm_cp_la_LDFLAGS = -rpath $(libdir)
+libSym_m_tm_lp_cg_la_LDFLAGS = -rpath $(libdir)
+libSym_m_tm_lp_cg_cp_la_LDFLAGS = -rpath $(libdir)
+libSym_lp_la_LDFLAGS = -rpath $(libdir)
+libSym_lp_cg_la_LDFLAGS = -rpath $(libdir)
+libSym_cg_la_LDFLAGS = -rpath $(libdir)
+libSym_cp_la_LDFLAGS = -rpath $(libdir)
+libSym_tm_la_LDFLAGS = -rpath $(libdir)
+libSym_tm_lp_la_LDFLAGS = -rpath $(libdir)
+libSym_tm_lp_cg_la_LDFLAGS = -rpath $(libdir)
+libSym_tm_lp_cg_cp_la_LDFLAGS = -rpath $(libdir)
+libSym_tm_cp_la_LDFLAGS = -rpath $(libdir)
 
 ########################################################################
 #                        symphony program                              #

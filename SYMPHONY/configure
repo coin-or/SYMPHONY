@@ -23553,7 +23553,6 @@ if test $sym_enable_parallel = true; then
        WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs$MASTEREXT.la"
        WHATTOINSTALLLIBS="$WHATTOMAKELIBS libSymApplStubs$MASTEREXT.la"
     fi
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
 
 
