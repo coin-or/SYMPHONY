@@ -311,7 +311,7 @@ CXXLD = $(CXX)
 #                               libSym                                 #
 ########################################################################
 
-EXTRA_LTLIBRARIES = libSym_cg.la libSym_lp.la libSym_lp_cg.la \
+EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 	libSym_tm.la libSym_tm_lp.la libSym_tm_cp.la libSym_tm_lp_cg.la \
 	libSym_tm_lp_cg_cp.la libSym_m_tm.la libSym_m_tm_lp.la \
 	libSym_m_tm_cp.la libSym_m_tm_lp_cg.la libSym_m_tm_lp_cg_cp.la \
@@ -320,11 +320,11 @@ EXTRA_LTLIBRARIES = libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 	libSymAppl_tm_cp.la libSymAppl_tm_lp_cg.la libSymAppl_tm_lp_cg_cp.la \
 	libSymAppl_m_tm.la libSymAppl_m_tm_lp.la libSymAppl_m_tm_cp.la \
 	libSymAppl_m_tm_lp_cg.la libSymAppl_m_tm_lp_cg_cp.la \
-	libSymAppl_cp.la libSym_m.la libSymAppl_m.la 
+	libSymAppl_cp.la libSym_m.la libSymApplStubs.la libSymAppl_m.la 
 
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
-lib_LTLIBRARIES = libSym.la libSymApplStubs.la
+lib_LTLIBRARIES = $(WHATTOINSTALLLIBS)
 
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
 libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
