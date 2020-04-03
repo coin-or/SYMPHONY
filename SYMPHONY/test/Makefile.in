@@ -30,6 +30,10 @@
 #                                                                           #
 #===========================================================================#
 
+########################################################################
+#                         unitTest for Symphony                        #
+########################################################################
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -104,16 +108,17 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@COIN_CXX_IS_CL_TRUE@am__append_1 = -TP
 
 # List all additionally required solver and Osi libraries
-@CLP_LP_SOLVER_TRUE@am__append_1 = -D__OSI_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_2 = -D__OSI_CPLEX__
-@GLPK_LP_SOLVER_TRUE@am__append_3 = -D__OSI_GLPK__
-@SOPLEX_LP_SOLVER_TRUE@am__append_4 = -D__OSI_SOPLEX__
-@XPRESS_LP_SOLVER_TRUE@am__append_5 = -D__OSI_XPRESS__
+@CLP_LP_SOLVER_TRUE@am__append_2 = -D__OSI_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_3 = -D__OSI_CPLEX__
+@GLPK_LP_SOLVER_TRUE@am__append_4 = -D__OSI_GLPK__
+@SOPLEX_LP_SOLVER_TRUE@am__append_5 = -D__OSI_SOPLEX__
+@XPRESS_LP_SOLVER_TRUE@am__append_6 = -D__OSI_XPRESS__
 noinst_PROGRAMS = unitTest$(EXEEXT)
-@COIN_HAS_NETLIB_TRUE@am__append_6 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
-@COIN_HAS_SAMPLE_TRUE@am__append_7 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
+@COIN_HAS_NETLIB_TRUE@am__append_7 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
+@COIN_HAS_SAMPLE_TRUE@am__append_8 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -214,8 +219,6 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
-CLLCFLAGS = @CLLCFLAGS@
-COIN_HAS_CLP = @COIN_HAS_CLP@
 COIN_PKG_CONFIG_PATH = @COIN_PKG_CONFIG_PATH@
 CPEXT = @CPEXT@
 CPP = @CPP@
@@ -284,14 +287,12 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 SYMAPPLDIR = @SYMAPPLDIR@
 SYMDEFS = @SYMDEFS@
-SYMINCDIR = @SYMINCDIR@
 SYMPDEFS = @SYMPDEFS@
 SYMPHONYLIB_CFLAGS = @SYMPHONYLIB_CFLAGS@
 SYMPHONYLIB_CFLAGS_NOPC = @SYMPHONYLIB_CFLAGS_NOPC@
 SYMPHONYLIB_LFLAGS = @SYMPHONYLIB_LFLAGS@
 SYMPHONYLIB_LFLAGS_NOPC = @SYMPHONYLIB_LFLAGS_NOPC@
 SYMPHONYLIB_PCFILES = @SYMPHONYLIB_PCFILES@
-SYMSRCDIR = @SYMSRCDIR@
 SYMUNITTEST_CFLAGS = @SYMUNITTEST_CFLAGS@
 SYMUNITTEST_CFLAGS_NOPC = @SYMUNITTEST_CFLAGS_NOPC@
 SYMUNITTEST_LFLAGS = @SYMUNITTEST_LFLAGS@
@@ -358,16 +359,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = foreign
-
-########################################################################
-#                         unitTest for Symphony                        #
-########################################################################
-AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(SYMUNITTEST_CFLAGS) \
-	$(SYMPHONYLIB_CFLAGS) -I`$(CYGPATH_W) $(top_srcdir)/include` \
-	-I`$(CYGPATH_W) $(top_builddir)/include` -I`$(CYGPATH_W) \
-	$(top_srcdir)/src/OsiSym` $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5)
+AM_CPPFLAGS = $(SYM_OPENMP_FLAGS) $(SYMUNITTEST_CFLAGS) \
+	$(SYMPHONYLIB_CFLAGS) $(am__append_1) -I`$(CYGPATH_W) \
+	$(top_srcdir)/include` -I`$(CYGPATH_W) \
+	$(top_builddir)/include` -I`$(CYGPATH_W) \
+	$(top_srcdir)/src/OsiSym` $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_6)
 unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
@@ -378,7 +375,7 @@ unitTest_LDADD = ../src/libSym.la ../src/OsiSym/libOsiSym.la \
 
 @COIN_HAS_MIPLIB3_FALSE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
 @COIN_HAS_MIPLIB3_TRUE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`
-unittestflags = $(am__append_6) $(am__append_7)
+unittestflags = $(am__append_7) $(am__append_8)
 testFILES = air03 air04 air05 bell3a blend2 cap6000 dcmulti dsbmip \
      egout enigma fiber fixnet6 flugpl gen gesa2 gesa2_o \
      gesa3 gesa3_o gt2 khb05250 l152lav lseu misc03 misc06 \
@@ -457,22 +454,25 @@ $(am__depfiles_remade):
 am--depfiles: $(am__depfiles_remade)
 
 .cpp.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
 
 .cpp.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .cpp.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<

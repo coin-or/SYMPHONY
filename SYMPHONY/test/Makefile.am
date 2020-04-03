@@ -16,13 +16,14 @@
 
 ## $Id: Makefile.am 372 2006-06-15 14:18:02Z andreasw $
 
-AUTOMAKE_OPTIONS = foreign
-
 ########################################################################
 #                         unitTest for Symphony                        #
 ########################################################################
 
-AM_CPPFLAGS = -DCOIN_HAS_SYMPHONY $(SYMUNITTEST_CFLAGS) $(SYMPHONYLIB_CFLAGS)
+AM_CPPFLAGS = $(SYM_OPENMP_FLAGS) $(SYMUNITTEST_CFLAGS) $(SYMPHONYLIB_CFLAGS)
+if COIN_CXX_IS_CL
+AM_CPPFLAGS += -TP
+endif
 
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(top_srcdir)/include` \
                -I`$(CYGPATH_W) $(top_builddir)/include` \

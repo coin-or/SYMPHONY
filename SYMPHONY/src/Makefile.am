@@ -16,8 +16,6 @@
 
 ## $Id: Makefile.am 387 2006-06-22 23:15:50Z menal $
 
-AUTOMAKE_OPTIONS = foreign subdir-objects
-
 include $(top_srcdir)/BuildTools/Makemain.inc
 
 ##############################################################################
@@ -207,7 +205,10 @@ USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
 #                           Common Flags                               #
 ########################################################################
 
-AM_CPPFLAGS = -DSYMPHONY_BUILD $(SYMPHONYLIB_CFLAGS)
+AM_CPPFLAGS = -DSYMPHONY_BUILD $(SYM_OPENMP_FLAGS) $(SYMPHONYLIB_CFLAGS)
+if COIN_CXX_IS_CL
+AM_CPPFLAGS += -TP
+endif
 
 if CLP_LP_SOLVER
   AM_CPPFLAGS += -D__OSI_CLP__

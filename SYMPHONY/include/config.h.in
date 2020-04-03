@@ -1,62 +1,5 @@
 /* include/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if Cgl is available. */
-#undef COIN_HAS_CGL
-
-/* Define to 1 if Clp is available. */
-#undef COIN_HAS_CLP
-
-/* Define to 1 if CoinUtils is available. */
-#undef COIN_HAS_COINUTILS
-
-/* Define to 1 if Glpk is available. */
-#undef COIN_HAS_GLPK
-
-/* Define to 1 if Miplib3 is available. */
-#undef COIN_HAS_MIPLIB3
-
-/* Define to 1 if Netlib is available. */
-#undef COIN_HAS_NETLIB
-
-/* Define to 1 if Osi is available. */
-#undef COIN_HAS_OSI
-
-/* Define to 1 if OsiClp is available. */
-#undef COIN_HAS_OSICLP
-
-/* Define to 1 if OsiCpx is available. */
-#undef COIN_HAS_OSICPX
-
-/* Define to 1 if OsiDyLP is available. */
-#undef COIN_HAS_OSIDYLP
-
-/* Define to 1 if OsiGlpk is available. */
-#undef COIN_HAS_OSIGLPK
-
-/* Define to 1 if OsiGrb is available. */
-#undef COIN_HAS_OSIGRB
-
-/* Define to 1 if OsiSpx is available. */
-#undef COIN_HAS_OSISPX
-
-/* Define to 1 if OsiTests is available. */
-#undef COIN_HAS_OSITESTS
-
-/* Define to 1 if OsiVol is available. */
-#undef COIN_HAS_OSIVOL
-
-/* Define to 1 if OsiXpr is available. */
-#undef COIN_HAS_OSIXPR
-
-/* Define to 1 if the PVM package is available */
-#undef COIN_HAS_PVM
-
-/* Define to 1 if readline is available */
-#undef COIN_HAS_READLINE
-
-/* Define to 1 if Sample is available. */
-#undef COIN_HAS_SAMPLE
-
 /* Define to 1 if your C++ compiler doesn't accept -c and -o together. */
 #undef CXX_NO_MINUS_C_MINUS_O
 
@@ -137,6 +80,63 @@
 
 /* Library Visibility Attribute */
 #undef SYMPHONYLIB_EXPORT
+
+/* Define to 1 if Cgl is available. */
+#undef SYMPHONY_HAS_CGL
+
+/* Define to 1 if Clp is available. */
+#undef SYMPHONY_HAS_CLP
+
+/* Define to 1 if CoinUtils is available. */
+#undef SYMPHONY_HAS_COINUTILS
+
+/* Define to 1 if Glpk is available. */
+#undef SYMPHONY_HAS_GLPK
+
+/* Define to 1 if Miplib3 is available. */
+#undef SYMPHONY_HAS_MIPLIB3
+
+/* Define to 1 if Netlib is available. */
+#undef SYMPHONY_HAS_NETLIB
+
+/* Define to 1 if Osi is available. */
+#undef SYMPHONY_HAS_OSI
+
+/* Define to 1 if OsiClp is available. */
+#undef SYMPHONY_HAS_OSICLP
+
+/* Define to 1 if OsiCpx is available. */
+#undef SYMPHONY_HAS_OSICPX
+
+/* Define to 1 if OsiDyLP is available. */
+#undef SYMPHONY_HAS_OSIDYLP
+
+/* Define to 1 if OsiGlpk is available. */
+#undef SYMPHONY_HAS_OSIGLPK
+
+/* Define to 1 if OsiGrb is available. */
+#undef SYMPHONY_HAS_OSIGRB
+
+/* Define to 1 if OsiSpx is available. */
+#undef SYMPHONY_HAS_OSISPX
+
+/* Define to 1 if OsiTests is available. */
+#undef SYMPHONY_HAS_OSITESTS
+
+/* Define to 1 if OsiVol is available. */
+#undef SYMPHONY_HAS_OSIVOL
+
+/* Define to 1 if OsiXpr is available. */
+#undef SYMPHONY_HAS_OSIXPR
+
+/* Define to 1 if the PVM package is available */
+#undef SYMPHONY_HAS_PVM
+
+/* Define to 1 if readline is available */
+#undef SYMPHONY_HAS_READLINE
+
+/* Define to 1 if Sample is available. */
+#undef SYMPHONY_HAS_SAMPLE
 
 /* Version number of project */
 #undef SYMPHONY_VERSION

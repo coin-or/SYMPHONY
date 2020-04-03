@@ -652,14 +652,10 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-CLLCFLAGS
 SYMAPPLDIR
-COIN_HAS_CLP
 ARCH
 SYMPDEFS
 SYMDEFS
-SYMSRCDIR
-SYMINCDIR
 SYM_OPENMP_LIBS
 SYM_OPENMP_FLAGS
 OPENMP_FALSE
@@ -687,8 +683,6 @@ SYM_WITH_APPL_FALSE
 SYM_WITH_APPL_TRUE
 SIGHANDLER_FALSE
 SIGHANDLER_TRUE
-STATICEXE_FALSE
-STATICEXE_TRUE
 DRAWGRAPH_FALSE
 DRAWGRAPH_TRUE
 PSEUDO_COSTS_FALSE
@@ -797,8 +791,6 @@ NMEDIT
 DSYMUTIL
 MANIFEST_TOOL
 RANLIB
-ac_ct_AR
-AR
 LN_S
 NM
 ac_ct_DUMPBIN
@@ -812,6 +804,8 @@ LIBTOOL
 OBJDUMP
 DLLTOOL
 AS
+ac_ct_AR
+AR
 ADD_CXXFLAGS
 am__fastdepCXX_FALSE
 am__fastdepCXX_TRUE
@@ -996,7 +990,6 @@ enable_cut_check
 enable_statistics
 enable_pseudo_costs
 enable_draw_graph
-enable_static_executable
 enable_signal_handler
 with_application
 with_pvm
@@ -1680,8 +1673,6 @@ Optional Features:
   --enable-statistics     additional statistics
   --enable-pseudo-costs   enable some experimental pseudo-cost branching stuff
   --enable-draw-graph     enable IGD graph drawing application
-  --enable-static-executable
-                          create a complete static executable
   --disable-signal-handler
                           disable signal handler
   --enable-openmp         compile in OpenMP features
@@ -2968,8 +2959,6 @@ fi
       : ${FCFLAGS:="-nologo -fpp -Z7 -MDd $ADD_FCFLAGS"}
       : ${CFLAGS:="-nologo -Z7 -MDd $ADD_CFLAGS"}
       : ${CXXFLAGS:="-nologo -EHs -Z7 -MDd $ADD_CXXFLAGS"}
-      : ${AR:="lib"}
-      : ${AR_FLAGS:="-nologo -out:"}
     else
       : ${FFLAGS:="-g $ADD_FFLAGS"}
       : ${FCFLAGS:="-g $ADD_FCFLAGS"}
@@ -2982,8 +2971,6 @@ fi
       : ${FCFLAGS:="-nologo -fpp -O2 -MD $ADD_FCFLAGS"}
       : ${CFLAGS:="-nologo -DNDEBUG -O2 -MD $ADD_CFLAGS"}
       : ${CXXFLAGS:="-nologo -EHs -DNDEBUG -O2 -MD $ADD_CXXFLAGS"}
-      : ${AR:="lib"}
-      : ${AR_FLAGS:="-nologo -out:"}
     else
       : ${FFLAGS:="-O2 $ADD_FFLAGS"}
       : ${FCFLAGS:="-O2 $ADD_FCFLAGS"}
@@ -3489,8 +3476,6 @@ _ACEOF
 
 
 
-
-
 # A useful makefile conditional that is always false
 
    if false; then
@@ -3569,9 +3554,11 @@ AM_BACKSLASH='\'
 
 
 # Initialize automake
+# - do not be as strict as for GNU projects
 # - don't AC_DEFINE PACKAGE or VERSION (but there're still defined as shell
 #   variables in configure, and as make variables).
 # - disable dist target
+# - place objects from sources in subdirs into corresponding subdirs
 # - enable all automake warnings
 
   if test "`cd $srcdir && pwd`" != "`pwd`"; then
@@ -3878,6 +3865,7 @@ done
       CC="$am_aux_dir/compile $CC"
       ac_cv_prog_CC="$CC"
       LD="$CC"
+      : ${AR:=lib}
     else
       as_fn_error $? "Neither MS nor Intel C compiler found in PATH and CC is unset." "$LINENO" 5
     fi
@@ -4735,6 +4723,7 @@ done
       CXX="$am_aux_dir/compile $CXX"
       ac_cv_prog_CXX="$CXX"
       LD="$CXX"
+      : ${AR:=lib}
     else
       as_fn_error $? "Neither MS nor Intel C++ compiler found in PATH and CXX is unset." "$LINENO" 5
     fi
@@ -5203,734 +5192,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   # Declare precious variable for additional compiler flags
 
 
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}gcc", so it can be a program name with args.
-set dummy ${ac_tool_prefix}gcc; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CC"; then
-  ac_cv_prog_CC="$CC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CC="${ac_tool_prefix}gcc"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CC=$ac_cv_prog_CC
-if test -n "$CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
-$as_echo "$CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_prog_CC"; then
-  ac_ct_CC=$CC
-  # Extract the first word of "gcc", so it can be a program name with args.
-set dummy gcc; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_ac_ct_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$ac_ct_CC"; then
-  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_CC="gcc"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-ac_ct_CC=$ac_cv_prog_ac_ct_CC
-if test -n "$ac_ct_CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_CC" >&5
-$as_echo "$ac_ct_CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_ct_CC" = x; then
-    CC=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    CC=$ac_ct_CC
-  fi
-else
-  CC="$ac_cv_prog_CC"
-fi
-
-if test -z "$CC"; then
-          if test -n "$ac_tool_prefix"; then
-    # Extract the first word of "${ac_tool_prefix}cc", so it can be a program name with args.
-set dummy ${ac_tool_prefix}cc; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CC"; then
-  ac_cv_prog_CC="$CC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CC="${ac_tool_prefix}cc"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CC=$ac_cv_prog_CC
-if test -n "$CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
-$as_echo "$CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  fi
-fi
-if test -z "$CC"; then
-  # Extract the first word of "cc", so it can be a program name with args.
-set dummy cc; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CC"; then
-  ac_cv_prog_CC="$CC" # Let the user override the test.
-else
-  ac_prog_rejected=no
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    if test "$as_dir/$ac_word$ac_exec_ext" = "/usr/ucb/cc"; then
-       ac_prog_rejected=yes
-       continue
-     fi
-    ac_cv_prog_CC="cc"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-if test $ac_prog_rejected = yes; then
-  # We found a bogon in the path, so make sure we never use it.
-  set dummy $ac_cv_prog_CC
-  shift
-  if test $# != 0; then
-    # We chose a different compiler from the bogus one.
-    # However, it has the same basename, so the bogon will be chosen
-    # first if we set CC to just the basename; use the full file name.
-    shift
-    ac_cv_prog_CC="$as_dir/$ac_word${1+' '}$@"
-  fi
-fi
-fi
-fi
-CC=$ac_cv_prog_CC
-if test -n "$CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
-$as_echo "$CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$CC"; then
-  if test -n "$ac_tool_prefix"; then
-  for ac_prog in cl.exe
-  do
-    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
-set dummy $ac_tool_prefix$ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CC"; then
-  ac_cv_prog_CC="$CC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CC="$ac_tool_prefix$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CC=$ac_cv_prog_CC
-if test -n "$CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
-$as_echo "$CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-    test -n "$CC" && break
-  done
-fi
-if test -z "$CC"; then
-  ac_ct_CC=$CC
-  for ac_prog in cl.exe
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_ac_ct_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$ac_ct_CC"; then
-  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_CC="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-ac_ct_CC=$ac_cv_prog_ac_ct_CC
-if test -n "$ac_ct_CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_CC" >&5
-$as_echo "$ac_ct_CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$ac_ct_CC" && break
-done
-
-  if test "x$ac_ct_CC" = x; then
-    CC=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    CC=$ac_ct_CC
-  fi
-fi
-
-fi
-
-
-test -z "$CC" && { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "no acceptable C compiler found in \$PATH
-See \`config.log' for more details" "$LINENO" 5; }
-
-# Provide some information about the compiler.
-$as_echo "$as_me:${as_lineno-$LINENO}: checking for C compiler version" >&5
-set X $ac_compile
-ac_compiler=$2
-for ac_option in --version -v -V -qversion; do
-  { { ac_try="$ac_compiler $ac_option >&5"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_compiler $ac_option >&5") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    sed '10a\
-... rest of stderr output deleted ...
-         10q' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-  fi
-  rm -f conftest.er1 conftest.err
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-done
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the GNU C compiler" >&5
-$as_echo_n "checking whether we are using the GNU C compiler... " >&6; }
-if ${ac_cv_c_compiler_gnu+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-#ifndef __GNUC__
-       choke me
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_compiler_gnu=yes
-else
-  ac_compiler_gnu=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-ac_cv_c_compiler_gnu=$ac_compiler_gnu
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_c_compiler_gnu" >&5
-$as_echo "$ac_cv_c_compiler_gnu" >&6; }
-if test $ac_compiler_gnu = yes; then
-  GCC=yes
-else
-  GCC=
-fi
-ac_test_CFLAGS=${CFLAGS+set}
-ac_save_CFLAGS=$CFLAGS
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -g" >&5
-$as_echo_n "checking whether $CC accepts -g... " >&6; }
-if ${ac_cv_prog_cc_g+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_save_c_werror_flag=$ac_c_werror_flag
-   ac_c_werror_flag=yes
-   ac_cv_prog_cc_g=no
-   CFLAGS="-g"
-   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_cv_prog_cc_g=yes
-else
-  CFLAGS=""
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-else
-  ac_c_werror_flag=$ac_save_c_werror_flag
-	 CFLAGS="-g"
-	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_cv_prog_cc_g=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-   ac_c_werror_flag=$ac_save_c_werror_flag
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_g" >&5
-$as_echo "$ac_cv_prog_cc_g" >&6; }
-if test "$ac_test_CFLAGS" = set; then
-  CFLAGS=$ac_save_CFLAGS
-elif test $ac_cv_prog_cc_g = yes; then
-  if test "$GCC" = yes; then
-    CFLAGS="-g -O2"
-  else
-    CFLAGS="-g"
-  fi
-else
-  if test "$GCC" = yes; then
-    CFLAGS="-O2"
-  else
-    CFLAGS=
-  fi
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to accept ISO C89" >&5
-$as_echo_n "checking for $CC option to accept ISO C89... " >&6; }
-if ${ac_cv_prog_cc_c89+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_prog_cc_c89=no
-ac_save_CC=$CC
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdarg.h>
-#include <stdio.h>
-struct stat;
-/* Most of the following tests are stolen from RCS 5.7's src/conf.sh.  */
-struct buf { int x; };
-FILE * (*rcsopen) (struct buf *, struct stat *, int);
-static char *e (p, i)
-     char **p;
-     int i;
-{
-  return p[i];
-}
-static char *f (char * (*g) (char **, int), char **p, ...)
-{
-  char *s;
-  va_list v;
-  va_start (v,p);
-  s = g (p, va_arg (v,int));
-  va_end (v);
-  return s;
-}
-
-/* OSF 4.0 Compaq cc is some sort of almost-ANSI by default.  It has
-   function prototypes and stuff, but not '\xHH' hex character constants.
-   These don't provoke an error unfortunately, instead are silently treated
-   as 'x'.  The following induces an error, until -std is added to get
-   proper ANSI mode.  Curiously '\x00'!='x' always comes out true, for an
-   array size at least.  It's necessary to write '\x00'==0 to get something
-   that's true only with -std.  */
-int osf4_cc_array ['\x00' == 0 ? 1 : -1];
-
-/* IBM C 6 for AIX is almost-ANSI by default, but it replaces macro parameters
-   inside strings and character constants.  */
-#define FOO(x) 'x'
-int xlc6_cc_array[FOO(a) == 'x' ? 1 : -1];
-
-int test (int i, double x);
-struct s1 {int (*f) (int a);};
-struct s2 {int (*f) (double a);};
-int pairnames (int, char **, FILE *(*)(struct buf *, struct stat *, int), int, int);
-int argc;
-char **argv;
-int
-main ()
-{
-return f (e, argv, 0) != argv[0]  ||  f (e, argv, 1) != argv[1];
-  ;
-  return 0;
-}
-_ACEOF
-for ac_arg in '' -qlanglvl=extc89 -qlanglvl=ansi -std \
-	-Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
-do
-  CC="$ac_save_CC $ac_arg"
-  if ac_fn_c_try_compile "$LINENO"; then :
-  ac_cv_prog_cc_c89=$ac_arg
-fi
-rm -f core conftest.err conftest.$ac_objext
-  test "x$ac_cv_prog_cc_c89" != "xno" && break
-done
-rm -f conftest.$ac_ext
-CC=$ac_save_CC
-
-fi
-# AC_CACHE_VAL
-case "x$ac_cv_prog_cc_c89" in
-  x)
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
-$as_echo "none needed" >&6; } ;;
-  xno)
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
-$as_echo "unsupported" >&6; } ;;
-  *)
-    CC="$CC $ac_cv_prog_cc_c89"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c89" >&5
-$as_echo "$ac_cv_prog_cc_c89" >&6; } ;;
-esac
-if test "x$ac_cv_prog_cc_c89" != xno; then :
-
-fi
-
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CC understands -c and -o together" >&5
-$as_echo_n "checking whether $CC understands -c and -o together... " >&6; }
-if ${am_cv_prog_cc_c_o+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-  # Make sure it works both with $CC and with simple cc.
-  # Following AC_PROG_CC_C_O, we do the test twice because some
-  # compilers refuse to overwrite an existing .o file with -o,
-  # though they will create one.
-  am_cv_prog_cc_c_o=yes
-  for am_i in 1 2; do
-    if { echo "$as_me:$LINENO: $CC -c conftest.$ac_ext -o conftest2.$ac_objext" >&5
-   ($CC -c conftest.$ac_ext -o conftest2.$ac_objext) >&5 2>&5
-   ac_status=$?
-   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-   (exit $ac_status); } \
-         && test -f conftest2.$ac_objext; then
-      : OK
-    else
-      am_cv_prog_cc_c_o=no
-      break
-    fi
-  done
-  rm -f core conftest*
-  unset am_i
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_prog_cc_c_o" >&5
-$as_echo "$am_cv_prog_cc_c_o" >&6; }
-if test "$am_cv_prog_cc_c_o" != yes; then
-   # Losing compiler, so override with the script.
-   # FIXME: It is wrong to rewrite CC.
-   # But if we don't then we get into trouble of one sort or another.
-   # A longer-term fix would be to have automake use am__CC in this case,
-   # and then we could set am__CC="\$(top_srcdir)/compile \$(CC)"
-   CC="$am_aux_dir/compile $CC"
-fi
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-depcc="$CC"   am_compiler_list=
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking dependency style of $depcc" >&5
-$as_echo_n "checking dependency style of $depcc... " >&6; }
-if ${am_cv_CC_dependencies_compiler_type+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -z "$AMDEP_TRUE" && test -f "$am_depcomp"; then
-  # We make a subdir and do the tests there.  Otherwise we can end up
-  # making bogus files that we don't know about and never remove.  For
-  # instance it was reported that on HP-UX the gcc test will end up
-  # making a dummy file named 'D' -- because '-MD' means "put the output
-  # in D".
-  rm -rf conftest.dir
-  mkdir conftest.dir
-  # Copy depcomp to subdir because otherwise we won't find it if we're
-  # using a relative directory.
-  cp "$am_depcomp" conftest.dir
-  cd conftest.dir
-  # We will build objects and dependencies in a subdirectory because
-  # it helps to detect inapplicable dependency modes.  For instance
-  # both Tru64's cc and ICC support -MD to output dependencies as a
-  # side effect of compilation, but ICC will put the dependencies in
-  # the current directory while Tru64 will put them in the object
-  # directory.
-  mkdir sub
-
-  am_cv_CC_dependencies_compiler_type=none
-  if test "$am_compiler_list" = ""; then
-     am_compiler_list=`sed -n 's/^#*\([a-zA-Z0-9]*\))$/\1/p' < ./depcomp`
-  fi
-  am__universal=false
-  case " $depcc " in #(
-     *\ -arch\ *\ -arch\ *) am__universal=true ;;
-     esac
-
-  for depmode in $am_compiler_list; do
-    # Setup a source with many dependencies, because some compilers
-    # like to wrap large dependency lists on column 80 (with \), and
-    # we should not choose a depcomp mode which is confused by this.
-    #
-    # We need to recreate these files for each test, as the compiler may
-    # overwrite some of them when testing with obscure command lines.
-    # This happens at least with the AIX C compiler.
-    : > sub/conftest.c
-    for i in 1 2 3 4 5 6; do
-      echo '#include "conftst'$i'.h"' >> sub/conftest.c
-      # Using ": > sub/conftst$i.h" creates only sub/conftst1.h with
-      # Solaris 10 /bin/sh.
-      echo '/* dummy */' > sub/conftst$i.h
-    done
-    echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
-
-    # We check with '-c' and '-o' for the sake of the "dashmstdout"
-    # mode.  It turns out that the SunPro C++ compiler does not properly
-    # handle '-M -o', and we need to detect this.  Also, some Intel
-    # versions had trouble with output in subdirs.
-    am__obj=sub/conftest.${OBJEXT-o}
-    am__minus_obj="-o $am__obj"
-    case $depmode in
-    gcc)
-      # This depmode causes a compiler race in universal mode.
-      test "$am__universal" = false || continue
-      ;;
-    nosideeffect)
-      # After this tag, mechanisms are not by side-effect, so they'll
-      # only be used when explicitly requested.
-      if test "x$enable_dependency_tracking" = xyes; then
-	continue
-      else
-	break
-      fi
-      ;;
-    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
-      # This compiler won't grok '-c -o', but also, the minuso test has
-      # not run yet.  These depmodes are late enough in the game, and
-      # so weak that their functioning should not be impacted.
-      am__obj=conftest.${OBJEXT-o}
-      am__minus_obj=
-      ;;
-    none) break ;;
-    esac
-    if depmode=$depmode \
-       source=sub/conftest.c object=$am__obj \
-       depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
-       $SHELL ./depcomp $depcc -c $am__minus_obj sub/conftest.c \
-         >/dev/null 2>conftest.err &&
-       grep sub/conftst1.h sub/conftest.Po > /dev/null 2>&1 &&
-       grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
-       grep $am__obj sub/conftest.Po > /dev/null 2>&1 &&
-       ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
-      # icc doesn't choke on unknown options, it will just issue warnings
-      # or remarks (even with -Werror).  So we grep stderr for any message
-      # that says an option was ignored or not supported.
-      # When given -MP, icc 7.0 and 7.1 complain thusly:
-      #   icc: Command line warning: ignoring option '-M'; no argument required
-      # The diagnosis changed in icc 8.0:
-      #   icc: Command line remark: option '-MP' not supported
-      if (grep 'ignoring option' conftest.err ||
-          grep 'not supported' conftest.err) >/dev/null 2>&1; then :; else
-        am_cv_CC_dependencies_compiler_type=$depmode
-        break
-      fi
-    fi
-  done
-
-  cd ..
-  rm -rf conftest.dir
-else
-  am_cv_CC_dependencies_compiler_type=none
-fi
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_CC_dependencies_compiler_type" >&5
-$as_echo "$am_cv_CC_dependencies_compiler_type" >&6; }
-CCDEPMODE=depmode=$am_cv_CC_dependencies_compiler_type
-
- if
-  test "x$enable_dependency_tracking" != xno \
-  && test "$am_cv_CC_dependencies_compiler_type" = gcc3; then
-  am__fastdepCC_TRUE=
-  am__fastdepCC_FALSE='#'
-else
-  am__fastdepCC_TRUE='#'
-  am__fastdepCC_FALSE=
-fi
-
-
 
 # Initialize libtool
+
 
 case `pwd` in
   *\ * | *\	*)
@@ -7418,7 +6682,6 @@ fi
 $as_echo "$lt_cv_sharedlib_from_linklib_cmd" >&6; }
 sharedlib_from_linklib_cmd=$lt_cv_sharedlib_from_linklib_cmd
 test -z "$sharedlib_from_linklib_cmd" && sharedlib_from_linklib_cmd=$ECHO
-
 
 
 
@@ -9636,8 +8899,180 @@ func_stripname_cnf ()
 } # func_stripname_cnf
 
 
-# Create libtool.
+# checkout AR and decide whether to use ar-lib wrapper
+  if test -n "$ac_tool_prefix"; then
+  for ac_prog in ar lib "link -lib"
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_AR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$AR"; then
+  ac_cv_prog_AR="$AR" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_AR="$ac_tool_prefix$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
 
+fi
+fi
+AR=$ac_cv_prog_AR
+if test -n "$AR"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AR" >&5
+$as_echo "$AR" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+    test -n "$AR" && break
+  done
+fi
+if test -z "$AR"; then
+  ac_ct_AR=$AR
+  for ac_prog in ar lib "link -lib"
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_ac_ct_AR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_AR"; then
+  ac_cv_prog_ac_ct_AR="$ac_ct_AR" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_AR="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_AR=$ac_cv_prog_ac_ct_AR
+if test -n "$ac_ct_AR"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_AR" >&5
+$as_echo "$ac_ct_AR" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$ac_ct_AR" && break
+done
+
+  if test "x$ac_ct_AR" = x; then
+    AR="false"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    AR=$ac_ct_AR
+  fi
+fi
+
+: ${AR=ar}
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking the archiver ($AR) interface" >&5
+$as_echo_n "checking the archiver ($AR) interface... " >&6; }
+if ${am_cv_ar_interface+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+   am_cv_ar_interface=ar
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+int some_variable = 0;
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  am_ar_try='$AR cru libconftest.a conftest.$ac_objext >&5'
+      { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$am_ar_try\""; } >&5
+  (eval $am_ar_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+      if test "$ac_status" -eq 0; then
+        am_cv_ar_interface=ar
+      else
+        am_ar_try='$AR -NOLOGO -OUT:conftest.lib conftest.$ac_objext >&5'
+        { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$am_ar_try\""; } >&5
+  (eval $am_ar_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+        if test "$ac_status" -eq 0; then
+          am_cv_ar_interface=lib
+        else
+          am_cv_ar_interface=unknown
+        fi
+      fi
+      rm -f conftest.lib libconftest.a
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_ar_interface" >&5
+$as_echo "$am_cv_ar_interface" >&6; }
+
+case $am_cv_ar_interface in
+ar)
+  ;;
+lib)
+  # Microsoft lib, so override with the ar-lib wrapper script.
+  # FIXME: It is wrong to rewrite AR.
+  # But if we don't then we get into trouble of one sort or another.
+  # A longer-term fix would be to have automake use am__AR in this case,
+  # and then we could set am__AR="$am_aux_dir/ar-lib \$(AR)" or something
+  # similar.
+  AR="$am_aux_dir/ar-lib $AR"
+  ;;
+unknown)
+  as_fn_error $? "could not determine $AR interface" "$LINENO" 5
+  ;;
+esac
+
+
+# Create libtool.
 
 
 
@@ -17537,27 +16972,19 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 # Patch libtool to circumvent some issues when using MSVC and MS lib.
 # This needs to be run after config.status has created libtool.
-# 1. Eliminate a trailing space after AR_FLAGS. Apparently necessary on
-#    Windows when AR=lib.exe.
-# 2. Patch libtool's func_extract_an_archive in case of $AR=lib. The current
-#    libtool implementation assumes that it can do $AR x to extract an archive.
-#    We replace this two-liner in func_extract_an_archive by replacing the first
-#    line by something clunky that works with lib and making sure that the following
-#    line is ignored (by finishing with ": \"). We completely disregard running the
-#    command through func_show_eval and do not stop if it fails.
-# 3. Relax check which libraries can be used when linking a DLL.
+# 1. Relax check which libraries can be used when linking a DLL.
 #    libtool's func_mode_link() would reject linking a .lib file when building a DLL,
 #    even though this .lib file may just be the one that eventually loads a depending DLL,
 #    e.g., mkl_core_dll.lib. Setting deplibs_check_method=pass_all will still print a
 #    warning, but the .lib is still passed to the linker.
-# 4. Ensure always_export_symbols=no if win32-dll. Even when we pass win32-dll,
+# 2. Ensure always_export_symbols=no if win32-dll. Even when we pass win32-dll,
 #    libtool forces always_export_symbols=yes for --tag=CXX if using MS compiler.
 #    This leads to a nm call that collects ALL C-functions from a library
 #    and explicitly dll-exporting them, leading to warnings about duplicates
 #    regarding those that are properly marked for dll-export in the source.
-# 5. Do not add mkl_*.lib to old_deplibs, which can result in trying to unpack and repack
+# 3. Do not add mkl_*.lib to old_deplibs, which can result in trying to unpack and repack
 #    the MKL libraries (which are pretty big). Instead, treat them like other -l<...> libs.
-# 6. Add MKL libraries to dependency_libs in .la file, which I guess should be
+# 4. Add MKL libraries to dependency_libs in .la file, which I guess should be
 #    the case due to point 5.
 #
 # Patch libtool also to circumvent some issues when using MinGW (Msys+GCC).
@@ -17568,8 +16995,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #    static libraries. Setting deplibs_check_method=pass_all will avoid
 #    this faulty check.
 
-  case "$AR" in
-    *lib* | *LIB* )
+  case "$am_cv_ar_interface" in
+    lib )
       ac_config_commands="$ac_config_commands libtoolclpatch"
 
       ;;
@@ -18099,7 +17526,7 @@ fi
 
   if test $coin_has_coinutils = yes ; then
 
-$as_echo "#define COIN_HAS_COINUTILS 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_COINUTILS 1" >>confdefs.h
 
     if test -n "$coinutils_pcfiles" ; then SYMPHONYLIB_PCFILES="$coinutils_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$coinutils_lflags $SYMPHONYLIB_LFLAGS"
@@ -18360,7 +17787,7 @@ fi
 
   if test $coin_has_osi = yes ; then
 
-$as_echo "#define COIN_HAS_OSI 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSI 1" >>confdefs.h
 
     if test -n "$osi_pcfiles" ; then SYMPHONYLIB_PCFILES="$osi_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osi_lflags $SYMPHONYLIB_LFLAGS"
@@ -18621,7 +18048,7 @@ fi
 
   if test $coin_has_cgl = yes ; then
 
-$as_echo "#define COIN_HAS_CGL 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_CGL 1" >>confdefs.h
 
     if test -n "$cgl_pcfiles" ; then SYMPHONYLIB_PCFILES="$cgl_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$cgl_lflags $SYMPHONYLIB_LFLAGS"
@@ -18882,7 +18309,7 @@ fi
 
   if test $coin_has_clp = yes ; then
 
-$as_echo "#define COIN_HAS_CLP 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_CLP 1" >>confdefs.h
 
     if test -n "$clp_pcfiles" ; then SYMPHONYLIB_PCFILES="$clp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$clp_lflags $SYMPHONYLIB_LFLAGS"
@@ -19141,7 +18568,7 @@ fi
 
   if test $coin_has_osiclp = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSICLP 1" >>confdefs.h
 
     if test -n "$osiclp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiclp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osiclp_lflags $SYMPHONYLIB_LFLAGS"
@@ -19395,7 +18822,7 @@ fi
 
   if test $coin_has_osidylp = yes ; then
 
-$as_echo "#define COIN_HAS_OSIDYLP 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSIDYLP 1" >>confdefs.h
 
     if test -n "$osidylp_pcfiles" ; then SYMPHONYLIB_PCFILES="$osidylp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osidylp_lflags $SYMPHONYLIB_LFLAGS"
@@ -19649,7 +19076,7 @@ fi
 
   if test $coin_has_osivol = yes ; then
 
-$as_echo "#define COIN_HAS_OSIVOL 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSIVOL 1" >>confdefs.h
 
     if test -n "$osivol_pcfiles" ; then SYMPHONYLIB_PCFILES="$osivol_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osivol_lflags $SYMPHONYLIB_LFLAGS"
@@ -19903,7 +19330,7 @@ fi
 
   if test $coin_has_osicpx = yes ; then
 
-$as_echo "#define COIN_HAS_OSICPX 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSICPX 1" >>confdefs.h
 
     if test -n "$osicpx_pcfiles" ; then SYMPHONYLIB_PCFILES="$osicpx_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osicpx_lflags $SYMPHONYLIB_LFLAGS"
@@ -20157,7 +19584,7 @@ fi
 
   if test $coin_has_osiglpk = yes ; then
 
-$as_echo "#define COIN_HAS_OSIGLPK 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSIGLPK 1" >>confdefs.h
 
     if test -n "$osiglpk_pcfiles" ; then SYMPHONYLIB_PCFILES="$osiglpk_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osiglpk_lflags $SYMPHONYLIB_LFLAGS"
@@ -20411,7 +19838,7 @@ fi
 
   if test $coin_has_osispx = yes ; then
 
-$as_echo "#define COIN_HAS_OSISPX 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSISPX 1" >>confdefs.h
 
     if test -n "$osispx_pcfiles" ; then SYMPHONYLIB_PCFILES="$osispx_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osispx_lflags $SYMPHONYLIB_LFLAGS"
@@ -20665,7 +20092,7 @@ fi
 
   if test $coin_has_osixpr = yes ; then
 
-$as_echo "#define COIN_HAS_OSIXPR 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSIXPR 1" >>confdefs.h
 
     if test -n "$osixpr_pcfiles" ; then SYMPHONYLIB_PCFILES="$osixpr_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osixpr_lflags $SYMPHONYLIB_LFLAGS"
@@ -20919,7 +20346,7 @@ fi
 
   if test $coin_has_osigrb = yes ; then
 
-$as_echo "#define COIN_HAS_OSIGRB 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSIGRB 1" >>confdefs.h
 
     if test -n "$osigrb_pcfiles" ; then SYMPHONYLIB_PCFILES="$osigrb_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osigrb_lflags $SYMPHONYLIB_LFLAGS"
@@ -21178,7 +20605,7 @@ fi
 
   if test $coin_has_glpk = yes ; then
 
-$as_echo "#define COIN_HAS_GLPK 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_GLPK 1" >>confdefs.h
 
     if test -n "$glpk_pcfiles" ; then SYMPHONYLIB_PCFILES="$glpk_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$glpk_lflags $SYMPHONYLIB_LFLAGS"
@@ -21435,7 +20862,7 @@ fi
 
   if test $coin_has_ositests = yes ; then
 
-$as_echo "#define COIN_HAS_OSITESTS 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_OSITESTS 1" >>confdefs.h
 
     if test -n "$ositests_pcfiles" ; then SYMUNITTEST_PCFILES="$ositests_pcfiles $SYMUNITTEST_PCFILES" ; fi
        SYMUNITTEST_LFLAGS="$ositests_lflags $SYMUNITTEST_LFLAGS"
@@ -21668,7 +21095,7 @@ fi
 
   if test $coin_has_sample = yes ; then
 
-$as_echo "#define COIN_HAS_SAMPLE 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_SAMPLE 1" >>confdefs.h
 
 
 
@@ -21899,7 +21326,7 @@ fi
 
   if test $coin_has_netlib = yes ; then
 
-$as_echo "#define COIN_HAS_NETLIB 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_NETLIB 1" >>confdefs.h
 
 
 
@@ -22130,7 +21557,7 @@ fi
 
   if test $coin_has_miplib3 = yes ; then
 
-$as_echo "#define COIN_HAS_MIPLIB3 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_MIPLIB3 1" >>confdefs.h
 
 
 
@@ -22278,10 +21705,10 @@ fi
 
     fi
     if test $coin_has_readline = yes ; then
-      SYMPHONYLIB_LFLAGS="-lreadline $SYMPHONYLIB_LFLAGS"
+      SYMPHONYLIB_LFLAGS="$LIBS $SYMPHONYLIB_LFLAGS"
 
 
-$as_echo "#define COIN_HAS_READLINE 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_READLINE 1" >>confdefs.h
 
     fi
     LIBS="$coin_save_LIBS"
@@ -22331,6 +21758,9 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+      # add -DXYZ_BUILD to XYZ_CFLAGS
+      SYMPHONYLIB_CFLAGS="${SYMPHONYLIB_CFLAGS} -DSYMPHONYLIB_BUILD"
+
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
       if test "$BUILDTOOLS_DEBUG" = 1 ; then
@@ -22377,6 +21807,9 @@ cat >>confdefs.h <<_ACEOF
 #define SYMUNITTEST_EXPORT $libexport_attribute
 _ACEOF
 
+
+      # add -DXYZ_BUILD to XYZ_CFLAGS
+      SYMUNITTEST_CFLAGS="${SYMUNITTEST_CFLAGS} -DSYMUNITTEST_BUILD"
 
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
@@ -22553,7 +21986,7 @@ else
 fi
 
 
- if test $CC = cl; then
+ if test $enable_msvc = yes; then
   COIN_CXX_IS_CL_TRUE=
   COIN_CXX_IS_CL_FALSE='#'
 else
@@ -22924,39 +22357,7 @@ fi
 
 
 #---------------------------------------------------------------------------#
-# STATIC EXECUTABLE
-#---------------------------------------------------------------------------#
-
-# Check whether --enable-static-executable was given.
-if test "${enable_static_executable+set}" = set; then :
-  enableval=$enable_static_executable; case "${enableval}" in
-   yes)
-      if test "$enable_shared" = yes; then
-        as_fn_error $? "static executable requires static COIN libraries: use with --enable-shared=no flag" "$LINENO" 5
-      fi
-      sym_static_exe=true
-   ;;
-   no)  sym_static_exe=false
-   ;;
-   *) as_fn_error $? "bad value ${enableval} for --enable-static-executable" "$LINENO" 5
-   ;;
-esac
-else
-  sym_static_exe=false
-fi
-
-
- if test $sym_static_exe = true; then
-  STATICEXE_TRUE=
-  STATICEXE_FALSE='#'
-else
-  STATICEXE_TRUE='#'
-  STATICEXE_FALSE=
-fi
-
-
-#---------------------------------------------------------------------------#
-# DRAWGRAPH
+# SIGNAL HANDLER
 #---------------------------------------------------------------------------#
 
 # Check whether --enable-signal-handler was given.
@@ -23318,7 +22719,7 @@ fi
 
   if test $coin_has_pvm = yes ; then
 
-$as_echo "#define COIN_HAS_PVM 1" >>confdefs.h
+$as_echo "#define SYMPHONY_HAS_PVM 1" >>confdefs.h
 
     SYMPHONYLIB_LFLAGS="$pvm_lflags $SYMPHONYLIB_LFLAGS"
        SYMPHONYLIB_CFLAGS="$pvm_cflags $SYMPHONYLIB_CFLAGS"
@@ -23594,17 +22995,17 @@ if test $sym_openmp = auto; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiler supports OpenMP" >&5
 $as_echo_n "checking whether compiler supports OpenMP... " >&6; }
    case "$CXX" in
-     clang*)
+     *clang*)
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
        sym_openmp=false
        ;;
-     cl* | *\cl* | */cl*)
+     *cl*)
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
        sym_openmp=true
        ;;
-     g++*)
+     *g++*)
         sym_openmp=true
    	fopenmp_version=4.2
    	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
@@ -23636,7 +23037,7 @@ fi
 
 
 if test $sym_openmp = true; then
-  if test x$coin_cxx_is_cl = xtrue; then
+  if test $enable_msvc = yes; then
     SYM_OPENMP_FLAGS=-openmp
     SYM_OPENMP_LIBS=
   else
@@ -23652,14 +23053,7 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-# Location of SYMPHONY for later use
-
-
-SYMINCDIR=`cd $srcdir; pwd`/include
-SYMSRCDIR=`cd $srcdir; pwd`/src
-
 # To be used in applications: default SYMPHONY defs
-
 
 
 
@@ -23667,49 +23061,6 @@ SYMSRCDIR=`cd $srcdir; pwd`/src
 # Location of Applications for later use
 
 SYMAPPLDIR=`pwd`/Applications
-
-#FIXME-Debugging conditional, for now
-
-#AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
-
-#Add openmp flag and take care of cl flags
-sym_use_cl=false
-CLLCFLAGS=
-case "$CXX" in
-  clang*)
-     if test $sym_openmp = true; then
-         CXXFLAGS="$CXXFLAGS -fopenmp"
-     fi
-  ;;
-  cl* | *\cl* | */cl*)
-     CLLCFLAGS=$CXXFLAGS
-     CXXFLAGS="$CXXFLAGS -TP"
-     if test $sym_openmp = true; then
-     	 CXXFLAGS="$CXXFLAGS -openmp"
-     fi
-  ;;
-  g++* | *\g++* | */g++*)
-     if test $sym_openmp = true; then
-         CXXFLAGS="$CXXFLAGS -fopenmp"
-     fi
-
-     #Ignore warnings about unrecognized pragma lines and
-     #deprecated string conversions
-     CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
-
-     #Ignore warnings about comparisons of signed and unsigned values and
-     #casting const pointers to ordinary pointers
-     CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
-   ;;
-esac
-
-
-
-#Set CFLAGS to CXXFLAGS since we are using g++
-CFLAGS=$CXXFLAGS
-
-
-
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
@@ -23902,10 +23253,6 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
-  as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${COIN_HAS_PKGCONFIG_TRUE}" && test -z "${COIN_HAS_PKGCONFIG_FALSE}"; then
   as_fn_error $? "conditional \"COIN_HAS_PKGCONFIG\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -24064,10 +23411,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${DRAWGRAPH_TRUE}" && test -z "${DRAWGRAPH_FALSE}"; then
   as_fn_error $? "conditional \"DRAWGRAPH\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${STATICEXE_TRUE}" && test -z "${STATICEXE_FALSE}"; then
-  as_fn_error $? "conditional \"STATICEXE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${SIGHANDLER_TRUE}" && test -z "${SIGHANDLER_FALSE}"; then
@@ -26576,9 +25919,7 @@ compiler_lib_search_path=$lt_compiler_lib_search_path_CXX
 _LT_EOF
 
  ;;
-    "libtoolclpatch":C) sed -e 's|AR_FLAGS |AR_FLAGS|g' \
-             -e '/$AR x/s/.*/( cd $f_ex_an_ar_dir ; for f in `$AR -nologo -list "$f_ex_an_ar_oldlib" | tr "\\r" " "` ; do lib -nologo -extract:$f "$f_ex_an_ar_oldlib"; done ); : \\/g' \
-             -e '/^deplibs_check_method/s/.*/deplibs_check_method="pass_all"/g' \
+    "libtoolclpatch":C) sed -e '/^deplibs_check_method/s/.*/deplibs_check_method="pass_all"/g' \
              -e 's|always_export_symbols=yes|always_export_symbols=no|g' \
              -e '/func_append old_deplibs/s/\(.*\)/case $arg in *mkl_*.lib) ;; *) \1 ;; esac/g' \
              -e '/static library .deplib is not portable/a case $deplib in *mkl_*.lib) newdependency_libs="$deplib $newdependency_libs" ;; esac' \

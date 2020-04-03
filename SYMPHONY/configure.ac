@@ -46,7 +46,7 @@ AC_CONFIG_SRCDIR(include/symphony.h)
 
 # Do some initialization work (version numbers, change prefix default, ...)
 
-AC_COIN_INITIALIZE(SYMPHONY)
+AC_COIN_INITIALIZE
 
 #############################################################################
 #                         Standard build tool stuff                         #
@@ -55,7 +55,6 @@ AC_COIN_INITIALIZE(SYMPHONY)
 # Get the name of the C++ compiler and appropriate compiler options
 
 AC_COIN_PROG_CXX
-AC_PROG_CC
 
 # Initialize libtool
 
@@ -199,7 +198,7 @@ test $coin_has_xpr = yes])
 AM_CONDITIONAL(GRB_LP_SOLVER,[test $sym_lp_solver = gurobi &&
 test $coin_has_grb = yes])
 
-AM_CONDITIONAL(COIN_CXX_IS_CL,[test $CC = cl])
+AM_CONDITIONAL(COIN_CXX_IS_CL,[test $enable_msvc = yes])
 
 #############################################################################
 #                       Add the options                                     #
@@ -449,30 +448,7 @@ esac],
 AM_CONDITIONAL(DRAWGRAPH, [test $sym_graph = true])
 
 #---------------------------------------------------------------------------#
-# STATIC EXECUTABLE
-#---------------------------------------------------------------------------#
-
-AC_ARG_ENABLE([static-executable],
-[AC_HELP_STRING([--enable-static-executable],
-                [create a complete static executable])],
-[case "${enableval}" in
-   yes) 
-      if test "$enable_shared" = yes; then 
-        AC_MSG_ERROR(static executable requires static COIN libraries: use with --enable-shared=no flag)
-      fi
-      sym_static_exe=true
-   ;;
-   no)  sym_static_exe=false
-   ;;
-   *) AC_MSG_ERROR(bad value ${enableval} for --enable-static-executable)
-   ;;
-esac],
-[sym_static_exe=false])
-
-AM_CONDITIONAL(STATICEXE, [test $sym_static_exe = true])
-
-#---------------------------------------------------------------------------#
-# DRAWGRAPH
+# SIGNAL HANDLER
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([signal-handler],
@@ -811,15 +787,15 @@ fi
 if test $sym_openmp = auto; then 
    AC_MSG_CHECKING([whether compiler supports OpenMP])
    case "$CXX" in
-     clang*) 
+     *clang*) 
        AC_MSG_RESULT([no])
        sym_openmp=false
        ;;
-     cl* | *\cl* | */cl*)
+     *cl*)
        AC_MSG_RESULT([yes])
        sym_openmp=true
        ;;
-     g++*)
+     *g++*)
         sym_openmp=true
    	fopenmp_version=4.2
    	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
@@ -842,7 +818,7 @@ AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
 AC_SUBST(SYM_OPENMP_FLAGS)
 AC_SUBST(SYM_OPENMP_LIBS)
 if test $sym_openmp = true; then
-  if test x$coin_cxx_is_cl = xtrue; then
+  if test $enable_msvc = yes; then
     SYM_OPENMP_FLAGS=-openmp 
     SYM_OPENMP_LIBS=
   else
@@ -858,64 +834,14 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-# Location of SYMPHONY for later use
-AC_SUBST(SYMINCDIR)
-AC_SUBST(SYMSRCDIR)
-SYMINCDIR=`cd $srcdir; pwd`/include
-SYMSRCDIR=`cd $srcdir; pwd`/src
-
 # To be used in applications: default SYMPHONY defs
 AC_SUBST(SYMDEFS)
 AC_SUBST(SYMPDEFS)
 AC_SUBST(ARCH)
-AC_SUBST(COIN_HAS_CLP)
 
 # Location of Applications for later use
 AC_SUBST(SYMAPPLDIR)
 SYMAPPLDIR=`pwd`/Applications
-
-#FIXME-Debugging conditional, for now
-
-#AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
-
-#Add openmp flag and take care of cl flags
-sym_use_cl=false
-CLLCFLAGS=
-case "$CXX" in
-  clang*) 
-     if test $sym_openmp = true; then
-         CXXFLAGS="$CXXFLAGS -fopenmp"
-     fi
-  ;; 
-  cl* | *\cl* | */cl*)
-     CLLCFLAGS=$CXXFLAGS
-     CXXFLAGS="$CXXFLAGS -TP"
-     if test $sym_openmp = true; then
-     	 CXXFLAGS="$CXXFLAGS -openmp"
-     fi
-  ;;
-  g++* | *\g++* | */g++*)
-     if test $sym_openmp = true; then
-         CXXFLAGS="$CXXFLAGS -fopenmp"
-     fi
-
-     #Ignore warnings about unrecognized pragma lines and 
-     #deprecated string conversions
-     CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
-
-     #Ignore warnings about comparisons of signed and unsigned values and 
-     #casting const pointers to ordinary pointers
-     CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
-   ;; 
-esac
-
-
-
-#Set CFLAGS to CXXFLAGS since we are using g++
-CFLAGS=$CXXFLAGS
-AC_SUBST(CFLAGS)
-AC_SUBST(CXXFLAGS)
-AC_SUBST(CLLCFLAGS)
 
 # Here list all the files that configure should create (except for the
 # configuration header file)

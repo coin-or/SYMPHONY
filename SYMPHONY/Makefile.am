@@ -16,8 +16,6 @@
 
 ## $Id: Makefile.am 344 2006-06-01 19:17:05Z menal $
 
-AUTOMAKE_OPTIONS = foreign
-
 include BuildTools/Makemain.inc
 
 ########################################################################
