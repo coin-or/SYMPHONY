@@ -63,7 +63,7 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-void sym_version(void)
+SYMPHONYLIB_EXPORT void sym_version(void)
 {
    printf("\n");
    printf("==  Welcome to the SYMPHONY MILP Solver \n");
@@ -85,7 +85,7 @@ void sym_version(void)
 /*===========================================================================*/
 /*===========================================================================*/
 
-sym_environment *sym_open_environment()
+SYMPHONYLIB_EXPORT sym_environment * sym_open_environment()
 {
    sym_environment *env;
 #if (!defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CG) || \
@@ -153,7 +153,7 @@ sym_environment *sym_open_environment()
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_close_environment(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_close_environment(sym_environment *env)
 {
    int termcode = 0;
    
@@ -173,7 +173,7 @@ int sym_close_environment(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_reset_environment(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_reset_environment(sym_environment *env)
 {
    int termcode = 0, my_tid = env->my_tid;
    //params par = env->par;
@@ -203,7 +203,7 @@ int sym_reset_environment(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_defaults(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
 {
    int termcode = 0;
    
@@ -649,7 +649,8 @@ int sym_set_defaults(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_parse_command_line(sym_environment *env, int argc, char **argv)
+SYMPHONYLIB_EXPORT int sym_parse_command_line(sym_environment *env, int argc,
+                                              char **argv)
 {
    int termcode = 0;
 
@@ -661,7 +662,7 @@ int sym_parse_command_line(sym_environment *env, int argc, char **argv)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_user_data(sym_environment *env, void *user)
+SYMPHONYLIB_EXPORT int sym_set_user_data(sym_environment *env, void *user)
 {
    if (user == NULL){
       return(ERROR__USER);
@@ -675,7 +676,7 @@ int sym_set_user_data(sym_environment *env, void *user)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_user_data(sym_environment *env, void **user)
+SYMPHONYLIB_EXPORT int sym_get_user_data(sym_environment *env, void **user)
 {
    if (env->user == NULL){
       return(ERROR__USER);
@@ -689,7 +690,7 @@ int sym_get_user_data(sym_environment *env, void **user)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_read_mps(sym_environment *env, char *infile)
+SYMPHONYLIB_EXPORT int sym_read_mps(sym_environment *env, char *infile)
 {  
    
   strncpy(env->par.infile, infile, MAX_FILE_NAME_LENGTH);
@@ -701,7 +702,7 @@ int sym_read_mps(sym_environment *env, char *infile)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_read_lp(sym_environment *env, char *infile)
+SYMPHONYLIB_EXPORT int sym_read_lp(sym_environment *env, char *infile)
 {  
    
   strncpy(env->par.infile, infile, MAX_FILE_NAME_LENGTH);
@@ -713,7 +714,8 @@ int sym_read_lp(sym_environment *env, char *infile)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
+SYMPHONYLIB_EXPORT int sym_read_gmpl(sym_environment *env, char *modelfile,
+                                     char *datafile)
 {  
   strncpy(env->par.infile, modelfile, MAX_FILE_NAME_LENGTH);
   strncpy(env->par.datafile, datafile, MAX_FILE_NAME_LENGTH);
@@ -724,7 +726,7 @@ int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_write_mps(sym_environment *env, char *infile)
+SYMPHONYLIB_EXPORT int sym_write_mps(sym_environment *env, char *infile)
 {  
    write_mip_desc_mps(env->mip, infile);
    return 0;
@@ -734,7 +736,7 @@ int sym_write_mps(sym_environment *env, char *infile)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_write_lp(sym_environment *env, char *infile)
+SYMPHONYLIB_EXPORT int sym_write_lp(sym_environment *env, char *infile)
 {  
    write_mip_desc_lp(env->mip, infile);
    return 0;
@@ -744,7 +746,7 @@ int sym_write_lp(sym_environment *env, char *infile)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_load_problem(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_load_problem(sym_environment *env)
 {
    double t = 0;
    int termcode = 0;
@@ -782,7 +784,7 @@ int sym_load_problem(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_find_initial_bounds(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_find_initial_bounds(sym_environment *env)
 {
    double total_time = 0;
    int termcode = 0;
@@ -824,7 +826,7 @@ int sym_find_initial_bounds(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_solve(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 {
 
    int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, temp, i;
@@ -875,7 +877,7 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
-   start_time = wall_clock(NULL);
+   start_time = sym_wall_clock(NULL);
 
    double *tmp_sol;
    lp_sol *best_sol = &(env->best_sol);
@@ -1322,7 +1324,7 @@ int sym_solve(sym_environment *env)
 
 	 print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat),
                           NULL,
-			  env->ub, env->lb, 0, start_time, wall_clock(NULL),
+			  env->ub, env->lb, 0, start_time, sym_wall_clock(NULL),
 			  env->mip->obj_offset, env->mip->obj_sense,
 			  env->has_ub, NULL, 0);
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
@@ -1578,7 +1580,7 @@ int sym_solve(sym_environment *env)
       print_statistics(&(tm->comp_times), &(tm->stat), 
 		       &(tm->lp_stat),
 		       tm->ub, env->lb,
-		       total_time, start_time, wall_clock(NULL),
+		       total_time, start_time, sym_wall_clock(NULL),
 		       env->mip->obj_offset, env->mip->obj_sense,
 		       tm->has_ub, tm->sp, tm->par.output_mode);
    }
@@ -1610,7 +1612,7 @@ int sym_solve(sym_environment *env)
    if(env->par.verbosity >=0 ) {
       print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 
 		       NULL,
-		       env->ub, env->lb, 0, start_time, wall_clock(NULL), 
+		       env->ub, env->lb, 0, start_time, sym_wall_clock(NULL), 
 		       env->mip->obj_offset, env->mip->obj_sense, 
 		       env->has_ub, NULL, 0);
       CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
@@ -1664,7 +1666,7 @@ int sym_solve(sym_environment *env)
 
 /*===========================================================================*/
 /*===========================================================================*/
-int sym_warm_solve(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 {
 
    int i, change_type;
@@ -1897,7 +1899,7 @@ typedef struct SOLUTION_PAIRS{
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_mc_solve(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_mc_solve(sym_environment *env)
 {
    int i, cp_num;
    double gamma, gamma0, gamma1, tau, slope;
@@ -1933,7 +1935,7 @@ int sym_mc_solve(sym_environment *env)
       env->rootdesc->uind.list[env->rootdesc->uind.size-1] = env->mip->n;
    }
    
-   start_time = wall_clock(NULL);
+   start_time = sym_wall_clock(NULL);
 
    /* Set some parameters */
    compare_sol_tol = env->par.mc_compare_solution_tolerance;
@@ -2501,11 +2503,11 @@ int sym_mc_solve(sym_environment *env)
    
    if (!env->par.multi_criteria){
       print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 
-                       NULL, 0.0, 0.0, 0, start_time, wall_clock(NULL), 
+                       NULL, 0.0, 0.0, 0, start_time, sym_wall_clock(NULL), 
                        env->mip->obj_offset, env->mip->obj_sense, env->has_ub,
                        NULL, 0);
    } else{ 
-      printf("Total WallClock Time         %.3f\n", wall_clock(NULL) -
+      printf("Total WallClock Time         %.3f\n", sym_wall_clock(NULL) -
 	     start_time);
    }
 
@@ -2604,7 +2606,8 @@ int sym_mc_solve(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_create_permanent_cut_pools(sym_environment *env, int * cp_num)
+SYMPHONYLIB_EXPORT int sym_create_permanent_cut_pools(sym_environment *env,
+                                                      int * cp_num)
 {
 
    *cp_num = 0;
@@ -2638,7 +2641,8 @@ int sym_create_permanent_cut_pools(sym_environment *env, int * cp_num)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
+SYMPHONYLIB_EXPORT int sym_explicit_load_problem(sym_environment *env,
+                              int numcols, int numrows,
 			      int *start, int *index, double *value,         
 			      double *collb, double *colub, char *is_int,    
 			      double *obj, double *obj2, char *rowsen,       
@@ -2824,7 +2828,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_abandoned(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_is_abandoned(sym_environment *env)
 {
 
    switch(env->termcode){
@@ -2842,7 +2846,7 @@ int sym_is_abandoned(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_proven_optimal(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_is_proven_optimal(sym_environment *env)
 {
 
    switch(env->termcode){
@@ -2859,7 +2863,7 @@ int sym_is_proven_optimal(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_proven_primal_infeasible(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_is_proven_primal_infeasible(sym_environment *env)
 {
 
    switch(env->termcode){
@@ -2876,7 +2880,7 @@ int sym_is_proven_primal_infeasible(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_iteration_limit_reached(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_is_iteration_limit_reached(sym_environment *env)
 {
 
    switch(env->termcode){
@@ -2893,7 +2897,7 @@ int sym_is_iteration_limit_reached(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_time_limit_reached(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_is_time_limit_reached(sym_environment *env)
 {
 
    switch(env->termcode){  
@@ -2909,7 +2913,7 @@ int sym_is_time_limit_reached(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_target_gap_achieved(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_is_target_gap_achieved(sym_environment *env)
 {
  
    switch(env->termcode){
@@ -2926,7 +2930,7 @@ int sym_is_target_gap_achieved(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_status(sym_environment *env)
+SYMPHONYLIB_EXPORT int sym_get_status(sym_environment *env)
 {
    return (env->termcode);
 }
@@ -2934,7 +2938,7 @@ int sym_get_status(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_num_cols(sym_environment *env, int *numcols)
+SYMPHONYLIB_EXPORT int sym_get_num_cols(sym_environment *env, int *numcols)
 {
    if (!env->mip){
       if(env->par.verbosity >= 1){
@@ -2951,7 +2955,7 @@ int sym_get_num_cols(sym_environment *env, int *numcols)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_num_rows(sym_environment *env, int *numrows)
+SYMPHONYLIB_EXPORT int sym_get_num_rows(sym_environment *env, int *numrows)
 {
    if (!env->mip){
       if(env->par.verbosity >= 1){
@@ -2968,7 +2972,7 @@ int sym_get_num_rows(sym_environment *env, int *numrows)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_num_elements(sym_environment *env, int *numelems)
+SYMPHONYLIB_EXPORT int sym_get_num_elements(sym_environment *env, int *numelems)
 {
    if (!env->mip){
       if(env->par.verbosity >= 1){
@@ -2985,7 +2989,7 @@ int sym_get_num_elements(sym_environment *env, int *numelems)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_col_lower(sym_environment *env, double *collb)
+SYMPHONYLIB_EXPORT int sym_get_col_lower(sym_environment *env, double *collb)
 {
    if (!env->mip || !env->mip->n || !env->mip->lb){
       if(env->par.verbosity >= 1){
@@ -3003,7 +3007,7 @@ int sym_get_col_lower(sym_environment *env, double *collb)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_col_upper(sym_environment *env, double *colub)
+SYMPHONYLIB_EXPORT int sym_get_col_upper(sym_environment *env, double *colub)
 {
    if (!env->mip || !env->mip->n || !env->mip->ub){
       if(env->par.verbosity >= 1){
@@ -3021,7 +3025,7 @@ int sym_get_col_upper(sym_environment *env, double *colub)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_row_sense(sym_environment *env, char *rowsen)
+SYMPHONYLIB_EXPORT int sym_get_row_sense(sym_environment *env, char *rowsen)
 {
    if (!env->mip || !env->mip->m || !env->mip->sense){
       if(env->par.verbosity >= 1){
@@ -3040,7 +3044,7 @@ int sym_get_row_sense(sym_environment *env, char *rowsen)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_rhs(sym_environment *env, double *rowrhs)
+SYMPHONYLIB_EXPORT int sym_get_rhs(sym_environment *env, double *rowrhs)
 {
    if (!env->mip || !env->mip->m || !env->mip->rhs){
       if(env->par.verbosity >= 1){
@@ -3059,8 +3063,9 @@ int sym_get_rhs(sym_environment *env, double *rowrhs)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_matrix(sym_environment *env, int *nz, int *matbeg, int *matind, 
-		   double *matval)
+SYMPHONYLIB_EXPORT int sym_get_matrix(sym_environment *env, int *nz,
+                                      int *matbeg, int *matind, 
+                                      double *matval)
 {
    if (!env->mip || !env->mip->m || !env->mip->n || !env->mip->matbeg){   
       if(env->par.verbosity >= 1){
@@ -3082,7 +3087,7 @@ int sym_get_matrix(sym_environment *env, int *nz, int *matbeg, int *matind,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_row_range(sym_environment *env, double *rowrng)
+SYMPHONYLIB_EXPORT int sym_get_row_range(sym_environment *env, double *rowrng)
 {
    if (!env->mip || !env->mip->m){
       if(env->par.verbosity >= 1){
@@ -3101,7 +3106,7 @@ int sym_get_row_range(sym_environment *env, double *rowrng)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_row_lower(sym_environment *env, double *rowlb)
+SYMPHONYLIB_EXPORT int sym_get_row_lower(sym_environment *env, double *rowlb)
 {
    if (!env->mip || !env->mip->m || !env->mip->rhs){
       if(env->par.verbosity >= 1){
@@ -3151,7 +3156,7 @@ int sym_get_row_lower(sym_environment *env, double *rowlb)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_row_upper(sym_environment *env, double *rowub)
+SYMPHONYLIB_EXPORT int sym_get_row_upper(sym_environment *env, double *rowub)
 {
    if (!env->mip || !env->mip->m || !env->mip->rhs){
       if(env->par.verbosity >= 1){
@@ -3202,7 +3207,7 @@ int sym_get_row_upper(sym_environment *env, double *rowub)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_obj_coeff(sym_environment *env, double *obj)
+SYMPHONYLIB_EXPORT int sym_get_obj_coeff(sym_environment *env, double *obj)
 {
    if (!env->mip || !env->mip->n || !env->mip->obj){
       if(env->par.verbosity >= 1){
@@ -3220,7 +3225,7 @@ int sym_get_obj_coeff(sym_environment *env, double *obj)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_obj2_coeff(sym_environment *env, double *obj2)
+SYMPHONYLIB_EXPORT int sym_get_obj2_coeff(sym_environment *env, double *obj2)
 {
    if (!env->mip || !env->mip->n || !env->mip->obj2){
       if(env->par.verbosity >= 1){
@@ -3238,7 +3243,7 @@ int sym_get_obj2_coeff(sym_environment *env, double *obj2)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_obj_sense(sym_environment *env, int *sense)
+SYMPHONYLIB_EXPORT int sym_get_obj_sense(sym_environment *env, int *sense)
 {
    if (!env->mip){
       if(env->par.verbosity >= 1){
@@ -3259,7 +3264,8 @@ int sym_get_obj_sense(sym_environment *env, int *sense)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_continuous(sym_environment *env, int index, int *value)
+SYMPHONYLIB_EXPORT int sym_is_continuous(sym_environment *env, int index,
+                                         int *value)
 {
    if (!env->mip || index < 0 || index >= env->mip->n || !env->mip->is_int){
       if(env->par.verbosity >= 1){
@@ -3281,7 +3287,8 @@ int sym_is_continuous(sym_environment *env, int index, int *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_binary(sym_environment *env, int index, int *value)
+SYMPHONYLIB_EXPORT int sym_is_binary(sym_environment *env, int index,
+                                     int *value)
 {
    if (!env->mip || index < 0 || index >= env->mip->n){
       if(env->par.verbosity >= 1){
@@ -3309,7 +3316,8 @@ int sym_is_binary(sym_environment *env, int index, int *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_integer(sym_environment *env, int index, char *value)
+SYMPHONYLIB_EXPORT int sym_is_integer(sym_environment *env, int index,
+                                      char *value)
 {
    if (!env->mip || index < 0 || index >= env->mip->n){
       if(env->par.verbosity >= 1){
@@ -3333,7 +3341,7 @@ int sym_is_integer(sym_environment *env, int index, char *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-double sym_get_infinity()
+SYMPHONYLIB_EXPORT double sym_get_infinity()
 {
    return(SYM_INFINITY);
 }
@@ -3341,7 +3349,8 @@ double sym_get_infinity()
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_col_solution(sym_environment *env, double *colsol)
+SYMPHONYLIB_EXPORT int sym_get_col_solution(sym_environment *env,
+                                            double *colsol)
 {
    int i;
    lp_sol sol;
@@ -3392,7 +3401,7 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_sp_size(sym_environment *env, int *size)
+SYMPHONYLIB_EXPORT int sym_get_sp_size(sym_environment *env, int *size)
 {
    if (env->sp){
       *size = env->sp->num_solutions;
@@ -3405,8 +3414,8 @@ int sym_get_sp_size(sym_environment *env, int *size)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_sp_solution(sym_environment *env, int index, double *colsol,
-			double *objval)
+SYMPHONYLIB_EXPORT int sym_get_sp_solution(sym_environment *env, int index,
+                                           double *colsol, double *objval)
 {
    int i;
    sp_solution *sol;
@@ -3429,7 +3438,8 @@ int sym_get_sp_solution(sym_environment *env, int index, double *colsol,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_row_activity(sym_environment *env, double *rowact)
+SYMPHONYLIB_EXPORT int sym_get_row_activity(sym_environment *env,
+                                            double *rowact)
 {
    double * colsol;  
    int i, j;
@@ -3475,7 +3485,7 @@ int sym_get_row_activity(sym_environment *env, double *rowact)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_obj_val(sym_environment *env, double *objval)
+SYMPHONYLIB_EXPORT int sym_get_obj_val(sym_environment *env, double *objval)
 {
    int i;
 
@@ -3503,7 +3513,7 @@ int sym_get_obj_val(sym_environment *env, double *objval)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_primal_bound(sym_environment *env, double *ub)
+SYMPHONYLIB_EXPORT int sym_get_primal_bound(sym_environment *env, double *ub)
 {
 
    if (!env->mip){
@@ -3525,7 +3535,8 @@ int sym_get_primal_bound(sym_environment *env, double *ub)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_iteration_count(sym_environment *env, int *numnodes)
+SYMPHONYLIB_EXPORT int sym_get_iteration_count(sym_environment *env,
+                                               int *numnodes)
 {
    if (!env->warm_start){
       if(env->par.verbosity >= 1){
@@ -3543,7 +3554,8 @@ int sym_get_iteration_count(sym_environment *env, int *numnodes)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_obj_coeff(sym_environment *env, int index, double value)
+SYMPHONYLIB_EXPORT int sym_set_obj_coeff(sym_environment *env, int index,
+                                         double value)
 {
 
    int i;
@@ -3582,7 +3594,8 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_obj2_coeff(sym_environment *env, int index, double value)
+SYMPHONYLIB_EXPORT int sym_set_obj2_coeff(sym_environment *env, int index,
+                                          double value)
 {
 
    if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->obj2){
@@ -3611,7 +3624,8 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_col_lower(sym_environment *env, int index, double value)
+SYMPHONYLIB_EXPORT int sym_set_col_lower(sym_environment *env, int index,
+                                         double value)
 {
    int i;
 
@@ -3645,7 +3659,8 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_col_upper(sym_environment *env, int index, double value)
+SYMPHONYLIB_EXPORT int sym_set_col_upper(sym_environment *env, int index,
+                                         double value)
 {
    int i;
 
@@ -3679,7 +3694,8 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_row_lower(sym_environment *env, int index, double value)
+SYMPHONYLIB_EXPORT int sym_set_row_lower(sym_environment *env, int index,
+                                         double value)
 {
    double rhs, range, lower = 0, upper = 0, inf = SYM_INFINITY;
    char   sense;
@@ -3772,7 +3788,8 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_row_upper(sym_environment *env, int index, double value)
+SYMPHONYLIB_EXPORT int sym_set_row_upper(sym_environment *env, int index,
+                                         double value)
 {
    double rhs, range, lower = 0, upper = 0, inf = SYM_INFINITY;
    char   sense;
@@ -3870,8 +3887,9 @@ int sym_set_row_upper(sym_environment *env, int index, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_row_type(sym_environment *env, int index, char rowsense, 
-		     double rowrhs, double rowrng)
+SYMPHONYLIB_EXPORT int sym_set_row_type(sym_environment *env, int index,
+                                        char rowsense, 
+                                        double rowrhs, double rowrng)
 		     
 {
 
@@ -3914,7 +3932,7 @@ int sym_set_row_type(sym_environment *env, int index, char rowsense,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_obj_sense(sym_environment *env, int sense)
+SYMPHONYLIB_EXPORT int sym_set_obj_sense(sym_environment *env, int sense)
 {
 
    int i;
@@ -3950,7 +3968,8 @@ int sym_set_obj_sense(sym_environment *env, int sense)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_col_solution(sym_environment *env, double * colsol)
+SYMPHONYLIB_EXPORT int sym_set_col_solution(sym_environment *env,
+                                            double * colsol)
 {
    int i, j, nz = 0,*matBeg, *matInd;
    double value, *rowAct = NULL, *matVal; 
@@ -4100,7 +4119,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_primal_bound(sym_environment *env, double bound)
+SYMPHONYLIB_EXPORT int sym_set_primal_bound(sym_environment *env, double bound)
 {
 
    if (!env->mip){
@@ -4123,7 +4142,7 @@ int sym_set_primal_bound(sym_environment *env, double bound)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_continuous(sym_environment *env, int index)
+SYMPHONYLIB_EXPORT int sym_set_continuous(sym_environment *env, int index)
 {
    if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->is_int){
       if(env->par.verbosity >= 1){
@@ -4141,7 +4160,7 @@ int sym_set_continuous(sym_environment *env, int index)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_integer(sym_environment *env, int index)
+SYMPHONYLIB_EXPORT int sym_set_integer(sym_environment *env, int index)
 {
 
    if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->is_int){
@@ -4160,7 +4179,7 @@ int sym_set_integer(sym_environment *env, int index)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_col_names(sym_environment * env, char **colname)
+SYMPHONYLIB_EXPORT int sym_set_col_names(sym_environment * env, char **colname)
 {
    int j;
 
@@ -4196,9 +4215,11 @@ int sym_set_col_names(sym_environment * env, char **colname)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_add_col(sym_environment *env, int numelems, int *indices, 
-		double *elements, double collb, double colub,
-		double obj, char is_int, char *name)
+SYMPHONYLIB_EXPORT int sym_add_col(sym_environment *env, int numelems,
+                                   int *indices, 
+                                   double *elements, double collb,
+                                   double colub,
+                                   double obj, char is_int, char *name)
 {
    int i, k, n, m, nz, *matBeg, *matInd;
    double *matVal, *colLb, *colUb, *objN;
@@ -4389,9 +4410,10 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_add_row(sym_environment *env, int numelems, int *indices, 
-		double *elements, char rowsen, double rowrhs,
-		double rowrng)
+SYMPHONYLIB_EXPORT int sym_add_row(sym_environment *env, int numelems,
+                                   int *indices, 
+                                   double *elements, char rowsen,
+                                   double rowrhs, double rowrng)
 {
    int i, j, k, m, n, nz, *matBeg, *matInd, *lengths;
    double *matVal, *rhs, *range;
@@ -4539,7 +4561,8 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
 /* Important: The indices given here are with respect to the current
    not the original user indices! */
 
-int sym_delete_cols(sym_environment *env, int num, int * indices)
+SYMPHONYLIB_EXPORT int sym_delete_cols(sym_environment *env, int num,
+                                       int * indices)
 {
 
    int i, j, k, n, nz, num_to_delete = 0, *matBeg, *matInd, *lengths;
@@ -4742,7 +4765,8 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 
 /*===========================================================================*/
 /*===========================================================================*/
-int sym_delete_rows(sym_environment *env, int num, int * indices)
+SYMPHONYLIB_EXPORT int sym_delete_rows(sym_environment *env, int num,
+                                       int * indices)
 {
 
    int i, j, k, n, m, nz, new_num_elements = 0, new_num_rows = 0;
@@ -4849,7 +4873,8 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
+SYMPHONYLIB_EXPORT int sym_write_warm_start_desc(warm_start_desc *ws,
+                                                 char *file)
 {
  
    FILE * f = NULL;
@@ -4958,7 +4983,7 @@ int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 /*===========================================================================*/
 /*===========================================================================*/
 
-warm_start_desc * sym_read_warm_start(char *file)
+SYMPHONYLIB_EXPORT warm_start_desc * sym_read_warm_start(char *file)
 {   
    FILE * f;
    char str[80];
@@ -5072,7 +5097,7 @@ warm_start_desc * sym_read_warm_start(char *file)
 /*===========================================================================*/
 /*===========================================================================*/
 
-void sym_delete_warm_start(warm_start_desc *ws)
+SYMPHONYLIB_EXPORT void sym_delete_warm_start(warm_start_desc *ws)
 {
    int i, temp;
    if (ws) {
@@ -5105,7 +5130,8 @@ void sym_delete_warm_start(warm_start_desc *ws)
 /*===========================================================================*/
 /*===========================================================================*/
 
-warm_start_desc * sym_get_warm_start(sym_environment *env, int copy_warm_start)
+SYMPHONYLIB_EXPORT warm_start_desc * sym_get_warm_start(sym_environment *env,
+                                                        int copy_warm_start)
 {
    
    warm_start_desc * ws;
@@ -5130,7 +5156,8 @@ warm_start_desc * sym_get_warm_start(sym_environment *env, int copy_warm_start)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_warm_start (sym_environment *env, warm_start_desc *ws)
+SYMPHONYLIB_EXPORT int sym_set_warm_start (sym_environment *env,
+                                           warm_start_desc *ws)
 {
 
    if (!ws){
@@ -5148,12 +5175,13 @@ int sym_set_warm_start (sym_environment *env, warm_start_desc *ws)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_int_param(sym_environment *env, const char *key, int value)
+SYMPHONYLIB_EXPORT int sym_set_int_param(sym_environment *env, const char *key,
+                                         int value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
    sprintf(line, "%s %d", key, value);  
-   termcode = set_param(env, line);
+   termcode = sym_set_param(env, line);
    FREE(line);
 
    return(termcode);
@@ -5162,12 +5190,13 @@ int sym_set_int_param(sym_environment *env, const char *key, int value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_dbl_param(sym_environment *env, const char *key, double value)
+SYMPHONYLIB_EXPORT int sym_set_dbl_param(sym_environment *env, const char *key,
+                                         double value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
    sprintf(line, "%s %.30f", key, value);  
-   termcode = set_param(env, line);
+   termcode = sym_set_param(env, line);
    FREE(line);
 
    return(termcode);
@@ -5176,12 +5205,13 @@ int sym_set_dbl_param(sym_environment *env, const char *key, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_str_param(sym_environment *env, const char *key, const char *value)
+SYMPHONYLIB_EXPORT int sym_set_str_param(sym_environment *env, const char *key,
+                                         const char *value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
    sprintf(line, "%s %s", key, value);  
-   termcode = set_param(env, line);
+   termcode = sym_set_param(env, line);
    FREE(line);
    
    return(termcode);
@@ -5190,7 +5220,8 @@ int sym_set_str_param(sym_environment *env, const char *key, const char *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_int_param(sym_environment *env, const char *key, int *value)
+SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
+                                         int *value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -6002,7 +6033,8 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
+SYMPHONYLIB_EXPORT int sym_get_dbl_param(sym_environment *env, const char *key,
+                                         double *value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -6223,7 +6255,8 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_str_param(sym_environment *env, const char *key, char **value)
+SYMPHONYLIB_EXPORT int sym_get_str_param(sym_environment *env, const char *key,
+                                         char **value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -6336,6 +6369,7 @@ int sym_get_str_param(sym_environment *env, const char *key, char **value)
 /*===========================================================================*/
 /*===========================================================================*/
 
+SYMPHONYLIB_EXPORT
 warm_start_desc *sym_create_copy_warm_start(warm_start_desc *ws)
 {
    return(create_copy_warm_start(ws));
@@ -6344,7 +6378,7 @@ warm_start_desc *sym_create_copy_warm_start(warm_start_desc *ws)
 /*===========================================================================*/
 /*===========================================================================*/
 
-MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
+SYMPHONYLIB_EXPORT MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
 {
    return(create_copy_mip_desc(env->mip));
 }
@@ -6352,7 +6386,7 @@ MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-MIPdesc *sym_get_presolved_mip_desc(sym_environment *env)
+SYMPHONYLIB_EXPORT MIPdesc *sym_get_presolved_mip_desc(sym_environment *env)
 {
    return(env->prep_mip);
 }
@@ -6360,6 +6394,7 @@ MIPdesc *sym_get_presolved_mip_desc(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
+SYMPHONYLIB_EXPORT
 sym_environment * sym_create_copy_environment (sym_environment *env)
 {
    return(create_copy_environment(env));
@@ -6368,8 +6403,10 @@ sym_environment * sym_create_copy_environment (sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
-			      double *new_rhs_val, double *lb_for_new_rhs)
+SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env, int cnt,
+                                              int *new_rhs_ind,
+                                              double *new_rhs_val,
+                                              double *lb_for_new_rhs)
 {
 #ifdef SENSITIVITY_ANALYSIS
 #ifdef USE_CGL_CUTS
@@ -6421,8 +6458,10 @@ int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
-			   double *new_rhs_val, double *ub_for_new_rhs)
+SYMPHONYLIB_EXPORT int sym_get_ub_for_new_rhs(sym_environment *env, int cnt,
+                                              int *new_rhs_ind, 
+                                              double *new_rhs_val,
+                                              double *ub_for_new_rhs)
 {
 #ifdef SENSITIVITY_ANALYSIS
    int *matbeg = NULL, *matind = NULL, nz, i, j, k;
@@ -6494,10 +6533,10 @@ int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 /*===========================================================================*/
 /*===========================================================================*/
 #if 0
-int sym_get_lb_for_new_obj(sym_environment *env, int cnt, 
-				 int *new_obj_ind, 
-				 double *new_obj_val, 
-				 double *lb_for_new_obj)
+SYMPHONYLIB_EXPORT int sym_get_lb_for_new_obj(sym_environment *env, int cnt, 
+                                              int *new_obj_ind, 
+                                              double *new_obj_val, 
+                                              double *lb_for_new_obj)
 {
 #ifdef SENSITIVITY_ANALYSIS
    double ub;
@@ -6539,10 +6578,10 @@ int sym_get_lb_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_ub_for_new_obj(sym_environment *env, int cnt, 
-				 int *new_obj_ind, 
-				 double *new_obj_val, 
-				 double *ub_for_new_obj)
+SYMPHONYLIB_EXPORT int sym_get_ub_for_new_obj(sym_environment *env, int cnt, 
+                                              int *new_obj_ind, 
+                                              double *new_obj_val, 
+                                              double *ub_for_new_obj)
 {
 #ifdef SENSITIVITY_ANALYSIS
    if (!env || !env->mip || 
@@ -6577,7 +6616,8 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
+SYMPHONYLIB_EXPORT int sym_test(sym_environment *env, int argc, char **argv,
+                                int *test_status)
 {
 
   int termcode = 0, verbosity;
@@ -6669,3 +6709,1709 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
   
 }
 
+/*===========================================================================*/
+/*===========================================================================*/
+
+SYMPHONYLIB_EXPORT void sym_print_statistics(sym_environment *env,
+                                            double start_time,
+                                            double finish_time)
+{
+   double initial_time; 
+
+   if (env->warm_start){
+      initial_time  = env->comp_times.readtime;
+      initial_time += env->comp_times.ub_overhead + 
+         env->comp_times.ub_heurtime;
+      initial_time += env->comp_times.lb_overhead + 
+         env->comp_times.lb_heurtime;
+
+      print_statistics(&(env->warm_start->comp_times), 
+                       &(env->warm_start->stat),
+                       NULL,
+                       env->warm_start->ub, env->warm_start->lb, 
+                       initial_time, start_time, finish_time,
+                       env->mip->obj_offset, env->mip->obj_sense,
+                       env->warm_start->has_ub,NULL, 0);
+      printf("\n");
+   }else{
+      printf("No statistics! Either the solution process"
+             "terminated in preprocessing or\n"
+             "the problem has not been solved yet!\n");
+   }
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+SYMPHONYLIB_EXPORT double sym_wall_clock(double *T)
+{
+   return wall_clock(T);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
+{
+   int i;
+   char key[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH +1];
+   double timeout;
+   str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
+   str_int compare_can_str[COMPARE_CAN_STR_SIZE] = COMPARE_CAN_STR_ARRAY;
+   tm_params *tm_par = &env->par.tm_par;
+   lp_params *lp_par = &env->par.lp_par;
+   cg_params *cg_par = &env->par.cg_par;
+   cp_params *cp_par = &env->par.cp_par;
+   dg_params *dg_par = &env->par.dg_par;
+   prep_params *prep_par = &env->par.prep_par;
+
+   strcpy(key,"");
+   sscanf(line,"%s%s", key, value);
+   
+   /***********************************************************************
+    ***                    Global parameters                            ***
+    ***********************************************************************/
+   if (strcmp(key, "verbosity") == 0){
+      READ_INT_PAR(env->par.verbosity);
+      tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
+	 cp_par->verbosity = env->par.verbosity;
+      prep_par->verbosity = env->par.verbosity;
+      return(0);
+   }
+   else if (strcmp(key, "test") == 0){
+     READ_INT_PAR(env->par.test);
+     return(0);
+   }
+   else if (strcmp(key, "random_seed") == 0){
+      READ_INT_PAR(env->par.random_seed);
+      tm_par->random_seed = env->par.random_seed;
+      return(0);
+   }
+   else if (strcmp(key, "granularity") == 0){
+      READ_DBL_PAR(tm_par->granularity);
+      lp_par->granularity = tm_par->granularity;
+      return(0);
+   }
+   
+      /***********************************************************************
+       ***                    Master parameters                            ***
+       ***********************************************************************/
+   else if (strcmp(key, "upper_bound") == 0 ||
+	    strcmp(key, "M_upper_bound") == 0){
+      READ_DBL_PAR(env->ub);
+      env->has_ub = TRUE;
+      return(0);
+   }
+   else if (strcmp(key, "upper_bound_estimate") == 0 ||
+	    strcmp(key, "M_upper_bound_estimate") == 0){
+      READ_DBL_PAR(env->ub_estimate);
+      env->has_ub_estimate = TRUE;
+      return(0);
+   }
+   else if (strcmp(key, "lower_bound") == 0 ||
+	    strcmp(key, "M_lower_bound") == 0){
+      READ_DBL_PAR(env->lb);
+      return(0);
+   }
+   else if (strcmp(key, "obj_offset") == 0 ||
+	    strcmp(key, "M_obj_offset") == 0){
+      READ_DBL_PAR(env->obj_offset);
+      return(0);
+   }   
+   else if (strcmp(key, "M_verbosity") == 0){
+      READ_INT_PAR(env->par.verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "M_random_seed") == 0){
+      READ_INT_PAR(env->par.random_seed);
+      return(0);
+   }
+   else if (strcmp(key, "param_file") == 0){
+     read_string(env->par.param_file, line, MAX_FILE_NAME_LENGTH);
+     return(0);
+   }
+   else if (strcmp(key, "tm_executable_name") == 0 ||
+	    strcmp(key, "tm_exe") == 0 ||
+	    strcmp(key, "M_tm_exe") == 0 ||
+	    strcmp(key, "M_tm_executable_name") == 0){
+      read_string(env->par.tm_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "dg_executable_name") == 0 ||
+	    strcmp(key, "dg_exe") == 0 ||
+	    strcmp(key, "M_dg_exe") == 0 ||
+	    strcmp(key, "M_dg_executable_name") == 0){
+      read_string(env->par.dg_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "tm_debug") == 0 ||
+	    strcmp(key, "M_tm_debug") == 0){
+      READ_INT_PAR(env->par.tm_debug);
+      if (env->par.tm_debug) env->par.tm_debug = 4;
+      return(0);
+   }
+   else if (strcmp(key, "dg_debug") == 0 ||
+	    strcmp(key, "M_dg_debug") == 0){
+      READ_INT_PAR(env->par.dg_debug);
+      if (env->par.dg_debug) env->par.dg_debug = 4;
+      return(0);
+   }
+   else if (strcmp(key, "tm_machine") == 0 ||
+	    strcmp(key, "M_tm_machine") == 0){
+	 read_string(env->par.tm_machine, line, MACH_NAME_LENGTH);
+	 env->par.tm_machine_set = TRUE;
+      return(0);
+   }
+   else if (strcmp(key, "dg_machine") == 0 ||
+	    strcmp(key, "M_dg_machine") == 0){
+      read_string(env->par.dg_machine, line, MACH_NAME_LENGTH);
+      env->par.dg_machine_set = TRUE;
+      return(0);
+   }
+   
+   else if (strcmp(key, "pvm_trace") == 0 ||
+	    strcmp(key, "M_pvm_trace") == 0){
+      READ_INT_PAR(env->par.pvm_trace);
+      return(0);
+   }
+   else if (strcmp(key, "do_branch_and_cut") == 0 ||
+	    strcmp(key, "M_do_branch_and_cut") == 0){
+      READ_INT_PAR(env->par.do_branch_and_cut);
+      return(0);
+   }
+   else if (strcmp(key, "do_draw_graph") == 0 ||
+	    strcmp(key, "M_do_draw_graph") == 0){
+      READ_INT_PAR(env->par.do_draw_graph);
+      return(0);
+   }
+   else if (strcmp(key, "use_permanent_cut_pools") == 0 ||
+	    strcmp(key, "M_use_permanent_cut_pools") == 0){
+      READ_INT_PAR(env->par.use_permanent_cut_pools);
+      return(0);
+   }
+   else if (strcmp(key, "mc_compare_solution_tolerance") == 0 ||
+	    strcmp(key, "M_mc_compare_solution_tolerance") == 0){
+      READ_DBL_PAR(env->par.mc_compare_solution_tolerance);
+      return(0);
+   }
+   else if (strcmp(key, "mc_binary_search_tolerance") == 0 ||
+	    strcmp(key, "M_mc_binary_search_tolerance") == 0){
+      READ_DBL_PAR(env->par.mc_binary_search_tolerance);
+      return(0);
+   }
+   else if (strcmp(key, "mc_search_order") == 0 ||
+	    strcmp(key, "M_mc_search_order") == 0){
+      READ_INT_PAR(env->par.mc_search_order);
+      return(0);
+   }
+   else if (strcmp(key, "mc_warm_start") == 0 ||
+	     strcmp(key, "M_mc_warm_start") == 0){
+      READ_INT_PAR(env->par.mc_warm_start);
+      return(0);
+   }
+   else if (strcmp(key, "mc_warm_start_rule") == 0 ||
+	     strcmp(key, "M_mc_warm_start_rule") == 0){
+      READ_INT_PAR(env->par.mc_warm_start_rule);
+      return(0);
+   }
+   else if (strcmp(key, "trim_warm_tree") == 0 ||
+	     strcmp(key, "M_trim_warm_tree") == 0){
+      READ_INT_PAR(env->par.trim_warm_tree);
+      return(0);
+   }
+   
+   /***********************************************************************
+    ***                 DrawGraph parameters                            ***
+    ***********************************************************************/
+   
+   else if (strcmp(key, "source_path") == 0 ||
+	    strcmp(key, "DG_source_path") == 0){
+      read_string(dg_par->source_path, line, MAX_FILE_NAME_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "echo_commands") == 0 ||
+	    strcmp(key, "DG_echo_commands") == 0){
+      READ_INT_PAR(dg_par->echo_commands);
+      return(0);
+   }
+   else if (strcmp(key, "canvas_width") == 0 ||
+	    strcmp(key, "DG_canvas_width") == 0){
+      READ_INT_PAR(dg_par->canvas_width);
+      return(0);
+   }
+   else if (strcmp(key, "canvas_height") == 0 ||
+	    strcmp(key, "DG_canvas_height") == 0){
+      READ_INT_PAR(dg_par->canvas_height);
+      return(0);
+   }
+   else if (strcmp(key, "viewable_width") == 0 ||
+	    strcmp(key, "DG_viewable_width") == 0){
+      READ_INT_PAR(dg_par->viewable_width);
+      return(0);
+   }
+   else if (strcmp(key, "viewable_height") == 0 ||
+	    strcmp(key, "DG_viewable_height") == 0){
+      READ_INT_PAR(dg_par->viewable_width);
+      return(0);
+   }
+   else if (strcmp(key, "disp_nodelabels") == 0 ||
+	    strcmp(key, "DG_disp_nodelabels") == 0){
+      READ_INT_PAR(dg_par->disp_nodelabels);
+      return(0);
+   }
+   else if (strcmp(key, "disp_nodeweights") == 0 ||
+	    strcmp(key, "DG_disp_nodeweights") == 0){
+      READ_INT_PAR(dg_par->disp_nodeweights);
+      return(0);
+   }
+   else if (strcmp(key, "disp_edgeweights") == 0 ||
+	    strcmp(key, "DG_disp_edgeweights") == 0){
+      READ_INT_PAR(dg_par->disp_edgeweights);
+      return(0);
+   }
+   else if (strcmp(key, "node_dash") == 0 ||
+	    strcmp(key, "DG_node_dash") == 0){
+      read_string(dg_par->node_dash, line, MAX_DASH_PATTERN_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "edge_dash") == 0 ||
+	    strcmp(key, "DG_edge_dash") == 0){
+      read_string(dg_par->edge_dash, line, MAX_DASH_PATTERN_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "node_radius") == 0 ||
+	    strcmp(key, "DG_node_radius") == 0){
+      READ_INT_PAR(dg_par->node_radius);
+      return(0);
+   }
+   else if (strcmp(key, "interactive_mode") == 0 ||
+	    strcmp(key, "DG_interactive_mode") == 0){
+      READ_INT_PAR(dg_par->interactive_mode);
+      return(0);
+   }
+   else if (strcmp(key, "mouse_tracking") == 0 ||
+	    strcmp(key, "DG_mouse_tracking") == 0){
+      READ_INT_PAR(dg_par->mouse_tracking);
+      return(0);
+   }
+   else if (strcmp(key, "scale_factor") == 0 ||
+	    strcmp(key, "DG_scale_factor") == 0){
+      READ_DBL_PAR(dg_par->scale_factor);
+      return(0);
+   }
+   else if (strcmp(key, "nodelabel_font") == 0 ||
+	    strcmp(key, "DG_nodelabel_font") == 0){
+      read_string(dg_par->nodelabel_font, line, MAX_FONT_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "nodeweight_font") == 0 ||
+	       strcmp(key, "DG_nodeweight_font") == 0){
+      read_string(dg_par->nodeweight_font, line, MAX_FONT_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "edgeweight_font") == 0 ||
+	    strcmp(key, "DG_edgeweight_font") == 0){
+      read_string(dg_par->edgeweight_font, line, MAX_FONT_LENGTH);
+      return(0);
+   }
+
+   /***********************************************************************
+    ***                  Treemanager parameters                         ***
+    ***********************************************************************/
+   if (strcmp(key, "TM_verbosity") == 0){
+      READ_INT_PAR(tm_par->verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "TM_granularity") == 0){
+      READ_DBL_PAR(tm_par->granularity);
+      lp_par->granularity = tm_par->granularity;
+      return(0);
+   }
+   else if (strcmp(key, "lp_executable_name") == 0 ||
+	    strcmp(key, "lp_exe") == 0 ||
+	    strcmp(key, "TM_lp_exe") == 0 ||
+	    strcmp(key, "TM_lp_executable_name") == 0){
+      read_string(tm_par->lp_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "cg_executable_name") == 0 ||
+	    strcmp(key, "cg_exe") == 0 ||
+	    strcmp(key, "TM_cg_exe") == 0 ||
+	    strcmp(key, "TM_cg_executable_name") == 0){
+      read_string(tm_par->cg_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "cp_executable_name") == 0 ||
+	    strcmp(key, "cp_exe") == 0 ||
+	    strcmp(key, "TM_cp_exe") == 0 ||
+	    strcmp(key, "TM_cp_executable_name") == 0){
+      read_string(tm_par->cp_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
+   }
+   else if (strcmp(key, "lp_debug") == 0 ||
+	    strcmp(key, "TM_lp_debug") == 0){
+      READ_INT_PAR(tm_par->lp_debug);
+      if (tm_par->lp_debug) tm_par->lp_debug = 4;
+      return(0);
+   }
+   else if (strcmp(key, "cg_debug") == 0 ||
+	    strcmp(key, "TM_cg_debug") == 0){
+      READ_INT_PAR(tm_par->cg_debug);
+      if (tm_par->cg_debug) tm_par->cg_debug = 4;
+      return(0);
+   }
+   else if (strcmp(key, "cp_debug") == 0 ||
+	    strcmp(key, "TM_cp_debug") == 0){
+      READ_INT_PAR(tm_par->cp_debug);
+      if (tm_par->cp_debug) tm_par->cp_debug = 4;
+      return(0);
+   }
+   else if (strcmp(key, "max_active_nodes") == 0 ||
+	    strcmp(key, "TM_max_active_nodes") == 0){
+      READ_INT_PAR(tm_par->max_active_nodes);
+#if defined(COMPILE_IN_LP) && !defined _OPENMP
+      if (tm_par->max_active_nodes > 1){
+	 printf("\nWarning: Trying to use multiple processors with ");
+	 printf("sequential build...\n");
+	 tm_par->max_active_nodes = 1;
+      }
+#endif
+      return(0);
+   }
+   else if (strcmp(key, "max_cp_num") == 0 ||
+	    strcmp(key, "TM_max_cp_num") == 0){
+      READ_INT_PAR(tm_par->max_cp_num);
+      return(0);
+   }
+   else if (strcmp(key, "lp_mach_num") == 0 ||
+	    strcmp(key, "TM_lp_mach_num") == 0){
+      READ_INT_PAR(tm_par->lp_mach_num);
+      return(0);
+   }
+   else if (strcmp(key, "cg_mach_num") == 0 ||
+	    strcmp(key, "TM_cg_mach_num") == 0){
+      READ_INT_PAR(tm_par->cg_mach_num);
+      return(0);
+   }
+   else if (strcmp(key, "cp_mach_num") == 0 ||
+	    strcmp(key, "TM_cp_mach_num") == 0){
+      READ_INT_PAR(tm_par->cp_mach_num);
+      return(0);
+   }
+#ifndef COMPILE_IN_CG
+   else if (strcmp(key, "use_cg") == 0 ||
+	    strcmp(key, "TM_use_cg") == 0 ||
+	    strcmp(key, "LP_use_cg") == 0){
+      READ_INT_PAR(tm_par->use_cg);
+      lp_par->use_cg = tm_par->use_cg;
+      return(0);
+   }
+#endif
+   else if (strcmp(key, "TM_random_seed") == 0){
+      READ_INT_PAR(tm_par->random_seed);
+      return(0);
+   }
+   else if (strcmp(key, "unconditional_dive_frac") == 0 ||
+	    strcmp(key, "TM_unconditional_dive_frac") == 0){
+      READ_DBL_PAR(tm_par->unconditional_dive_frac);
+      return(0);
+   }
+   else if (strcmp(key, "diving_strategy") == 0 ||
+	    strcmp(key, "TM_diving_strategy") == 0){
+      READ_INT_PAR(tm_par->diving_strategy);
+      return(0);
+   }
+   else if (strcmp(key, "diving_k") == 0 ||
+	    strcmp(key, "TM_diving_k") == 0){
+      READ_INT_PAR(tm_par->diving_k);
+      return(0);
+   }
+   else if (strcmp(key, "diving_threshold") == 0 ||
+	    strcmp(key, "TM_diving_threshold") == 0){
+      READ_DBL_PAR(tm_par->diving_threshold);
+      return(0);
+   }
+   else if (strcmp(key, "node_selection_rule") == 0 ||
+	    strcmp(key, "TM_node_selection_rule") == 0){
+      READ_INT_PAR(tm_par->node_selection_rule);
+      return(0);
+   }
+   else if (strcmp(key, "keep_description_of_pruned") == 0 ||
+	    strcmp(key, "TM_keep_description_of_pruned") == 0){
+      READ_INT_PAR(tm_par->keep_description_of_pruned);
+      lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
+      return(0);
+   }
+   else if(strcmp(key, "keep_warm_start") == 0){
+      if (value[0]){
+	 tm_par->keep_description_of_pruned = 
+	   lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
+         //lp_par->should_reuse_lp = FALSE; //by asm4
+         return(0);
+   } else
+	 tm_par->keep_description_of_pruned = 
+	   lp_par->keep_description_of_pruned = DISCARD;
+      return(0);
+   }
+   else if (strcmp(key, "warm_start") == 0 ||
+	    strcmp(key, "TM_warm_start") == 0){
+      READ_INT_PAR(tm_par->warm_start);
+      return(0);
+   }
+   else if (strcmp(key, "warm_start_node_limit") == 0 ||
+	    strcmp(key, "TM_warm_start_node_limit") == 0){
+      READ_INT_PAR(tm_par->warm_start_node_limit);
+      return(0);
+   }
+   else if (strcmp(key, "warm_start_node_level") == 0 ||
+	    strcmp(key, "TM_warm_start_node_level") == 0){
+      READ_INT_PAR(tm_par->warm_start_node_level);
+      return(0);
+   }
+   else if (strcmp(key, "warm_start_node_level_ratio") == 0 ||
+	    strcmp(key, "TM_warm_start_node_level_ratio") == 0){
+      READ_DBL_PAR(tm_par->warm_start_node_level_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "warm_start_node_ratio") == 0 ||
+	    strcmp(key, "TM_warm_start_node_ratio") == 0){
+      READ_DBL_PAR(tm_par->warm_start_node_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "vbc_emulation") == 0 ||
+	    strcmp(key, "TM_vbc_emulation") == 0){
+      READ_INT_PAR(tm_par->vbc_emulation);
+      return(0);
+   }
+   else if (strcmp(key, "logging_interval") == 0 ||
+	    strcmp(key, "TM_logging_interval") == 0){
+      READ_INT_PAR(tm_par->logging_interval);
+      return(0);
+   }
+   else if (strcmp(key, "status_interval") == 0 ||
+	    strcmp(key, "TM_status_interval") == 0){
+      READ_INT_PAR(tm_par->status_interval);
+      return(0);
+   }
+   else if (strcmp(key, "logging") == 0 ||
+	    strcmp(key, "TM_logging") == 0){
+      READ_INT_PAR(tm_par->logging);
+      return(0);
+   }
+   else if (strcmp(key, "price_in_root") == 0 ||
+	    strcmp(key, "TM_price_in_root") == 0){
+      READ_INT_PAR(tm_par->price_in_root);
+      return(0);
+   }
+   else if (strcmp(key, "trim_search_tree") == 0 ||
+	    strcmp(key, "TM_trim_search_tree") == 0){
+      READ_INT_PAR(tm_par->trim_search_tree);
+      return(0);
+   }
+   else if (strcmp(key, "colgen_in_first_phase") == 0 ||
+	    strcmp(key, "TM_colgen_in_first_phase") == 0){
+      READ_INT_PAR(tm_par->colgen_strat[0]);
+      return(0);
+   }
+   else if (strcmp(key, "colgen_in_second_phase") == 0 ||
+	    strcmp(key, "TM_colgen_in_second_phase") == 0){
+      READ_INT_PAR(tm_par->colgen_strat[1]);
+      return(0);
+   }
+   else if (strcmp(key, "colgen_in_first_phase_str") == 0 ||
+	    strcmp(key, "TM_colgen_in_first_phase_str") == 0){
+      READ_STRINT_PAR(tm_par->colgen_strat[0],
+		      colgen_str, COLGEN_STR_SIZE, value);
+      return(0);
+   }
+   else if (strcmp(key, "colgen_in_second_phase_str") == 0 ||
+	    strcmp(key, "TM_colgen_in_second_phase_str") == 0){
+      READ_STRINT_PAR(tm_par->colgen_strat[1],
+		      colgen_str, COLGEN_STR_SIZE, value);
+      return(0);
+   }
+   else if (strcmp(key, "time_limit") == 0 ||
+	    strcmp(key, "TM_time_limit") == 0){
+      READ_DBL_PAR(tm_par->time_limit);
+      lp_par->time_limit = tm_par->time_limit;
+      return(0);
+   }
+   else if (strcmp(key, "node_limit") == 0 ||
+	    strcmp(key, "TM_node_limit") == 0){
+      READ_INT_PAR(tm_par->node_limit);
+      return(0);
+   }
+   else if (strcmp(key, "gap_limit") == 0 ||
+	    strcmp(key, "TM_gap_limit") == 0){
+      READ_DBL_PAR(tm_par->gap_limit);
+      return(0);
+   }
+   else if (strcmp(key, "find_first_feasible") == 0 ||
+	    strcmp(key, "TM_find_first_feasible") == 0){
+      READ_INT_PAR(tm_par->find_first_feasible);
+      lp_par->find_first_feasible = tm_par->find_first_feasible;
+      return(0);
+   }
+   else if (strcmp(key, "sensitivity_analysis") == 0 ||
+	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
+#ifdef SENSITIVITY_ANALYSIS
+      READ_INT_PAR(tm_par->sensitivity_analysis);
+      if(tm_par->sensitivity_analysis){
+	 tm_par->keep_description_of_pruned = 
+	    lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
+      }else{
+	 tm_par->keep_description_of_pruned = DISCARD;
+      }
+      lp_par->sensitivity_analysis = tm_par->sensitivity_analysis;
+#else
+      printf("Warning: Sensitivity analysis features are not currently\n");
+      printf("         enabled. You must rebuild SYMPHONY with these\n");
+      printf("         features enabled in order to use them.\n\n");
+#endif
+      return(0);
+   }else if (strcmp(key, "output_mode") == 0 ||
+	    strcmp(key, "TM_output_mode") == 0){
+      READ_INT_PAR(tm_par->output_mode);
+      return(0);
+   }else if (strcmp(key, "tighten_root_bounds") == 0 ||
+	    strcmp(key, "TM_tighten_root_bounds") == 0){
+      READ_INT_PAR(tm_par->find_first_feasible);
+      lp_par->find_first_feasible = tm_par->find_first_feasible;
+      return(0);
+   }
+
+   /***********************************************************************
+    ***                      LP parameters                              ***
+    ***********************************************************************/
+   if (strcmp(key, "LP_verbosity") == 0){
+      READ_INT_PAR(lp_par->verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "LP_granularity") == 0){
+      READ_DBL_PAR(lp_par->granularity);
+      tm_par->granularity = lp_par->granularity;
+      return(0);
+   }
+   else if (strcmp(key, "debug_lp") == 0 ||
+	    strcmp(key, "LP_debug_lp") == 0){
+      READ_INT_PAR(lp_par->debug_lp);
+      return(0);
+   }
+   else if (strcmp(key, "set_obj_upper_lim") == 0 ||
+	    strcmp(key, "LP_set_obj_upper_lim") == 0){
+      READ_INT_PAR(lp_par->set_obj_upper_lim);
+      return(0);
+   }
+   else if (strcmp(key, "do_primal_heuristic") == 0 ||
+	    strcmp(key, "LP_do_primal_heuristic") == 0){
+      READ_INT_PAR(lp_par->do_primal_heuristic);
+      return(0);
+   }
+   else if (strcmp(key, "scaling") == 0 ||
+	    strcmp(key, "LP_scaling") == 0){
+      READ_INT_PAR(lp_par->scaling);
+      return(0);
+   }
+   else if (strcmp(key, "fastmip") == 0 ||
+	    strcmp(key, "LP_fastmip") == 0){
+      READ_INT_PAR(lp_par->fastmip);
+      return(0);
+   }
+   else if (strcmp(key, "should_warmstart_chain") == 0 ||
+	    strcmp(key, "LP_should_warmstart_chain") == 0){
+      READ_INT_PAR(lp_par->should_warmstart_chain);
+      return(0);
+   }
+   else if (strcmp(key, "should_reuse_lp") == 0 ||
+	    strcmp(key, "LP_should_reuse_lp") == 0){
+      READ_INT_PAR(lp_par->should_reuse_lp);
+      return(0);
+   }
+   else if (strcmp(key, "try_to_recover_from_error") == 0 ||
+	    strcmp(key, "LP_try_to_recover_from_error") == 0){
+      READ_INT_PAR(lp_par->try_to_recover_from_error);
+      return(0);
+   }
+   else if (strcmp(key, "problem_type") == 0 ||
+	    strcmp(key, "LP_problem_type") == 0){
+      READ_INT_PAR(lp_par->problem_type);
+      return(0);
+   }
+   else if (strcmp(key, "not_fixed_storage_size") == 0 ||
+	    strcmp(key, "LP_not_fixed_storage_size") == 0 ||
+	    strcmp(key, "TM_not_fixed_storage_size") == 0 ){
+      READ_INT_PAR(lp_par->not_fixed_storage_size);
+      tm_par->not_fixed_storage_size = lp_par->not_fixed_storage_size;
+      return(0);
+   }
+   else if (strcmp(key, "cut_pool_check_frequency") == 0 ||
+	    strcmp(key, "LP_cut_pool_check_frequency") == 0){
+      READ_INT_PAR(lp_par->cut_pool_check_freq);
+      return(0);
+   }
+   else if (strcmp(key, "load_balance_level") == 0 ||
+	    strcmp(key, "LP_load_balance_level") == 0){
+      READ_INT_PAR(lp_par->load_balance_level);
+      return(0);
+   }
+   else if (strcmp(key, "load_balance_iterations") == 0 ||
+	    strcmp(key, "LP_load_balance_iterations") == 0){
+      READ_INT_PAR(lp_par->load_balance_iterations);
+      return(0);
+   }
+   else if (strcmp(key, "load_balance_compare_candidates") == 0 ||
+	    strcmp(key, "LP_load_balance_compare_candidates") == 0){
+      READ_INT_PAR(lp_par->load_balance_compare_candidates);
+      return(0);
+   }
+   else if (strcmp(key, "fractional_diving_ratio") == 0 ||
+	    strcmp(key, "LP_fractional_diving_ratio") == 0){
+      READ_DBL_PAR(lp_par->fractional_diving_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fractional_diving_num") == 0 ||
+	    strcmp(key, "LP_fractional_diving_num") == 0){
+      READ_INT_PAR(lp_par->fractional_diving_num);
+      return(0);
+   }
+   else if (strcmp(key, "max_non_dual_feas_to_add_frac") == 0 ||
+	    strcmp(key, "LP_max_non_dual_feas_to_add_frac") == 0){
+      READ_DBL_PAR(lp_par->max_non_dual_feas_to_add_frac);
+      return(0);
+   }
+   else if (strcmp(key, "max_cols_to_add_min") == 0 ||
+	    strcmp(key, "LP_max_non_dual_feas_to_add_min") == 0){
+      READ_INT_PAR(lp_par->max_non_dual_feas_to_add_min);
+      return(0);
+   }
+   else if (strcmp(key, "max_non_dual_feas_to_add_max") == 0 ||
+	    strcmp(key, "LP_max_non_dual_feas_to_add_max") == 0){
+      READ_INT_PAR(lp_par->max_non_dual_feas_to_add_max);
+      return(0);
+   }
+   else if (strcmp(key, "max_not_fixable_to_add_frac") == 0 ||
+	    strcmp(key, "LP_max_not_fixable_to_add_frac") == 0){
+      READ_DBL_PAR(lp_par->max_not_fixable_to_add_frac);
+      return(0);
+   }
+   else if (strcmp(key, "max_not_fixable_to_add_min") == 0 ||
+	    strcmp(key, "LP_max_not_fixable_to_add_min") == 0){
+      READ_INT_PAR(lp_par->max_not_fixable_to_add_min);
+      return(0);
+   }
+   else if (strcmp(key, "max_not_fixable_to_add_max") == 0 ||
+	    strcmp(key, "LP_max_not_fixable_to_add_max") == 0){
+      READ_INT_PAR(lp_par->max_not_fixable_to_add_max);
+      return(0);
+   }
+   
+   else if (strcmp(key, "mat_col_compress_num") == 0 ||
+	    strcmp(key, "LP_mat_col_compress_num") == 0){
+      READ_INT_PAR(lp_par->mat_col_compress_num);
+      return(0);
+   }
+   else if (strcmp(key, "mat_col_compress_ratio") == 0 ||
+	    strcmp(key, "LP_mat_col_compress_ratio") == 0){
+      READ_DBL_PAR(lp_par->mat_col_compress_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "mat_row_compress_num") == 0 ||
+	    strcmp(key, "LP_mat_row_compress_num") == 0){
+      READ_INT_PAR(lp_par->mat_row_compress_num);
+      return(0);
+   }
+   else if (strcmp(key, "mat_row_compress_ratio") == 0 ||
+	    strcmp(key, "LP_mat_row_compress_ratio") == 0){
+      READ_DBL_PAR(lp_par->mat_row_compress_ratio);
+      return(0);
+   }
+   
+   else if (strcmp(key, "tailoff_gap_backsteps") == 0 ||
+	    strcmp(key, "LP_tailoff_gap_backsteps") == 0){
+      READ_INT_PAR(lp_par->tailoff_gap_backsteps);
+      return(0);
+   }
+   else if (strcmp(key, "tailoff_obj_backsteps") == 0 ||
+	    strcmp(key, "LP_tailoff_obj_backsteps") == 0){
+      READ_INT_PAR(lp_par->tailoff_obj_backsteps);
+      return(0);
+   }
+   else if (strcmp(key, "tailoff_gap_frac") == 0 ||
+	    strcmp(key, "LP_tailoff_gap_frac") == 0){
+      READ_DBL_PAR(lp_par->tailoff_gap_frac);
+      return(0);
+   }
+   else if (strcmp(key, "tailoff_obj_frac") == 0 ||
+	    strcmp(key, "LP_tailoff_obj_frac") == 0){
+      READ_DBL_PAR(lp_par->tailoff_obj_frac);
+      return(0);
+   }
+   else if (strcmp(key, "tailoff_absolute") == 0 ||
+	    strcmp(key, "LP_tailoff_absolute") == 0){
+      READ_DBL_PAR(lp_par->tailoff_absolute);
+      return(0);
+   }
+   else if (strcmp(key, "tailoff_max_no_iterative_impr_iters_root") == 0 ||
+	    strcmp(key, "LP_tailoff_max_no_iterative_impr_iters_root") == 0){
+      READ_INT_PAR(lp_par->tailoff_max_no_iterative_impr_iters_root);
+      return(0);
+   }
+   
+   else if (strcmp(key, "ineff_cnt_to_delete") == 0 ||
+	    strcmp(key, "LP_ineff_cnt_to_delete") == 0){
+      READ_INT_PAR(lp_par->ineff_cnt_to_delete);
+      return(0);
+   }
+   else if (strcmp(key, "eff_cnt_before_cutpool") == 0 ||
+	    strcmp(key, "LP_eff_cnt_before_cutpool") == 0){
+      READ_INT_PAR(lp_par->eff_cnt_before_cutpool);
+      return(0);
+   }
+   else if (strcmp(key, "ineffective_constraints") == 0 ||
+	    strcmp(key, "LP_ineffective_constraints") == 0){
+      READ_INT_PAR(lp_par->ineffective_constraints);
+      return(0);
+   }
+   else if (strcmp(key, "base_constraints_always_effective") == 0 ||
+	    strcmp(key, "LP_base_constraints_always_effective") == 0){
+      READ_INT_PAR(lp_par->base_constraints_always_effective);
+      return(0);
+   }
+   
+   else if (strcmp(key, "branch_on_cuts") == 0 ||
+	    strcmp(key, "LP_branch_on_cuts") == 0){
+      READ_INT_PAR(lp_par->branch_on_cuts);
+      return(0);
+   }
+   else if (strcmp(key, "discard_slack_cuts") == 0 ||
+	    strcmp(key, "LP_discard_slack_cuts") == 0){
+      READ_INT_PAR(lp_par->discard_slack_cuts);
+      return(0);
+   }
+   
+   /* timeouts on receiving cuts */
+   else if (strcmp(key, "first_lp_first_cut_time_out") == 0 ||
+	    strcmp(key, "LP_first_lp_first_cut_time_out") == 0){
+      READ_DBL_PAR(timeout);
+      if (timeout == -1){
+	 lp_par->first_lp.first_cut_time_out = 0;
+      }else{
+	 lp_par->first_lp.first_cut_time_out = timeout;
+      }
+      return(0);
+   }
+   else if (strcmp(key, "first_lp_all_cuts_time_out") == 0 ||
+	    strcmp(key, "LP_first_lp_all_cuts_time_out") == 0){
+      READ_DBL_PAR(timeout);
+      if (timeout == -1){
+	 lp_par->first_lp.all_cuts_time_out = 0;
+      }else{
+	 lp_par->first_lp.all_cuts_time_out = timeout;
+      }
+      return(0);
+   }
+   else if (strcmp(key, "later_lp_first_cut_time_out") == 0 ||
+	    strcmp(key, "LP_later_lp_first_cut_time_out") == 0){
+      READ_DBL_PAR(timeout);
+      if (timeout == -1){
+	 lp_par->later_lp.first_cut_time_out = 0;
+      }else{
+	 lp_par->later_lp.first_cut_time_out = timeout;
+      }
+      return(0);
+   }
+   else if (strcmp(key, "later_lp_all_cuts_time_out") == 0 ||
+	    strcmp(key, "LP_later_lp_all_cuts_time_out") == 0){
+      READ_DBL_PAR(timeout);
+      if (timeout == -1){
+	 lp_par->later_lp.all_cuts_time_out = 0;
+      }else{
+	 lp_par->later_lp.all_cuts_time_out = timeout;
+      }
+      return(0);
+   }
+   
+   else if (strcmp(key, "no_cut_timeout") == 0 ||
+	    strcmp(key, "LP_no_cut_timeout") == 0){
+      lp_par->first_lp.first_cut_time_out = 0;
+      lp_par->first_lp.all_cuts_time_out = 0;
+      lp_par->later_lp.first_cut_time_out = 0;
+      lp_par->later_lp.all_cuts_time_out = 0;
+      return(0);
+   }
+   else if (strcmp(key, "all_cut_timeout") == 0 ||
+	    strcmp(key, "LP_all_cut_timeout") == 0){
+      READ_DBL_PAR(timeout);
+      lp_par->first_lp.first_cut_time_out = timeout;
+      lp_par->first_lp.all_cuts_time_out = timeout;
+      lp_par->later_lp.first_cut_time_out= timeout;
+      lp_par->later_lp.all_cuts_time_out = timeout;
+      return(0);
+   }
+   
+   else if (strcmp(key, "max_cut_num_per_iter") == 0 ||
+	    strcmp(key, "LP_max_cut_num_per_iter") == 0){
+      READ_INT_PAR(lp_par->max_cut_num_per_iter);
+      return(0);
+   }
+   
+   else if (strcmp(key, "max_cut_num_per_iter_root") == 0 ||
+	    strcmp(key, "LP_max_cut_num_per_iter_root") == 0){
+      READ_INT_PAR(lp_par->max_cut_num_per_iter_root);
+      return(0);
+   }
+   
+   else if (strcmp(key, "min_root_cut_rounds") == 0 ||
+	    strcmp(key, "LP_min_root_cut_rounds") == 0){
+      READ_INT_PAR(lp_par->min_root_cut_rounds);
+      return(0);
+   }
+   
+   else if (strcmp(key, "max_cut_length") == 0 ||
+	    strcmp(key, "LP_max_cut_length") == 0){
+      READ_INT_PAR(lp_par->max_cut_length);
+      return(0);
+   }
+
+   /* variable fixing parameters */
+   else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
+	    strcmp(key, "LP_do_reduced_cost_fixing") == 0){
+      READ_INT_PAR(lp_par->do_reduced_cost_fixing);
+      return(0);
+   }
+   else if (strcmp(key, "gap_as_ub_frac") == 0 ||
+	    strcmp(key, "LP_gap_as_ub_frac") == 0){
+      READ_DBL_PAR(lp_par->gap_as_ub_frac);
+      return(0);
+   }
+   else if (strcmp(key, "gap_as_last_gap_frac") == 0 ||
+	    strcmp(key, "LP_gap_as_last_gap_frac") == 0){
+      READ_DBL_PAR(lp_par->gap_as_last_gap_frac);
+      return(0);
+   }
+   else if (strcmp(key, "do_logical_fixing") == 0 ||
+	    strcmp(key, "LP_do_logical_fixing") == 0){
+      READ_INT_PAR(lp_par->do_logical_fixing);
+      return(0);
+   }
+   else if (strcmp(key, "fixed_to_ub_before_logical_fixing") == 0 ||
+	    strcmp(key, "LP_fixed_to_ub_before_logical_fixing") == 0){
+      READ_INT_PAR(lp_par->fixed_to_ub_before_logical_fixing);
+      return(0);
+   }
+   else if (strcmp(key, "fixed_to_ub_frac_before_logical_fixing")==0 ||
+	    strcmp(key, "LP_fixed_to_ub_frac_before_logical_fixing")==0){
+      READ_DBL_PAR(lp_par->fixed_to_ub_frac_before_logical_fixing);
+      return(0);
+   }
+   
+   else if (strcmp(key, "generate_cgl_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_gomory_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_gomory_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_gomory_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_redsplit_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_redsplit_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_knapsack_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_knapsack_cuts);
+      return(0);
+   }
+   
+   else if (strcmp(key, "generate_cgl_oddhole_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_oddhole_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_oddhole_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_probing_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_probing_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_probing_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_clique_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_clique_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_clique_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_mir_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_mir_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_twomir_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_twomir_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_twomir_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flow_and_cover_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flowcover_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flowcover_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_rounding_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_rounding_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_rounding_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_landp_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_landp_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_gomory_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_gomory_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_gomory_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_redsplit_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_redsplit_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_knapsack_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_knapsack_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_knapsack_cuts_freq);
+      return(0);
+   }
+   
+   else if (strcmp(key, "generate_cgl_oddhole_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_oddhole_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_oddhole_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_probing_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_probing_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_probing_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_clique_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_clique_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_clique_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_mir_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_mir_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_twomir_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_twomir_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_twomir_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flowcover_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flowcover_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_rounding_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_rounding_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_rounding_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_lift_and_project_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_landp_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_landp_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts_freq);
+      return(0);
+   }
+
+    else if (strcmp(key, "gomory_max_depth") == 0 ||
+	    strcmp(key, "LP_gomory_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.gomory_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "knapsack_max_depth") == 0 ||
+	    strcmp(key, "LP_knapsack_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.knapsack_max_depth);
+      return(0);
+   }
+   
+   else if (strcmp(key, "oddhole_max_depth") == 0 ||
+	    strcmp(key, "LP_oddhole_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.oddhole_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "probing_max_depth") == 0 ||
+	    strcmp(key, "LP_probing_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.probing_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "clique_max_depth") == 0 ||
+	    strcmp(key, "LP_clique_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.clique_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "twomir_max_depth") == 0 ||
+	    strcmp(key, "LP_twomir_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.twomir_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "flowcover_max_depth") == 0 ||
+	    strcmp(key, "LP_flowcover_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.flowcover_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "max_chain_backtrack") == 0 ||
+	    strcmp(key, "LP_max_chain_backtrack") == 0){
+      READ_INT_PAR(lp_par->cgl.max_chain_backtrack);
+      return(0);
+   }
+
+   else if (strcmp(key, "max_chain_trial_num") == 0 ||
+	    strcmp(key, "LP_max_chain_trial_num") == 0){
+      READ_INT_PAR(lp_par->cgl.max_chain_trial_num);
+      return(0);
+   }
+   
+   else if (strcmp(key, "chain_trial_freq") == 0 ||
+	    strcmp(key, "chain_trial_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.chain_trial_freq);
+      return(0);
+   }
+   
+   else if (strcmp(key, "chain_weighted_gap") == 0 ||
+	    strcmp(key, "LP_chain_weighted_gap") == 0){
+      READ_DBL_PAR(lp_par->cgl.chain_weighted_gap);
+      return(0);
+   }
+
+   else if (strcmp(key, "chain_br_weighted_gap") == 0 ||
+	    strcmp(key, "LP_chain_br_weighted_gap") == 0){
+      READ_DBL_PAR(lp_par->cgl.chain_br_weighted_gap);
+      return(0);
+   }
+
+   else if (strcmp(key, "max_presolve_iter") == 0 ||
+	    strcmp(key, "LP_max_presolve_iter") == 0){
+      READ_INT_PAR(lp_par->max_presolve_iter);
+      lp_par->user_set_max_presolve_iter = TRUE;
+      return(0);
+   }
+   
+   /* user-defined function defaults */
+   if (strcmp(key, "is_feasible_default") == 0 ||
+	    strcmp(key, "LP_is_feasible_default") == 0){
+      READ_INT_PAR(lp_par->is_feasible_default);
+      return(0);
+   }
+   else if (strcmp(key, "send_feasible_solution_default") == 0 ||
+	    strcmp(key, "LP_send_feasible_solution_default") == 0){
+      READ_INT_PAR(lp_par->send_feasible_solution_default);
+      return(0);
+   }
+   else if (strcmp(key, "display_solution_default") == 0 ||
+	    strcmp(key, "LP_display_solution_default") == 0){
+      READ_INT_PAR(lp_par->display_solution_default);
+      return(0);
+   }
+   else if (strcmp(key, "shall_we_branch_default") == 0 ||
+	    strcmp(key, "LP_shall_we_branch_default") == 0){
+      READ_INT_PAR(lp_par->shall_we_branch_default);
+      return(0);
+   }
+   else if (strcmp(key, "select_candidates_default") == 0 ||
+	    strcmp(key, "LP_select_candidates_default") == 0){
+      READ_INT_PAR(lp_par->select_candidates_default);
+      return(0);
+   }
+   else if (strcmp(key, "strong_branching_cand_num") == 0){
+      READ_INT_PAR(lp_par->strong_branching_cand_num_max);
+      lp_par->strong_branching_cand_num_min =
+	 lp_par->strong_branching_cand_num_max;
+      lp_par->user_set_strong_branching_cand_num = TRUE;
+      lp_par->strong_branching_red_ratio = 0;
+      return(0);
+   }
+   else if (strcmp(key, "strong_branching_cand_num_max") == 0 ||
+	    strcmp(key, "LP_strong_branching_cand_num_max") == 0){
+      READ_INT_PAR(lp_par->strong_branching_cand_num_max);
+      return(0);
+   }
+   else if (strcmp(key, "strong_branching_cand_num_min") == 0 ||
+	    strcmp(key, "LP_strong_branching_cand_num_min") == 0){
+      READ_INT_PAR(lp_par->strong_branching_cand_num_min);
+      return(0);
+   }
+   else if (strcmp(key, "strong_br_min_level") == 0) {
+      READ_INT_PAR(lp_par->strong_br_min_level);
+      return(0);
+   }
+   else if (strcmp(key, "strong_br_all_candidates_level") == 0) {
+      READ_INT_PAR(lp_par->strong_br_all_candidates_level);
+      return(0);
+   }
+   else if (strcmp(key, "limit_strong_branching_time") == 0) {
+      READ_INT_PAR(lp_par->limit_strong_branching_time);
+      return(0);
+   }
+   else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
+	    strcmp(key,"LP_strong_branching_red_ratio") == 0){
+      READ_DBL_PAR(lp_par->strong_branching_red_ratio);
+      return(0);
+   }
+   else if (strcmp(key,"strong_branching_high_low_weight") == 0 ||
+	    strcmp(key,"LP_strong_branching_high_low_weight") == 0){
+      READ_DBL_PAR(lp_par->strong_branching_high_low_weight);
+      return(0);
+   }
+   else if (strcmp(key,"use_hot_starts") == 0) {
+      READ_INT_PAR(lp_par->use_hot_starts);
+      return(0);
+   }
+   else if (strcmp(key,"should_use_rel_br") == 0) {
+      READ_INT_PAR(lp_par->should_use_rel_br);
+      return(0);
+   }
+   else if (strcmp(key,"use_branching_prep") == 0) {
+      READ_INT_PAR(lp_par->use_branching_prep);
+      return(0);
+   }
+   else if (strcmp(key,"rel_br_threshold") == 0) {
+      READ_INT_PAR(lp_par->rel_br_threshold);
+      return(0);
+   }
+   else if (strcmp(key,"rel_br_cand_threshold") == 0) {
+      READ_INT_PAR(lp_par->rel_br_cand_threshold);
+      return(0);
+   }
+   else if (strcmp(key,"use_sos_branching") == 0) {
+      READ_INT_PAR(lp_par->use_sos_branching);
+      return(0);
+   }
+   else if (strcmp(key,"sos_branching_max_level") == 0) {
+      READ_INT_PAR(lp_par->sos_branching_max_level);
+      return(0);
+   }
+   else if (strcmp(key, "compare_candidates_default") == 0 ||
+	    strcmp(key, "LP_compare_candidates_default") == 0){
+      READ_INT_PAR(lp_par->compare_candidates_default);
+      return(0);
+   }
+   else if (strcmp(key, "compare_candidates_default_str") == 0 ||
+	    strcmp(key, "LP_compare_candidates_default_str") == 0){
+      READ_STRINT_PAR(lp_par->compare_candidates_default,
+		      compare_can_str, COMPARE_CAN_STR_SIZE, value);
+      return(0);
+   }
+   else if (strcmp(key, "select_child_default") == 0 ||
+	    strcmp(key, "LP_select_child_default") == 0){
+      READ_INT_PAR(lp_par->select_child_default);
+      return(0);
+   }
+   else if (strcmp(key, "pack_lp_solution_default") == 0 ||
+	    strcmp(key, "LP_pack_lp_solution_default") == 0){
+      READ_INT_PAR(lp_par->pack_lp_solution_default);
+      return(0);
+   }
+   else if (strcmp(key, "multi_criteria") == 0 ||
+	    strcmp(key, "LP_multi_criteria") == 0 ){
+      READ_INT_PAR(lp_par->multi_criteria);
+      env->par.multi_criteria = lp_par->multi_criteria;
+      return(0);
+   }
+   else if (strcmp(key, "mc_find_supported_solutions") == 0 ||
+	    strcmp(key, "LP_mc_find_supported_solutions") == 0 ){
+      READ_INT_PAR(lp_par->mc_find_supported_solutions);
+      return(0);
+   }
+   else if (strcmp(key, "mc_add_optimality_cuts") == 0 ||
+	    strcmp(key, "LP_mc_add_optimality_cuts") == 0 ){
+      READ_INT_PAR(lp_par->mc_add_optimality_cuts);
+      return(0);
+   }
+   else if (strcmp(key, "mc_gamma") == 0 ||
+	    strcmp(key, "LP_mc_gamma") == 0 ){
+      READ_DBL_PAR(lp_par->mc_gamma);
+      return(0);
+   }
+   else if (strcmp(key, "mc_tau") == 0 ||
+	    strcmp(key, "LP_mc_tau") == 0 ){
+      READ_DBL_PAR(lp_par->mc_tau);
+      return(0);
+   }
+   else if (strcmp(key, "mc_rho") == 0 ||
+	    strcmp(key, "LP_mc_rho") == 0 ){
+      READ_DBL_PAR(lp_par->mc_rho);
+      return(0);
+   }
+   else if (strcmp(key, "fp_enabled") == 0) {
+      READ_INT_PAR(lp_par->fp_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fp_frequency") == 0) {
+      READ_INT_PAR(lp_par->fp_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "fp_max_cycles") == 0) {
+      READ_INT_PAR(lp_par->fp_max_cycles);
+      return(0);
+   }
+   else if (strcmp(key, "fp_time_limit") == 0) {
+      READ_DBL_PAR(lp_par->fp_time_limit);
+      return(0);
+   }
+   else if (strcmp(key, "fp_display_interval") == 0) {
+      READ_DBL_PAR(lp_par->fp_display_interval);
+      return(0);
+   }
+   else if (strcmp(key, "fp_flip_fraction") == 0) {
+      READ_DBL_PAR(lp_par->fp_flip_fraction);
+      return(0);
+   }
+   else if (strcmp(key, "fp_max_initial_time") == 0) {
+      READ_DBL_PAR(lp_par->fp_max_initial_time);
+      return(0);
+   }
+   else if (strcmp(key, "fp_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->fp_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "fp_fix_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fp_fix_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "ls_enabled") == 0) {
+      READ_INT_PAR(lp_par->ls_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ls_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->ls_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "ls_frequency") == 0) {
+      READ_INT_PAR(lp_par->ls_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "ls_fix_ratio") == 0) {
+      READ_DBL_PAR(lp_par->ls_fix_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rounding_enabled") == 0) {
+      READ_INT_PAR(lp_par->rounding_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "rounding_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->rounding_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "rounding_frequency") == 0) {
+      READ_INT_PAR(lp_par->rounding_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_enabled") == 0) {
+      READ_INT_PAR(lp_par->shifting_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->shifting_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_frequency") == 0) {
+      READ_INT_PAR(lp_par->shifting_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "fr_enabled") == 0) {
+      READ_INT_PAR(lp_par->fr_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fr_dive_level") == 0) {
+      READ_INT_PAR(lp_par->fr_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "fr_frequency") == 0) {
+      READ_INT_PAR(lp_par->fr_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "fr_first_feas_enabled") == 0) {
+      READ_INT_PAR(lp_par->fr_first_feas_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fr_max_int_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_max_int_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_min_int_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_min_int_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_max_c_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_max_c_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_min_c_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_min_c_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_incr_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_incr_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rs_mode_enabled") == 0) {
+      READ_INT_PAR(lp_par->rs_mode_enabled);
+      tm_par->rs_mode_enabled = lp_par->rs_mode_enabled;
+      return(0);
+   }
+   else if (strcmp(key, "rs_lp_iter_limit") == 0){
+      READ_INT_PAR(lp_par->rs_lp_iter_limit);
+      tm_par->rs_lp_iter_limit = lp_par->rs_lp_iter_limit; 
+      return(0);
+   }
+   else if (strcmp(key, "fr_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->fr_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "rs_enabled") == 0) {
+      READ_INT_PAR(lp_par->rs_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "rs_dive_level") == 0) {
+      READ_INT_PAR(lp_par->rs_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "rs_min_int_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->rs_min_int_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rs_min_c_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->rs_min_c_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rs_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->rs_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "lb_enabled") == 0) {
+      READ_INT_PAR(lp_par->lb_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "lb_dive_level") == 0) {
+      READ_INT_PAR(lp_par->lb_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "lb_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->lb_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "lb_frequency") == 0) {
+      READ_INT_PAR(lp_par->lb_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "lb_search_k") == 0) {
+      READ_INT_PAR(lp_par->lb_search_k);
+      return(0);
+   }
+   else if (strcmp(key, "lb_first_feas_enabled") == 0) {
+      READ_INT_PAR(lp_par->lb_first_feas_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_frequency") == 0) {
+      READ_INT_PAR(lp_par->ds_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "ds_fractional_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_fractional_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_fractional_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_fractional_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_vlength_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_vlength_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_vlength_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_vlength_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_euc_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_euc_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_euc_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_euc_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_guided_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_guided_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_guided_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_guided_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_crossover_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_crossover_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_crossover_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_crossover_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_root_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_root_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_coeff_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_coeff_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_pc_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_pc_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_rank_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_rank_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_rank_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_rank_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_incr_ratio") == 0) {
+      READ_DBL_PAR(lp_par->ds_incr_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "ds_solve_ip") == 0) {
+      READ_INT_PAR(lp_par->ds_solve_ip);
+      return(0);
+   }
+   else if (strcmp(key, "ds_solve_ip_col_ratio") == 0) {
+      READ_DBL_PAR(lp_par->ds_solve_ip_col_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "ds_solve_ip_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->ds_solve_ip_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "ds_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->ds_min_gap);
+      return(0);
+   }
+   /***********************************************************************
+    ***                     cut_gen parameters                          ***
+    ***********************************************************************/
+   else if (strcmp(key, "CG_verbosity") == 0){
+      READ_INT_PAR(cg_par->verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "do_findcuts") == 0 ||
+	    strcmp(key, "CG_do_findcuts") == 0){
+      READ_INT_PAR(cg_par->do_findcuts);
+      return(0);
+   }
+   
+   /***********************************************************************
+    ***                      cutpool parameters                         ***
+    ***********************************************************************/
+   if (strcmp(key, "CP_verbosity") == 0){
+      READ_INT_PAR(cp_par->verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "cp_warm_start") == 0 ||
+	    strcmp(key, "CP_warm_start") == 0){
+      READ_INT_PAR(cp_par->warm_start);
+      return(0);
+   }
+   else if (strcmp(key, "cp_logging") == 0 ||
+	    strcmp(key, "CP_logging") == 0){
+      READ_INT_PAR(cp_par->logging);
+      return(0);
+   }
+   else if (strcmp(key, "block_size") == 0 ||
+	    strcmp(key, "CP_block_size") == 0){
+      READ_INT_PAR(cp_par->block_size);
+      return(0);
+   }
+   else if (strcmp(key, "max_size") == 0 ||
+	    strcmp(key, "CP_max_size") == 0){
+      READ_INT_PAR(cp_par->max_size);
+      return(0);
+   }
+   else if (strcmp(key, "max_number_of_cuts") == 0 ||
+	    strcmp(key, "CP_max_number_of_cuts") == 0){
+      READ_INT_PAR(cp_par->max_number_of_cuts);
+      return(0);
+   }
+   else if (strcmp(key, "cuts_to_check") == 0 ||
+	    strcmp(key, "cuts_to_check") == 0){
+      READ_INT_PAR(cp_par->cuts_to_check);
+      return(0);
+   }
+   else if (strcmp(key, "delete_which") == 0 ||
+	    strcmp(key, "CP_delete_which") == 0){
+      READ_INT_PAR(cp_par->delete_which);
+      return(0);
+   }
+   else if (strcmp(key, "touches_until_deletion") == 0 ||
+	    strcmp(key, "CP_touches_until_deletion") == 0){
+      READ_INT_PAR(cp_par->touches_until_deletion);
+      return(0);
+   }
+   else if (strcmp(key, "min_to_delete") == 0 ||
+	    strcmp(key, "CP_min_to_delete") == 0){
+      READ_INT_PAR(cp_par->min_to_delete);
+      return(0);
+   }
+   else if (strcmp(key, "check_which") == 0 ||
+	       strcmp(key, "CP_check_which") == 0){
+      READ_INT_PAR(cp_par->check_which);
+      return(0);
+   }
+
+   /*************************************************************************
+    ***                     preprocessing - parameters                    ***
+    *************************************************************************/ 
+
+   if (strcmp(key, "prep_level") == 0){
+      READ_INT_PAR(prep_par->level);
+      return(0);
+   }
+   else if (strcmp(key, "prep_dive_level") == 0){
+      READ_INT_PAR(prep_par->dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "prep_impl_dive_level") == 0){
+      READ_INT_PAR(prep_par->impl_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "prep_impl_limit") == 0){
+      READ_INT_PAR(prep_par->impl_limit);
+      return(0);
+   }
+   else if (strcmp(key, "prep_iter_limit") == 0){
+      READ_INT_PAR(prep_par->iteration_limit);
+      return(0);
+   }
+   else if (strcmp(key, "prep_do_probing") == 0){
+      READ_INT_PAR(prep_par->do_probe);
+      return(0);
+   }
+   else if (strcmp(key, "prep_do_sr") == 0){
+      READ_INT_PAR(prep_par->do_single_row_rlx);
+      return(0);
+   }
+   else if (strcmp(key, "prep_verbosity") == 0){
+      READ_INT_PAR(prep_par->verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "prep_reduce_mip") == 0){
+      READ_INT_PAR(prep_par->reduce_mip);
+      return(0);
+   }
+   else if (strcmp(key, "prep_probing_verbosity") == 0){
+      READ_INT_PAR(prep_par->probe_verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "prep_probing_level") == 0){
+      READ_INT_PAR(prep_par->probe_level);
+      return(0);
+   }
+   else if (strcmp(key, "prep_display_stats") == 0){
+      READ_INT_PAR(prep_par->display_stats);
+      return(0);
+   }
+   else if (strcmp(key, "max_sr_cnt") == 0){
+      READ_INT_PAR(prep_par->max_sr_cnt);
+      return(0);
+   }
+   else if (strcmp(key, "max_aggr_row_cnt") == 0){
+      READ_INT_PAR(prep_par->max_aggr_row_cnt);
+      return(0);
+   }
+   else if (strcmp(key, "keep_row_ordered") == 0){
+      READ_INT_PAR(prep_par->keep_row_ordered);
+      return(0);
+   }
+   else if (strcmp(key, "write_mps") == 0){
+      READ_INT_PAR(prep_par->write_mps);
+      return(0);
+   }
+   else if (strcmp(key, "write_lp") == 0){
+      READ_INT_PAR(prep_par->write_lp);
+      return(0);
+   }
+   else if (strcmp(key, "prep_time_limit") == 0){
+      READ_INT_PAR(prep_par->time_limit);
+      return(0);
+   }
+
+   return(FUNCTION_TERMINATED_ABNORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+SYMPHONYLIB_EXPORT int sym_free_env(sym_environment *env)
+{
+   if(env->mip->n){
+      free_master_u(env);
+      env->ub = 0;
+      env->lb = -MAXDOUBLE;
+      env->has_ub = FALSE;
+      env->termcode = TM_NO_SOLUTION;
+      strcpy(env->par.infile, "");
+      strcpy(env->par.datafile, "");
+      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+   }
+   return 0;
+} 
+
+/*===========================================================================* \
+\*===========================================================================*/

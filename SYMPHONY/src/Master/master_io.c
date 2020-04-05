@@ -137,7 +137,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 
    while (NULL != fgets(line, MAX_LINE_LENGTH, f)){  /* read in parameters */
 
-      set_param(env, line);
+      sym_set_param(env, line);
 
       printf("%s", line);
       strcpy(key,"");

@@ -205,7 +205,7 @@ USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
 #                           Common Flags                               #
 ########################################################################
 
-AM_CPPFLAGS = -DSYMPHONY_BUILD $(SYM_OPENMP_FLAGS) $(SYMPHONYLIB_CFLAGS)
+AM_CPPFLAGS = $(SYM_OPENMP_FLAGS) $(SYMPHONYLIB_CFLAGS)
 if COIN_CXX_IS_CL
 AM_CPPFLAGS += -TP
 endif
@@ -237,10 +237,6 @@ endif
 ########################################################################
 #                            Additional Definitions                    #
 ########################################################################
-
-if COIN_HAS_READLINE
-AM_CPPFLAGS += -DHAS_READLINE
-endif
 
 if SENSITIVITY_ANALYSIS
 AM_CPPFLAGS += -DSENSITIVITY_ANALYSIS
@@ -327,9 +323,11 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 # in the 'lib' directory
 lib_LTLIBRARIES = $(WHATTOINSTALLLIBS)
 
+AM_LDFLAGS = -rpath $(libdir) $(LT_LDFLAGS)
+
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
 libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
-libSym_la_LDFLAGS = -rpath $(libdir)
+#libSym_la_LDFLAGS = -rpath $(libdir) 
 libSym_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 # List all source files for this library, including headers

@@ -144,8 +144,6 @@ int read_tree PROTO((bc_node * root, FILE *f));
 int write_node PROTO((bc_node *node, FILE *f));
 int write_tree PROTO((bc_node *root, FILE *f));
 
-int set_param PROTO((sym_environment *env,  char *line));
-
 warm_start_desc *create_copy_warm_start PROTO((warm_start_desc * ws));
 MIPdesc *create_copy_mip_desc PROTO((MIPdesc *mip));
 sym_environment *create_copy_environment PROTO((sym_environment *env));

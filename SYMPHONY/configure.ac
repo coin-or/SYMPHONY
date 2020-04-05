@@ -78,7 +78,7 @@ AC_COIN_CHECK_MATH_HDRS
 #############################################################################
 
 m4_foreach_w([myvar],[CoinUtils Osi Cgl Clp],
-  [ AC_COIN_CHK_PKG(myvar,[SymphonyLib])
+  [ AC_COIN_CHK_PKG(myvar,[SymphonyLib OsiSymphonyLib])
     if test $coin_has_[]m4_tolower(myvar) != yes ; then
       AC_MSG_ERROR([Required package myvar is not available.])
     fi
@@ -106,7 +106,7 @@ AC_COIN_CHK_PKG(Miplib3,,[coindatamiplib3],,dataonly)
 
 AC_COIN_CHK_GNU_READLINE([SymphonyLib])
 
-AC_COIN_FINALIZE_FLAGS([SymphonyLib SymUnitTest])
+AC_COIN_FINALIZE_FLAGS([SymphonyLib OsiSymphonyLib SymUnitTest])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -470,7 +470,7 @@ AM_CONDITIONAL(SIGHANDLER, [test $sym_sig_catch = true])
 #              Check the OS and add default defs                            #
 #############################################################################
 
-SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
+SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM'
 
 ARCH=
 case $host in
@@ -837,7 +837,6 @@ fi
 # To be used in applications: default SYMPHONY defs
 AC_SUBST(SYMDEFS)
 AC_SUBST(SYMPDEFS)
-AC_SUBST(ARCH)
 
 # Location of Applications for later use
 AC_SUBST(SYMAPPLDIR)

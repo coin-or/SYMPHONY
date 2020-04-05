@@ -16,4 +16,10 @@
 /* Release Version number of project */
 #define SYMPHONY_VERSION_RELEASE 9999
 
-
+#ifndef SYMPHONYLIB_EXPORT
+#if defined(_WIN32) && defined(DLL_EXPORT)
+#define SYMPHONYLIB_EXPORT __declspec(dllimport)
+#else
+#define SYMPHONYLIB_EXPORT
+#endif
+#endif

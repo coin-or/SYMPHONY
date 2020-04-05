@@ -257,7 +257,6 @@ ADD_CXXFLAGS = @ADD_CXXFLAGS@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-ARCH = @ARCH@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -314,6 +313,11 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OSISYMPHONYLIB_CFLAGS = @OSISYMPHONYLIB_CFLAGS@
+OSISYMPHONYLIB_CFLAGS_NOPC = @OSISYMPHONYLIB_CFLAGS_NOPC@
+OSISYMPHONYLIB_LFLAGS = @OSISYMPHONYLIB_LFLAGS@
+OSISYMPHONYLIB_LFLAGS_NOPC = @OSISYMPHONYLIB_LFLAGS_NOPC@
+OSISYMPHONYLIB_PCFILES = @OSISYMPHONYLIB_PCFILES@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -406,7 +410,6 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = foreign
 pkgdocdir = $(docdir)
 
 # doxydocdir is the top-level directory for doxygen documentation. It holds
@@ -449,7 +452,8 @@ libOsiSym_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
-AM_CPPFLAGS = -DOSISYMPHONY_BUILD -I`$(CYGPATH_W) $(srcdir)/../../include` $(SYMPHONYLIB_CFLAGS)
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(top_srcdir)/include` -I`$(CYGPATH_W) \
+	$(top_builddir)/include` $(OSISYMPHONYLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #

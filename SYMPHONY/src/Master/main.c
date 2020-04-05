@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 #include "symphony.h"
 #include "sym_master.h"
 #include "sym_messages.h"
-#if defined HAS_READLINE
+#if defined SYMPHONY_HAS_READLINE
 #include <pwd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -148,7 +148,6 @@ int main_level = 0; /* 0 - SYMPHONY:
 
 int sym_help(const char *line);
 int sym_read_line(const char *prompt, char **input);
-int sym_free_env(sym_environment *env);
 
 int main(int argc, char **argv)
 {    
@@ -319,25 +318,25 @@ int main(int argc, char **argv)
 	   continue;
 	 } 
 	 if(strcmp(args[0], "solve") == 0){
-	   start_time = wall_clock(NULL);
+	   start_time = sym_wall_clock(NULL);
 	   printf("\n");
 	   if (env->mip->obj2 != NULL){
 	      termcode = sym_mc_solve(env);
 	   } else {
 	      termcode = sym_solve(env);
 	   }
-	   finish_time = wall_clock(NULL);
+	   finish_time = sym_wall_clock(NULL);
 	 } else {
 	   is_int = env->mip->is_int;
 	   env->mip->is_int  = (char *)   calloc(CSIZE, env->mip->n);
-	   start_time = wall_clock(NULL);
+	   start_time = sym_wall_clock(NULL);
 	   printf("\n");
 	   if (env->mip->obj2 != NULL){
 	      termcode = sym_mc_solve(env);
 	   } else {
 	      termcode = sym_solve(env);
 	   }
-	   finish_time = wall_clock(NULL);
+	   finish_time = sym_wall_clock(NULL);
 	   env->mip->is_int = is_int;
 	   is_int = 0;
 	 }
@@ -449,26 +448,7 @@ int main(int argc, char **argv)
 	       }
 	       strcpy(args[1], "");	       
 	     } else if (strcmp(args[1], "stats") == 0){
-	       initial_time  = env->comp_times.readtime;
-	       initial_time += env->comp_times.ub_overhead + 
-		 env->comp_times.ub_heurtime;
-	       initial_time += env->comp_times.lb_overhead + 
-		 env->comp_times.lb_heurtime;
-	       
-	       if (env->warm_start){
-		  print_statistics(&(env->warm_start->comp_times), 
-				   &(env->warm_start->stat),
-				   NULL,
-				   env->warm_start->ub, env->warm_start->lb, 
-				   initial_time, start_time, finish_time,
-				   env->mip->obj_offset, env->mip->obj_sense,
-				   env->warm_start->has_ub,NULL, 0);
-		  printf("\n");
-	       }else{
-		  printf("No statistics! Either the solution process"
-			 "terminated in preprocessing or\n"
-			 "the problem has not been solved yet!\n");
-	       }
+                sym_print_statistics(env, start_time, finish_time);
 	     }
 	     strcpy(args[1], "");	       
 	   } else if (strcmp(args[1], "parameter") == 0){
@@ -572,7 +552,7 @@ int main(int argc, char **argv)
 	     /*read in parameter file*/
 	     while(NULL != fgets(args[2], MAX_LINE_LENGTH, f)){ 
 	       sscanf(args[2],"%s%s", param, value);
-	       if(set_param(env, args[2]) == 0){
+	       if(sym_set_param(env, args[2]) == 0){
 		 printf("Setting %s to: %s\n", param, value); 
 	       } else {
 		 printf("Unknown parameter %s: !\n", param);
@@ -589,7 +569,7 @@ int main(int argc, char **argv)
 	     }
 	     strcpy(args[0], "");
 	     sprintf(args[0], "%s %s", args[1], args[2]);  
-	     if(set_param(env, args[0]) == 0){
+	     if(sym_set_param(env, args[0]) == 0){
 	       printf("Setting %s to: %s\n", args[1], args[2]); 
 	     } else {
 	       printf("Unknown parameter/command!\n");
@@ -756,21 +736,6 @@ int sym_read_line(const char *prompt, char **input)
   return (0);
 }
 
-/*===========================================================================*\
-\*===========================================================================*/
-int sym_free_env(sym_environment *env){
-   if(env->mip->n){
-      free_master_u(env);
-      env->ub = 0;
-      env->lb = -MAXDOUBLE;
-      env->has_ub = FALSE;
-      env->termcode = TM_NO_SOLUTION;
-      strcpy(env->par.infile, "");
-      strcpy(env->par.datafile, "");
-      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-   }
-   return 0;
-} 
 /*===========================================================================*\
 \*===========================================================================*/
 #if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \

@@ -187,6 +187,8 @@ typedef struct MIPDESC MIPdesc;
 typedef struct WARM_START_DESC warm_start_desc;
 typedef struct SYM_ENVIRONMENT sym_environment;
 
+#include "SymConfig.h"
+
 #ifdef __cplusplus
 extern "C" // Export C names when in C
 {
@@ -196,139 +198,185 @@ extern "C" // Export C names when in C
 /*===================== Interface functions (master.c) ======================*/
 /*===========================================================================*/
 
-void sym_version PROTO((void));
-sym_environment *sym_open_environment PROTO((void));
-int sym_close_environment PROTO((sym_environment *env));
-int sym_reset_environment PROTO((sym_environment *env));
-int sym_set_defaults PROTO((sym_environment *env));
-int sym_parse_command_line PROTO((sym_environment *env, int argc, 
-				  char **argv));
-int sym_set_user_data PROTO((sym_environment *env, void *user));
-int sym_get_user_data PROTO((sym_environment *env, void **user));
-int sym_read_mps PROTO((sym_environment *env, char *infile));
-int sym_read_lp PROTO((sym_environment *env, char *infile));
-int sym_read_gmpl PROTO((sym_environment *env, char *modelfile, 
-			 char *datafile));
-int sym_write_mps PROTO((sym_environment *env, char *infile));
-int sym_write_lp PROTO((sym_environment *env, char *infile));
-
-int sym_load_problem PROTO((sym_environment *env));
-int sym_find_initial_bounds PROTO((sym_environment *env));
-
-int sym_solve PROTO((sym_environment *env));
-int sym_warm_solve PROTO((sym_environment *env));
-int sym_mc_solve PROTO((sym_environment *env));
-
-int sym_create_permanent_cut_pools PROTO((sym_environment *env, int *cp_num));
-int sym_explicit_load_problem PROTO((sym_environment *env, int numcols, 
+SYMPHONYLIB_EXPORT void sym_version(void);
+SYMPHONYLIB_EXPORT sym_environment * sym_open_environment(void);
+SYMPHONYLIB_EXPORT int sym_close_environment(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_reset_environment(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_parse_command_line(sym_environment *env,
+                                                  int argc, char **argv);
+SYMPHONYLIB_EXPORT int sym_set_user_data(sym_environment *env, void *user);
+SYMPHONYLIB_EXPORT int sym_get_user_data(sym_environment *env, void **user);
+SYMPHONYLIB_EXPORT int sym_read_mps(sym_environment *env, char *infile);
+SYMPHONYLIB_EXPORT int sym_read_lp(sym_environment *env, char *infile);
+SYMPHONYLIB_EXPORT int sym_read_gmpl(sym_environment *env, char *modelfile, 
+                                         char *datafile);
+SYMPHONYLIB_EXPORT int sym_write_mps(sym_environment *env, char *infile);
+SYMPHONYLIB_EXPORT int sym_write_lp(sym_environment *env, char *infile);
+SYMPHONYLIB_EXPORT int sym_load_problem(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_find_initial_bounds(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_mc_solve(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_create_permanent_cut_pools(sym_environment *env,
+                                                          int *cp_num); 
+SYMPHONYLIB_EXPORT int sym_explicit_load_problem(sym_environment
+                                     *env, int numcols, 
 				     int numrows, int *start, int *index, 
 				     double *value, double *collb,
 				     double *colub, char *is_int, double *obj,
 				     double *obj2, char *rowsen,
 				     double *rowrhs, double *rowrng,
-				     char make_copy));   
+				     char make_copy);   
 
-int sym_is_abandoned PROTO((sym_environment *env));
-int sym_is_proven_optimal PROTO((sym_environment *env));
-int sym_is_proven_primal_infeasible PROTO((sym_environment *env));	 
-int sym_is_iteration_limit_reached PROTO((sym_environment *env)); 
-int sym_is_time_limit_reached PROTO((sym_environment *env));
-int sym_is_target_gap_achieved PROTO((sym_environment *env));
+SYMPHONYLIB_EXPORT int sym_is_abandoned(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_is_proven_optimal(sym_environment *env);
+SYMPHONYLIB_EXPORT int
+sym_is_proven_primal_infeasible(sym_environment *env);	  
+SYMPHONYLIB_EXPORT int 
+sym_is_iteration_limit_reached(sym_environment *env); 
+SYMPHONYLIB_EXPORT int sym_is_time_limit_reached(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_is_target_gap_achieved(sym_environment *env);
 
-int sym_get_status PROTO((sym_environment *env));
-int sym_get_num_cols PROTO((sym_environment *env, int *numcols));
-int sym_get_num_rows PROTO((sym_environment *env, int *numrows));
-int sym_get_num_elements PROTO((sym_environment *env, int *numelems));
-int sym_get_col_lower PROTO((sym_environment *env, double *collb));
-int sym_get_col_upper PROTO((sym_environment *env, double *colub));
-int sym_get_row_sense PROTO((sym_environment *env, char *rowsen));
-int sym_get_rhs PROTO((sym_environment *env, double *rowrhs));
-int sym_get_matrix PROTO((sym_environment *env, int *nz, int *matbeg, 
-			  int *matind, double *matval));
-int sym_get_row_range PROTO((sym_environment *env, double *rowrng));
-int sym_get_row_lower PROTO((sym_environment *env, double *rowlb));
-int sym_get_row_upper PROTO((sym_environment *env, double *rowub));
-int sym_get_obj_coeff PROTO((sym_environment *env, double *obj));
-int sym_get_obj2_coeff PROTO((sym_environment *env, double *obj2));
-int sym_get_obj_sense PROTO((sym_environment *env, int *sense));
+SYMPHONYLIB_EXPORT int sym_get_status(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_get_num_cols(sym_environment *env, int *numcols);
+SYMPHONYLIB_EXPORT int sym_get_num_rows(sym_environment *env, int *numrows);
+SYMPHONYLIB_EXPORT int sym_get_num_elements(sym_environment *env,
+                                                int *numelems);
+SYMPHONYLIB_EXPORT int sym_get_col_lower(sym_environment *env,
+                                             double *collb);
+SYMPHONYLIB_EXPORT int sym_get_col_upper(sym_environment *env,
+                                             double *colub);
+SYMPHONYLIB_EXPORT int sym_get_row_sense(sym_environment *env,
+                                             char *rowsen);
+SYMPHONYLIB_EXPORT int sym_get_rhs(sym_environment *env,
+                                       double *rowrhs);
+SYMPHONYLIB_EXPORT int sym_get_matrix(sym_environment *env, int *nz,
+                                          int *matbeg, 
+                                          int *matind, double *matval);
+SYMPHONYLIB_EXPORT int sym_get_row_range(sym_environment *env,
+                                             double *rowrng);
+SYMPHONYLIB_EXPORT int sym_get_row_lower(sym_environment *env,
+                                             double *rowlb);
+SYMPHONYLIB_EXPORT int sym_get_row_upper(sym_environment *env,
+                                             double *rowub);
+SYMPHONYLIB_EXPORT int sym_get_obj_coeff(sym_environment *env,
+                                             double *obj);
+SYMPHONYLIB_EXPORT int sym_get_obj2_coeff(sym_environment *env,
+                                              double *obj2);
+SYMPHONYLIB_EXPORT int sym_get_obj_sense(sym_environment *env, int *sense);
+SYMPHONYLIB_EXPORT int sym_is_continuous(sym_environment *env, int index,
+                                             int *value);
+SYMPHONYLIB_EXPORT int sym_is_binary(sym_environment *env, int index,
+                                         int *value);
+SYMPHONYLIB_EXPORT int sym_is_integer(sym_environment *env, int index,
+                                          char *value);
+SYMPHONYLIB_EXPORT double sym_get_infinity();
 
-int sym_is_continuous PROTO((sym_environment *env, int index, int *value));
-int sym_is_binary PROTO((sym_environment *env, int index, int *value));
-int sym_is_integer PROTO((sym_environment *env, int index, char *value));
-
-double sym_get_infinity PROTO(());
-
-int sym_get_col_solution PROTO((sym_environment *env, double *colsol));
-int sym_get_sp_size PROTO((sym_environment *env, int *size));
-int sym_get_sp_solution PROTO((sym_environment *env, int index,
-			       double *colsol, double *objval));
-int sym_get_row_activity PROTO((sym_environment *env, double *rowact));
-int sym_get_obj_val PROTO((sym_environment *env, double *objval));
-int sym_get_primal_bound PROTO((sym_environment *env, double *ub));
-int sym_get_iteration_count PROTO((sym_environment *env, int *numnodes));
-
-int sym_set_obj_coeff PROTO((sym_environment *env, int index, double value));
-int sym_set_obj2_coeff PROTO((sym_environment *env, int index, double value));
-int sym_set_col_lower PROTO((sym_environment *env, int index, double value));
-int sym_set_col_upper PROTO((sym_environment *env, int index, double value));
-int sym_set_row_lower PROTO((sym_environment *env, int index, double value));
-int sym_set_row_upper PROTO((sym_environment *env, int index, double value));
-int sym_set_row_type PROTO((sym_environment *env, int index, char rowsense, 
-			     double rowrhs, double rowrng));
-int sym_set_obj_sense PROTO((sym_environment *env, int sense));
-int sym_set_col_solution PROTO((sym_environment *env, double * colsol));
-int sym_set_primal_bound PROTO((sym_environment *env, double bound));
-int sym_set_continuous PROTO((sym_environment *env, int index));
-int sym_set_integer PROTO((sym_environment *env, int index));
-int sym_set_col_names PROTO((sym_environment *env, char **colname));
-int sym_add_col PROTO((sym_environment *env, int numelems, int *indices, 
-		       double *elements, double collb, double colub,
-		       double obj, char is_int, char *name));
-int sym_add_row PROTO((sym_environment *env, int numelems, int *indices, 
-		       double *elements, char rowsen, double rowrhs,
-		       double rowrng));
-int sym_delete_cols PROTO((sym_environment *env, int num, int * indices));
-int sym_delete_rows PROTO((sym_environment *env, int num, int * indices));
-
-int sym_write_warm_start_desc PROTO((warm_start_desc *ws, char *file));
-warm_start_desc *sym_read_warm_start PROTO((char *file));
-
-void sym_delete_warm_start PROTO((warm_start_desc *ws));
-warm_start_desc *sym_get_warm_start PROTO((sym_environment *env, 
-					   int copy_warm_start));
-
-int sym_set_warm_start PROTO((sym_environment *env, warm_start_desc *ws));
-
-int sym_set_int_param PROTO((sym_environment *env, const char *key, int value));
-int sym_set_dbl_param PROTO((sym_environment *env, const char *key, double value));
-int sym_set_str_param PROTO((sym_environment *env, const char *key, const char *value));
-
-int sym_get_int_param PROTO((sym_environment *env, const char *key, int *value));
-int sym_get_dbl_param PROTO((sym_environment *env, const char *key, double *value));
-int sym_get_str_param PROTO((sym_environment *env, const char *key, char **value));
-
-int sym_get_lb_for_new_rhs PROTO((sym_environment *env, int cnt, 
-				  int *new_rhs_ind, double *new_rhs_val,
-				  double *lb_for_new_rhs));
-int sym_get_ub_for_new_rhs PROTO((sym_environment *env, int cnt, 
-				  int *new_rhs_ind, double *new_rhs_val,
-				  double *ub_for_new_rhs));
+SYMPHONYLIB_EXPORT int sym_get_col_solution(sym_environment *env,
+                                                double *colsol);
+SYMPHONYLIB_EXPORT int sym_get_sp_size(sym_environment *env, int *size);
+SYMPHONYLIB_EXPORT int sym_get_sp_solution(sym_environment *env, int index,
+                                               double *colsol, double *objval);
+SYMPHONYLIB_EXPORT int 
+sym_get_row_activity(sym_environment *env, double *rowact);
+SYMPHONYLIB_EXPORT int sym_get_obj_val(sym_environment *env,
+                                           double *objval);
+SYMPHONYLIB_EXPORT int sym_get_primal_bound(sym_environment *env,
+                                                double *ub);
+SYMPHONYLIB_EXPORT int sym_get_iteration_count(sym_environment *env,
+                                                   int *numnodes);
+SYMPHONYLIB_EXPORT int sym_set_obj_coeff(sym_environment *env,
+                                             int index, double value);
+SYMPHONYLIB_EXPORT int sym_set_obj2_coeff(sym_environment *env,
+                                              int index, double value);
+SYMPHONYLIB_EXPORT int sym_set_col_lower(sym_environment *env,
+                                             int index, double value);
+SYMPHONYLIB_EXPORT int sym_set_col_upper(sym_environment *env,
+                                             int index, double value);
+SYMPHONYLIB_EXPORT int sym_set_row_lower(sym_environment *env,
+                                             int index, double value);
+SYMPHONYLIB_EXPORT int sym_set_row_upper(sym_environment *env,
+                                             int index, double value);
+SYMPHONYLIB_EXPORT int sym_set_row_type(sym_environment *env,
+                                            int index, char rowsense, 
+                                            double rowrhs, double rowrng);
+SYMPHONYLIB_EXPORT int sym_set_obj_sense(sym_environment *env, int sense);
+SYMPHONYLIB_EXPORT int sym_set_col_solution(sym_environment *env,
+                                                double * colsol);
+SYMPHONYLIB_EXPORT int sym_set_primal_bound(sym_environment *env,
+                                                double bound);
+SYMPHONYLIB_EXPORT int sym_set_continuous(sym_environment *env, int index);
+SYMPHONYLIB_EXPORT int sym_set_integer(sym_environment *env, int index);
+SYMPHONYLIB_EXPORT int sym_set_col_names(sym_environment *env,
+                                             char **colname);
+SYMPHONYLIB_EXPORT int sym_add_col(sym_environment *env, int numelems,
+                                       int *indices, double *elements,
+                                       double collb, double colub,
+                                       double obj, char is_int, char *name);
+SYMPHONYLIB_EXPORT int sym_add_row(sym_environment *env, int numelems,
+                                       int *indices, double *elements,
+                                       char rowsen, double rowrhs,
+                                       double rowrng);
+SYMPHONYLIB_EXPORT int sym_delete_cols(sym_environment *env, int num,
+                                           int * indices);
+SYMPHONYLIB_EXPORT int sym_delete_rows(sym_environment *env, int num,
+                                           int * indices);
+SYMPHONYLIB_EXPORT int sym_write_warm_start_desc(warm_start_desc *ws,
+                                                     char *file);
+SYMPHONYLIB_EXPORT warm_start_desc * sym_read_warm_start(char *file);
+SYMPHONYLIB_EXPORT void sym_delete_warm_start(warm_start_desc *ws);
+SYMPHONYLIB_EXPORT warm_start_desc *
+sym_get_warm_start(sym_environment *env, int copy_warm_start);
+SYMPHONYLIB_EXPORT int sym_set_warm_start(sym_environment *env,
+                                              warm_start_desc *ws);
+SYMPHONYLIB_EXPORT int sym_set_int_param(sym_environment *env,
+                                             const char *key, int value);
+SYMPHONYLIB_EXPORT int sym_set_dbl_param(sym_environment *env,
+                                             const char *key, double value);
+SYMPHONYLIB_EXPORT int sym_set_str_param(sym_environment *env,
+                                             const char *key,
+                                             const char *value);
+SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env,
+                                             const char *key, int *value);
+SYMPHONYLIB_EXPORT int sym_get_dbl_param(sym_environment *env,
+                                             const char *key, double *value);
+SYMPHONYLIB_EXPORT int sym_get_str_param(sym_environment *env,
+                                             const char *key, char **value);
+SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env,
+                                                  int cnt, int *new_rhs_ind,
+                                                  double *new_rhs_val,
+                                                  double *lb_for_new_rhs);
+SYMPHONYLIB_EXPORT int sym_get_ub_for_new_rhs(sym_environment *env,
+                                                  int cnt, int *new_rhs_ind,
+                                                  double *new_rhs_val,
+                                                  double *ub_for_new_rhs);
 #if 0
-int sym_get_lb_for_new_obj PROTO((sym_environment *env, int cnt, 
-				  int *new_obj_ind, double *new_obj_val,
-				  double *lb_for_new_obj));
+SYMPHONYLIB_EXPORT int sym_get_lb_for_new_obj(sym_environment *env,
+                                                  int cnt, int *new_obj_ind,
+                                                  double *new_obj_val,
+                                                  double *lb_for_new_obj);
 #endif
-int sym_get_ub_for_new_obj PROTO((sym_environment *env, int cnt, 
-				  int *new_obj_ind, double *new_obj_val,
-				  double *ub_for_new_obj));
-				     
-warm_start_desc *sym_create_copy_warm_start PROTO((warm_start_desc * ws));
-MIPdesc *sym_create_copy_mip_desc PROTO((sym_environment *env));
-MIPdesc *sym_get_presolved_mip_desc PROTO((sym_environment *env));
-sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
-
-int sym_test PROTO((sym_environment *env, int argc, char **argv,
-		    int *test_status));
+SYMPHONYLIB_EXPORT int sym_get_ub_for_new_obj(sym_environment *env,
+                                                  int cnt, int *new_obj_ind,
+                                                  double *new_obj_val,
+                                                  double *ub_for_new_obj);
+SYMPHONYLIB_EXPORT warm_start_desc *
+sym_create_copy_warm_start(warm_start_desc * ws); 
+SYMPHONYLIB_EXPORT MIPdesc * 
+sym_create_copy_mip_desc(sym_environment *env);
+SYMPHONYLIB_EXPORT MIPdesc * 
+sym_get_presolved_mip_desc(sym_environment *env); 
+SYMPHONYLIB_EXPORT sym_environment *
+sym_create_copy_environment(sym_environment *env);
+SYMPHONYLIB_EXPORT int sym_test(sym_environment *env, int argc,
+                                    char **argv, int *test_status);
+SYMPHONYLIB_EXPORT void sym_print_statistics(sym_environment *env,
+                                             double start_time,
+                                             double finish_time);
+SYMPHONYLIB_EXPORT double sym_wall_clock(double *T);
+SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line);
+SYMPHONYLIB_EXPORT int sym_free_env(sym_environment *env);
 
 #ifdef __cplusplus
 } // end extern "C"

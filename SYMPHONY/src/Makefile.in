@@ -147,19 +147,18 @@ host_triplet = @host@
 ########################################################################
 #                            Additional Definitions                    #
 ########################################################################
-@COIN_HAS_READLINE_TRUE@am__append_22 = -DHAS_READLINE
-@SENSITIVITY_ANALYSIS_TRUE@am__append_23 = -DSENSITIVITY_ANALYSIS
-@USE_CGL_CUTS_TRUE@am__append_24 = -DUSE_CGL_CUTS
-@ROOT_NODE_ONLY_TRUE@am__append_25 = -DROOT_NODE_ONLY
-@COMPILE_FRAC_BRANCHING_TRUE@am__append_26 = -DCOMPILE_FRAC_BRANCHING
-@DO_TESTS_TRUE@am__append_27 = -DDO_TESTS
-@TM_BASIS_TESTS_TRUE@am__append_28 = -DTM_BASIS_TESTS
-@TRACE_PATH_TRUE@am__append_29 = -DTRACE_PATH
-@CHECK_CUT_VALIDITY_TRUE@am__append_30 = -DCHECK_CUT_VALIDITY
-@STATISTICS_TRUE@am__append_31 = -DSTATISTICS
-@PSEUDO_COSTS_TRUE@am__append_32 = -DPSEUDO_COSTS
-@DRAWGRAPH_TRUE@am__append_33 = 
-@SIGHANDLER_TRUE@am__append_34 = -DSIGHANDLER
+@SENSITIVITY_ANALYSIS_TRUE@am__append_22 = -DSENSITIVITY_ANALYSIS
+@USE_CGL_CUTS_TRUE@am__append_23 = -DUSE_CGL_CUTS
+@ROOT_NODE_ONLY_TRUE@am__append_24 = -DROOT_NODE_ONLY
+@COMPILE_FRAC_BRANCHING_TRUE@am__append_25 = -DCOMPILE_FRAC_BRANCHING
+@DO_TESTS_TRUE@am__append_26 = -DDO_TESTS
+@TM_BASIS_TESTS_TRUE@am__append_27 = -DTM_BASIS_TESTS
+@TRACE_PATH_TRUE@am__append_28 = -DTRACE_PATH
+@CHECK_CUT_VALIDITY_TRUE@am__append_29 = -DCHECK_CUT_VALIDITY
+@STATISTICS_TRUE@am__append_30 = -DSTATISTICS
+@PSEUDO_COSTS_TRUE@am__append_31 = -DPSEUDO_COSTS
+@DRAWGRAPH_TRUE@am__append_32 = 
+@SIGHANDLER_TRUE@am__append_33 = -DSIGHANDLER
 bin_PROGRAMS = symphony$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -245,9 +244,6 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libSym_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libSym_la_LDFLAGS) $(LDFLAGS) -o $@
 libSymAppl_la_LIBADD =
 libSymAppl_la_SOURCES = libSymAppl.c
 libSymAppl_la_OBJECTS = libSymAppl.lo
@@ -1403,7 +1399,6 @@ ADD_CXXFLAGS = @ADD_CXXFLAGS@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-ARCH = @ARCH@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -1462,6 +1457,11 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OSISYMPHONYLIB_CFLAGS = @OSISYMPHONYLIB_CFLAGS@
+OSISYMPHONYLIB_CFLAGS_NOPC = @OSISYMPHONYLIB_CFLAGS_NOPC@
+OSISYMPHONYLIB_LFLAGS = @OSISYMPHONYLIB_LFLAGS@
+OSISYMPHONYLIB_LFLAGS_NOPC = @OSISYMPHONYLIB_LFLAGS_NOPC@
+OSISYMPHONYLIB_PCFILES = @OSISYMPHONYLIB_PCFILES@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -1670,15 +1670,15 @@ USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
 ########################################################################
 #                           Common Flags                               #
 ########################################################################
-AM_CPPFLAGS = -DSYMPHONY_BUILD $(SYM_OPENMP_FLAGS) \
-	$(SYMPHONYLIB_CFLAGS) $(am__append_15) $(am__append_16) \
-	$(am__append_17) $(am__append_18) $(am__append_19) \
-	$(am__append_20) $(am__append_21) $(am__append_22) \
-	$(am__append_23) $(am__append_24) $(am__append_25) \
-	$(am__append_26) $(am__append_27) $(am__append_28) \
-	$(am__append_29) $(am__append_30) $(am__append_31) \
-	$(am__append_32) $(am__append_33) $(am__append_34) $(SYMDEFS) \
-	-I`$(CYGPATH_W) $(top_srcdir)/include` -I`$(CYGPATH_W) \
+AM_CPPFLAGS = $(SYM_OPENMP_FLAGS) $(SYMPHONYLIB_CFLAGS) \
+	$(am__append_15) $(am__append_16) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_20) \
+	$(am__append_21) $(am__append_22) $(am__append_23) \
+	$(am__append_24) $(am__append_25) $(am__append_26) \
+	$(am__append_27) $(am__append_28) $(am__append_29) \
+	$(am__append_30) $(am__append_31) $(am__append_32) \
+	$(am__append_33) $(SYMDEFS) -I`$(CYGPATH_W) \
+	$(top_srcdir)/include` -I`$(CYGPATH_W) \
 	$(top_builddir)/include` -I`$(CYGPATH_W) \
 	$(top_srcdir)/Applications/USER/include`
 @SYM_PARALLEL_TRUE@PCPPFLAGS = $(AM_CPPFLAGS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
@@ -1706,9 +1706,10 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
 lib_LTLIBRARIES = $(WHATTOINSTALLLIBS)
+AM_LDFLAGS = -rpath $(libdir) $(LT_LDFLAGS)
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
 libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
-libSym_la_LDFLAGS = -rpath $(libdir)
+#libSym_la_LDFLAGS = -rpath $(libdir) 
 libSym_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 # List all source files for this library, including headers
@@ -2004,7 +2005,7 @@ Common/libSym_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym.la: $(libSym_la_OBJECTS) $(libSym_la_DEPENDENCIES) $(EXTRA_libSym_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libSym_la_LINK)  $(libSym_la_OBJECTS) $(libSym_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK)  $(libSym_la_OBJECTS) $(libSym_la_LIBADD) $(LIBS)
 
 libSymAppl.la: $(libSymAppl_la_OBJECTS) $(libSymAppl_la_DEPENDENCIES) $(EXTRA_libSymAppl_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK)  $(libSymAppl_la_OBJECTS) $(libSymAppl_la_LIBADD) $(LIBS)

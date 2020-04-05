@@ -16,8 +16,6 @@
 
 ## $Id: Makefile.am 1152 2007-12-28 03:59:07Z andreasw $
 
-AUTOMAKE_OPTIONS = foreign
-
 include $(top_srcdir)/BuildTools/Makemain.inc
 
 ########################################################################
@@ -41,7 +39,9 @@ libOsiSym_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
-AM_CPPFLAGS = -DOSISYMPHONY_BUILD -I`$(CYGPATH_W) $(srcdir)/../../include` $(SYMPHONYLIB_CFLAGS)
+AM_CPPFLAGS =  -I`$(CYGPATH_W) $(top_srcdir)/include` \
+               -I`$(CYGPATH_W) $(top_builddir)/include` 
+AM_CPPFLAGS += $(OSISYMPHONYLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #

@@ -4,6 +4,6 @@
 #define __CONFIG_OSISYM_H__
 
 /* Library Visibility Attribute */
-#undef OSISYMLIB_EXPORT
+#undef OSISYMPHONYLIB_EXPORT
 
 #endif

@@ -653,7 +653,6 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 SYMAPPLDIR
-ARCH
 SYMPDEFS
 SYMDEFS
 SYM_OPENMP_LIBS
@@ -727,6 +726,8 @@ CLP_LP_SOLVER_FALSE
 CLP_LP_SOLVER_TRUE
 SYMUNITTEST_CFLAGS_NOPC
 SYMUNITTEST_LFLAGS_NOPC
+OSISYMPHONYLIB_CFLAGS_NOPC
+OSISYMPHONYLIB_LFLAGS_NOPC
 SYMPHONYLIB_CFLAGS_NOPC
 SYMPHONYLIB_LFLAGS_NOPC
 COIN_HAS_READLINE_FALSE
@@ -771,6 +772,9 @@ COIN_HAS_OSI_FALSE
 COIN_HAS_OSI_TRUE
 COIN_HAS_COINUTILS_FALSE
 COIN_HAS_COINUTILS_TRUE
+OSISYMPHONYLIB_PCFILES
+OSISYMPHONYLIB_CFLAGS
+OSISYMPHONYLIB_LFLAGS
 SYMPHONYLIB_PCFILES
 SYMPHONYLIB_CFLAGS
 SYMPHONYLIB_LFLAGS
@@ -17293,6 +17297,9 @@ $as_echo_n "checking for package CoinUtils... " >&6; }
 
 
 
+
+
+
 # Check to see if the user has set an override to skip this primary.
 
   coin_has_coinutils=noInfo
@@ -17531,6 +17538,9 @@ $as_echo "#define SYMPHONY_HAS_COINUTILS 1" >>confdefs.h
     if test -n "$coinutils_pcfiles" ; then SYMPHONYLIB_PCFILES="$coinutils_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$coinutils_lflags $SYMPHONYLIB_LFLAGS"
        SYMPHONYLIB_CFLAGS="$coinutils_cflags $SYMPHONYLIB_CFLAGS"
+      if test -n "$coinutils_pcfiles" ; then OSISYMPHONYLIB_PCFILES="$coinutils_pcfiles $OSISYMPHONYLIB_PCFILES" ; fi
+       OSISYMPHONYLIB_LFLAGS="$coinutils_lflags $OSISYMPHONYLIB_LFLAGS"
+       OSISYMPHONYLIB_CFLAGS="$coinutils_cflags $OSISYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -17548,6 +17558,9 @@ $as_echo "#define SYMPHONY_HAS_COINUTILS 1" >>confdefs.h
 $as_echo_n "checking for package Osi... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
+
+
+
 
 
 
@@ -17792,6 +17805,9 @@ $as_echo "#define SYMPHONY_HAS_OSI 1" >>confdefs.h
     if test -n "$osi_pcfiles" ; then SYMPHONYLIB_PCFILES="$osi_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$osi_lflags $SYMPHONYLIB_LFLAGS"
        SYMPHONYLIB_CFLAGS="$osi_cflags $SYMPHONYLIB_CFLAGS"
+      if test -n "$osi_pcfiles" ; then OSISYMPHONYLIB_PCFILES="$osi_pcfiles $OSISYMPHONYLIB_PCFILES" ; fi
+       OSISYMPHONYLIB_LFLAGS="$osi_lflags $OSISYMPHONYLIB_LFLAGS"
+       OSISYMPHONYLIB_CFLAGS="$osi_cflags $OSISYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -17809,6 +17825,9 @@ $as_echo "#define SYMPHONY_HAS_OSI 1" >>confdefs.h
 $as_echo_n "checking for package Cgl... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
+
+
+
 
 
 
@@ -18053,6 +18072,9 @@ $as_echo "#define SYMPHONY_HAS_CGL 1" >>confdefs.h
     if test -n "$cgl_pcfiles" ; then SYMPHONYLIB_PCFILES="$cgl_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$cgl_lflags $SYMPHONYLIB_LFLAGS"
        SYMPHONYLIB_CFLAGS="$cgl_cflags $SYMPHONYLIB_CFLAGS"
+      if test -n "$cgl_pcfiles" ; then OSISYMPHONYLIB_PCFILES="$cgl_pcfiles $OSISYMPHONYLIB_PCFILES" ; fi
+       OSISYMPHONYLIB_LFLAGS="$cgl_lflags $OSISYMPHONYLIB_LFLAGS"
+       OSISYMPHONYLIB_CFLAGS="$cgl_cflags $OSISYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -18070,6 +18092,9 @@ $as_echo "#define SYMPHONY_HAS_CGL 1" >>confdefs.h
 $as_echo_n "checking for package Clp... " >&6; }
 
 # Make sure the necessary variables exist for each client package.
+
+
+
 
 
 
@@ -18314,6 +18339,9 @@ $as_echo "#define SYMPHONY_HAS_CLP 1" >>confdefs.h
     if test -n "$clp_pcfiles" ; then SYMPHONYLIB_PCFILES="$clp_pcfiles $SYMPHONYLIB_PCFILES" ; fi
        SYMPHONYLIB_LFLAGS="$clp_lflags $SYMPHONYLIB_LFLAGS"
        SYMPHONYLIB_CFLAGS="$clp_cflags $SYMPHONYLIB_CFLAGS"
+      if test -n "$clp_pcfiles" ; then OSISYMPHONYLIB_PCFILES="$clp_pcfiles $OSISYMPHONYLIB_PCFILES" ; fi
+       OSISYMPHONYLIB_LFLAGS="$clp_lflags $OSISYMPHONYLIB_LFLAGS"
+       OSISYMPHONYLIB_CFLAGS="$clp_cflags $OSISYMPHONYLIB_CFLAGS"
 
 
 # Finally, set up PRIM_DATA, unless the user specified nodata.
@@ -21776,6 +21804,56 @@ $as_echo "$as_me: SYMPHONYLIB_LFLAGS: \"${SYMPHONYLIB_LFLAGS}\"" >&6;}
 $as_echo "$as_me: SYMPHONYLIB_CFLAGS: \"${SYMPHONYLIB_CFLAGS}\"" >&6;}
       fi
      if test "$BUILDTOOLS_DEBUG" = 1 ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: FINALIZE_FLAGS for OsiSymphonyLib:" >&5
+$as_echo "$as_me: FINALIZE_FLAGS for OsiSymphonyLib:" >&6;}
+      fi
+      OSISYMPHONYLIB_LFLAGS_NOPC=$OSISYMPHONYLIB_LFLAGS
+
+      OSISYMPHONYLIB_CFLAGS_NOPC=$OSISYMPHONYLIB_CFLAGS
+
+      if test -n "${OSISYMPHONYLIB_PCFILES}" ; then
+        temp_CFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --cflags ${OSISYMPHONYLIB_PCFILES}`
+        temp_LFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --libs ${OSISYMPHONYLIB_PCFILES}`
+        OSISYMPHONYLIB_CFLAGS="$temp_CFLAGS ${OSISYMPHONYLIB_CFLAGS}"
+        OSISYMPHONYLIB_LFLAGS="$temp_LFLAGS ${OSISYMPHONYLIB_LFLAGS}"
+      fi
+
+      # setup XYZ_EXPORT symbol for library users
+      libexport_attribute=
+      if test "$enable_shared" = yes ; then
+        case $build_os in
+          cygwin* | mingw* | msys* | cegcc* )
+            libexport_attribute="__declspec(dllimport)"
+            if test "$enable_static" = yes ; then
+              as_fn_error $? "Cannot do DLL and static LIB builds simultaneously. Do not add --enable-static without --disable-shared." "$LINENO" 5
+            fi
+          ;;
+        esac
+      fi
+
+cat >>confdefs.h <<_ACEOF
+#define OSISYMPHONYLIB_EXPORT $libexport_attribute
+_ACEOF
+
+
+      # add -DXYZ_BUILD to XYZ_CFLAGS
+      OSISYMPHONYLIB_CFLAGS="${OSISYMPHONYLIB_CFLAGS} -DOSISYMPHONYLIB_BUILD"
+
+# Define BUILDTOOLS_DEBUG to enable debugging output
+
+      if test "$BUILDTOOLS_DEBUG" = 1 ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: OSISYMPHONYLIB_LFLAGS_NOPC: \"${OSISYMPHONYLIB_LFLAGS_NOPC}\"" >&5
+$as_echo "$as_me: OSISYMPHONYLIB_LFLAGS_NOPC: \"${OSISYMPHONYLIB_LFLAGS_NOPC}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: OSISYMPHONYLIB_CFLAGS_NOPC: \"${OSISYMPHONYLIB_CFLAGS_NOPC}\"" >&5
+$as_echo "$as_me: OSISYMPHONYLIB_CFLAGS_NOPC: \"${OSISYMPHONYLIB_CFLAGS_NOPC}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: adding \"${OSISYMPHONYLIB_PCFILES}\"" >&5
+$as_echo "$as_me: adding \"${OSISYMPHONYLIB_PCFILES}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: OSISYMPHONYLIB_LFLAGS: \"${OSISYMPHONYLIB_LFLAGS}\"" >&5
+$as_echo "$as_me: OSISYMPHONYLIB_LFLAGS: \"${OSISYMPHONYLIB_LFLAGS}\"" >&6;}
+        { $as_echo "$as_me:${as_lineno-$LINENO}: OSISYMPHONYLIB_CFLAGS: \"${OSISYMPHONYLIB_CFLAGS}\"" >&5
+$as_echo "$as_me: OSISYMPHONYLIB_CFLAGS: \"${OSISYMPHONYLIB_CFLAGS}\"" >&6;}
+      fi
+     if test "$BUILDTOOLS_DEBUG" = 1 ; then
         { $as_echo "$as_me:${as_lineno-$LINENO}: FINALIZE_FLAGS for SymUnitTest:" >&5
 $as_echo "$as_me: FINALIZE_FLAGS for SymUnitTest:" >&6;}
       fi
@@ -22388,7 +22466,7 @@ fi
 #              Check the OS and add default defs                            #
 #############################################################################
 
-SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
+SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM'
 
 ARCH=
 case $host in
@@ -23054,7 +23132,6 @@ fi
 ##############################################################################
 
 # To be used in applications: default SYMPHONY defs
-
 
 
 
