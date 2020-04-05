@@ -55,7 +55,6 @@ int main(int argc, char **argv)
 #include "sym_master.h"
 #include "sym_messages.h"
 #if defined SYMPHONY_HAS_READLINE
-#include <pwd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
