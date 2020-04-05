@@ -209,9 +209,9 @@ int main(int argc, char **argv)
 
      sym_set_int_param(env, "verbosity", -1);
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) || \
- 			      (RL_VERSION_MAJOR >= 6))
+#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                        RL_VERSION_MINOR >= 2) ||       \
+                                       (RL_VERSION_MAJOR >= 6))
      sym_initialize_readline();
 #endif
      
@@ -235,9 +235,9 @@ int main(int argc, char **argv)
 	   strcpy(args[1], line);
 	 }	 
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) || \
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                        RL_VERSION_MINOR >= 2) ||       \
+                                       (RL_VERSION_MAJOR >= 6))
 	 sym_read_tilde(args[1]);	 
 #endif	 	 
 	 if (fopen(args[1], "r") == NULL){
@@ -294,9 +294,9 @@ int main(int argc, char **argv)
 	     strcpy(args[2], line);
 	   }
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) || \
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                        RL_VERSION_MINOR >= 2) ||       \
+                                       (RL_VERSION_MAJOR >= 6))
 	   sym_read_tilde(args[2]);	 
 #endif	 	 
 	 
@@ -532,9 +532,9 @@ int main(int argc, char **argv)
 	       strcpy(args[2], line);
 	     }
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) ||\
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                        RL_VERSION_MINOR >= 2) ||       \
+                                       (RL_VERSION_MAJOR >= 6))
 	     sym_read_tilde(args[2]);	 
 #endif	 	 
 
@@ -687,9 +687,9 @@ int sym_help(const char *line)
 int sym_read_line(const char *prompt, char **input)
 {
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) || \
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                        RL_VERSION_MINOR >= 2) ||       \
+                                       (RL_VERSION_MAJOR >= 6))
 
   if (*input) FREE(*input);
 
@@ -738,9 +738,9 @@ int sym_read_line(const char *prompt, char **input)
 
 /*===========================================================================*\
 \*===========================================================================*/
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) || \
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                        RL_VERSION_MINOR >= 2) ||       \
+                                       (RL_VERSION_MAJOR >= 6))
 
 void sym_initialize_readline()
 {

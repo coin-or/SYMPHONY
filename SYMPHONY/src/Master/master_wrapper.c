@@ -181,7 +181,7 @@ int io_u(sym_environment *env)
 	    }
 	 }
       }else{
-#ifdef USE_GLPMPL
+#if defined(USE_GLPMPL) && defined(COINUTILS_HAS_GLPK)
 	 err = read_gmpl(env->mip, env->par.infile, 
 			 env->par.datafile, env->probname);
 	 env->par.file_type = MPS_FORMAT;
