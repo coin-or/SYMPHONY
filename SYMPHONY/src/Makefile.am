@@ -205,7 +205,11 @@ USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
 #                           Common Flags                               #
 ########################################################################
 
-AM_CPPFLAGS = $(SYM_OPENMP_FLAGS) $(SYMPHONYLIB_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/include \
+              -I$(top_builddir)/include \
+              -I$(top_srcdir)/Applications/USER/include
+
+AM_CPPFLAGS += $(SYMDEFS) $(SYM_OPENMP_FLAGS) $(SYMPHONYLIB_CFLAGS)
 if COIN_CXX_IS_CL
 AM_CPPFLAGS += -TP
 endif
@@ -286,13 +290,8 @@ if SIGHANDLER
 AM_CPPFLAGS += -DSIGHANDLER
 endif
 
-AM_CPPFLAGS += $(SYMDEFS) 
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(top_srcdir)/include` \
-               -I`$(CYGPATH_W) $(top_builddir)/include` \
-               -I`$(CYGPATH_W) $(top_srcdir)/Applications/USER/include`
-
 if SYM_PARALLEL
-PCPPFLAGS = $(AM_CPPFLAGS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+PCPPFLAGS = $(AM_CPPFLAGS) -I$(PVM_ROOT)/include
 PLDADD = -lgpvm3 -lpvm3
 APPLPCPPFLAGS = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
 endif
