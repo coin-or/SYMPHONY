@@ -848,22 +848,21 @@ void sym_read_tilde(char input[])
 {
    char temp;
    char temp_inp[MAX_LINE_LENGTH+1];
-   struct passwd *pwd = 0 ;
 
    if(*input){
       sscanf(input, "%c", &temp);
       if(temp == '~'){
 #ifdef HAVE_PWD_H
+         struct passwd *pwd = 0 ;
 	 pwd = getpwuid(getuid());
-#else
-         printf("Automatic parsing of '~' not available.\n");
-         printf("Please use full path\n");
-         pwd = NULL;
-#endif
 	 if(pwd != NULL){
 	    strcpy(temp_inp, input);
 	    sprintf(input, "%s%s", pwd->pw_dir, &temp_inp[1]);
 	 }
+#else
+         printf("Automatic parsing of '~' not available.\n");
+         printf("Please use full path.\n");
+#endif
       }	    
    }
 }
