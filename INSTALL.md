@@ -39,7 +39,7 @@ incantation will execute the procedure non-interactively.
 
 ```
 ./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
-./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir
 ./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
@@ -49,7 +49,7 @@ build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
 
 ```
-./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1 --enable-debug
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --enable-debug
 ```
 
 To get help with additional options available in running the script, do
