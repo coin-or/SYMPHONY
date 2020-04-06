@@ -858,7 +858,7 @@ void sym_read_tilde(char input[])
 #else
          printf("Automatic parsing of '~' not available.\n");
          printf("Please use full path\n");
-         pwd = NULL
+         pwd = NULL;
 #endif
 	 if(pwd != NULL){
 	    strcpy(temp_inp, input);
