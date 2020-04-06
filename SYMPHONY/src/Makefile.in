@@ -439,9 +439,9 @@ am__objects_65 = $(am__objects_59) $(am__objects_60) $(am__objects_61) \
 	$(am__objects_62) $(am__objects_63) $(am__objects_64)
 am_libSym_m_la_OBJECTS = $(am__objects_3) $(am__objects_65)
 libSym_m_la_OBJECTS = $(am_libSym_m_la_OBJECTS)
-libSym_m_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libSym_m_la_LDFLAGS) $(LDFLAGS) -o $@
+libSym_m_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libSym_m_la_LDFLAGS) $(LDFLAGS) -o $@
 libSym_m_tm_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__objects_66 = Master/libSym_m_tm_la-master.lo \
@@ -492,10 +492,10 @@ am__objects_81 = $(am__objects_75) $(am__objects_76) $(am__objects_77) \
 	$(am__objects_78) $(am__objects_79) $(am__objects_80)
 am_libSym_m_tm_la_OBJECTS = $(am__objects_3) $(am__objects_81)
 libSym_m_tm_la_OBJECTS = $(am_libSym_m_tm_la_OBJECTS)
-libSym_m_tm_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libSym_m_tm_la_LDFLAGS) $(LDFLAGS) -o \
-	$@
+libSym_m_tm_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(libSym_m_tm_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 libSym_m_tm_cp_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__objects_82 = Master/libSym_m_tm_cp_la-master.lo \
@@ -544,10 +544,10 @@ am__objects_97 = $(am__objects_91) $(am__objects_92) $(am__objects_93) \
 	$(am__objects_94) $(am__objects_95) $(am__objects_96)
 am_libSym_m_tm_cp_la_OBJECTS = $(am__objects_3) $(am__objects_97)
 libSym_m_tm_cp_la_OBJECTS = $(am_libSym_m_tm_cp_la_OBJECTS)
-libSym_m_tm_cp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libSym_m_tm_cp_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
+libSym_m_tm_cp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(libSym_m_tm_cp_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 libSym_m_tm_lp_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__objects_98 = Master/libSym_m_tm_lp_la-master.lo \
@@ -598,10 +598,10 @@ am__objects_113 = $(am__objects_107) $(am__objects_108) \
 	$(am__objects_112)
 am_libSym_m_tm_lp_la_OBJECTS = $(am__objects_3) $(am__objects_113)
 libSym_m_tm_lp_la_OBJECTS = $(am_libSym_m_tm_lp_la_OBJECTS)
-libSym_m_tm_lp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libSym_m_tm_lp_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
+libSym_m_tm_lp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(libSym_m_tm_lp_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 libSym_m_tm_lp_cg_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__objects_114 = Master/libSym_m_tm_lp_cg_la-master.lo \
@@ -652,9 +652,9 @@ am__objects_129 = $(am__objects_123) $(am__objects_124) \
 	$(am__objects_128)
 am_libSym_m_tm_lp_cg_la_OBJECTS = $(am__objects_3) $(am__objects_129)
 libSym_m_tm_lp_cg_la_OBJECTS = $(am_libSym_m_tm_lp_cg_la_OBJECTS)
-libSym_m_tm_lp_cg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libSym_m_tm_lp_cg_la_LDFLAGS) \
+libSym_m_tm_lp_cg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(libSym_m_tm_lp_cg_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libSym_m_tm_lp_cg_cp_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
@@ -706,9 +706,9 @@ am_libSym_m_tm_lp_cg_cp_la_OBJECTS = $(am__objects_3) \
 	$(am__objects_145)
 libSym_m_tm_lp_cg_cp_la_OBJECTS =  \
 	$(am_libSym_m_tm_lp_cg_cp_la_OBJECTS)
-libSym_m_tm_lp_cg_cp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libSym_m_tm_lp_cg_cp_la_LDFLAGS) \
+libSym_m_tm_lp_cg_cp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(libSym_m_tm_lp_cg_cp_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libSym_tm_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
@@ -1350,6 +1350,23 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS)
+AM_V_CXX = $(am__v_CXX_@AM_V@)
+am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
+am__v_CXX_0 = @echo "  CXX     " $@;
+am__v_CXX_1 = 
+CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+am__v_CXXLD_1 = 
 SOURCES = $(libSym_la_SOURCES) libSymAppl.c \
 	$(libSymApplStubs_la_SOURCES) libSymAppl_cg.c libSymAppl_cp.c \
 	libSymAppl_lp.c libSymAppl_lp_cg.c libSymAppl_m.c \
@@ -1600,11 +1617,12 @@ SYMHEADERS = ../include/sym_constants.h ../include/sym_macros.h \
 
 #Add SymConfig.h
 SYMINCFILES = ../include/SymConfig.h ../include/OsiSymConfig.h $(SYMHEADERS)
-SYM_MASTER_SRC = Master/master.c Master/master_wrapper.c Master/master_io.c \
-	Master/master_func.c Master/master_prep.c Master/master_prep_base.c Master/master_prep_sr.c 
+SYM_MASTER_SRC = Master/master.cpp Master/master_wrapper.c Master/master_io.c \
+		Master/master_func.c Master/master_prep.c Master/master_prep_base.c \
+		Master/master_prep_sr.c 
 
 MASTER_SRC = $(SYM_MASTER_SRC) $(am__append_8) $(am__append_10)
-MASTER_MAIN_SRC = Master/main.c
+MASTER_MAIN_SRC = Master/main.cpp
 DG_SRC = DrawGraph/draw_graph.c
 SYM_TM_SRC = TreeManager/tm_func.c TreeManager/tm_proccomm.c
 @SYM_COMPILE_IN_TM_FALSE@TM_SRC = TreeManager/treemanager.c \
@@ -1791,7 +1809,7 @@ includecoin_HEADERS = ../include/symphony.h
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .cpp .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/BuildTools/Makemain.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -2003,7 +2021,7 @@ Common/libSym_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym.la: $(libSym_la_OBJECTS) $(libSym_la_DEPENDENCIES) $(EXTRA_libSym_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK)  $(libSym_la_OBJECTS) $(libSym_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libSym_la_OBJECTS) $(libSym_la_LIBADD) $(LIBS)
 
 libSymAppl.la: $(libSymAppl_la_OBJECTS) $(libSymAppl_la_DEPENDENCIES) $(EXTRA_libSymAppl_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK)  $(libSymAppl_la_OBJECTS) $(libSymAppl_la_LIBADD) $(LIBS)
@@ -2281,7 +2299,7 @@ Common/libSym_m_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym_m.la: $(libSym_m_la_OBJECTS) $(libSym_m_la_DEPENDENCIES) $(EXTRA_libSym_m_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libSym_m_la_LINK)  $(libSym_m_la_OBJECTS) $(libSym_m_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libSym_m_la_LINK)  $(libSym_m_la_OBJECTS) $(libSym_m_la_LIBADD) $(LIBS)
 Master/libSym_m_tm_la-master.lo: Master/$(am__dirstamp) \
 	Master/$(DEPDIR)/$(am__dirstamp)
 Master/libSym_m_tm_la-master_wrapper.lo: Master/$(am__dirstamp) \
@@ -2344,7 +2362,7 @@ Common/libSym_m_tm_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym_m_tm.la: $(libSym_m_tm_la_OBJECTS) $(libSym_m_tm_la_DEPENDENCIES) $(EXTRA_libSym_m_tm_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libSym_m_tm_la_LINK)  $(libSym_m_tm_la_OBJECTS) $(libSym_m_tm_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libSym_m_tm_la_LINK)  $(libSym_m_tm_la_OBJECTS) $(libSym_m_tm_la_LIBADD) $(LIBS)
 Master/libSym_m_tm_cp_la-master.lo: Master/$(am__dirstamp) \
 	Master/$(DEPDIR)/$(am__dirstamp)
 Master/libSym_m_tm_cp_la-master_wrapper.lo: Master/$(am__dirstamp) \
@@ -2407,7 +2425,7 @@ Common/libSym_m_tm_cp_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym_m_tm_cp.la: $(libSym_m_tm_cp_la_OBJECTS) $(libSym_m_tm_cp_la_DEPENDENCIES) $(EXTRA_libSym_m_tm_cp_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libSym_m_tm_cp_la_LINK)  $(libSym_m_tm_cp_la_OBJECTS) $(libSym_m_tm_cp_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libSym_m_tm_cp_la_LINK)  $(libSym_m_tm_cp_la_OBJECTS) $(libSym_m_tm_cp_la_LIBADD) $(LIBS)
 Master/libSym_m_tm_lp_la-master.lo: Master/$(am__dirstamp) \
 	Master/$(DEPDIR)/$(am__dirstamp)
 Master/libSym_m_tm_lp_la-master_wrapper.lo: Master/$(am__dirstamp) \
@@ -2470,7 +2488,7 @@ Common/libSym_m_tm_lp_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym_m_tm_lp.la: $(libSym_m_tm_lp_la_OBJECTS) $(libSym_m_tm_lp_la_DEPENDENCIES) $(EXTRA_libSym_m_tm_lp_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libSym_m_tm_lp_la_LINK)  $(libSym_m_tm_lp_la_OBJECTS) $(libSym_m_tm_lp_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libSym_m_tm_lp_la_LINK)  $(libSym_m_tm_lp_la_OBJECTS) $(libSym_m_tm_lp_la_LIBADD) $(LIBS)
 Master/libSym_m_tm_lp_cg_la-master.lo: Master/$(am__dirstamp) \
 	Master/$(DEPDIR)/$(am__dirstamp)
 Master/libSym_m_tm_lp_cg_la-master_wrapper.lo: Master/$(am__dirstamp) \
@@ -2534,7 +2552,7 @@ Common/libSym_m_tm_lp_cg_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym_m_tm_lp_cg.la: $(libSym_m_tm_lp_cg_la_OBJECTS) $(libSym_m_tm_lp_cg_la_DEPENDENCIES) $(EXTRA_libSym_m_tm_lp_cg_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libSym_m_tm_lp_cg_la_LINK)  $(libSym_m_tm_lp_cg_la_OBJECTS) $(libSym_m_tm_lp_cg_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libSym_m_tm_lp_cg_la_LINK)  $(libSym_m_tm_lp_cg_la_OBJECTS) $(libSym_m_tm_lp_cg_la_LIBADD) $(LIBS)
 Master/libSym_m_tm_lp_cg_cp_la-master.lo: Master/$(am__dirstamp) \
 	Master/$(DEPDIR)/$(am__dirstamp)
 Master/libSym_m_tm_lp_cg_cp_la-master_wrapper.lo:  \
@@ -2598,7 +2616,7 @@ Common/libSym_m_tm_lp_cg_cp_la-pack_array.lo: Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 
 libSym_m_tm_lp_cg_cp.la: $(libSym_m_tm_lp_cg_cp_la_OBJECTS) $(libSym_m_tm_lp_cg_cp_la_DEPENDENCIES) $(EXTRA_libSym_m_tm_lp_cg_cp_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libSym_m_tm_lp_cg_cp_la_LINK)  $(libSym_m_tm_lp_cg_cp_la_OBJECTS) $(libSym_m_tm_lp_cg_cp_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libSym_m_tm_lp_cg_cp_la_LINK)  $(libSym_m_tm_lp_cg_cp_la_OBJECTS) $(libSym_m_tm_lp_cg_cp_la_LIBADD) $(LIBS)
 TreeManager/libSym_tm_la-treemanager.lo: TreeManager/$(am__dirstamp) \
 	TreeManager/$(DEPDIR)/$(am__dirstamp)
 TreeManager/libSym_tm_la-tm_func.lo: TreeManager/$(am__dirstamp) \
@@ -2849,7 +2867,7 @@ Master/main.$(OBJEXT): Master/$(am__dirstamp) \
 
 symphony$(EXEEXT): $(symphony_OBJECTS) $(symphony_DEPENDENCIES) $(EXTRA_symphony_DEPENDENCIES) 
 	@rm -f symphony$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(symphony_OBJECTS) $(symphony_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(symphony_OBJECTS) $(symphony_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -3300,13 +3318,6 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
-
-Master/libSym_la-master.lo: Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_la-master.Tpo -c -o Master/libSym_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_la-master.Tpo Master/$(DEPDIR)/libSym_la-master.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Master/master.c' object='Master/libSym_la-master.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Master/libSym_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
 
 Master/libSym_la-master_wrapper.lo: Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_la-master_wrapper.lo -MD -MP -MF Master/$(DEPDIR)/libSym_la-master_wrapper.Tpo -c -o Master/libSym_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
@@ -3889,13 +3900,6 @@ Common/libSym_lp_cg_la-pack_array.lo: Common/pack_array.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_lp_cg_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
 
-Master/libSym_m_la-master.lo: Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_la-master.Tpo -c -o Master/libSym_m_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_la-master.Tpo Master/$(DEPDIR)/libSym_m_la-master.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Master/master.c' object='Master/libSym_m_la-master.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Master/libSym_m_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-
 Master/libSym_m_la-master_wrapper.lo: Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_la-master_wrapper.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_la-master_wrapper.Tpo -c -o Master/libSym_m_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_la-master_wrapper.Tpo Master/$(DEPDIR)/libSym_m_la-master_wrapper.Plo
@@ -4091,13 +4095,6 @@ Common/libSym_m_la-pack_array.lo: Common/pack_array.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Common/pack_array.c' object='Common/libSym_m_la-pack_array.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_m_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
-
-Master/libSym_m_tm_la-master.lo: Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_la-master.Tpo -c -o Master/libSym_m_tm_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_la-master.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Master/master.c' object='Master/libSym_m_tm_la-master.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Master/libSym_m_tm_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
 
 Master/libSym_m_tm_la-master_wrapper.lo: Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_la-master_wrapper.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_la-master_wrapper.Tpo -c -o Master/libSym_m_tm_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
@@ -4295,13 +4292,6 @@ Common/libSym_m_tm_la-pack_array.lo: Common/pack_array.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_m_tm_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
 
-Master/libSym_m_tm_cp_la-master.lo: Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_cp_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_cp_la-master.Tpo -c -o Master/libSym_m_tm_cp_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_cp_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_cp_la-master.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Master/master.c' object='Master/libSym_m_tm_cp_la-master.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Master/libSym_m_tm_cp_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-
 Master/libSym_m_tm_cp_la-master_wrapper.lo: Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_cp_la-master_wrapper.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_cp_la-master_wrapper.Tpo -c -o Master/libSym_m_tm_cp_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_cp_la-master_wrapper.Tpo Master/$(DEPDIR)/libSym_m_tm_cp_la-master_wrapper.Plo
@@ -4497,13 +4487,6 @@ Common/libSym_m_tm_cp_la-pack_array.lo: Common/pack_array.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Common/pack_array.c' object='Common/libSym_m_tm_cp_la-pack_array.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_m_tm_cp_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
-
-Master/libSym_m_tm_lp_la-master.lo: Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_lp_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_la-master.Tpo -c -o Master/libSym_m_tm_lp_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_lp_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_lp_la-master.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Master/master.c' object='Master/libSym_m_tm_lp_la-master.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Master/libSym_m_tm_lp_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
 
 Master/libSym_m_tm_lp_la-master_wrapper.lo: Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_lp_la-master_wrapper.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_la-master_wrapper.Tpo -c -o Master/libSym_m_tm_lp_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
@@ -4701,13 +4684,6 @@ Common/libSym_m_tm_lp_la-pack_array.lo: Common/pack_array.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_m_tm_lp_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
 
-Master/libSym_m_tm_lp_cg_la-master.lo: Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_lp_cg_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master.Tpo -c -o Master/libSym_m_tm_lp_cg_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Master/master.c' object='Master/libSym_m_tm_lp_cg_la-master.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Master/libSym_m_tm_lp_cg_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-
 Master/libSym_m_tm_lp_cg_la-master_wrapper.lo: Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_lp_cg_la-master_wrapper.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master_wrapper.Tpo -c -o Master/libSym_m_tm_lp_cg_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master_wrapper.Tpo Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master_wrapper.Plo
@@ -4903,13 +4879,6 @@ Common/libSym_m_tm_lp_cg_la-pack_array.lo: Common/pack_array.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Common/pack_array.c' object='Common/libSym_m_tm_lp_cg_la-pack_array.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_m_tm_lp_cg_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
-
-Master/libSym_m_tm_lp_cg_cp_la-master.lo: Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_lp_cg_cp_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-master.Tpo -c -o Master/libSym_m_tm_lp_cg_cp_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-master.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Master/master.c' object='Master/libSym_m_tm_lp_cg_cp_la-master.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Master/libSym_m_tm_lp_cg_cp_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
 
 Master/libSym_m_tm_lp_cg_cp_la-master_wrapper.lo: Master/master_wrapper.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT Master/libSym_m_tm_lp_cg_cp_la-master_wrapper.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-master_wrapper.Tpo -c -o Master/libSym_m_tm_lp_cg_cp_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
@@ -5876,6 +5845,79 @@ Common/libSym_tm_lp_cg_cp_la-sym_qsort.lo: Common/sym_qsort.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Common/sym_qsort.c' object='Common/libSym_tm_lp_cg_cp_la-sym_qsort.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o Common/libSym_tm_lp_cg_cp_la-sym_qsort.lo `test -f 'Common/sym_qsort.c' || echo '$(srcdir)/'`Common/sym_qsort.c
+
+.cpp.o:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
+
+.cpp.obj:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cpp.lo:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+Master/libSym_la-master.lo: Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Master/libSym_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_la-master.Tpo -c -o Master/libSym_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_la-master.Tpo Master/$(DEPDIR)/libSym_la-master.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Master/master.cpp' object='Master/libSym_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Master/libSym_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+
+Master/libSym_m_la-master.lo: Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Master/libSym_m_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_la-master.Tpo -c -o Master/libSym_m_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_la-master.Tpo Master/$(DEPDIR)/libSym_m_la-master.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Master/master.cpp' object='Master/libSym_m_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Master/libSym_m_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+
+Master/libSym_m_tm_la-master.lo: Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Master/libSym_m_tm_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_la-master.Tpo -c -o Master/libSym_m_tm_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_la-master.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Master/master.cpp' object='Master/libSym_m_tm_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Master/libSym_m_tm_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+
+Master/libSym_m_tm_cp_la-master.lo: Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Master/libSym_m_tm_cp_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_cp_la-master.Tpo -c -o Master/libSym_m_tm_cp_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_cp_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_cp_la-master.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Master/master.cpp' object='Master/libSym_m_tm_cp_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Master/libSym_m_tm_cp_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+
+Master/libSym_m_tm_lp_la-master.lo: Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Master/libSym_m_tm_lp_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_la-master.Tpo -c -o Master/libSym_m_tm_lp_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_lp_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_lp_la-master.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Master/master.cpp' object='Master/libSym_m_tm_lp_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Master/libSym_m_tm_lp_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+
+Master/libSym_m_tm_lp_cg_la-master.lo: Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Master/libSym_m_tm_lp_cg_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master.Tpo -c -o Master/libSym_m_tm_lp_cg_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_lp_cg_la-master.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Master/master.cpp' object='Master/libSym_m_tm_lp_cg_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Master/libSym_m_tm_lp_cg_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+
+Master/libSym_m_tm_lp_cg_cp_la-master.lo: Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Master/libSym_m_tm_lp_cg_cp_la-master.lo -MD -MP -MF Master/$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-master.Tpo -c -o Master/libSym_m_tm_lp_cg_cp_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Master/$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-master.Tpo Master/$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-master.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Master/master.cpp' object='Master/libSym_m_tm_lp_cg_cp_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Master/libSym_m_tm_lp_cg_cp_la-master.lo `test -f 'Master/master.cpp' || echo '$(srcdir)/'`Master/master.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

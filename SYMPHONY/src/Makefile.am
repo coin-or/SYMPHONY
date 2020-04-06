@@ -67,12 +67,13 @@ endif
 #Add SymConfig.h
 SYMINCFILES = ../include/SymConfig.h ../include/OsiSymConfig.h $(SYMHEADERS)
 
-SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
-	Master/master_func.c Master/master_prep.c Master/master_prep_base.c Master/master_prep_sr.c 
+SYM_MASTER_SRC	= Master/master.cpp Master/master_wrapper.c Master/master_io.c \
+		Master/master_func.c Master/master_prep.c Master/master_prep_base.c \
+		Master/master_prep_sr.c 
 
 MASTER_SRC =$(SYM_MASTER_SRC)
 
-MASTER_MAIN_SRC     = Master/main.c
+MASTER_MAIN_SRC     = Master/main.cpp
 
 DG_SRC		= DrawGraph/draw_graph.c
 
