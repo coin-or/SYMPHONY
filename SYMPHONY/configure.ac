@@ -66,12 +66,16 @@ AC_COIN_PROG_LIBTOOL
 AC_COIN_RPATH_FLAGS([$expanded_libdir])
 
 #############################################################################
-#                   Math headers                                            #
+#                        Headers                                            #
 #############################################################################
 
 # Check for cmath/math.h, cfloat/float.h, cieeefp/ieeefp.h
 
 AC_COIN_CHECK_MATH_HDRS
+
+# Check for pwd.h
+
+AC_CHECK_HEADERS([pwd.h])
 
 #############################################################################
 #                    COIN-OR components                                     #

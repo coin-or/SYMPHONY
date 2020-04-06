@@ -55,6 +55,9 @@ int main(int argc, char **argv)
 #include "sym_master.h"
 #include "sym_messages.h"
 #if defined SYMPHONY_HAS_READLINE
+#ifdef HAVE_PWD_H
+#include <pwd.h>
+#endif
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -234,11 +237,8 @@ int main(int argc, char **argv)
 	   strcpy(args[1], line);
 	 }	 
 
-#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-                                        RL_VERSION_MINOR >= 2) ||       \
-                                       (RL_VERSION_MAJOR >= 6))
 	 sym_read_tilde(args[1]);	 
-#endif	 	 
+
 	 if (fopen(args[1], "r") == NULL){
 	   printf("Input file '%s' can't be opened\n",
 		  args[1]);
@@ -293,11 +293,7 @@ int main(int argc, char **argv)
 	     strcpy(args[2], line);
 	   }
 
-#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-                                        RL_VERSION_MINOR >= 2) ||       \
-                                       (RL_VERSION_MAJOR >= 6))
 	   sym_read_tilde(args[2]);	 
-#endif	 	 
 	 
 	   if(fopen(args[2], "r") == NULL){
 	     printf("Data file '%s' can't be opened\n",
@@ -531,11 +527,7 @@ int main(int argc, char **argv)
 	       strcpy(args[2], line);
 	     }
 
-#if defined(SYMPHONY_HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-                                        RL_VERSION_MINOR >= 2) ||       \
-                                       (RL_VERSION_MAJOR >= 6))
 	     sym_read_tilde(args[2]);	 
-#endif	 	 
 
 	     if ((f = fopen(args[2], "r")) == NULL){
 	       printf("Parameter file '%s' can't be opened\n",
@@ -861,7 +853,13 @@ void sym_read_tilde(char input[])
    if(*input){
       sscanf(input, "%c", &temp);
       if(temp == '~'){
+#ifdef HAVE_PWD_H
 	 pwd = getpwuid(getuid());
+#else
+         printf("Automatic parsing of '~' not available.\n");
+         printf("Please use full path\n");
+         pwd = NULL
+#endif
 	 if(pwd != NULL){
 	    strcpy(temp_inp, input);
 	    sprintf(input, "%s%s", pwd->pw_dir, &temp_inp[1]);
