@@ -21,7 +21,7 @@
 
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverParameters.hpp"
-#include "OsiSymConfig.h"
+#include "OsiSymConfig.hpp"
 #include "SymWarmStart.hpp"
 
 #include <string>

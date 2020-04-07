@@ -20,7 +20,7 @@
 #define SymWarmStart_H
 
 #include "CoinWarmStart.hpp"
-#include "OsiSymConfig.h"
+#include "OsiSymConfig.hpp"
 
 typedef struct WARM_START_DESC warm_start_desc;
 

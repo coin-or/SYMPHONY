@@ -65,7 +65,7 @@ if COIN_CXX_IS_CL
 endif
 
 #Add SymConfig.h
-SYMINCFILES = ../include/SymConfig.h ../include/OsiSymConfig.h $(SYMHEADERS)
+SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 
 SYM_MASTER_SRC	= Master/master.cpp Master/master_wrapper.c Master/master_io.c \
 		Master/master_func.c Master/master_prep.c Master/master_prep_base.c \

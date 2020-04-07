@@ -28,7 +28,7 @@ lib_LTLIBRARIES = libOsiSym.la
 # List all source files for this library, including headers
 libOsiSym_la_SOURCES = \
 	OsiSymSolverInterface.cpp OsiSymSolverInterface.hpp \
-	OsiSymSolverParameters.hpp \
+	OsiSymSolverParameters.hpp OsiSymConfig.hpp \
 	SymWarmStart.cpp SymWarmStart.hpp
 
 # List all additionally required libraries
@@ -53,10 +53,11 @@ includecoindir = $(pkgincludedir)
 includecoin_HEADERS = \
 	OsiSymSolverInterface.hpp \
 	OsiSymSolverParameters.hpp \
-	SymWarmStart.hpp
+	SymWarmStart.hpp \
+	OsiSymConfig.hpp
 
 install-exec-local:
-	$(install_sh_DATA) ../../include/config_osisym.h $(DESTDIR)$(includecoindir)/OsiSymConfig.h
+	$(install_sh_DATA) ../../include/config_osisym.h $(DESTDIR)$(includecoindir)/OsiSymConfig.hpp
 
 uninstall-local:
 	rm -f $(DESTDIR)$(includecoindir)/OsiSymConfig.h

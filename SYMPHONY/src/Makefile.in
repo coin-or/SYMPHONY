@@ -1616,7 +1616,7 @@ SYMHEADERS = ../include/sym_constants.h ../include/sym_macros.h \
 	$(am__append_1)
 
 #Add SymConfig.h
-SYMINCFILES = ../include/SymConfig.h ../include/OsiSymConfig.h $(SYMHEADERS)
+SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 SYM_MASTER_SRC = Master/master.cpp Master/master_wrapper.c Master/master_io.c \
 		Master/master_func.c Master/master_prep.c Master/master_prep_base.c \
 		Master/master_prep_sr.c 
