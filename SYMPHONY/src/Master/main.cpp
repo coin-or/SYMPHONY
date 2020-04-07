@@ -54,10 +54,10 @@ int main(int argc, char **argv)
 #include "symphony.h"
 #include "sym_master.h"
 #include "sym_messages.h"
-#if defined SYMPHONY_HAS_READLINE
 #ifdef HAVE_PWD_H
 #include <pwd.h>
 #endif
+#if defined SYMPHONY_HAS_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -136,10 +136,11 @@ char **sym_completion(const char *text, int start, int end);
 void sym_initialize_readline();
 char *command_generator (const char *text, int state);
 char *alloc_str (char *s);
-void sym_read_tilde(char input[]);
 
 #endif
 #endif
+
+void sym_read_tilde(char input[]);
 
 int comp_level = 0;
 int main_level = 0; /* 0 - SYMPHONY:
@@ -841,6 +842,8 @@ char *alloc_str(char *s)
   return (r);
 }
 
+#endif
+
 /*===========================================================================*\
 \*===========================================================================*/
 
@@ -867,7 +870,6 @@ void sym_read_tilde(char input[])
    }
 }
 
-#endif
 #endif
 
 
