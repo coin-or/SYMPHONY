@@ -38,9 +38,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
-./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install SYMPHONY
+./coinbrew fetch --no-prompt SYMPHONY@5.6
+./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity 1
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -115,9 +114,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew fetch --no-prompt SYMPHONY@5.6
 ./coinbrew build --no-prompt SYMPHONY --prefix=C:\path\to\install\dir --verbosity=1
-./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
@@ -313,9 +311,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt SYMPHONY:stable/5.6
+./coinbrew fetch --no-prompt SYMPHONY@5.6
 ./coinbrew build --no-prompt SYMPHONY --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install SYMPHONY
 ```
 Note that is no prefix is specified, the package will be installed in the build 
 directory and no separate install step is necessary. 
