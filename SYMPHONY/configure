@@ -21654,8 +21654,8 @@ fi
 
 
 if test $coin_has_coinutils != yes ; then
-  { { echo "$as_me:$LINENO: error: Required package CoinUtilsnot available." >&5
-echo "$as_me: error: Required package CoinUtilsnot available." >&2;}
+  { { echo "$as_me:$LINENO: error: Required package CoinUtils not available." >&5
+echo "$as_me: error: Required package CoinUtils not available." >&2;}
    { (exit 1); exit 1; }; }
 fi
 

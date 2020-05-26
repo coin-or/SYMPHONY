@@ -88,7 +88,7 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 
 AC_COIN_CHECK_PACKAGE(CoinUtils, [coinutils], [SymphonyLib])
 if test $coin_has_coinutils != yes ; then
-  AC_MSG_ERROR([Required package CoinUtilsnot available.])
+  AC_MSG_ERROR([Required package CoinUtils not available.])
 fi
 AC_COIN_CHECK_PACKAGE(Osi, [osi], [SymphonyLib])
 if test $coin_has_osi != yes ; then
