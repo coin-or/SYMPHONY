@@ -8,7 +8,7 @@ explanation of the build options and for building in parallel, see the
 SYMPHONY [manual](https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.17-Manual.pdf).
 
 Also, please see more general, but detail instructions in the 
-[COIN-OR User's Guide](https://coin-or.github.io/user_introduction)
+[COIN-OR User's Guide](https://coin-or.github.io/user_introduction).
 
 ### Building on Linux
 
