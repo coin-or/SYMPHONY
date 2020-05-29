@@ -28,11 +28,15 @@ Binaries for most platforms are available for download from [Bintray](https://bi
 
 Due to license incompatibilities, pre-compiled binaries lack some functionality and are not available for the distributed parallel version of SYMPHONY. If binaries are not available for your platform for the latest version and you would like to request them to be built and posted, feel free to let us know on the mailing list or by opening an [issue](https://github.com/coin-or/SYMPHONY/newissue).
 
+## Docker Image
+
+A Docker image containing an installed version of SYMPHONYH is available at
+
+https://hub.docker.com/repository/docker/coinor/symphony
+
 # DOCUMENTATION
 
-If you have downloaded a source distribution, LaTex source for the full documentation is available in the SYMPHONY/Doc/ subdirectory. Quick start guides and pointers to other on-line documentation can be found at the project Wiki:
-
-https://github.com/coin-or/SYMPHONY/wiki
+If you have downloaded a source distribution, LaTex source for the full documentation is available in the SYMPHONY/Doc/ subdirectory. Quick start guides and pointers to other on-line documentation can be found below.
 
 The PDF version of the manual is available here:
 
@@ -47,9 +51,9 @@ installation and usage. Please see the documentation for more details.
 
 ## BUILDING FROM SOURCE
 
-If you downloaded a source distribution and would like instructions on
-building SYMPHONY or you downloaded a binary distribution and would like to
-know how to install it, please see the [INSTALL](https://github.com/coin-or/SYMPHONY/blob/master/INSTALL.md) file.
+If you would like instructions on building SYMPHONY or you downloaded a binary distribution and would like to
+know how to install it, please see either the [INSTALL](https://github.com/coin-or/SYMPHONY/blob/master/INSTALL.md) file
+or also the more general, but alsol more detailed [COIN-OR User's Guide](https://coin-or.github.io/user_introduction.html)
 
 ## USING SYMPHONY
 
