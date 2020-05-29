@@ -53,7 +53,7 @@ installation and usage. Please see the documentation for more details.
 
 If you would like instructions on building SYMPHONY or you downloaded a binary distribution and would like to
 know how to install it, please see either the [INSTALL](https://github.com/coin-or/SYMPHONY/blob/master/INSTALL.md) file
-or also the more general, but alsol more detailed [COIN-OR User's Guide](https://coin-or.github.io/user_introduction.html)
+or also the more general, but alsol more detailed [COIN-OR User's Guide](https://coin-or.github.io/user_introduction.html).
 
 ## USING SYMPHONY
 
