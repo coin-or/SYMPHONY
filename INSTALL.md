@@ -1,14 +1,14 @@
 ## BUILDING AND INSTALLING
 
 These instructions are for building and installing SYMPHONY from source. For
-instructions on how to obtain pre-built binaries, please see the README file.
+instructions on how to obtain pre-built binaries, please see the 
+[README](https://github.com/coin-or/SYMPHONY/blob/master/README.md) file.
 The instructions here are for the standard build. For a more detailed
 explanation of the build options and for building in parallel, see the
 SYMPHONY [manual](https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.17-Manual.pdf).
 
-IMPORTANT: The build instructions have changed significantly. In most case,
-you do not need to clone this repository first! Please follow the instructions
-for your platform below.
+Also, please see more general, but detail instructions in the 
+[COIN-OR User's Guide](https://coin-or.github.io/user_introduction)
 
 ### Building on Linux
 
