@@ -20,10 +20,10 @@
 #include "symphony.h"
 #include "sym_tm_params.h"
 #include "sym_types.h"
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 #include "sym_cg.h"
 #endif
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 #include "sym_cp.h"
 #endif
 
@@ -72,14 +72,14 @@ typedef struct TM_PROB{
    process_set     cg;
    process_set     cp;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    struct LP_PROB **lpp;
    int            opt_thread_num;
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    cg_prob      **cgp;
 #endif
 #endif
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    cut_pool     **cpp;
 #endif
    

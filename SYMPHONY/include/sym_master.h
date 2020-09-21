@@ -23,7 +23,7 @@
 #include "sym_types.h"
 #include "sym_macros.h"
 #include "sym_master_params.h"
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
 #include "sym_tm.h"
 #endif
 
@@ -71,9 +71,9 @@ typedef struct SYM_ENVIRONMENT{
    
    double          mc_time;
 
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
    tm_prob         *tm;
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    cut_pool       **cp;
 #endif
    /* solution pool */

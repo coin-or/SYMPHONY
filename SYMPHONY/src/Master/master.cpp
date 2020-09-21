@@ -39,9 +39,9 @@
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
 #include "sym_prep.h"
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
 #include "sym_tm.h"
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #include "sym_lp.h"
 #endif
 #endif
@@ -88,8 +88,8 @@ SYMPHONYLIB_EXPORT void sym_version(void)
 SYMPHONYLIB_EXPORT sym_environment * sym_open_environment()
 {
    sym_environment *env;
-#if (!defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CG) || \
-   !defined(COMPILE_IN_CP)) && defined(__PVM__)
+#if (!defined(SYM_COMPILE_IN_LP) || !defined(SYM_COMPILE_IN_CG) || \
+   !defined(SYM_COMPILE_IN_CP)) && defined(__PVM__)
    int xpvm_tid;
    Pvmtmask trace_mask;
 #endif
@@ -98,8 +98,8 @@ SYMPHONYLIB_EXPORT sym_environment * sym_open_environment()
    
    env = (sym_environment *) calloc(1, sizeof(sym_environment));
 
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
-    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)
+#if !defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP) ||                   \
+    !defined(SYM_COMPILE_IN_CG) || !defined(SYM_COMPILE_IN_CP)
        
    env->my_tid = register_process();   /* Enroll this process */
 
@@ -123,8 +123,8 @@ SYMPHONYLIB_EXPORT sym_environment * sym_open_environment()
    /* This next set of commands has to be executed if we want to create a PVM
       trace file for viewing in xpvm (this is a very slow process) */
 
-#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
-    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
+#if (!defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP) ||                   \
+    !defined(SYM_COMPILE_IN_CG) || !defined(SYM_COMPILE_IN_CP)) && defined(__PVM__)
    if (env->par.pvm_trace){
       if ((xpvm_tid = pvm_gettid((char *)"xpvm", 0)) > 0){
 	 pvm_setopt(PvmSelfTraceTid, xpvm_tid);
@@ -161,8 +161,8 @@ SYMPHONYLIB_EXPORT int sym_close_environment(sym_environment *env)
 
    FREE(env);
 
-#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
-    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
+#if (!defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP) ||                   \
+    !defined(SYM_COMPILE_IN_CG) || !defined(SYM_COMPILE_IN_CP)) && defined(__PVM__)
    pvm_catchout(0);
    comm_exit();
 #endif
@@ -182,8 +182,8 @@ SYMPHONYLIB_EXPORT int sym_reset_environment(sym_environment *env)
    
    free_master(env);
 
-#if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
-    !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
+#if (!defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP) ||                   \
+    !defined(SYM_COMPILE_IN_CG) || !defined(SYM_COMPILE_IN_CP)) && defined(__PVM__)
    pvm_catchout(0);
 #endif
    
@@ -225,13 +225,13 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    env->par.tm_machine_set = FALSE;
    env->par.dg_machine_set = FALSE;
    strcpy(env->par.tm_exe, "symphony_tm");
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    strcat(env->par.tm_exe, "_lp");
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    strcat(env->par.tm_exe, "_cg");
 #endif
 #endif
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    strcat(env->par.tm_exe, "_cp");
 #endif   
    strcpy(env->par.dg_exe, "symphony_dg");
@@ -253,7 +253,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    tm_par->verbosity = 0;
    tm_par->granularity = 1e-7;
    strcpy(tm_par->lp_exe, "symphony_lp");
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    strcat(tm_par->lp_exe, "_cg");
 #endif
    strcpy(tm_par->cg_exe, "symphony_cg");
@@ -319,7 +319,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
    lp_par->should_warmstart_chain = TRUE; /* see header file for description */
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #endif
 #ifdef _OPENMP
@@ -831,7 +831,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 
    int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, temp, i;
    int lp_data_sent = 0, cg_data_sent = 0, cp_data_sent = 0;
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    char repricing, node_type;
 #else
    tm_prob *tm;
@@ -961,7 +961,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
       printf("Solving...\n\n");
    }
    
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
     * Start the tree manager and send the parameters
    \*------------------------------------------------------------------------*/
@@ -1112,14 +1112,14 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    tm->obj_sense = env->mip->obj_sense;
    tm->master = env->my_tid;
    
-#ifdef COMPILE_IN_LP  
+#ifdef SYM_COMPILE_IN_LP  
    CALL_WRAPPER_FUNCTION( send_lp_data_u(env, 0) );
 #ifdef _OPENMP
    lp_data_sent = env->par.tm_par.max_active_nodes;
 #else 
    lp_data_sent = 1;
 #endif
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    CALL_WRAPPER_FUNCTION( send_cg_data_u(env, 0) );
 #ifdef _OPENMP
    cg_data_sent = env->par.tm_par.max_active_nodes;
@@ -1128,7 +1128,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 #endif
 #endif
 #endif
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    if (env->cp && env->par.use_permanent_cut_pools){
       tm->cpp = env->cp;
    }else{
@@ -1252,7 +1252,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
     * Wait for messages
    \*------------------------------------------------------------------------*/
    
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
    while (!(lp_data_sent == env->par.tm_par.max_active_nodes) ||
 	  !(cg_data_sent == env->par.tm_par.max_active_nodes) ||
 	  !(cp_data_sent == env->par.tm_par.max_cp_num)){
@@ -1262,7 +1262,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 #endif
       r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
       if (r_bufid == 0){
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
 	 if (pstat(env->tm_tid) != PROCESS_OK){
 	    printf("\nThe treemanager has died :-(\n\n");
 #else
@@ -1282,7 +1282,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
        case FEASIBLE_SOLUTION_USER:
 	 CALL_WRAPPER_FUNCTION( receive_feasible_solution_u(env, msgtag) );
 	 if (env->par.verbosity >= -1){
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
 	    CALL_WRAPPER_FUNCTION( display_solution_u(env,
 						env->tm->opt_thread_num) );
 #else
@@ -1327,7 +1327,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 			  env->ub, env->lb, 0, start_time, sym_wall_clock(NULL),
 			  env->mip->obj_offset, env->mip->obj_sense,
 			  env->has_ub, NULL, 0);
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
 	 CALL_WRAPPER_FUNCTION( display_solution_u(env,
 						   env->tm->opt_thread_num) );
 #else
@@ -1361,7 +1361,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
       }
       freebuf(r_bufid);
 
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    }while (msgtag != TM_OPTIMAL_SOLUTION_FOUND && msgtag != SOMETHING_DIED &&
 	   msgtag != TM_TIME_LIMIT_EXCEEDED &&
 	   msgtag != TM_SIGNAL_CAUGHT &&
@@ -1382,7 +1382,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    /*------------------------------------------------------------------------*\
     * Solve the problem and receive solutions                         
    \*------------------------------------------------------------------------*/
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    sp_initialize(tm);
 #endif
 
@@ -1405,7 +1405,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    }
    env->par.tm_par.warm_start = FALSE;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    int thread_num;
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
@@ -1468,13 +1468,13 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    tm->rootnode = NULL;
    tm->cuts = NULL;
    tm->cut_num = tm->allocated_cut_num = 0;
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    if (env->cp && env->par.use_permanent_cut_pools){
       tm->cpp = NULL;
    }
 #endif
    
-#if !defined(COMPILE_IN_LP) && 0
+#if !defined(SYM_COMPILE_IN_LP) && 0
    /* This is not needed anymore */
    if (termcode != SOMETHING_DIED){
       int old_termcode = termcode;
@@ -1574,7 +1574,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    
    env->termcode = termcode;
 
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
    if (tm->lb > env->lb) env->lb = tm->lb;
    if(env->par.verbosity >=0 ) {
       print_statistics(&(tm->comp_times), &(tm->stat), 
@@ -1585,7 +1585,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 		       tm->has_ub, tm->sp, tm->par.output_mode);
    }
    temp = termcode;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if (env->sp){
       sp_free_sp(env->sp);
       FREE(env->sp);
@@ -1602,7 +1602,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 #endif
    
    if(env->par.verbosity >=-1 ) {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       CALL_WRAPPER_FUNCTION( display_solution_u(env, env->tm->opt_thread_num) );
 #else
       CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
@@ -1619,7 +1619,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
       }
 #endif
    termcode = temp;
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    if (env->tm && env->tm->lpp[env->tm->opt_thread_num]){
       env->tm->lpp[env->tm->opt_thread_num]->best_sol.xlength = 0;
       env->tm->lpp[env->tm->opt_thread_num]->best_sol.xind = NULL;
@@ -2492,7 +2492,7 @@ SYMPHONYLIB_EXPORT int sym_mc_solve(sym_environment *env)
    printf(  "* Now displaying stats...                              *\n");
    printf(  "********************************************************\n\n");
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_CP)
    if (env->par.use_permanent_cut_pools){
       for (i = 0; i < env->par.tm_par.max_cp_num; i++){
 	 env->comp_times.bc_time.cut_pool += env->cp[i]->cut_pool_time;
@@ -2612,7 +2612,7 @@ SYMPHONYLIB_EXPORT int sym_create_permanent_cut_pools(sym_environment *env,
 
    *cp_num = 0;
    
-#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP))
+#if !(defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_CP))
    return(FUNCTION_TERMINATED_ABNORMALLY);
 #else
    int i;
@@ -5409,7 +5409,7 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
       *value = tm_par->cp_mach_num;
       return(0);
    }
-#ifndef COMPILE_IN_CG
+#ifndef SYM_COMPILE_IN_CG
    else if (strcmp(key, "use_cg") == 0 ||
 	    strcmp(key, "TM_use_cg") == 0 ||
 	    strcmp(key, "LP_use_cg") == 0){
@@ -7069,7 +7069,7 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
       READ_INT_PAR(tm_par->max_active_nodes);
-#if defined(COMPILE_IN_LP) && !defined _OPENMP
+#if defined(SYM_COMPILE_IN_LP) && !defined _OPENMP
       if (tm_par->max_active_nodes > 1){
 	 printf("\nWarning: Trying to use multiple processors with ");
 	 printf("sequential build...\n");
@@ -7098,7 +7098,7 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
       READ_INT_PAR(tm_par->cp_mach_num);
       return(0);
    }
-#ifndef COMPILE_IN_CG
+#ifndef SYM_COMPILE_IN_CG
    else if (strcmp(key, "use_cg") == 0 ||
 	    strcmp(key, "TM_use_cg") == 0 ||
 	    strcmp(key, "LP_use_cg") == 0){

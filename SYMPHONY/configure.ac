@@ -20,9 +20,7 @@
 #                       Names and other basic things                        #
 #############################################################################
 
-AC_PREREQ(2.59)
-
-AC_INIT([SYMPHONY],[trunk],[https://github.com/coin-or/SYMPHONY/issues/new],[coin-or-symphony],[https://github.com/coin-or/SYMPHONY])
+AC_INIT([SYMPHONY],[devel],[https://github.com/coin-or/SYMPHONY/issues/new],[coin-or-symphony],[https://github.com/coin-or/SYMPHONY])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -53,11 +51,9 @@ AC_COIN_INITIALIZE
 #############################################################################
 
 # Get the name of the C++ compiler and appropriate compiler options
-
 AC_COIN_PROG_CXX
 
 # Initialize libtool
-
 AC_COIN_PROG_LIBTOOL
 
 # set RPATH_FLAGS to the compiler link flags required to hardcode location
@@ -70,11 +66,9 @@ AC_COIN_RPATH_FLAGS([$expanded_libdir])
 #############################################################################
 
 # Check for cmath/math.h, cfloat/float.h, cieeefp/ieeefp.h
-
 AC_COIN_CHECK_MATH_HDRS
 
 # Check for pwd.h
-
 AC_CHECK_HEADERS([pwd.h])
 
 #############################################################################
@@ -588,43 +582,42 @@ dnl AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 
 AC_COIN_CHK_LIB(PVM, [SymphonyLib], [-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3], [-I$PVM_ROOT/include], [], [pvm_gettid])
 #AC_COIN_CHECK_USER_LIBRARY([Pvm], [PVM], [pvm3.h], [pvm_gettid])
-#AC_ARG_WITH([pvm],
-#[AC_HELP_STRING([--with-pvm],
-#                [compile in distributed parallel mode (assuming that 
-#		pvm is installed and the variable PVM_ROOT is 
-#		defined.)])],
-#		[find_pvm=$withval],[find_pvm=no])
+AC_ARG_WITH([pvm],
+[AC_HELP_STRING([--with-pvm],
+                [compile in distributed parallel mode (assuming that 
+		pvm is installed and the variable PVM_ROOT is 
+		defined.)])],
+		[find_pvm=$withval],[find_pvm=no])
 
-#if test x"$find_pvm" = xyes; then 
-#    if test x"$coin_has_pvm" != xyes; then 
-#        m4_ifvaln([pvm3.h],
-#                  [AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
-#                  [pvm_header=yes])],
-#                  [])
-#	m4_ifvaln([pvm_gettid],
-#                  [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
-#                   pvm_link=no
-#                   AC_LANG_PUSH(C)
-#                   AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
-#                   AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],[[pvm_gettid()]])],
-#                                  [AC_MSG_RESULT(yes)
-#                                   pvm_link=yes
-#                                   break],
-#                                  [AC_MSG_RESULT(no)])
-#                   AC_LANG_POP(C)])
-#    fi
+if test x"$find_pvm" = xyes; then 
+    if test x"$coin_has_pvm" != xyes; then 
+        m4_ifvaln([pvm3.h],
+                  [AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
+                  [pvm_header=yes])],
+                  [])
 
-#    if test x"$pvm_header" != xyes; then
-#       AC_MSG_ERROR([Cannot find the pvm header files either in system path or 
-#in PVM_ROOT path:$PVM_ROOT])
-#    fi
-#    if test x"$pvm_link" != xyes ; then
-#       AC_MSG_ERROR([Cannot find PVM library in system paths or in PVM_ROOT path:$PVM_ROOT])
-#    fi
-#    if test $pvm_link == yes && test $pvm_header == yes; then
-#       coin_has_pvm=yes
-#    fi
-#fi
+	m4_ifvaln([pvm_gettid],
+                  [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
+                   pvm_link=no
+                   AC_LANG_PUSH(C)
+                   AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
+                   AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],[[pvm_gettid()]])],
+                                  [AC_MSG_RESULT(yes)
+                                   pvm_link=yes
+                                   break],
+                                  [AC_MSG_RESULT(no)])
+                   AC_LANG_POP(C)])
+        if test x"$pvm_header" != xyes; then
+            AC_MSG_ERROR([Cannot find the pvm header files either in system path or in PVM_ROOT path:$PVM_ROOT])
+        fi
+        if test x"$pvm_link" != xyes ; then
+            AC_MSG_ERROR([Cannot find PVM library in system paths or in PVM_ROOT path$PVM_ROOT])
+        fi
+        if test $pvm_link == yes && test $pvm_header == yes; then
+            coin_has_pvm=yes
+        fi
+    fi
+fi
 
 #---------------------------------------------------------------------------#
 
@@ -683,24 +676,24 @@ MASTEREXT=
 LIBNAME=
 SYMPDEFS="$SYMDEFS"
 
-SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM"
+SYMDEFS="$SYMDEFS -DSYM_COMPILE_IN_CG -DSYM_COMPILE_IN_CP -DSYM_COMPILE_IN_LP -DSYM_COMPILE_IN_TM"
 
 if test $in_cg = yes; then 
    LPEXT=_cg
-   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CG"
+   SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_CG"
 fi 
 if test $in_cp = yes; then 
-   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CP"
+   SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_CP"
    CPEXT=_cp
 fi 
 if test $in_lp = yes; then 
-  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_LP"
+  SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_LP"
   TMEXT="_lp$LPEXT$CPEXT"
 else
   TMEXT=$CPEXT
 fi 
 if test $in_tm = yes; then 
-  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_TM"
+  SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_TM"
   MASTEREXT="_tm$TMEXT"
 fi 
 

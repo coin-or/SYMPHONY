@@ -22,33 +22,9 @@ include BuildTools/Makemain.inc
 #                          Subdirectories                              #
 ########################################################################
 
-SUBDIRS = src
+SUBDIRS = src src/OsiSym
 
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = symphony.pc symphony-app.pc
-
-# Don't do src/OsiSym recursively, since src/OsiSym/libOsiSym depends on
-# src/libSym
-SUBDIRS += src/OsiSym
-pkgconfiglib_DATA += osi-sym.pc
-
-# We don't want to compile the test subdirectory, unless the test target is
-# specified.  But we need to list it as subdirectory to make sure that it is
-# included in the tarball
-
-if ALWAYS_FALSE
-  SUBDIRS += test
-endif
-
-########################################################################
-#             Additional files to be included in tarball               #
-########################################################################
-
-# Here we need include all files that are not mentioned in other Makefiles
-
-# FIXME-Add everything here!
-
- EXTRA_DIST = 
+pkgconfiglib_DATA = symphony.pc symphony-app.pc osi-sym.pc
 
 ########################################################################
 #                           Extra Targets                              #
@@ -81,14 +57,4 @@ install-exec-local: install-doc
 uninstall-local: uninstall-doc
 
 .PHONY: test unitTest ptest punitTest
-
-########################################################################
-#                         Maintainer Stuff                             #
-########################################################################
-
-CLEANFILES =
-
-# Files that are generated and should be cleaned with make distclean
-
-DISTCLEANFILES =
 

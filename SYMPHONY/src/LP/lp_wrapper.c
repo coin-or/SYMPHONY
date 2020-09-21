@@ -36,10 +36,10 @@
 #ifdef USE_CGL_CUTS
 #include "sym_cg.h"
 #endif
-#if defined (COMPILE_IN_LP) && defined (COMPILE_IN_TM)
+#if defined (SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_TM)
 #include "sym_master_u.h"
 #endif
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 #include "sym_cp.h"
 #endif
 
@@ -544,7 +544,7 @@ int create_subproblem_u(lp_prob *p)
    }
    /* We don't need the cuts anymore. Free them. */
    if (desc->cutind.size > 0){
-#ifndef COMPILE_IN_LP /*If we are using shared memory, we don't need to free*/
+#ifndef SYM_COMPILE_IN_LP /*If we are using shared memory, we don't need to free*/
       free_cuts(desc->cuts, desc->cutind.size);
 #endif 
       FREE(desc->cuts);
@@ -552,7 +552,7 @@ int create_subproblem_u(lp_prob *p)
       desc->cuts = NULL;
    }
    lp_data->cgl = p->par.cgl;
-#ifdef COMPILE_IN_LP 
+#ifdef SYM_COMPILE_IN_LP 
    /* reliability branching */
    /* pseudo costs and reliability measures */
    if (p->tm->pcost_down==NULL) {
@@ -675,7 +675,7 @@ int create_subproblem_u(lp_prob *p)
 	     -bobj->name-1 :
 	       bfind(bobj->name, d_cind, desc->cutind.size) + bcutnum;
 	    change_row(lp_data, j, bobj->sense, bobj->rhs, bobj->range);
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	    /* Because these cuts are shared with the treemanager, we have to
 	       make a copy before changing them if the LP is compiled in */
 	    cut = (cut_data *) malloc(sizeof(cut_data));
@@ -712,7 +712,7 @@ int create_subproblem_u(lp_prob *p)
       }
    }
    */
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if (p->desc->bnd_change) {
       bounds_change_desc *bnd_change = p->desc->bnd_change;
       int *index = bnd_change->index;
@@ -804,7 +804,7 @@ int create_subproblem_u(lp_prob *p)
  * longer be a last call. */
 int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 {
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    int s_bufid;
 #endif
    int user_res;
@@ -905,7 +905,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       break;
    }
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 
    if(p->bc_index < 1 && p->lp_stat.lp_calls < 2){
      memcpy(p->root_lp, lp_data->x, DSIZE*n);
@@ -1182,7 +1182,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
       p->has_ub = TRUE;
       p->ub = true_objval;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       p->tm->lp_stat.ip_sols++;
 #endif
       if (p->par.set_obj_upper_lim) {
@@ -1219,7 +1219,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 					+ p->mip->obj_offset));
 	 }
       }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #pragma omp critical (new_ub)
       {
 	 install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
@@ -1244,7 +1244,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       send_msg(p->tree_manager, UPPER_BOUND);
       freebuf(s_bufid);
 #endif
-#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
+#if !defined(SYM_COMPILE_IN_LP) || !defined(SYM_COMPILE_IN_TM)
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
 			       lpetol, true_objval, cnt, indices, values);
 #endif
@@ -1253,7 +1253,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    if (feasible == IP_FEASIBLE){
       lp_data->termcode = LP_OPT_FEASIBLE;
       p->lp_stat.lp_sols++;
-      //#ifdef COMPILE_IN_LP
+      //#ifdef SYM_COMPILE_IN_LP
       //      sp_add_solution(p,cnt,indices,values,true_objval+p->mip->obj_offset,
       //            p->bc_index);
       //#endif
@@ -2217,7 +2217,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 break;
 
        default: /* A user cut type */
-#if defined(COMPILE_IN_CG) && defined(CHECK_CUT_VALIDITY)
+#if defined(SYM_COMPILE_IN_CG) && defined(CHECK_CUT_VALIDITY)
 	  check_validity_of_cut_u(p->cgp, cuts[i]);
 #endif
 	  if (l != i){
@@ -2440,13 +2440,13 @@ int generate_cuts_in_lp_u(lp_prob *p)
    
    colind_sort_extra(p);
    
-#if defined(COMPILE_IN_CG) || defined(COMPILE_IN_CP) 
+#if defined(SYM_COMPILE_IN_CG) || defined(SYM_COMPILE_IN_CP) 
    {
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
       int cp_new_row_num = 0;
       waiting_row **cp_new_rows = NULL;
 #endif
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
       int cg_new_row_num = 0;
       waiting_row **cg_new_rows = NULL;
 #endif
@@ -2488,7 +2488,7 @@ int generate_cuts_in_lp_u(lp_prob *p)
 		                     collect_fractions(p, x, xind, xval);
 	 break;
       }
-#ifdef COMPILE_IN_CG      
+#ifdef SYM_COMPILE_IN_CG      
       if (p->cgp->par.do_findcuts && !new_row_num)
 	 find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
 #endif
@@ -2518,7 +2518,7 @@ int generate_cuts_in_lp_u(lp_prob *p)
 	    FREE(cg_new_rows);
 	 }
       }
-#if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_CP) && defined(SYM_COMPILE_IN_LP)
       
       if ((p->iter_num == 1 && (p->bc_level > 0 || p->phase==1)) ||
 	  (p->iter_num % p->par.cut_pool_check_freq == 0) ||
@@ -2956,7 +2956,7 @@ int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
      p->best_sol.has_sol = TRUE;
   }
 
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
   send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
 			   lpetol, *true_objval-p->par.mc_rho*(obj[0]+obj[1]),
 			   length, indices, values);

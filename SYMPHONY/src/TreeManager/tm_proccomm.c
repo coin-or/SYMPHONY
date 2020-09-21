@@ -30,10 +30,10 @@
 #include "sym_timemeas.h"
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #include "sym_lp.h"
 #endif
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
 #include "sym_master.h"
 #endif
 
@@ -107,7 +107,7 @@ char processes_alive(tm_prob *tm)
 {
    int i;
 
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    for (i = tm->lp.procnum-1; i>=0; i--){
       if (pstat(tm->lp.procs[i]) != PROCESS_OK){
 	 printf("\nLP process has died -- halting machine\n\n");
@@ -121,7 +121,7 @@ char processes_alive(tm_prob *tm)
 	 return(FALSE);
       }
    }
-#ifndef COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_CP
    for (i = tm->cp.procnum-1; i>=0; i--){
       if (pstat(tm->cp.procs[i]) != PROCESS_OK){
 	 printf("\nCP process has died -- halting machine\n\n");
@@ -141,7 +141,7 @@ char processes_alive(tm_prob *tm)
 void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
 		      int thread_num)
 {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    lp_prob **lp = tm->lpp;
    node_desc *new_desc;
 #else
@@ -251,7 +251,7 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
    }else{
       not_fixed.size = 0;
    }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    /* If the LP function is compiled into the tree manager as a single
       executable, then we allocate new memory for these arrays since
       these arrays will be used directly instead of being passed
@@ -391,7 +391,7 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
 	 modify_list(&not_fixed, &path[i]->desc.not_fixed);
    }
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if(lp[thread_num]->frac_var_cnt == NULL){
      lp[thread_num]->frac_var_cnt = (int*)calloc(ISIZE,tm->bvarnum + extravar.size);      
    }else{
@@ -451,7 +451,7 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
    }
    */
    
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 
 #if 0
    if(!tm->par.sensitivity_analysis){   
@@ -770,7 +770,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	 /* the active_nodes_per_... will be updated when the LP__IS_FREE
 	    message comes */
 	 if (n->cp)
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 	    tm->nodes_per_cp[n->cp]++;
 #else
 	    tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
@@ -790,7 +790,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	       fclose(f); 
 	    }
 	 }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	 /* FIXME: This currently only works in sequential mode */
 	 else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
 	    FILE *f;
@@ -1007,7 +1007,7 @@ char process_messages(tm_prob *tm, int r_bufid)
 
       switch(msgtag){
 
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
        case FEASIBLE_SOLUTION_NONZEROS:
        case FEASIBLE_SOLUTION_USER:
 	 receive_int_array(&(tm->best_sol.xlevel), 1);
@@ -1124,7 +1124,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 {
    int old_cutnum, new_cutnum = cutnum, *itmp, i;
    cut_data **cuts;
-#ifndef COMPILE_IN_LP   
+#ifndef SYM_COMPILE_IN_LP   
    int s_bufid;
 
    /* If the LP solver exists as a separate process, we have to
@@ -1139,7 +1139,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 	      new_cutnum, (old_cutnum / tm->stat.created + 5) * BB_BUNCH);
       cuts = tm->cuts;
       for (i = 0; i < new_cutnum; i++){
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	 cuts[old_cutnum + i] = rows[i].cut;
 	 cuts[old_cutnum + i]->name = old_cutnum + i;
 #else   
@@ -1151,7 +1151,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
       }
       tm->cut_num += new_cutnum;
    }
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    if (sender){ /* Do we have to return the names? */
       s_bufid = init_send(DataInPlace);
       send_int_array(itmp, new_cutnum);
@@ -1165,7 +1165,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 int receive_lp_timing(tm_prob *tm)
 {
    char something_died = FALSE;
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    int i, r_bufid = 0, msgtag, bytes, sender;
    node_times tim;
    lp_stat_desc lp_stat;
@@ -1190,7 +1190,7 @@ int receive_lp_timing(tm_prob *tm)
 	    bufinfo(r_bufid, &bytes, &msgtag, &sender);
 	    switch(msgtag){
 	       
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
 	     case FEASIBLE_SOLUTION_NONZEROS:
 	     case FEASIBLE_SOLUTION_USER:
 	       receive_int_array(&(tm->best_sol.xlevel), 1);

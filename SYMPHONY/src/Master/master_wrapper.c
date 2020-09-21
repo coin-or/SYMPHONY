@@ -26,7 +26,7 @@
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
 #include "sym_lp.h"
 #endif
 
@@ -453,7 +453,7 @@ int receive_feasible_solution_u(sym_environment *env, int msgtag)
 
 int send_lp_data_u(sym_environment *env, int sender)
 {
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    int i;
    tm_prob *tm = env->tm;
    tm->par.max_active_nodes = env->par.tm_par.max_active_nodes;
@@ -566,7 +566,7 @@ int send_lp_data_u(sym_environment *env, int sender)
 
 int send_cg_data_u(sym_environment *env, int sender)
 {
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined(COMPILE_IN_CG)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined(SYM_COMPILE_IN_CG)
    int i;
    tm_prob *tm = env->tm;
    tm->cgp = (cg_prob **) malloc(tm->par.max_active_nodes*sizeof(cg_prob *));
@@ -604,7 +604,7 @@ int send_cg_data_u(sym_environment *env, int sender)
 
 int send_cp_data_u(sym_environment *env, int sender)
 {
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_CP)
    int i;
    tm_prob *tm = env->tm;
 
@@ -656,7 +656,7 @@ int display_solution_u(sym_environment *env, int thread_num)
        return(FUNCTION_TERMINATED_NORMALLY);
    }     
    
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    if (env->tm && env->tm->lpp[thread_num]){
       sol = env->tm->lpp[thread_num]->best_sol;
       if (env->par.multi_criteria){

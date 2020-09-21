@@ -31,7 +31,7 @@
 //Some parameters depend on how many nodes have been analyzed so far.
 //We are using the current node index as a rought proxy for this.
 //I would be surprised if this makes much difference.
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #define NUM_NODES p->tm->stat.analyzed
 #else
 #define NUM_NODES p->bc_index
@@ -440,7 +440,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
    new_lp_data->si->setupForRepeatedUse(3,0); 
 #endif
    
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if(p->mip->matbeg){
      double mat_den = (1.0)*p->mip->nz/(p->mip->m * p->mip->n + 1);
 #ifdef __OSI_CLP__
@@ -520,7 +520,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
    outrhsind = (int *)calloc(m, ISIZE);
    k = 0;
 
-#ifdef COMPILE_IN_LP   
+#ifdef SYM_COMPILE_IN_LP   
    if(p->bc_level < 1 && p->mip->mip_inf && p->mip->mip_inf->cont_var_num <= 0){
       fp_max_length_cuts = 100;   
    }
@@ -1030,7 +1030,7 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
    }
 
    int fp_freq_base = p->bc_level;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    //   fp_freq_base = NUM_NODES - 1;
 #endif
 
@@ -1734,7 +1734,7 @@ int ds_fix_vars(lp_prob *p, LPdata *diving_lp, double *x,
    double x_obj, val, etol = p->lp_data->lpetol;
    // double x_rank_1257;
    // double x_rank_1006;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    sp_desc *sp = p->tm->sp;
 #else
    sp_desc *sp = NULL;
@@ -3476,7 +3476,7 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
    total_time = used_time(&total_time);   
    double timeleft = 0;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    
    if (p->tm->par.time_limit >= 0.0 &&
        (timeleft = p->tm->par.time_limit - wall_clock(NULL) + p->tm->start_time) <= 0.0) {
@@ -3818,7 +3818,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
 
   total_time = used_time(&total_time);
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
   if (p->tm->par.time_limit >= 0.0 &&
       (timeleft = p->tm->par.time_limit - wall_clock(NULL) + p->tm->start_time) <= 0.0) {
      return FALSE; 
@@ -3893,7 +3893,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
       x_diff[i] = DBL_MAX;
     }  
   
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
     sp_desc *sp = p->tm->sp;
 #else
     sp_desc *sp = NULL;

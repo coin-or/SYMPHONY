@@ -445,7 +445,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       memcpy(x, lp_data->x, lp_data->n*DSIZE);
       
       
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       
       if(p->par.rel_br_override_default && p->mip->mip_inf && cand_num > 1){
 
@@ -723,7 +723,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       if (p->par.max_presolve_iter > 0) {
 	 max_presolve_iter = p->par.max_presolve_iter - bc_level;
 
-#ifdef COMPILE_IN_LP	 
+#ifdef SYM_COMPILE_IN_LP	 
 	 if(p->mip->nz > 5e4){
 	    max_presolve_iter = (int)(1.0 * max_presolve_iter * 5e4/p->mip->nz);
 	 }
@@ -757,7 +757,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
       if (1.0*p->lp_stat.str_br_total_iter_num > str_br_cnt_limit) str_br_iter_limit = TRUE; 
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       int node_factor = (int)(p->tm->stat.analyzed/50.0);
 #else
       int node_factor = 0;
@@ -785,7 +785,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       }
 
       if (
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	  p->tm->stat.analyzed > 5e5 ||
 #endif
 	  p->lp_stat.str_br_total_iter_num > 5e5) {
@@ -1166,7 +1166,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       }
       //printf("reliability branching: selected var %d with score %f\n", best_var, best_var_score);
       
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if (num_bnd_changes > 0) {
 	 str_br_bound_changes(p, num_bnd_changes, bnd_val, bnd_ind, bnd_sense);
       }
@@ -2014,7 +2014,7 @@ int branch(lp_prob *p, int cuts)
    cut_data *cut;
    node_desc *desc;
    int termcode;
-#if defined(DO_TESTS) && defined(COMPILE_IN_LP)
+#if defined(DO_TESTS) && defined(SYM_COMPILE_IN_LP)
    branch_obj *bobj = &(p->tm->active_nodes[p->proc_index]->bobj);
 #endif
 
@@ -2067,7 +2067,7 @@ int branch(lp_prob *p, int cuts)
       return(FATHOMED_NODE);
    }
 
-#if defined(DO_TESTS) && defined(COMPILE_IN_LP)
+#if defined(DO_TESTS) && defined(SYM_COMPILE_IN_LP)
    assert(can->rhs[old_keep] == bobj->rhs[keep]); 
 #endif
    
@@ -2121,7 +2121,7 @@ int branch(lp_prob *p, int cuts)
 	    exit(-123);
 	 }
 #endif
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	 /* Because these cuts are shared with the treemanager, we have to
 	    make a copy before changing them if the LP is compiled in */
 	 cut = (cut_data *) malloc(sizeof(cut_data));
@@ -2282,7 +2282,7 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
       *cand_num = cnt;
    }
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    p->tm->active_nodes[p->proc_index]->frac_cnt = cnt; 
    p->tm->active_nodes[p->proc_index]->frac_avg = frac_avg; 
 #endif

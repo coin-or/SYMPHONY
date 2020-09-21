@@ -243,7 +243,7 @@ int check_row_effectiveness(lp_prob *p)
 	       p->slack_cuts[p->slack_cut_num++] = row->cut;
 	       row->cut = NULL;
 	    }else{
-#ifdef COMPILE_IN_LP /*we don't want to free rows that have a name if we are
+#ifdef SYM_COMPILE_IN_LP /*we don't want to free rows that have a name if we are
 		       using shared memory because they are still being used*/
 	       if (row->cut->name < 0)
 #endif

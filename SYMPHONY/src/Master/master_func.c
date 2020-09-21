@@ -1220,7 +1220,7 @@ int copy_node(bc_node * n_to, bc_node *n_from)
    
    n_to->bobj = n_from->bobj;
 
-#if defined (COMPILING_FOR_LP) || defined(COMPILE_IN_LP)
+#if defined (COMPILING_FOR_LP) || defined(SYM_COMPILE_IN_LP)
 
    //FIXME, Do we need this while writing to file
 
@@ -1936,7 +1936,7 @@ sym_environment *create_copy_environment (sym_environment *env)
    sym_environment *env_copy;
    params *par;
    lp_sol *sol;
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_CP)
    cp_cut_data *cp_cut;
    cut_data *cut;
 #endif
@@ -2142,7 +2142,7 @@ sym_environment *create_copy_environment (sym_environment *env)
    /*========================================================================*/
    /*copy the cut pool */
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_CP)
    if (env_copy->par.tm_par.max_cp_num > 1){
       env_copy->cp =
 	 (cut_pool **) malloc(env_copy->par.tm_par.max_cp_num*
@@ -2676,7 +2676,7 @@ void free_master(sym_environment *env)
       FREE(env->base);
    }
 
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
    if (env->warm_start){
       free_subtree(env->warm_start->rootnode);
       if(env->warm_start->best_sol.has_sol){
@@ -2695,7 +2695,7 @@ void free_master(sym_environment *env)
       FREE(env->warm_start->cuts);
       FREE(env->warm_start);
    }
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    if (env->cp){
       for (i = 0; i < env->par.tm_par.max_cp_num; i++){
 	 env->cp[i]->msgtag = YOU_CAN_DIE;
@@ -2704,7 +2704,7 @@ void free_master(sym_environment *env)
       FREE(env->cp);
    }
 #endif
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if (env->sp){
       sp_free_sp(env->sp);
       FREE(env->sp);

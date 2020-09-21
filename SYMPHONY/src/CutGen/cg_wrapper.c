@@ -101,7 +101,7 @@ int find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 int free_cg_u(cg_prob *p)
 {
 
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    FREE(p->cuts_to_add);
 #else
    FREE(p->cur_sol.xind);

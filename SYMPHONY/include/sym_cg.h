@@ -37,7 +37,7 @@ typedef struct CG_PROB{
 				    is one */
    double         tt;
    lp_sol         cur_sol;
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    int           cuts_to_add_num;
    cut_data    **cuts_to_add;
    int           cuts_to_add_size;

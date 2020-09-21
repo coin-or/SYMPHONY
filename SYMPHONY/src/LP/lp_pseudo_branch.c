@@ -558,7 +558,7 @@ int branch(lp_prob *p, int cuts)
 	    exit(-123);
 	 }
 #endif
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	 /* Because these cuts are shared with the treemanager, we have to
 	    make a copy before changing them if the LP is compiled in */
 	 cut = (cut_data *) malloc(sizeof(cut_data));

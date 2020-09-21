@@ -43,17 +43,17 @@
 
 int lp_initialize(lp_prob *p, int master_tid)
 {
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    int msgtag, bytes, r_bufid;
 #endif
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
+#if !defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP)
    int s_bufid;
 #endif
    int i, j;
    row_data *rows;
    var_desc **vars;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 
    p->master = master_tid;
 
@@ -83,7 +83,7 @@ int lp_initialize(lp_prob *p, int master_tid)
 
    (void) used_time(&p->tt);
 
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
+#if !defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP)
    s_bufid = init_send(DataInPlace);
    send_msg(p->master, REQUEST_FOR_LP_DATA);
    freebuf(s_bufid);
@@ -99,7 +99,7 @@ int lp_initialize(lp_prob *p, int master_tid)
 	 p->obj_history[j] = -DBL_MAX;
       }
    }
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    if (p->par.use_cg){
       r_bufid = receive_msg(p->tree_manager, LP__CG_TID_INFO);
       receive_int_array(&p->cut_gen, 1);
@@ -129,7 +129,7 @@ int lp_initialize(lp_prob *p, int master_tid)
    p->lp_data->tmp.iv_size = 2*p->par.not_fixed_storage_size;
    p->lp_data->cgl = p->par.cgl;
 
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    if (!p->cgp){
       p->cgp = (cg_prob *) calloc(1, sizeof(cg_prob));
    }
@@ -187,7 +187,7 @@ int process_chain(lp_prob *p)
       }
       termcode = fathom_branch(p);
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 OPENMP_ATOMIC_UPDATE
       p->tm->stat.chains++;
 #pragma omp critical (tree_update)
@@ -234,7 +234,7 @@ int fathom_branch(lp_prob *p)
    const int verbosity = p->par.verbosity;
    double now, then2, timeout2;
    int rs_mode_enabled = FALSE;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    rs_mode_enabled = p->tm->par.rs_mode_enabled; 
    then2 = wall_clock(NULL);
    timeout2 = p->tm->par.status_interval;
@@ -259,7 +259,7 @@ int fathom_branch(lp_prob *p)
     * are found
    \*------------------------------------------------------------------------*/
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    while (p->tm->termcode == TM_UNFINISHED){
 #else
    while (TRUE){
@@ -276,7 +276,7 @@ int fathom_branch(lp_prob *p)
 	 }
       }
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       
       //set time limit here      
 
@@ -343,7 +343,7 @@ int fathom_branch(lp_prob *p)
       p->lp_stat.lp_calls++;
       p->lp_stat.lp_node_calls++;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 OPENMP_ATOMIC_UPDATE
       p->tm->lp_stat.lp_iter_num += iterd;
 #endif
@@ -460,7 +460,7 @@ OPENMP_ATOMIC_UPDATE
 		   termcode == LP_D_OBJLIM){
 	    PRINT(verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #ifdef DO_TESTS
             if (lp_data->objval < p->tm->lb - .001 && p->bc_index > 0){
                printf("#####Warning: lower bound corruption detected\n");
@@ -610,7 +610,7 @@ OPENMP_ATOMIC_UPDATE
 	 }
 	 p->node_iter_num = 0;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #pragma omp master
 {
 	 now = wall_clock(NULL);
@@ -686,7 +686,7 @@ OPENMP_ATOMIC_UPDATE
       check_ub(p);
       first_in_loop = FALSE;      
       
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       char gap_limit_reached = FALSE;
       if(p->has_ub && p->tm->par.gap_limit >= 0.0 && 
 	 (p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){
@@ -740,7 +740,7 @@ int fathom(lp_prob *p, int primal_feasible, int time_limit_reached)
    int colgen = p->colgen_strategy & COLGEN__FATHOM;
    int termcode = p->lp_data->termcode;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if(p->branch_dir == 'L' && p->branch_var >= 0){
       p->br_inf_down[p->branch_var]++;
    }else{
@@ -1191,7 +1191,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
 
    int *ulist, *clist; /* this later uses tmp.i1 */
    int cutcnt, i, j;
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    int s_bufid, r_bufid;
 #endif
 
@@ -1212,7 +1212,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
       }
    }
    if (cutcnt > 0){
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       row_data *tmp_rows = (row_data *) malloc(cutcnt*sizeof(row_data));
       
       for (j = 0, i = bcutnum; j < cutcnt; i++){
@@ -1277,7 +1277,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
       }
    }
 
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    /* At this point we will need the missing names */
    if (cutcnt > 0){
       static struct timeval tout = {15, 0};
@@ -1364,7 +1364,7 @@ int check_tailoff(lp_prob *p)
    }
 
    if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       && p->tm->stat.analyzed < 100
 #endif
       ){
@@ -1543,7 +1543,7 @@ void lp_exit(lp_prob *p)
 
 void lp_close(lp_prob *p)
 {
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    int s_bufid;
    
    /* Send back the timing data for the whole algorithm */
@@ -1702,10 +1702,10 @@ void lp_close(lp_prob *p)
    }
  }
 #endif
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
  cg_close(p->cgp);
 #endif
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
  free_lp(p);
 #endif
 }
@@ -1720,7 +1720,7 @@ void lp_close(lp_prob *p)
  */
 int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
 {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    LPdata                *lp_data = p->lp_data; 
    var_desc             **vars = lp_data->vars;
    int                    i, num_bnd_changes, cnt;
@@ -1780,7 +1780,7 @@ int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
 int str_br_bound_changes(lp_prob *p, int num_bnd_changes, double *bnd_val, 
       int *bnd_ind, char *bnd_sense)
 {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    bounds_change_desc    *bnd_change;
    int                   i, j;
    var_desc              **vars = p->lp_data->vars;
@@ -1856,7 +1856,7 @@ int update_solve_parameters(lp_prob *p)
   
   p->par.no_impr_in_obj = FALSE; 
 
-#ifdef COMPILE_IN_LP  
+#ifdef SYM_COMPILE_IN_LP  
   bc_node * node = p->tm->active_nodes[p->proc_index];
   int backtrack = 0;
   etol = 100*p->lp_data->lpetol;
@@ -1887,7 +1887,7 @@ int update_cut_parameters(lp_prob *p)
    cgl_params   *par      = &(p->par.cgl);
    cgl_params   *data_par = &(p->lp_data->cgl);
 
-#ifdef COMPILE_IN_LP   
+#ifdef SYM_COMPILE_IN_LP   
 
    if(data_par->use_chain_strategy){
 
@@ -2011,7 +2011,7 @@ int update_cut_parameters(lp_prob *p)
    }
    if (data_par->generate_cgl_probing_cuts == GENERATE_DEFAULT) {
 
-#ifdef COMPILE_IN_LP      
+#ifdef SYM_COMPILE_IN_LP      
       if(data_par->use_chain_strategy){
 	 if(p->bc_level > 0 && p->tm->lp_stat.probing_calls +
 	    p->lp_stat.probing_calls > 100 &&
@@ -2089,7 +2089,7 @@ int update_cut_parameters(lp_prob *p)
 	    data_par->generate_cgl_probing_cuts_freq = 
 	       par->generate_cgl_probing_cuts_freq = 100;
 	 }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       }
 #endif
    }
@@ -2100,7 +2100,7 @@ int update_cut_parameters(lp_prob *p)
       data_par->generate_cgl_twomir_cuts_freq = -1;
    }
    if (data_par->generate_cgl_twomir_cuts == GENERATE_DEFAULT) {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if(data_par->use_chain_strategy){
 	 if(p->bc_level > 0 && p->tm->lp_stat.twomir_calls +
 	    p->lp_stat.twomir_calls > 50 &&
@@ -2129,7 +2129,7 @@ int update_cut_parameters(lp_prob *p)
 	    data_par->generate_cgl_twomir_cuts_freq = 
 	       par->generate_cgl_twomir_cuts_freq = 100;
 	 }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       }
 #endif
    }
@@ -2141,7 +2141,7 @@ int update_cut_parameters(lp_prob *p)
       data_par->generate_cgl_clique_cuts_freq = -1;
    }
    if (data_par->generate_cgl_clique_cuts == GENERATE_DEFAULT) {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if(data_par->use_chain_strategy){
 	 if(p->bc_level > 0 && p->tm->lp_stat.clique_calls + p->lp_stat.clique_calls > 50 &&
 	    p->tm->lp_stat.clique_cuts + p->lp_stat.clique_cuts < 10){
@@ -2168,7 +2168,7 @@ int update_cut_parameters(lp_prob *p)
 	       data_par->generate_cgl_clique_cuts_freq = 10;
 	    }
 	 }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       }
 #endif
    }
@@ -2180,7 +2180,7 @@ int update_cut_parameters(lp_prob *p)
    }
    
    if (data_par->generate_cgl_flowcover_cuts == GENERATE_DEFAULT) {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if(data_par->use_chain_strategy){
 	 if(p->bc_level > 0 && p->tm->lp_stat.flowcover_calls +
 	    p->lp_stat.flowcover_calls > 50 &&
@@ -2211,7 +2211,7 @@ int update_cut_parameters(lp_prob *p)
 	       data_par->generate_cgl_flowcover_cuts_freq = 100;
 	    }
 	 }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       }
 #endif
    }
@@ -2224,7 +2224,7 @@ int update_cut_parameters(lp_prob *p)
    }
    
    if (data_par->generate_cgl_knapsack_cuts == GENERATE_DEFAULT) {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if(data_par->use_chain_strategy){
 	 if(p->bc_level > 0 && p->tm->lp_stat.knapsack_calls + p->lp_stat.knapsack_calls > 50 &&
 	    p->tm->lp_stat.knapsack_cuts + p->lp_stat.knapsack_cuts < 10){
@@ -2254,7 +2254,7 @@ int update_cut_parameters(lp_prob *p)
 		data_par->generate_cgl_knapsack_cuts_freq = 20;
 	     }
 	  }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
        }
 #endif
    }
@@ -2267,7 +2267,7 @@ int update_cut_parameters(lp_prob *p)
    }
    
    if (data_par->generate_cgl_gomory_cuts == GENERATE_DEFAULT) {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if(data_par->use_chain_strategy){
 
 	 //printf("gomory_nz: %.2f\n", p->gomory_nz);
@@ -2298,7 +2298,7 @@ int update_cut_parameters(lp_prob *p)
 	       data_par->generate_cgl_gomory_cuts_freq = 10;
 	    }
 	 }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       }
 #endif
    }   
@@ -2328,7 +2328,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       }  
    }
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if(p->bc_level < 1 && p->iter_num < 2){
       int row_den = (int)(1.0*p->mip->nz/p->mip->m) + 1;
       /* all previous */
@@ -2408,7 +2408,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
        p->par.best_violation_length[i] = p->par.max_cut_length;
      }
      //p->par.best_violation_length = p->par.max_cut_length;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
      if(p->par.verbosity > 1){
        printf("c-length - max_row - max-col - dens: %i - %i - %i - %f\n", p->par.max_cut_length, 
 	      p->mip->mip_inf->max_row_size, p->mip->mip_inf->max_col_size, 
@@ -2501,7 +2501,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          } 
 
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	 if(data_par->use_chain_strategy){
 	    probing->setRowCuts(3); 
 	    probing->setMode(2);
@@ -2609,7 +2609,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 		  probing->setMaxLookRoot(50);    /* default is 50 */
 	       }
 	    }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	 }
 #endif
          *should_generate = TRUE;
@@ -3118,7 +3118,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       }
 
       //j++;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if(p->bc_index < 1 && p->mip->mip_inf && ( generator == CGL_PROBING_GENERATOR || 
 						 generator == CGL_CLIQUE_GENERATOR ||
 						 generator == CGL_KNAPSACK_GENERATOR)){	 
@@ -3292,7 +3292,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 
       sym_cut->deletable = TRUE;
 
-#ifdef COMPILE_IN_LP      
+#ifdef SYM_COMPILE_IN_LP      
       if(p->bc_level < 1 && p->mip->mip_inf && (generator == CGL_PROBING_GENERATOR ||
 						generator == CGL_CLIQUE_GENERATOR ||
 						generator == CGL_KNAPSACK_GENERATOR)){
@@ -3519,7 +3519,7 @@ int should_stop_adding_cgl_cuts(lp_prob *p, int i, int *should_stop)
 /*===========================================================================*/
 int update_pcost(lp_prob *p)
 {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    bc_node *parent = p->tm->active_nodes[p->proc_index]->parent;
    char sense = parent->bobj.sense[0];
    int branch_var = parent->bobj.position;

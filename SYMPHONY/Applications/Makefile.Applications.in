@@ -26,13 +26,13 @@ EXE = $(MASTERNAME)@EXEEXT@
 CYGPATH_W = @CYGPATH_W@
 
 # Directory with COIN header files
-COININCDIR = @abs_include_dir@/coin
+COININCDIR = @prefix@/include/coin-or
 
 # Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
+COINLIBDIR = @prefix@/lib
 
 # Directory with Application files
-SYMAPPLDIR = @abs_source_dir@/Applications/$(SYMAPPLNAME)
+SYMAPPLDIR = @srcdir@/$(SYMAPPLNAME)
 
 # Directory for application obj files
 SYMAPPLOBJDIR = src
@@ -47,7 +47,6 @@ USE_CGL_CUTS = @USE_CGL_CUTS_TRUE@TRUE
 CLP_LP_SOLVER = @CLP_LP_SOLVER_TRUE@TRUE
 GLPK_LP_SOLVER = @GLPK_LP_SOLVER_TRUE@TRUE
 CPLEX_LP_SOLVER = @CPLEX_LP_SOLVER_TRUE@TRUE
-OSL_LP_SOLVER = @OSL_LP_SOLVER_TRUE@TRUE
 SOPLEX_LP_SOLVER = @SOPLEX_LP_SOLVER_TRUE@TRUE
 XPRESS_LP_SOLVER = @XPRESS_LP_SOLVER_TRUE@TRUE
 SYM_PARALLEL = @SYM_PARALLEL_TRUE@TRUE
@@ -58,7 +57,7 @@ LPEXT = @LPEXT@
 TMEXT = @TMEXT@
 
 ##############################################################################
-# This section is for listing CNRP source file names
+# This section is for listing source file names
 ##############################################################################
 
 VPATH = \
@@ -160,7 +159,7 @@ CXXLINKFLAGS = @RPATH_FLAGS@
 
 #Include files
 CFLAGS += -I`$(CYGPATH_W) $(SYMAPPLDIR)/include` \
-	  -I`$(CYGPATH_W) @abs_source_dir@/include`
+	  -I`$(CYGPATH_W) @top_srcdir@/include`
 
 # Libraries necessary to link
 ifeq ($(SYM_BUILD_APP),FALSE)
@@ -168,7 +167,7 @@ ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
 LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony`
 CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony`
 else
-LIBS += -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@
+LIBS += -L@libdir@ -lSym @SYMPHONYLIB_LFLAGS@
 CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
 endif
 else
@@ -176,7 +175,7 @@ ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
 LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony-app`
 CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony-app`
 else
-LIBS += -L@abs_lib_dir@ -lSymAppl @SYMPHONYLIB_LIBS_INSTALLED@
+LIBS += -L@libdir@ -lSymAppl  @SYMPHONYLIB_LFLAGS@
 CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
 endif
 endif
@@ -211,7 +210,7 @@ ADDFLAGS += $(CFLAGS) @SYMDEFS@
 ADDPFLAGS += $(CFLAGS) @SYMPDEFS@
 
 CFLAGS += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-PLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS) 
+PLIBS = -L$(PVM_ROOT)/lib/$PVM_ARCH -lgpvm3 -lpvm3 $(LIBS) 
 
 all: $(APPL_PARALLEL) $(WHATTOMAKE)
 
