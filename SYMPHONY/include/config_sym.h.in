@@ -3,6 +3,9 @@
 #ifndef __CONFIG_SYM_H__
 #define __CONFIG_SYM_H__
 
+/* Library Visibility Attribute */
+#undef SYMPHONYLIB_EXPORT
+
 /* Version number of project */
 #undef SYMPHONY_VERSION
 

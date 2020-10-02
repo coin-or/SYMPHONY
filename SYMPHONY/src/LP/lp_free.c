@@ -41,7 +41,7 @@ void free_cuts(cut_data **cuts, int cut_num)
    if (cuts)
       for (i=cut_num-1; i>=0; i--)
 	 if (cuts[i])
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	    if (cuts[i]->name < 0 || cuts[i]->branch & CUT_BRANCHED_ON)
 #endif
 	       free_cut(cuts+i);
@@ -216,12 +216,12 @@ void free_node_dependent(lp_prob *p)
 
    free_node_desc(&p->desc);
    for (i = p->base.cutnum; i < lp_data->m; i++){
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if (lp_data->rows[i].cut->name < 0 ||
 	  lp_data->rows[i].cut->branch & CUT_BRANCHED_ON)
 #endif
 	 free_cut(&lp_data->rows[i].cut);
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       else
 	 lp_data->rows[i].cut = NULL;
 #endif
@@ -252,7 +252,7 @@ void free_lp(lp_prob *p)
    for (i = p->lp_data->maxn - 1; i >= 0; i--)
       FREE(p->lp_data->vars[i]);
    FREE(p->lp_data->vars);
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    for (i = p->base.cutnum - 1; i >= 0; i--)
       free_cut(&(p->lp_data->rows[i].cut));
    free_node_desc(&p->desc);
@@ -269,7 +269,7 @@ void free_lp(lp_prob *p)
    }
    FREE(p->lp_data->mip);
    FREE(p->lp_data);
-#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
+#if !(defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP))
    free_mip_desc(p->mip);
    FREE(p->mip);
    FREE(p->base.userind);

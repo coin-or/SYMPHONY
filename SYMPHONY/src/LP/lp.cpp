@@ -12,7 +12,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef COMPILE_IN_LP 
+#ifndef SYM_COMPILE_IN_LP 
 
 #include <stdlib.h> 
 #include <math.h>

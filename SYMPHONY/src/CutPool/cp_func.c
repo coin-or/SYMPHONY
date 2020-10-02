@@ -41,13 +41,13 @@
 
 void cp_initialize(cut_pool *cp, int master_tid)
 {
-#ifndef COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_CP
    int bytes;
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    int s_bufid, r_bufid;
 #endif
 #endif
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
+#if !defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP)
    int s_bufid, r_bufid;
 #endif
    
@@ -55,7 +55,7 @@ void cp_initialize(cut_pool *cp, int master_tid)
     * Receive tid info; request and receive problem specific data
    \*------------------------------------------------------------------------*/
 
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 
    cp->master = master_tid;
 
@@ -74,7 +74,7 @@ void cp_initialize(cut_pool *cp, int master_tid)
 
 #endif
    
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_CP)
+#if !defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_CP)
        
    s_bufid = init_send(DataInPlace);
    send_msg(cp->master, REQUEST_FOR_CP_DATA);
@@ -400,7 +400,7 @@ int cp_read_tm_cut_list(cut_pool *cp, char *file)
 
 void cp_close(cut_pool *cp)
 {
-#ifndef COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_CP
    int s_bufid;
       
    s_bufid = init_send(DataInPlace);

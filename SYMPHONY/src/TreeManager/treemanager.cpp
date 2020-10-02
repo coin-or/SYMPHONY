@@ -12,7 +12,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
 
 #define COMPILING_FOR_TM
 

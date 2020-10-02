@@ -12,7 +12,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_CP
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -43,7 +43,7 @@
 
 void check_ub(lp_prob *p)
 {
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if (p->tm->has_ub){
       p->has_ub = TRUE;
       p->ub = p->tm->ub;
@@ -162,7 +162,7 @@ int process_message(lp_prob *p, int r_bufid, int *pindex, int *pitnum)
       return(FALSE);
 
     case YOU_CAN_DIE:
-#if defined(COMPILE_IN_TM) && !defined(COMPILE_IN_LP) && 0
+#if defined(SYM_COMPILE_IN_TM) && !defined(SYM_COMPILE_IN_LP) && 0
       /* This is not needed anymore */
       send_feasible_solution_u(p, p->best_sol.xlevel, p->best_sol.xindex,
 			       p->best_sol.xiter_num, p->best_sol.lpetol,
@@ -513,7 +513,7 @@ void send_node_desc(lp_prob *p, int node_type)
    
    LPdata *lp_data = p->lp_data;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    tm_prob *tm = p->tm;
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
@@ -579,7 +579,7 @@ void send_node_desc(lp_prob *p, int node_type)
       }
 #endif	 
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    int *indices;
    double *values;
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
@@ -796,7 +796,7 @@ void send_node_desc(lp_prob *p, int node_type)
 	 /* the active_nodes_per_... will be updated when the LP__IS_FREE
 	    message comes */
 	 if (n->cp)
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 	    tm->nodes_per_cp[n->cp]++;
 #else	    
 	    tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
@@ -1127,7 +1127,7 @@ array_desc pack_array_desc_diff(array_desc *ad, array_desc *new_ad, int *itmp)
 {
    /* Note that new_ad cannot be WRT_PARENT */
 
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    if (new_ad->type == NO_DATA_STORED){
       pack_array_desc(new_ad);
    }else if (new_ad->size == 0){
@@ -1158,7 +1158,7 @@ array_desc pack_array_desc_diff(array_desc *ad, array_desc *new_ad, int *itmp)
 	 /* (origsize-i + newsize-j >= newsize - (k + l)) :
 	    The rest of the change is more than the free space in the
 	    change area ==> send explicitly, so just send new_ad */
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
 	 pack_array_desc(new_ad);
 #else
 	 itmp[0] = -1;
@@ -1179,7 +1179,7 @@ array_desc pack_array_desc_diff(array_desc *ad, array_desc *new_ad, int *itmp)
 	    memcpy(desc.list + desc.added, isub, l * ISIZE);
 	 if (origsize > i)
 	    memcpy(desc.list+desc.added+l, origlist+i, (origsize-i) * ISIZE);
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
 	 pack_array_desc(&desc);
 #endif
 	 return(desc);
@@ -1229,7 +1229,7 @@ basis_desc pack_basis_diff(node_desc *oldnode, node_desc *newnode,
 {
    int size;
    basis_desc basis;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    int orig_size;
    char type;
 #else
@@ -1240,7 +1240,7 @@ basis_desc pack_basis_diff(node_desc *oldnode, node_desc *newnode,
 
    memset((char *)(&basis), 0, sizeof(basis_desc));
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    /* take care of the base rows */
    PACK_BASE_DIFF(newnode, oldnode, basis.baserows);
 
@@ -1323,7 +1323,7 @@ char pack_base_diff(int *size, int *oldstat, int *newstat, int *itmp)
    if (2 * k < *size){ /*changes are shorter */
       *size = k;
       type = WRT_PARENT;
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
       send_char_array(&type, 1);
       send_int_array(size, 1); /* size */
       if (k > 0){
@@ -1333,7 +1333,7 @@ char pack_base_diff(int *size, int *oldstat, int *newstat, int *itmp)
 #endif
    }else{ /* explicit shorter */ 
       type = EXPLICIT_LIST;
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
       send_char_array(&type, 1);
       send_int_array(size, 1);
       if (*size > 0){
@@ -1368,7 +1368,7 @@ char pack_extra_diff(array_desc *olddesc, int *oldstat,
    if (newdesc_type_in_tm == EXPLICIT_LIST ||
        oldbasis_type_in_tm == EXPLICIT_LIST){
       type = EXPLICIT_LIST;
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
       send_char_array(&type, 1);
       send_int_array(&newsize, 1);
       if (newsize > 0)
@@ -1409,7 +1409,7 @@ char pack_extra_diff(array_desc *olddesc, int *oldstat,
    if (2*(*size = newsize-j + l) < newsize){
       /* changes smaller than explicit */
       type = WRT_PARENT;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       if (newsize-j > 0){
 	 memcpy((char *)(modlist+l), (char *)(newlist+j), (newsize-j)*ISIZE);
 	 memcpy((char *)(modstat+l), (char *)(newstat+j), (newsize-j)*ISIZE);
@@ -1432,7 +1432,7 @@ char pack_extra_diff(array_desc *olddesc, int *oldstat,
    }else{
       /* EXPLICIT_LIST is shorter */
       type = EXPLICIT_LIST;
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
       send_char_array(&type, 1);
       send_int_array(&newsize, 1);
       if (newsize > 0){
@@ -1448,7 +1448,7 @@ char pack_extra_diff(array_desc *olddesc, int *oldstat,
 void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep) 
 {
    LPdata *lp_data = p->lp_data;
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    int s_bufid, r_bufid, name;
 #endif
    int i = 0, pos = can->position;
@@ -1456,7 +1456,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    char dive = p->dive, olddive = p->dive;
    char fractional_dive = FALSE;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    tm_prob *tm = p->tm;
    bc_node *node = tm->active_nodes[p->proc_index];
    branch_obj *bobj = &node->bobj;
@@ -1665,7 +1665,7 @@ void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
 {
    int i, cnt = 0;
    row_data *extrarows = p->lp_data->rows + p->base.cutnum;
-#if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_CP) && defined(SYM_COMPILE_IN_LP)
 
    cut_pool *cp = p->tm->cpp[p->cut_pool];
 
@@ -1685,7 +1685,7 @@ void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
 	 cnt++;
    }
 
-#if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_CP) && defined(SYM_COMPILE_IN_LP)
 
    if (cnt > 0){
       REALLOC(cp->cuts_to_add, cut_data *, cp->cuts_to_add_size,

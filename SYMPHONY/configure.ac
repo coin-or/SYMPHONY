@@ -20,9 +20,7 @@
 #                       Names and other basic things                        #
 #############################################################################
 
-AC_PREREQ(2.59)
-
-AC_INIT([SYMPHONY],[trunk],[symphony@list.coin-or.org])
+AC_INIT([SYMPHONY],[devel],[https://github.com/coin-or/SYMPHONY/issues/new],[coin-or-symphony],[https://github.com/coin-or/SYMPHONY])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -44,78 +42,69 @@ AC_COPYRIGHT([
 # whether the package is actually there
 AC_CONFIG_SRCDIR(include/symphony.h)
 
-# Where should everything be installed by default?  Here, we want it
-# to be installed directly in 'bin', 'lib', 'include' subdirectories
-# of the directory where configure is run.  The default would be
-# /usr/local.
-AC_PREFIX_DEFAULT([`pwd`])
+# Do some initialization work (version numbers, change prefix default, ...)
+
+AC_COIN_INITIALIZE
 
 #############################################################################
 #                         Standard build tool stuff                         #
 #############################################################################
 
-# Get the system type
-AC_CANONICAL_BUILD
-
-# If this project depends on external projects, the Externals file in
-# the source root directory contains definition of where to find those
-# externals.  The following macro ensures that those externals are
-# retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT(SYMPHONY)
-
-# Check if user wants to produce debugging code
-AC_COIN_DEBUG_COMPILE(SYMPHONY)
-
 # Get the name of the C++ compiler and appropriate compiler options
 AC_COIN_PROG_CXX
-#AC_LIBTOOL_LANG_CXX_CONFIG
-AC_LANG_PUSH(C++)
 
-# Initialize automake and libtool
-AC_COIN_INIT_AUTO_TOOLS
+# Initialize libtool
+AC_COIN_PROG_LIBTOOL
 
-# Get the EXEXT variable for CYGWIN
-AC_EXEEXT
-
-# Check if user wants to use readline library
-AC_COIN_CHECK_GNU_READLINE
-AM_CONDITIONAL(COIN_HAS_READLINE,
-               [test $coin_has_readline = yes])
+# set RPATH_FLAGS to the compiler link flags required to hardcode location
+# of the shared objects (expanded_libdir is set somewhere in configure before)
+# (use in examples Makefile)
+AC_COIN_RPATH_FLAGS([$expanded_libdir])
 
 #############################################################################
-#                              COIN components                              #
+#                        Headers                                            #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinUtils, [coinutils], [SymphonyLib])
-if test $coin_has_coinutils != yes ; then
-  AC_MSG_ERROR([Required package CoinUtils not available.])
-fi
-AC_COIN_CHECK_PACKAGE(Osi, [osi], [SymphonyLib])
-if test $coin_has_osi != yes ; then
-  AC_MSG_ERROR([Required package Osi not available.])
-fi
+# Check for cmath/math.h, cfloat/float.h, cieeefp/ieeefp.h
+AC_COIN_CHECK_MATH_HDRS
 
-AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp clp],  [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(DyLP, [osi-dylp dylp], [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Vol,  [osi-vol vol],  [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Cgl,  [cgl],      [SymphonyLib])
-
-AC_COIN_CHECK_PACKAGE(OsiTests, [osi-unittests])
-AC_COIN_CHECK_PACKAGE(Sample,   [coindatasample])
-AC_COIN_CHECK_PACKAGE(Netlib,   [coindatanetlib])
-AC_COIN_CHECK_PACKAGE(Miplib3,  [coindatamiplib3])
+# Check for pwd.h
+AC_CHECK_HEADERS([pwd.h])
 
 #############################################################################
-#                            Third party solvers                            #
+#                    COIN-OR components                                     #
 #############################################################################
 
-# Check which third party solvers are available
-AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Glpk, [osi-glpk],   [SymphonyLib]) 
-#AC_COIN_CHECK_PACKAGE(Grb,  [osi-gurobi], [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Msk,  [osi-mosek],  [SymphonyLib])
-#AC_COIN_CHECK_PACKAGE(Spx,  [osi-soplex], [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Xpr,  [osi-xpress], [SymphonyLib])
+m4_foreach_w([myvar],[CoinUtils Osi Cgl Clp],
+  [ AC_COIN_CHK_PKG(myvar,[SymphonyLib OsiSymphonyLib])
+    if test $coin_has_[]m4_tolower(myvar) != yes ; then
+      AC_MSG_ERROR([Required package myvar is not available.])
+    fi
+  ])
+
+AC_COIN_CHK_PKG(OsiClp,[SymphonyLib],[osi-clp])
+AC_COIN_CHK_PKG(OsiDyLP,[SymphonyLib],[osi-dylp])
+AC_COIN_CHK_PKG(OsiVol,[SymphonyLib],[osi-vol])
+AC_COIN_CHK_PKG(OsiCpx,[SymphonyLib],[osi-cplex])
+AC_COIN_CHK_PKG(OsiGlpk,[SymphonyLib],[osi-glpk])
+AC_COIN_CHK_PKG(OsiSpx,[SymphonyLib],[osi-soplex])
+AC_COIN_CHK_PKG(OsiXpr,[SymphonyLib],[osi-xpress])
+AC_COIN_CHK_PKG(OsiGrb,[SymphonyLib],[osi-gurobi])
+
+AC_COIN_CHK_PKG(Glpk,[SymphonyLib],,[build])
+
+# Data Packages
+
+AC_COIN_CHK_PKG(OsiTests,[SymUnitTest],[osi-unittests])
+AC_COIN_CHK_PKG(Sample,,[coindatasample],,dataonly)
+AC_COIN_CHK_PKG(Netlib,,[coindatanetlib],,dataonly)
+AC_COIN_CHK_PKG(Miplib3,,[coindatamiplib3],,dataonly)
+
+# Optional package for command line edit support
+
+AC_COIN_CHK_GNU_READLINE([SymphonyLib])
+
+AC_COIN_FINALIZE_FLAGS([SymphonyLib OsiSymphonyLib SymUnitTest])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -137,21 +126,29 @@ case $sym_lp_solver in
          found_package=false
      fi
    ;;
-   glpk)
-     AC_MSG_RESULT(Glpk)
-     if test $coin_has_glpk = false; then 
+   dylp)
+    AC_MSG_RESULT(DyLP) 
+     if [test $coin_has_dylp = unavailable]; \
+     then
          found_package=false
      fi
-   ;; 
+   ;;
+   vol)
+    AC_MSG_RESULT(Vol) 
+     if [test $coin_has_vol = unavailable]; \
+     then
+         found_package=false
+     fi
+   ;;
    cplex)
      AC_MSG_RESULT(Cplex)
      if test $coin_has_cpx = false; then 
          found_package=false
      fi
    ;; 
-   osl)
-         AC_MSG_RESULT(Osl)
-     if test $coin_has_osl = false; then 
+   glpk)
+     AC_MSG_RESULT(Glpk)
+     if test $coin_has_glpk = false; then 
          found_package=false
      fi
    ;; 
@@ -167,6 +164,12 @@ case $sym_lp_solver in
          found_package=false
      fi
    ;; 
+   gurobi)
+         AC_MSG_RESULT(Gurobi)
+     if test $coin_has_grb = false; then 
+         found_package=false
+     fi
+   ;; 
   *)
     AC_MSG_ERROR(Unknown LP solver!)
   ;;
@@ -178,16 +181,22 @@ fi
 
 AM_CONDITIONAL(CLP_LP_SOLVER,[test $sym_lp_solver = clp &&
 test $coin_has_clp = yes])
-AM_CONDITIONAL(GLPK_LP_SOLVER,[test $sym_lp_solver = glpk &&
-test $coin_has_glpk = yes])
-AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
-test $coin_has_osl = yes])
+AM_CONDITIONAL(DYLP_LP_SOLVER,[test $sym_lp_solver = dylp &&
+test $coin_has_dylp = yes])
+AM_CONDITIONAL(VOL_LP_SOLVER,[test $sym_lp_solver = vol &&
+test $coin_has_vol = yes])
 AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex &&
 test $coin_has_cpx = yes])
+AM_CONDITIONAL(GLPK_LP_SOLVER,[test $sym_lp_solver = glpk &&
+test $coin_has_glpk = yes])
 AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
 test $coin_has_spx = yes])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
 test $coin_has_xpr = yes])
+AM_CONDITIONAL(GRB_LP_SOLVER,[test $sym_lp_solver = gurobi &&
+test $coin_has_grb = yes])
+
+AM_CONDITIONAL(COIN_CXX_IS_CL,[test $enable_msvc = yes])
 
 #############################################################################
 #                       Add the options                                     #
@@ -437,30 +446,7 @@ esac],
 AM_CONDITIONAL(DRAWGRAPH, [test $sym_graph = true])
 
 #---------------------------------------------------------------------------#
-# STATIC EXECUTABLE
-#---------------------------------------------------------------------------#
-
-AC_ARG_ENABLE([static-executable],
-[AC_HELP_STRING([--enable-static-executable],
-                [create a complete static executable])],
-[case "${enableval}" in
-   yes) 
-      if test "$enable_shared" = yes; then 
-        AC_MSG_ERROR(static executable requires static COIN libraries: use with --enable-shared=no flag)
-      fi
-      sym_static_exe=true
-   ;;
-   no)  sym_static_exe=false
-   ;;
-   *) AC_MSG_ERROR(bad value ${enableval} for --enable-static-executable)
-   ;;
-esac],
-[sym_static_exe=false])
-
-AM_CONDITIONAL(STATICEXE, [test $sym_static_exe = true])
-
-#---------------------------------------------------------------------------#
-# DRAWGRAPH
+# SIGNAL HANDLER
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([signal-handler],
@@ -482,7 +468,7 @@ AM_CONDITIONAL(SIGHANDLER, [test $sym_sig_catch = true])
 #              Check the OS and add default defs                            #
 #############################################################################
 
-SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
+SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM'
 
 ARCH=
 case $host in
@@ -594,7 +580,8 @@ dnl AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 #                       Parallel configuration                              #
 #############################################################################
 
-AC_COIN_CHECK_USER_LIBRARY([Pvm], [PVM], [pvm3.h], [pvm_gettid])
+AC_COIN_CHK_LIB(PVM, [SymphonyLib], [-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3], [-I$PVM_ROOT/include], [], [pvm_gettid])
+#AC_COIN_CHECK_USER_LIBRARY([Pvm], [PVM], [pvm3.h], [pvm_gettid])
 AC_ARG_WITH([pvm],
 [AC_HELP_STRING([--with-pvm],
                 [compile in distributed parallel mode (assuming that 
@@ -608,6 +595,7 @@ if test x"$find_pvm" = xyes; then
                   [AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
                   [pvm_header=yes])],
                   [])
+
 	m4_ifvaln([pvm_gettid],
                   [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
                    pvm_link=no
@@ -619,17 +607,15 @@ if test x"$find_pvm" = xyes; then
                                    break],
                                   [AC_MSG_RESULT(no)])
                    AC_LANG_POP(C)])
-    fi
-
-    if test x"$pvm_header" != xyes; then
-       AC_MSG_ERROR([Cannot find the pvm header files either in system path or 
-in PVM_ROOT path:$PVM_ROOT])
-    fi
-    if test x"$pvm_link" != xyes ; then
-       AC_MSG_ERROR([Cannot find PVM library in system paths or in PVM_ROOT path:$PVM_ROOT])
-    fi
-    if test $pvm_link == yes && test $pvm_header == yes; then
-       coin_has_pvm=yes
+        if test x"$pvm_header" != xyes; then
+            AC_MSG_ERROR([Cannot find the pvm header files either in system path or in PVM_ROOT path:$PVM_ROOT])
+        fi
+        if test x"$pvm_link" != xyes ; then
+            AC_MSG_ERROR([Cannot find PVM library in system paths or in PVM_ROOT path$PVM_ROOT])
+        fi
+        if test $pvm_link == yes && test $pvm_header == yes; then
+            coin_has_pvm=yes
+        fi
     fi
 fi
 
@@ -690,37 +676,36 @@ MASTEREXT=
 LIBNAME=
 SYMPDEFS="$SYMDEFS"
 
-SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM"
+SYMDEFS="$SYMDEFS -DSYM_COMPILE_IN_CG -DSYM_COMPILE_IN_CP -DSYM_COMPILE_IN_LP -DSYM_COMPILE_IN_TM"
 
 if test $in_cg = yes; then 
    LPEXT=_cg
-   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CG"
+   SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_CG"
 fi 
 if test $in_cp = yes; then 
-   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CP"
+   SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_CP"
    CPEXT=_cp
 fi 
 if test $in_lp = yes; then 
-  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_LP"
+  SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_LP"
   TMEXT="_lp$LPEXT$CPEXT"
 else
   TMEXT=$CPEXT
 fi 
 if test $in_tm = yes; then 
-  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_TM"
+  SYMPDEFS="$SYMPDEFS -DSYM_COMPILE_IN_TM"
   MASTEREXT="_tm$TMEXT"
 fi 
 
 WHATTOMAKELIBS="libSym.la"
+WHATTOINSTALLLIBS="libSym.la"
 WHATTOMAKEBINS="symphony$EXEEXT"
 if test $sym_appl = yes ; then 
    WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
    WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
-   if test $dependency_linking = yes ; then
-       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
-   fi
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+   WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymApplStubs.la"
 fi
-WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
@@ -758,11 +743,9 @@ if test $sym_enable_parallel = true; then
     if test $sym_appl = yes ; then 
        WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
        WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl$MASTEREXT.la"
-       if test $dependency_linking = yes ; then
-       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
-       fi
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs$MASTEREXT.la"
+       WHATTOINSTALLLIBS="$WHATTOMAKELIBS libSymApplStubs$MASTEREXT.la"
     fi
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
 
 AC_SUBST(WHATTOMAKELIBS)
@@ -801,15 +784,15 @@ fi
 if test $sym_openmp = auto; then 
    AC_MSG_CHECKING([whether compiler supports OpenMP])
    case "$CXX" in
-     clang*) 
+     *clang*) 
        AC_MSG_RESULT([no])
        sym_openmp=false
        ;;
-     cl* | *\cl* | */cl*)
+     *cl*)
        AC_MSG_RESULT([yes])
        sym_openmp=true
        ;;
-     g++*)
+     *g++*)
         sym_openmp=true
    	fopenmp_version=4.2
    	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
@@ -832,7 +815,7 @@ AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
 AC_SUBST(SYM_OPENMP_FLAGS)
 AC_SUBST(SYM_OPENMP_LIBS)
 if test $sym_openmp = true; then
-  if test x$coin_cxx_is_cl = xtrue; then
+  if test $enable_msvc = yes; then
     SYM_OPENMP_FLAGS=-openmp 
     SYM_OPENMP_LIBS=
   else
@@ -844,82 +827,17 @@ else
   SYM_OPENMP_LIBS=
 fi
 
-#############################################################################
-#                       Other third party software                          #
-#############################################################################
-
-# Ampl Solver library
-#AC_COIN_HAS_ASL
-
-##############################################################################
-#                   VPATH links for example input files                      #
-##############################################################################
-
-# In case this is a VPATH configuration we need to make sure that the
-# input files for the examples are available in the VPATH directory.
-
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-# Location of SYMPHONY for later use
-AC_SUBST(SYMINCDIR)
-AC_SUBST(SYMSRCDIR)
-SYMINCDIR=`cd $srcdir; pwd`/include
-SYMSRCDIR=`cd $srcdir; pwd`/src
-
 # To be used in applications: default SYMPHONY defs
 AC_SUBST(SYMDEFS)
 AC_SUBST(SYMPDEFS)
-AC_SUBST(ARCH)
-AC_SUBST(COIN_HAS_CLP)
 
 # Location of Applications for later use
 AC_SUBST(SYMAPPLDIR)
 SYMAPPLDIR=`pwd`/Applications
-
-#FIXME-Debugging conditional, for now
-
-#AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
-
-#Add openmp flag and take care of cl flags
-sym_use_cl=false
-CLLCFLAGS=
-case "$CXX" in
-  clang*) 
-     if test $sym_openmp = true; then
-         CXXFLAGS="$CXXFLAGS -fopenmp"
-     fi
-  ;; 
-  cl* | *\cl* | */cl*)
-     CLLCFLAGS=$CXXFLAGS
-     CXXFLAGS="$CXXFLAGS -TP"
-     if test $sym_openmp = true; then
-     	 CXXFLAGS="$CXXFLAGS -openmp"
-     fi
-  ;;
-  g++* | *\g++* | */g++*)
-     if test $sym_openmp = true; then
-         CXXFLAGS="$CXXFLAGS -fopenmp"
-     fi
-
-     #Ignore warnings about unrecognized pragma lines and 
-     #deprecated string conversions
-     CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
-
-     #Ignore warnings about comparisons of signed and unsigned values and 
-     #casting const pointers to ordinary pointers
-     CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
-   ;; 
-esac
-
-
-
-#Set CFLAGS to CXXFLAGS since we are using g++
-CFLAGS=$CXXFLAGS
-AC_SUBST(CFLAGS)
-AC_SUBST(CXXFLAGS)
-AC_SUBST(CLLCFLAGS)
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
@@ -940,9 +858,7 @@ AC_CONFIG_FILES([Makefile
 		 Applications/VRP/Makefile
 		 symphony.pc
 		 symphony-app.pc
-		 symphony-uninstalled.pc
-		 osi-sym.pc:src/OsiSym/osi-sym.pc.in
-		 osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in])
+		 osi-sym.pc:src/OsiSym/osi-sym.pc.in])
 
 AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/CNRP/README
@@ -973,7 +889,7 @@ AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/VRP/sample.vrp])
 
 # Here put the location and name of the configuration header file
-AC_CONFIG_HEADER([include/config.h include/config_sym.h])
+AC_CONFIG_HEADER([include/config.h include/config_sym.h include/config_osisym.h])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE

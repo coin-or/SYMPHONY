@@ -1,12 +1,15 @@
-prefix=@prefix@
+@COIN_RELOCATABLE_FALSE@prefix=@prefix@
+@COIN_RELOCATABLE_TRUE@prefix=${pcfiledir}/../..
 exec_prefix=@exec_prefix@
 libdir=@libdir@
-includedir=@includedir@/coin
+includedir=@includedir@/coin-or
 
 Name: SYMPHONY
 Description: SYMPHONY MILP Solver Framework
-URL: https://projects.coin-or.org/SYMPHONY
+URL: https://github.com/coin-or/SYMPHONY
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lSymAppl @SYMPHONYLIB_PCLIBS@ @SYM_OPENMP_LIBS@
+Libs: -L${libdir} -lSymAppl
+Libs.private: @SYMPHONYLIB_LFLAGS_NOPC@ @SYM_OPENMP_LIBS@
 Cflags: -I${includedir} @SYM_OPENMP_FLAGS@
-Requires: @SYMPHONYLIB_PCREQUIRES@
+Requires:
+Requires.private: @SYMPHONYLIB_PCFILES@

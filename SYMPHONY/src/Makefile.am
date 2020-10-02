@@ -16,7 +16,7 @@
 
 ## $Id: Makefile.am 387 2006-06-22 23:15:50Z menal $
 
-AUTOMAKE_OPTIONS = foreign
+include $(top_srcdir)/BuildTools/Makemain.inc
 
 ##############################################################################
 ##############################################################################
@@ -64,16 +64,16 @@ if COIN_CXX_IS_CL
  SYMHEADERS += ../include/sym_win32_time.h
 endif
 
-
 #Add SymConfig.h
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 
-SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
-	Master/master_func.c Master/master_prep.c Master/master_prep_base.c Master/master_prep_sr.c 
+SYM_MASTER_SRC	= Master/master.cpp Master/master_wrapper.c Master/master_io.c \
+		Master/master_func.c Master/master_prep.c \
+		Master/master_prep_base.c Master/master_prep_sr.c 
 
 MASTER_SRC =$(SYM_MASTER_SRC)
 
-MASTER_MAIN_SRC     = Master/main.c
+MASTER_MAIN_SRC     = Master/main.cpp
 
 DG_SRC		= DrawGraph/draw_graph.c
 
@@ -121,8 +121,8 @@ if SYM_COMPILE_IN_TM
 MASTER_SRC     += $(TM_SRC)
 endif
 
-LP_SRC		= LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_sp.c \
+LP_SRC		= LP/lp.cpp LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/lp_sp.c \
 	LP/lp_heuristics.c
 if PSEUDO_COSTS
 LP_SRC         += LP/lp_pseudo_branch.c
@@ -195,183 +195,121 @@ MAIN_SRC = $(MASTER_MAIN_SRC)
 
 USER_APPL_DIR = ../Applications/USER/src/
 
-USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
+USER_MASTER_SRC = $(USER_APPL_DIR)/Master/user_master.c 
+USER_LP_SRC = $(USER_APPL_DIR)/LP/user_lp.c $(USER_APPL_DIR)/LP/user_lp_branch.c
+USER_CG_SRC = $(USER_APPL_DIR)/CutGen/user_cg.c 
+USER_CP_SRC = $(USER_APPL_DIR)/CutPool/user_cp.c 
+USER_DG_SRC = $(USER_APPL_DIR)/DrawGraph/user_dg.c
+
+USER_SRC = $(USER_APPL_DIR)/Master/user_master.c \
 	$(USER_APPL_DIR)/LP/user_lp.c \
 	$(USER_APPL_DIR)/LP/user_lp_branch.c \
 	$(USER_APPL_DIR)/CutGen/user_cg.c \
 	$(USER_APPL_DIR)/CutPool/user_cp.c \
 	$(USER_APPL_DIR)/DrawGraph/user_dg.c
 
-##############################################################################
-#  Extensions and filenames for various configurations
-##############################################################################
-
-# if SYM_COMPILE_IN_CG
-# LPEXT = _cg
-# endif
-# if SYM_COMPILE_IN_CP
-# CPEXT = _cp
-# endif
-# if SYM_COMPILE_IN_LP
-# TMEXT = _lp$(LPEXT)$(CPEXT)
-# else
-# TMEXT = $(CPEXT)
-# endif
-# if SYM_COMPILE_IN_TM
-# MASTEREXT = _m_tm$(TMEXT)
-# endif
-
-# LIBNAME = Sym
-# MASTERNAME = symphony
-
-# if SYM_PARALLEL
-# MASTERLIBNAME = $(LIBNAME)$(MASTEREXT)
-# MASTERBIN = $(MASTERNAME)$(MASTEREXT)
-# else
-# MASTERLIBNAME = $(LIBNAME)
-# MASTERBIN = $(MASTERNAME)
-# endif
-
 ########################################################################
 #                           Common Flags                               #
 ########################################################################
 
-SYMCPPFLAGS =
-PCPPFLAGS =
-APPLCPPFLAGS =
-APPLPCPPFLAGS =
-ALLLDADD =
-PLDADD =
-LDADD = $(SYMPHONYLIB_LIBS)
-DEPENDENCIES = $(SYMPHONYLIB_DEPENDENCIES)
-AM_CPPFLAGS = $(SYMPHONYLIB_CFLAGS)
+COMMON_FLAGS = -I$(top_srcdir)/include \
+              -I$(top_builddir)/include \
+              -I$(top_srcdir)/Applications/USER/include
+
+COMMON_FLAGS += $(SYM_OPENMP_FLAGS) $(SYMPHONYLIB_CFLAGS)
+if COIN_CXX_IS_CL
+COMMON_FLAGS += -TP
+endif
 
 if CLP_LP_SOLVER
-  AM_CPPFLAGS += -D__OSI_CLP__
+  COMMON_FLAGS += -D__OSI_CLP__
 endif
 
 if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += -D__OSI_CPLEX__
+  COMMON_FLAGS += -D__OSI_CPLEX__
 endif
 
 if GLPK_LP_SOLVER
-  AM_CPPFLAGS += -D__OSI_GLPK__
+  COMMON_FLAGS += -D__OSI_GLPK__
 else 
 if USE_GMPL
-  AM_CPPFLAGS += -DUSE_GLPMPL
+  COMMON_FLAGS += -DUSE_GLPMPL
 endif
 endif
 
 if SOPLEX_LP_SOLVER
-  AM_CPPFLAGS += -D__OSI_SOPLEX__
+  COMMON_FLAGS += -D__OSI_SOPLEX__
 endif
 
 if XPRESS_LP_SOLVER
-  AM_CPPFLAGS += -D__OSI_XPRESS__
+  COMMON_FLAGS += -D__OSI_XPRESS__
 endif
 
 ########################################################################
 #                            Additional Definitions                    #
 ########################################################################
 
-if COIN_HAS_READLINE
-AM_CPPFLAGS += -DHAS_READLINE
-endif
-
 if SENSITIVITY_ANALYSIS
-AM_CPPFLAGS += -DSENSITIVITY_ANALYSIS
+COMMON_FLAGS += -DSENSITIVITY_ANALYSIS
 endif
 
 if USE_CGL_CUTS
-AM_CPPFLAGS += -DUSE_CGL_CUTS
+COMMON_FLAGS += -DUSE_CGL_CUTS
 endif
 
 if ROOT_NODE_ONLY
-AM_CPPFLAGS += -DROOT_NODE_ONLY
+COMMON_FLAGS += -DROOT_NODE_ONLY
 endif
 
 if COMPILE_FRAC_BRANCHING
-AM_CPPFLAGS += -DCOMPILE_FRAC_BRANCHING
+COMMON_FLAGS += -DCOMPILE_FRAC_BRANCHING
 endif
 
 if DO_TESTS
-AM_CPPFLAGS += -DDO_TESTS
+COMMON_FLAGS += -DDO_TESTS
 endif
 
 if TM_BASIS_TESTS
-AM_CPPFLAGS += -DTM_BASIS_TESTS
+COMMON_FLAGS += -DTM_BASIS_TESTS
 endif
 
 if TRACE_PATH
-AM_CPPFLAGS += -DTRACE_PATH
+COMMON_FLAGS += -DTRACE_PATH
 endif
 
 if CHECK_CUT_VALIDITY
-AM_CPPFLAGS += -DCHECK_CUT_VALIDITY
+COMMON_FLAGS += -DCHECK_CUT_VALIDITY
 endif
 
 if STATISTICS
-AM_CPPFLAGS += -DSTATISTICS
+COMMON_FLAGS += -DSTATISTICS
 endif
 
 if PSEUDO_COSTS
-AM_CPPFLAGS += -DPSEUDO_COSTS
+COMMON_FLAGS += -DPSEUDO_COSTS
 endif
 
 if DRAWGRAPH
-AM_CPPFLAGS += 
+COMMON_FLAGS += 
 endif
 
 if SIGHANDLER
-AM_CPPFLAGS += -DSIGHANDLER
+COMMON_FLAGS += -DSIGHANDLER
 endif
 
-SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
+AM_CPPFLAGS = $(COMMON_FLAGS) $(SYMDEFS)
+APPLCPPFLAGS = $(AM_CPPFLAGS) -DUSE_SYM_APPLICATION
 
 if SYM_PARALLEL
-PCPPFLAGS += $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-PLDADD += $(LDADD) -lgpvm3 -lpvm3
-APPLPCPPFLAGS += $(PCPPFLAGS) -DUSE_SYM_APPLICATION
+PCPPFLAGS = $(COMMON_FLAGS) $(SYMPDEFS) -I$(PVM_ROOT)/include
+PLDADD = -lgpvm3 -lpvm3
+APPLPCPPFLAGS = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
 endif
-
-APPLCPPFLAGS += $(SYMCPPFLAGS) -DUSE_SYM_APPLICATION
-
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
-                   -I`$(CYGPATH_W) $(top_builddir)/include`
-
-if DEPENDENCY_LINKING
-DEFAULT_INCLUDES += -I`$(CYGPATH_W) $(top_srcdir)/Applications/USER/include`
-endif
-
-########################################################################
-########################################################################
 
 # Compile everything with g++
 CC = $(CXX)
 CCLD = $(CXX)
-
-#Static link
-STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static\
-	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-
-# Link with g++
-LINK =
-if STATICEXE
-LINK +=  $(STATIC_LINK) 
-else
-LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@ -rpath $(libdir)
-# the rpath seem to be necessary to have a .lai file created, which is necessary for installing libraries
-endif
-
-SYMLINK =
-if COIN_CXX_IS_CL
-SYMLINK += cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
-	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-else
-SYMLINK += $(LINK)
-endif
+CXXLD = $(CXX)
 
 ########################################################################
 #                               libSym                                 #
@@ -386,16 +324,26 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 	libSymAppl_tm_cp.la libSymAppl_tm_lp_cg.la libSymAppl_tm_lp_cg_cp.la \
 	libSymAppl_m_tm.la libSymAppl_m_tm_lp.la libSymAppl_m_tm_cp.la \
 	libSymAppl_m_tm_lp_cg.la libSymAppl_m_tm_lp_cg_cp.la \
-	libSymAppl_cp.la libSym_m.la libSymApplStubs.la libSymAppl_m.la 
-#$(WHATTOMAKELIBS) $(WHATTOMAKEBINS)
-#if !SYM_PARALLEL
-
+	libSymAppl_cp.la libSym_m.la libSymApplStubs.la libSymAppl_m.la \
+	libSymApplStubs_cg.la libSymApplStubs_lp.la libSymApplStubs_m.la \
+	libSymApplStubs_lp_cg.la libSymApplStubs_tm.la libSymApplStubs_tm_lp.la \
+	libSymApplStubs_tm_cp.la libSymApplStubs_tm_lp_cg.la \
+	libSymApplStubs_tm_lp_cg_cp.la \
+	libSymApplStubs_m_tm.la libSymApplStubs_m_tm_lp.la \
+	libSymApplStubs_m_tm_cp.la \
+	libSymApplStubs_m_tm_lp_cg.la libSymApplStubs_m_tm_lp_cg_cp.la \
+	libSymApplStubs_cp.la
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
 lib_LTLIBRARIES = $(WHATTOINSTALLLIBS)
 
-# List all source files for this library, including headers
+AM_LDFLAGS = -rpath $(libdir) $(LT_LDFLAGS)
+
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
+libSym_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+#libSym_la_CPPFLAGS = $(AM_CPPFLAGS)
+
+# List all source files for this library, including headers
 libSym_m_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
 libSym_m_tm_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
 libSym_m_tm_lp_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
@@ -412,7 +360,6 @@ libSym_tm_lp_cg_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
 libSym_tm_lp_cg_cp_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
 libSym_tm_cp_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
 
-libSym_la_CPPFLAGS = $(SYMCPPFLAGS)
 libSym_m_la_CPPFLAGS = $(PCPPFLAGS) 
 libSym_m_tm_la_CPPFLAGS = $(PCPPFLAGS) 
 libSym_m_tm_lp_la_CPPFLAGS = $(PCPPFLAGS) 
@@ -429,155 +376,106 @@ libSym_tm_lp_cg_la_CPPFLAGS = $(PCPPFLAGS)
 libSym_tm_lp_cg_cp_la_CPPFLAGS = $(PCPPFLAGS) 
 libSym_tm_cp_la_CPPFLAGS = $(PCPPFLAGS) 
 
-libSym_lp_la_LINK = $(STATIC_LINK)
-libSym_lp_cg_la_LINK = $(STATIC_LINK)
-libSym_cg_la_LINK = $(STATIC_LINK)
-libSym_cp_la_LINK = $(STATIC_LINK)
-libSym_tm_la_LINK = $(STATIC_LINK)
-libSym_tm_lp_la_LINK = $(STATIC_LINK)
-libSym_tm_lp_cg_la_LINK = $(STATIC_LINK)
-libSym_tm_lp_cg_cp_la_LINK = $(STATIC_LINK)
-libSym_tm_cp_la_LINK = $(STATIC_LINK)
-
-libSym_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_m_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_m_tm_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_m_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_m_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_m_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_m_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_lp_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_tm_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
-
-# List all additionally required libraries
-if DEPENDENCY_LINKING
-libSym_la_LIBADD = $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-endif
+libSym_m_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_m_tm_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_m_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_m_tm_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_m_tm_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_m_tm_lp_cg_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_tm_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_tm_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_tm_lp_cg_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSym_tm_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 
 ########################################################################
 #                        symphony program                              #
 ########################################################################
 
-EXTRA_PROGRAMS = symphony symphony_m symphony_m_tm symphony_m_tm_lp \
-	symphony_m_tm_cp \
-	symphony_m_tm_lp_cg symphony_m_tm_lp_cg_cp symphony_cp symphony_lp \
-	symphony_lp_cg symphony_lp_cg_cp symphony_tm symphony_tm_cp \
-	symphony_tm_lp 	symphony_tm_lp_cg symphony_tm_lp_cg_cp 
-
-# # # Name of the executable compiled in this directory.  We want it to be
-# # # installed in the 'bin' directory
-
 bin_PROGRAMS = $(WHATTOMAKEBINS)
 
-symphony_SOURCES = $(MAIN_SRC) symphony.h
-#symphony_DEPENDENCIES = $(SYMLDADD) libSym.la
-symphony_CPPFLAGS = $(SYMCPPFLAGS)
-symphony_LDADD = libSym.la $(LDADD) $(ADDLIBS)
-symphony_DEPENDENCIES = libSym.la $(DEPENDENCIES)
-symphony_LINK = $(SYMLINK)
+EXTRA_PROGRAMS = symphony symphony_m symphony_m_tm symphony_m_tm_lp \
+	symphony_m_tm_cp symphony_m_tm_lp_cg symphony_m_tm_lp_cg_cp \
+	symphony_tm symphony_tm_lp symphony_tm_cp symphony_tm_lp_cg \
+	symphony_tm_lp_cg_cp symphony_cp symphony_lp symphony_lp_cg \
+	symphony_lp_cg_cp
 
-symphony_m_SOURCES = $(MAIN_SRC) symphony.h
-#symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
-symphony_m_CPPFLAGS = $(PCPPFLAGS)
+symphony_SOURCES = $(MASTER_MAIN_SRC) symphony.h
+symphony_LDADD = libSym.la 
+
+symphony_m_SOURCES = $(MASTER_MAIN_SRC) symphony.h
 symphony_m_LDADD = libSym$(MASTEREXT).la $(PLDADD)
-symphony_m_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
+symphony_m_CPPFLAGS = $(PCPPFLAGS)
 
-symphony_m_tm_SOURCES = $(MAIN_SRC) symphony.h
-#symphony_m_tm_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
-symphony_m_tm_CPPFLAGS = $(PCPPFLAGS)
+symphony_m_tm_SOURCES = $(MASTER_MAIN_SRC) symphony.h
 symphony_m_tm_LDADD = libSym$(MASTEREXT).la $(PLDADD)
-symphony_m_tm_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
+symphony_m_tm_CPPFLAGS = $(PCPPFLAGS)
 
-symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony.h
-#symphony_m_tm_lp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
+symphony_m_tm_lp_SOURCES = $(MASTER_MAIN_SRC) symphony.h
+symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la libSym.la $(PLDADD)
-symphony_m_tm_lp_DEPENDENCIES = libSym$(MASTEREXT).la libSym.la $(DEPENDENCIES)
 
-symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony.h
-#symphony_m_tm_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
-symphony_m_tm_cp_CPPFLAGS = $(PCPPFLAGS)
+symphony_m_tm_cp_SOURCES = $(MASTER_MAIN_SRC) symphony.h
 symphony_m_tm_cp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
-symphony_m_tm_cp_DEPENDENCIES = libSym$(MASTEREXT).la $(DEPENDENCIES)
+symphony_m_tm_cp_CPPFLAGS = $(PCPPFLAGS)
 
-symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony.h
-#symphony_m_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
+symphony_m_tm_lp_cg_SOURCES = $(MASTER_MAIN_SRC) symphony.h
+symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la libSym.la $(PLDADD)
-symphony_m_tm_lp_cg_DEPENDENCIES = libSym$(MASTEREXT).la libSym.la $(DEPENDENCIES)
 
-symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony.h
-#symphony_m_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
+symphony_m_tm_lp_cg_cp_SOURCES = $(MASTER_MAIN_SRC) symphony.h
+symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la libSym.la $(PLDADD)
-symphony_m_tm_lp_cg_cp_DEPENDENCIES = libSym$(MASTEREXT).la libSym.la $(DEPENDENCIES)
 
-symphony_tm_SOURCES =
-#symphony_tm_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
-symphony_tm_CPPFLAGS = $(PCPPFLAGS)
+symphony_tm_SOURCES = 
 symphony_tm_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
-symphony_tm_DEPENDENCIES = libSym_tm$(TMEXT).la $(DEPENDENCIES)
+symphony_tm_CPPFLAGS = $(PCPPFLAGS)
 
-symphony_tm_lp_SOURCES =
-#symphony_tm_lp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
+symphony_tm_lp_SOURCES = 
+symphony_tm_lp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_LDADD = libSym_tm$(TMEXT).la libSym.la $(PLDADD)
-symphony_tm_lp_DEPENDENCIES = libSym_tm$(TMEXT).la libSym.la $(DEPENDENCIES)
 
-symphony_tm_cp_SOURCES =
-#symphony_tm_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
-symphony_tm_cp_CPPFLAGS = $(PCPPFLAGS)
+symphony_tm_cp_SOURCES = 
 symphony_tm_cp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
-symphony_tm_cp_DEPENDENCIES = libSym_tm$(TMEXT).la $(DEPENDENCIES)
+symphony_tm_cp_CPPFLAGS = $(PCPPFLAGS)
 
-symphony_tm_lp_cg_SOURCES =
-#symphony_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
+symphony_tm_lp_cg_SOURCES = 
+symphony_tm_lp_cg_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_cg_LDADD = libSym_tm$(TMEXT).la libSym.la $(PLDADD)
-symphony_tm_lp_cg_DEPENDENCIES = libSym_tm$(TMEXT).la libSym.la $(DEPENDENCIES)
 
-symphony_tm_lp_cg_cp_SOURCES =
-#symphony_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
+symphony_tm_lp_cg_cp_SOURCES = 
+symphony_tm_lp_cg_cp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_cg_cp_LDADD = libSym_tm$(TMEXT).la libSym.la $(PLDADD)
-symphony_tm_lp_cg_cp_DEPENDENCIES = libSym_tm$(TMEXT).la libSym.la $(DEPENDENCIES)
 
-symphony_cp_SOURCES =
-#symphony_cp_DEPENDENCIES = $(LDADD) libSym_cp.la
-symphony_cp_CPPFLAGS = $(PCPPFLAGS)
+symphony_cp_SOURCES = 
 symphony_cp_LDADD = libSym_cp.la $(PLDADD)
-symphony_cp_DEPENDENCIES = libSym_cp.la $(DEPENDENCIES)
+symphony_cp_CPPFLAGS = $(PCPPFLAGS)
 
-symphony_lp_SOURCES =
-#symphony_lp_DEPENDENCIES = $(LDADD) 
+symphony_lp_SOURCES = 
+symphony_lp_LDADD = libSym_lp.la $(PLDADD)
 symphony_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_LDADD = libSym_lp$(LPEXT).la libSym.la $(PLDADD)
-symphony_lp_DEPENDENCIES = libSym_lp$(LPEXT).la libSym.la $(DEPENDENCIES)
 
-symphony_lp_cg_SOURCES =
-#symphony_lp_cg_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la 
-symphony_lp_cg__CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_cg_LDADD = libSym_lp$(LPEXT).la libSym.la $(PLDADD)
-symphony_lp_cg_DEPENDENCIES = libSym_lp$(LPEXT).la libSym.la $(DEPENDENCIES)
+symphony_lp_cg_SOURCES = 
+symphony_lp_cg_LDADD = libSym_lp$(LPEXT).la libSym$(MASTEREXT).la $(PLDADD)
+symphony_lp_cg_CPPFLAGS = $(PCPPFLAGS)
 
-symphony_lp_cg_cp_SOURCES =
-#symphony_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la
-symphony_lp_cg_cp__CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la libSym.la $(PLDADD)
-symphony_lp_cg_cp_DEPENDENCIES = libSym_lp$(LPEXT).la libSym.la $(DEPENDENCIES)
+symphony_lp_cg_cp_SOURCES = 
+symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
+symphony_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
 
 ########################################################################
 #                Application Library                                   #    
 ########################################################################
 
 libSymAppl_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
+libSymAppl_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_la_CPPFLAGS = $(APPLCPPFLAGS)
+
+# List all source files for this library, including headers
 libSymAppl_m_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
 libSymAppl_m_tm_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
 libSymAppl_m_tm_lp_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
@@ -594,93 +492,97 @@ libSymAppl_tm_lp_cg_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
 libSymAppl_tm_lp_cg_cp_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
 libSymAppl_tm_cp_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
 
-libSymAppl_lp_la_LINK = $(STATIC_LINK)
-libSymAppl_lp_cg_la_LINK = $(STATIC_LINK)
-libSymAppl_cg_la_LINK = $(STATIC_LINK)
-libSymAppl_cp_la_LINK = $(STATIC_LINK)
-libSymAppl_tm_la_LINK = $(STATIC_LINK)
-libSymAppl_tm_lp_la_LINK = $(STATIC_LINK)
-libSymAppl_tm_lp_cg_la_LINK = $(STATIC_LINK)
-libSymAppl_tm_lp_cg_cp_la_LINK = $(STATIC_LINK)
-libSymAppl_tm_cp_la_LINK = $(STATIC_LINK)
-
-libSymAppl_la_LDFLAGS = $(LT_LDFLAGS) 
-libSymAppl_m_la_LDFLAGS = $(LT_LDFLAGS) 
-libSymAppl_m_tm_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_m_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_m_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_m_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_m_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_lp_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_tm_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
-libSymAppl_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
-
-libSymAppl_la_CPPFLAGS = $(APPLCPPFLAGS) 
 libSymAppl_m_la_CPPFLAGS = $(APPLPCPPFLAGS) 
-libSymAppl_m_tm_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_m_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_m_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_m_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_m_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_lp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_cg_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_tm_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
+libSymAppl_m_tm_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_m_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_m_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_m_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_m_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_lp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_tm_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
 
-# List all additionally required libraries
-if DEPENDENCY_LINKING
-libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_m_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_m_tm_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_m_tm_lp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_m_tm_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_m_tm_lp_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_m_tm_lp_cg_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_lp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_lp_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_tm_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_tm_lp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_tm_lp_cg_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_tm_lp_cg_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-libSymAppl_tm_cp_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
-endif
+libSymAppl_m_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_m_tm_lp_cg_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_lp_cg_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymAppl_tm_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 
 ########################################################################
 #     A Dummy Library with Stubs for User Callbacks                    #
-#       (We need this to do dependency linking)                        #
 ########################################################################
 
-libSymApplStubs_la_SOURCES = $(SYMINCFILES) $(USER_APPL_DIR)/include/user.h \
-	                     $(USER_APPL_STUBS_SRC)
-libSymApplStubs_lp_la_LINK = $(STATIC_LINK)
-libSymApplStubs_la_LDFLAGS = $(LT_LDFLAGS) 
-libSymApplStubs_la_CPPFLAGS = $(APPLCPPFLAGS) 
+libSymApplStubs_la_SOURCES  = $(SYMINCFILES) $(USER_APPL_DIR)/include/user.h
+libSymApplStubs_la_SOURCES += $(USER_SRC)
+libSymApplStubs_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_la_CPPFLAGS = $(APPLCPPFLAGS)
 
-########################################################################
-#                Other stuff                                           #    
-########################################################################
+libSymApplStubs_m_la_SOURCES = $(SYMINCFILES) $(USER_MASTER_SRC)
+libSymApplStubs_m_tm_la_SOURCES = $(SYMINCFILES) $(USER_MASTER_SRC)
+libSymApplStubs_m_tm_lp_la_SOURCES = $(SYMINCFILES) $(USER_MASTER_SRC) $(USER_LP_SRC)
+libSymApplStubs_m_tm_cp_la_SOURCES = $(SYMINCFILES) $(USER_MASTER_SRC) $(USER_CP_SRC)
+libSymApplStubs_m_tm_lp_cg_la_SOURCES = $(SYMINCFILES) $(USER_MASTER_SRC) $(USER_LP_SRC) \
+	$(USER_CG_SRC)
+libSymApplStubs_m_tm_lp_cg_cp_la_SOURCES = $(SYMINCFILES) $(USER_MASTER_SRC) $(USER_LP_SRC) \
+	$(USER_CG_SRC) $(USER_CP_SRC)
+libSymApplStubs_lp_la_SOURCES = $(SYMINCFILES) $(USER_LP_SRC) 
+libSymApplStubs_lp_cg_la_SOURCES = $(SYMINCFILES) $(USER_LP_SRC) $(USER_CG_SRC)
+libSymApplStubs_cg_la_SOURCES = $(SYMINCFILES) $(USER_CG_SRC)
+libSymApplStubs_cp_la_SOURCES = $(SYMINCFILES) $(USER_CP_SRC)
+libSymApplStubs_tm_la_SOURCES = $(SYMINCFILES) 
+libSymApplStubs_tm_lp_la_SOURCES = $(SYMINCFILES) $(USER_LP_SRC)
+libSymApplStubs_tm_lp_cg_la_SOURCES = $(SYMINCFILES) $(USER_LP_SRC) $(USER_CG_SRC)
+libSymApplStubs_tm_lp_cg_cp_la_SOURCES = $(SYMINCFILES) $(USER_LP_SRC) $(USER_CG_SRC) \
+	$(USER_CP_SRC)
+libSymApplStubs_tm_cp_la_SOURCES = $(SYMINCFILES) $(USER_CP_SRC)
 
-#COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
-# Get rid of warning flags
-#FIXME-Try to have the following later
-#CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
-#CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
+libSymApplStubs_m_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_m_tm_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_m_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_m_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_m_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_m_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_lp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_tm_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
+libSymApplStubs_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS) 
 
-rename_obj:
-	mv main.obj symphony-main.obj
+libSymApplStubs_m_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_m_tm_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_m_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_m_tm_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_m_tm_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_m_tm_lp_cg_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_tm_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_tm_lp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_tm_lp_cg_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_tm_lp_cg_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
+libSymApplStubs_tm_cp_la_LIBADD = $(SYMPHONYLIB_LFLAGS) $(SYM_OPENMP_LIBS)
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -688,20 +590,9 @@ rename_obj:
 
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+includecoindir = $(pkgincludedir)
 includecoin_HEADERS = ../include/symphony.h
 #	$(SYMHEADERS)
-
-########################################################################
-#                     Installing manifest (MSVC++)                     #
-########################################################################
-
-if COIN_CXX_IS_CL
-install-exec-hook:
-	test -s symphony.exe.manifest && \
-	mt -manifest symphony.exe.manifest -outputresource:symphony.exe;\
-	cp symphony.exe $(bindir)/symphony.exe
-endif
 
 #######################################################################
 # Create the Config.h file that has all public defines and install it #

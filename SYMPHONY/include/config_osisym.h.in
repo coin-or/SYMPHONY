@@ -1,0 +1,9 @@
+/* src/config_osisym.h.in. */
+
+#ifndef __CONFIG_OSISYM_H__
+#define __CONFIG_OSISYM_H__
+
+/* Library Visibility Attribute */
+#undef OSISYMPHONYLIB_EXPORT
+
+#endif

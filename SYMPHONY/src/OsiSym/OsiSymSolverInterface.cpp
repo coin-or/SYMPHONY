@@ -1062,6 +1062,15 @@ bool OsiSymSolverInterface::isProvenPrimalInfeasible() const
 /*===========================================================================*/
 /*===========================================================================*/
 
+bool OsiSymSolverInterface::isProvenDualInfeasible() const
+{
+   throw CoinError("Error: Function not implemented",
+                   "isProvenDualInfeasible", "OsiSymSolverInterface");
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 //bool OsiSymSolverInterface::isPrimalObjectiveLimitReached() const
 //{
 //   if(sym_is_target_gap_achieved(env_)){
@@ -1097,6 +1106,7 @@ bool OsiSymSolverInterface::isTimeLimitReached() const
       return false;
    }
 }
+
 /*===========================================================================*/
 /*===========================================================================*/
 
@@ -1108,6 +1118,14 @@ bool OsiSymSolverInterface::isTargetGapReached() const
    else{
       return false;
    }
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+CoinWarmStart *OsiSymSolverInterface::getEmptyWarmStart () const{
+   throw CoinError("Error: Function not implemented",
+                   "getEmptyWarmStart", "OsiSymSolverInterface");
 }
 
 /*===========================================================================*/
@@ -1583,6 +1601,23 @@ int OsiSymSolverInterface::getIterationCount() const
 /*===========================================================================*/
 /*===========================================================================*/
 
+std::vector<double*> OsiSymSolverInterface::getDualRays(int maxNumRays,
+                                                  bool fullRay) const{
+   throw CoinError("Error: Function not implemented",
+                   "getDualRays", "OsiSymSolverInterface");
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+std::vector<double*> OsiSymSolverInterface::getPrimalRays(int maxNumRays) const{
+   throw CoinError("Error: Function not implemented",
+                   "getPrimalRays", "OsiSymSolverInterface");
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 void OsiSymSolverInterface::setObjCoeff( int elementIndex, 
 					 double elementValue )
 {
@@ -1922,6 +1957,14 @@ bool OsiSymSolverInterface::setWarmStart(const CoinWarmStart* warmstart)
    sym_delete_warm_start(ws);
 
    return true;   
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+sym_environment *OsiSymSolverInterface::getSymphonyEnvironment() const
+{
+   return env_;
 }
 
 /*===========================================================================*/

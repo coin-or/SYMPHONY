@@ -40,13 +40,13 @@
 
 void cg_initialize(cg_prob *p, int master_tid)
 {
-#ifndef COMPILE_IN_CG
+#ifndef SYM_COMPILE_IN_CG
    int bytes, msgtag;
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    int s_bufid, r_bufid, info;
 #endif
 #endif
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
+#if !defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP)
    int r_bufid, s_bufid = 0;
 #endif
 
@@ -54,7 +54,7 @@ void cg_initialize(cg_prob *p, int master_tid)
     * Receive the problem data 
     *------------------------------------------------------------------------*/
 
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 
    p->master = master_tid;
 
@@ -77,8 +77,8 @@ void cg_initialize(cg_prob *p, int master_tid)
    
 #endif
    
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) || \
-   !defined(COMPILE_IN_CG)
+#if !defined(SYM_COMPILE_IN_TM) || !defined(SYM_COMPILE_IN_LP) || \
+   !defined(SYM_COMPILE_IN_CG)
       
    /* This part, we only need to do if we are not running in full serial mode*/
 
@@ -104,7 +104,7 @@ void cg_initialize(cg_prob *p, int master_tid)
 int cg_send_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
 		cut_data ***cuts)
 {
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 
    int i;
    cut_data *tmp_cut;
@@ -211,7 +211,7 @@ int cg_add_explicit_cut(int nzcnt, int *indices, double *values,
 int cg_add_user_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
 		    cut_data ***cuts)
 {
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 
    int i;
    cut_data *tmp_cut;

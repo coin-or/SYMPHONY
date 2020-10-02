@@ -54,7 +54,7 @@ typedef struct CUT_POOL{
    int           total_cut_num;
    int           reorder_count; /* Only reorder the cuts periodically */
    lp_sol        cur_sol;
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    int           cuts_to_add_num;
    cut_data    **cuts_to_add;
    int           cuts_to_add_size;

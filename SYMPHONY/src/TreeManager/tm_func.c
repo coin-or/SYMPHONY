@@ -44,10 +44,10 @@ extern long random PROTO((void));
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
 #include "sym_qsort.h"
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #include "sym_lp.h"
 #endif
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
 #include "sym_master.h"
 #else
 #include "sym_cp.h"
@@ -70,16 +70,16 @@ int c_count = 0;
 
 int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 {
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    int r_bufid, bytes, msgtag, i;
 #endif
    FILE *f = NULL;
    tm_params *par;
    bc_node *root = (bc_node *) calloc(1, sizeof(bc_node));
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    int i;
 #else
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
    int i;
 #endif
    int s_bufid;
@@ -109,7 +109,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
     * Receives data from the master
    \*------------------------------------------------------------------------*/
 
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
    tm->bvarnum = base->varnum;
    tm->bcutnum = base->cutnum;
 #else
@@ -142,16 +142,16 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    
    SRANDOM(par->random_seed);
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    tm->active_nodes = (bc_node **) calloc(par->max_active_nodes, sizeof(bc_node *));
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    tm->lpp = (lp_prob **)
       malloc(par->max_active_nodes * sizeof(lp_prob *));
    for (i = 0; i < par->max_active_nodes; i++){
       tm->lpp[i] = (lp_prob *) calloc(1, sizeof(lp_prob));
       tm->lpp[i]->proc_index = i;
    }
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    tm->cgp = (cg_prob **) malloc(par->max_active_nodes * sizeof(cg_prob *));
    for (i = 0; i < par->max_active_nodes; i++)
       tm->lpp[i]->cgp = tm->cgp[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
@@ -197,11 +197,11 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    }
 
    if (par->use_cg){
-#ifndef COMPILE_IN_CG
+#ifndef SYM_COMPILE_IN_CG
       tm->cg = start_processes(tm, par->max_active_nodes, par->cg_exe,
 			       par->cg_debug, par->cg_mach_num, par->cg_machs);
       
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       for (i = 0; i < par->max_active_nodes; i++)
 	 tm->lpp[i]->cut_gen = tm->cg.procs[i];
 #else
@@ -215,12 +215,12 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    }
    
    if (par->max_cp_num){
-#ifdef COMPILE_IN_CP
-#ifndef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_TM
       tm->cpp = (cut_pool **) malloc(par->max_cp_num * sizeof(cut_pool *));
 #endif
       for (i = 0; i < par->max_cp_num; i++){
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
 	 tm->cpp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
 #endif
 	 cp_initialize(tm->cpp[i], tm->master);
@@ -237,7 +237,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
       tm->nodes_per_cp = (int *) calloc(tm->par.max_cp_num, ISIZE);
       tm->active_nodes_per_cp = (int *) calloc(tm->par.max_cp_num, ISIZE);
    }else{
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
       tm->cpp = (cut_pool **) calloc(1, sizeof(cut_pool *));
 #endif
    }
@@ -272,7 +272,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
       if(root->node_status != NODE_STATUS__WARM_STARTED)
 	root->node_status = NODE_STATUS__ROOT;
    }else{
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
       (tm->rootnode = root)->desc = *rootdesc;
       /* Copy the root description in case it is still needed */
       root->desc.uind.list = (int *) malloc(rootdesc->uind.size*ISIZE);
@@ -308,7 +308,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 
 int solve(tm_prob *tm)
 {
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    int r_bufid;
 #endif
    double start_time = tm->start_time;
@@ -399,7 +399,7 @@ int solve(tm_prob *tm)
 	       ramp_down_time += wall_clock(NULL) - no_work_start;
 	    }
 	       
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	    if (tm->active_node_num >= tm->par.max_active_nodes-1){
 #else
             if (!tm->lp.free_num){
@@ -424,7 +424,7 @@ int solve(tm_prob *tm)
 	    if (i != NEW_NODE__STARTED)
 	       break;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #ifdef _OPENMP
 	    if (tm->par.verbosity > 1)
 	       printf("Thread %i now processing node %i\n", thread_num,
@@ -535,7 +535,7 @@ OPENMP_ATOMIC_WRITE
 	    break;
 	 }
 	 
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
 	 struct timeval timeout = {5, 0};
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
@@ -626,7 +626,7 @@ OPENMP_ATOMIC_WRITE
 
 void write_log_files(tm_prob *tm)
 {
-#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CP)
+#if !defined(SYM_COMPILE_IN_LP) || !defined(SYM_COMPILE_IN_CP)
    int s_bufid;
 #endif
 
@@ -639,7 +639,7 @@ void write_log_files(tm_prob *tm)
    }
 
    if (tm->par.max_cp_num > 0 && tm->par.cp_logging){
-#if defined(COMPILE_IN_LP) && defined(COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_LP) && defined(SYM_COMPILE_IN_CP)
       write_cp_cut_list(tm->cpp[0], tm->cpp[0]->par.log_file_name,
 			FALSE);
 #else
@@ -949,7 +949,7 @@ int start_node(tm_prob *tm, int thread_num)
        case (NF_CHECK_NOTHING << 8) + 1:
 	  if(!tm->par.sensitivity_analysis){
 	     if (tm->par.max_cp_num > 0 && best_node->cp){
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 		ind = best_node->cp;
 #else
 		ind = find_process_index(&tm->cp, best_node->cp);
@@ -1023,7 +1023,7 @@ int start_node(tm_prob *tm, int thread_num)
    }
 
    /* Assign a free lp process */
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    lp_ind = thread_num;
 #else
    lp_ind = tm->lp.free_ind[--tm->lp.free_num];
@@ -1304,7 +1304,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
 		int *active_nodes_per_pool, int *nodes_per_pool)
 {
    int oldind = -1, ind, pool;
-#ifndef COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_CP
    int s_bufid, r_bufid;
    struct timeval timeout = {5, 0};
 #endif
@@ -1315,7 +1315,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
    }
 
    if (oldpool > 0){
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
       oldind = oldpool;
 #else
       oldind = find_process_index(pools, oldpool);
@@ -1328,7 +1328,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
    }
 
    ind = pools->free_ind[--pools->free_num];
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    pool = ind;
 #else
    pool = pools->procs[ind];
@@ -1343,7 +1343,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
    /* finally when we really move the node from one pool to another */
    nodes_per_pool[oldind]--;
    active_nodes_per_pool[ind] = 1;
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    /*FIXME: Multiple Pools won't work in shared memory mode until I fill this
      in.*/
 #else
@@ -1423,7 +1423,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #endif
       child->frac_cnt = node->frac_cnt; 
       child->frac_avg = node->frac_avg; 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       child->update_pc = bobj->is_est[i] ? TRUE : FALSE;
 #endif
       child->parent = node;
@@ -1656,7 +1656,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       }
    }
    if (node->cp)
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
       tm->nodes_per_cp[node->cp] += np_cp;
 #else
       tm->nodes_per_cp[find_process_index(&tm->cp, node->cp)] += np_cp;
@@ -1939,7 +1939,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	       int *swap_si = bobj->sos_ind[i];
 	       bobj->sos_ind[i] = bobj->sos_ind[new_child_num];
 	       bobj->sos_ind[new_child_num] = swap_si;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	       bobj->is_est[i] = bobj->is_est[new_child_num];
 	       bobj->termcode[i] = bobj->termcode[new_child_num];
 	       bobj->iterd[i] = bobj->iterd[new_child_num];
@@ -1950,7 +1950,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    }
 
    free_tree_node(node);
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #ifdef _OPENMP
    int thread_num = omp_get_thread_num();
 #else
@@ -2034,7 +2034,7 @@ void mark_lp_process_free(tm_prob *tm, int lp, int cp)
 {
    int ind;
    if (tm->cp.procnum > 0){
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
       ind = cp;
 #else
       ind = find_process_index(&tm->cp, cp);
@@ -2081,7 +2081,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    }else{
       changed_bound = FALSE;
    }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    for (i = 0; i < tm->par.max_active_nodes; i ++){
       tm->lpp[i]->has_ub = tm->has_ub;
       tm->lpp[i]->ub = tm->ub;
@@ -2091,7 +2091,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    if (!changed_bound){
       return;
    }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    tm->opt_thread_num = opt_thread_num;
 #endif
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
@@ -2159,7 +2159,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	 node = list[i];
 	 if (tm->has_ub &&
 	     node->lower_bound >= tm->ub-tm->par.granularity){
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 	    if (node->parent && node->parent->bobj.type == BRANCHING_VARIABLE){
 	       for (j = 0; j < node->parent->bobj.child_num; j++){
 		  if (node->parent->children[j] == node){
@@ -2246,7 +2246,7 @@ void merge_descriptions(node_desc *old_node, node_desc *new_node)
       old_node->basis = new_node->basis;
       merge_arrays(&old_node->uind, &new_node->uind);
       merge_arrays(&old_node->cutind, &new_node->cutind);
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       memset((char *)&(new_node->basis), 0, sizeof(basis_desc));
 #endif
    }
@@ -2267,7 +2267,7 @@ void merge_base_stat(double_array_desc *dad, double_array_desc *moddad)
       FREE(dad->list);
       FREE(dad->stat);
       *dad = *moddad;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       moddad->stat = NULL;
 #endif
       return;
@@ -2300,7 +2300,7 @@ void merge_extra_array_and_stat(array_desc *ad, double_array_desc *dad,
       FREE(dad->list);
       FREE(dad->stat);
       *dad = *moddad;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       moddad->stat = NULL;
 #endif
    }else{
@@ -2357,7 +2357,7 @@ void merge_double_array_descs(double_array_desc *dad,
    if (moddad->size != 0){
       if (dad->size == 0){
 	 *dad = *moddad;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       moddad->stat = moddad->list = NULL;
 #endif
       }else{
@@ -2407,7 +2407,7 @@ void merge_arrays(array_desc *array, array_desc *adesc)
       /* Replace the old with the new one */
       FREE(array->list);
       *array = *adesc;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       adesc->list = NULL;
 #endif
       return;
@@ -2426,7 +2426,7 @@ void merge_arrays(array_desc *array, array_desc *adesc)
 	 it would be shorter to explicitly list the new stuff then wrt an
 	 empty explicit list. */
       *array = *adesc;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       adesc->list = NULL;
 #endif
    }else{
@@ -2662,10 +2662,10 @@ void modify_list_and_stat(array_desc *origad, int *origstat,
 
 int tasks_before_phase_two(tm_prob *tm)
 {
-#if !defined(COMPILE_IN_TM)||(defined(COMPILE_IN_TM)&&!defined(COMPILE_IN_LP))
+#if !defined(SYM_COMPILE_IN_TM)||(defined(SYM_COMPILE_IN_TM)&&!defined(SYM_COMPILE_IN_LP))
    int s_bufid;
 #endif
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    int num_threads = 1;
 #else
    int r_bufid, msgtag, bytes, sender, not_fixed_size;
@@ -2674,7 +2674,7 @@ int tasks_before_phase_two(tm_prob *tm)
    bc_node *n;
    int termcode = 0;
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #ifdef _OPENMP
    num_threads =  omp_get_num_threads();
 #endif
@@ -2731,7 +2731,7 @@ int tasks_before_phase_two(tm_prob *tm)
    if (tm->par.price_in_root && tm->has_ub){
       /* receive what the LP has to say, what is the new not_fixed list.
        * also, incorporate that list into the not_fixed field of everything */
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       switch(process_chain(tm->lpp[0])){
 	 
       case FUNCTION_TERMINATED_NORMALLY:
@@ -2891,7 +2891,7 @@ int tasks_before_phase_two(tm_prob *tm)
 #endif
    }
    
-#ifdef COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_TM
    if (tm->samephase_candnum > 0){
       printf( "\n");
       printf( "**********************************************\n");
@@ -2965,7 +2965,7 @@ int trim_subtree(tm_prob *tm, bc_node *n)
    if (i < 0){
       /* put back this node into the nodes_per_... stuff */
       if (tm->par.max_cp_num > 0 && n->cp)
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 	 tm->nodes_per_cp[n->cp]++;
 #else
 	 tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
@@ -3006,7 +3006,7 @@ int mark_subtree(tm_prob *tm, bc_node *n)
 	 delete it from the nodes_per_... stuff */
       if (n->node_status != NODE_STATUS__PRUNED){
 	 if (tm->par.max_cp_num > 0 && n->cp){
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 	    i = n->cp;
 #else
 	    i = find_process_index(&tm->cp, n->cp);
@@ -3278,7 +3278,7 @@ int read_node(tm_prob *tm, bc_node *node, FILE *f, int **children)
       /* the active_nodes_per_... will be updated when the LP__IS_FREE
 	 message comes */
       if (node->cp)
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 	 tm->nodes_per_cp[node->cp]++;
 #else
 	 tm->nodes_per_cp[find_process_index(&tm->cp, node->cp)]++;
@@ -3566,11 +3566,11 @@ void free_tm(tm_prob *tm)
    int num_threads = 1;
 #endif
    
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    for (i = 0; i < num_threads; i++)
       free_lp(tm->lpp[i]);
    FREE(tm->lpp);
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    FREE(tm->cgp);
 #endif
 #endif
@@ -3601,7 +3601,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->nextphase_cand);
    FREE(tm->termcodes);
 
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    /* Go over the tree and free the nodes */
    free_subtree(tm->rootnode);
 #endif
@@ -3751,13 +3751,13 @@ void free_basis(basis_desc *basis)
 
 int tm_close(tm_prob *tm, int termcode)
 {
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    int s_bufid;
 #endif
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    lp_prob **lp = tm->lpp;
 #endif
-#ifndef COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_CP
    int r_bufid = 0, new_cuts;
    struct timeval timeout = {5, 0};
    double new_time;
@@ -3776,20 +3776,20 @@ int tm_close(tm_prob *tm, int termcode)
    /*------------------------------------------------------------------------*\
     * Kill the processes. Some of them will send back statistics.
    \*------------------------------------------------------------------------*/
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    stop_processes(&tm->lp);
 #endif
-#ifndef COMPILE_IN_CG
+#ifndef SYM_COMPILE_IN_CG
    stop_processes(&tm->cg);
 #endif
-#ifndef COMPILE_IN_CP
+#ifndef SYM_COMPILE_IN_CP
    stop_processes(&tm->cp);
 #endif
 
    /*------------------------------------------------------------------------*\
     * Receive statistics from the cutpools
    \*------------------------------------------------------------------------*/
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    if (tm->cpp){
       for (i = 0; i < tm->par.max_cp_num; i++){
 	 tm->comp_times.cut_pool += tm->cpp[i]->cut_pool_time;
@@ -3821,7 +3821,7 @@ int tm_close(tm_prob *tm, int termcode)
       printf("\nWarning: problem receiving LP timing. LP process is dead\n\n");
    }
    
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    for (i = 0; i < tm->par.max_active_nodes; i ++){
       lp_close(lp[i]);
    }
@@ -3831,7 +3831,7 @@ int tm_close(tm_prob *tm, int termcode)
    find_tree_lb(tm);
    return(termcode);
 
-#ifndef COMPILE_IN_TM
+#ifndef SYM_COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
     * Send back the statistics to the master
    \*------------------------------------------------------------------------*/
@@ -3926,7 +3926,7 @@ int find_tree_lb(tm_prob *tm)
 	    }
 	 }
       }
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
       for (int i = tm->par.max_active_nodes - 1; i >= 0; i--){
 	 if (tm->active_nodes[i]){
 	    lb = MIN(lb, tm->active_nodes[i]->lower_bound);
@@ -3982,7 +3982,7 @@ int tighten_root_bounds(tm_prob *tm)
    int                 *ind;
    double              *bd;
    char                *lu;
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    double               lpetol = tm->lpp[0]->lp_data->lpetol;
 #else
    double               lpetol = 9.9999999999999995e-07;

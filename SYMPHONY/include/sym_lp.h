@@ -24,15 +24,15 @@
 #include "sym_lp_solver.h"
 #include "sym_lp_u.h"
 
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 #include "sym_cg.h"
 #endif
 
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 #include "sym_cp.h"
 #endif
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #include "sym_tm.h"
 #endif
 
@@ -89,10 +89,10 @@ typedef struct LP_PROB{
    int           cut_pool;
    int           cut_gen;
 
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
    cg_prob      *cgp;
 #endif
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    tm_prob      *tm;
 #endif
    lp_sol        best_sol;

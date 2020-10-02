@@ -103,6 +103,6 @@
 
 void start_time PROTO((void));
 double used_time PROTO((double *T));
-double wall_clock PROTO((double *T));
+double wall_clock(double *T);
 
 #endif

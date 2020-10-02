@@ -20,18 +20,19 @@
 #define SymWarmStart_H
 
 #include "CoinWarmStart.hpp"
+#include "OsiSymConfig.hpp"
 
 typedef struct WARM_START_DESC warm_start_desc;
 
 //#############################################################################
 
-class SymWarmStart : public CoinWarmStart 
+class OSISYMPHONYLIB_EXPORT SymWarmStart : public CoinWarmStart 
 {
 
 public:
 
    /* Default constructor. Will do nothing! */
-   SymWarmStart(){}
+   SymWarmStart();
    
    /* Initialize the warmStart_ using the given warm start. If dominate
       WarmStart is set, then, SymWarmStart will take the control of the 

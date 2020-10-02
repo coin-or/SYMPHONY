@@ -180,7 +180,7 @@ void cp_process_message(cut_pool *cp, int r_bufid)
 
 void cut_pool_send_cut(cut_pool *cp, cut_data *new_cut, int tid)
 {
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 
    cut_data *tmp_cut;
      
@@ -217,7 +217,7 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
    int del_cuts = 0, deleted_duplicates = FALSE;
    cp_cut_data *cp_cut;
 
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    cnt = cp->cuts_to_add_num;
 #else
    receive_int_array(&cnt, 1);
@@ -229,7 +229,7 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
       printf("Too many cuts have arrived to CP. Forget it...\n");
       printf("  [ cnt: %i   bl_size: %i   max: %i ]\n\n",
 	     cnt, cp->par.block_size, cp->par.max_number_of_cuts);
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
       for (i = cnt - 1; i >= 0; i--)
 	 FREE(cp->cuts_to_add[i]);
       cp->cuts_to_add_num = 0;
@@ -275,14 +275,14 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
       }
    }
 
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    level = bc_level;
 #else
    receive_int_array(&level, 1);
 #endif
    for (i = cnt - 1; i >= 0; i--, del_cuts = 0){
       cp_cut = (cp_cut_data *) malloc( sizeof(cp_cut_data));
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
       memcpy((char *)(&cp_cut->cut), (char *)cp->cuts_to_add[i],
 	     sizeof(cut_data));
       if (cp_cut->cut.size >0){

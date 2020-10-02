@@ -192,7 +192,7 @@ typedef struct NODE_DESC{
    int            nf_status;   /* NF_CHECK_ALL, NF_CHECK_AFTER_LAST,
 				  NF_CHECK_UNTIL_LAST, NF_CHECK_NOTHING */
    array_desc     cutind;
-#if defined(COMPILING_FOR_LP) || defined(COMPILING_FOR_MASTER) || defined(COMPILE_IN_LP)
+#if defined(COMPILING_FOR_LP) || defined(COMPILING_FOR_MASTER) || defined(SYM_COMPILE_IN_LP)
    cut_data     **cuts;        /* this is not used in TM anyway. */
 #endif
 
@@ -209,13 +209,13 @@ typedef struct NODE_DESC{
 
 typedef struct BRANCH_OBJ{
    char          type;         /* Type of the candidate */
-#if defined(COMPILING_FOR_LP) || defined(COMPILE_IN_LP) 
+#if defined(COMPILING_FOR_LP) || defined(SYM_COMPILE_IN_LP) 
    int           position;     /* The position of the candidate */
    waiting_row  *row;          /* Description of the left hand side; makes
 				  sense only for branching cuts */
 #endif
    int           child_num;    /* Number of kids */
-#if defined(COMPILING_FOR_TM) || defined(COMPILING_FOR_MASTER) || defined(COMPILE_IN_LP) 
+#if defined(COMPILING_FOR_TM) || defined(COMPILING_FOR_MASTER) || defined(SYM_COMPILE_IN_LP) 
    int           name;         /* userind for VAR, the index for CUT */
 #endif
    double        value;        /* for evaluating pcost */
@@ -254,7 +254,7 @@ typedef struct BRANCH_OBJ{
 #endif
 #endif
 
-#if defined(COMPILING_FOR_LP) || defined(COMPILE_IN_LP) 
+#if defined(COMPILING_FOR_LP) || defined(SYM_COMPILE_IN_LP) 
    double        lhs;          /* purely for the user */
 
 #ifdef MAX_CHILDREN_NUM

@@ -1,12 +1,15 @@
-prefix=@prefix@
+@COIN_RELOCATABLE_FALSE@prefix=@prefix@
+@COIN_RELOCATABLE_TRUE@prefix=${pcfiledir}/../..
 exec_prefix=@exec_prefix@
 libdir=@libdir@
-includedir=@includedir@/coin
+includedir=@includedir@/coin-or
 
 Name: OsiSym
 Description: COIN-OR Open Solver Interface for SYMPHONY
-URL: https://projects.coin-or.org/Osi
+URL: https://github.com/coin-or/Osi
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lOsiSym
+Libs.private: @OSISYMLIB_LFLAGS_NOPC@
 Cflags: -I${includedir}
-Requires: osi symphony
+Requires: 
+Requires.private: @OSISYMLIB_PCFILES@

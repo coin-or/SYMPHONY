@@ -137,7 +137,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 
    while (NULL != fgets(line, MAX_LINE_LENGTH, f)){  /* read in parameters */
 
-      set_param(env, line);
+      sym_set_param(env, line);
 
       printf("%s", line);
       strcpy(key,"");
@@ -537,7 +537,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-#if defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_LP)
 #ifdef _OPENMP
 	       tm_par->max_active_nodes = tmpi + 1;
 #else
@@ -855,11 +855,11 @@ void print_statistics(node_times *tim, problem_stat *stat,
       printf("=================== Parallel Overhead ======================\n");
       printf("  Communication         %.3f\n", tim->communication);
       printf("  Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
       printf("  Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
 #endif
       printf("  Ramp Down Time        %.3f\n", tim->ramp_down_time);
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
       printf("  Idle Time (Node Pack) %.3f\n", tim->start_node);
       printf("  Idle Time (Nodes)     %.3f\n", tim->idle_node);
       printf("  Idle Time (Names)     %.3f\n", tim->idle_names);

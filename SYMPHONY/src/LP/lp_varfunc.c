@@ -253,7 +253,7 @@ void tighten_bounds(lp_prob *p)
       }
    }
 
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
    if (p->bc_level==0 && p->par.do_reduced_cost_fixing) {
       /* we are root node. we will save the reduced costs after each round of
        * cuts. whenever ub is updated, we can come back and update bounds in
@@ -1045,7 +1045,7 @@ int var_cind_comp(const void *v0, const void *v1)
 
 
 /*===========================================================================*/
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 int save_root_reduced_costs(lp_prob *p)
 {
    int         *indices;

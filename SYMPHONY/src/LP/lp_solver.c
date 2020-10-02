@@ -3881,7 +3881,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    const double         lpetol = lp_data->lpetol;
    const double         etol1000 = lpetol*1000;
 
-#ifndef COMPILE_IN_LP
+#ifndef SYM_COMPILE_IN_LP
    par->probing_generated_in_root               = TRUE;
    par->gomory_generated_in_root                = TRUE;
    par->redsplit_generated_in_root              = FALSE;

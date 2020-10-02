@@ -274,7 +274,7 @@ void free_cut_pool_u(cut_pool *cp)
    FREE(cp->cuts);
    FREE(cp->cur_sol.xind);
    FREE(cp->cur_sol.xval);
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
    FREE(cp->cuts_to_add);
 #endif
    FREE(cp);

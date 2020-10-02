@@ -21,6 +21,7 @@
 
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverParameters.hpp"
+#include "OsiSymConfig.hpp"
 #include "SymWarmStart.hpp"
 
 #include <string>
@@ -50,7 +51,7 @@ typedef struct SYM_ENVIRONMENT sym_environment;
   the methods that return vectors.
 */
 
-class OsiSymSolverInterface : virtual public OsiSolverInterface {
+class OSISYMPHONYLIB_EXPORT OsiSymSolverInterface : virtual public OsiSolverInterface {
    friend void OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
    
 public:
@@ -179,10 +180,8 @@ public:
    virtual bool isProvenPrimalInfeasible() const;
 
     /// Is dual infeasiblity proven?
-   virtual bool isProvenDualInfeasible() const {
-      throw CoinError("Error: Function not implemented",
-		      "isProvenDualInfeasible", "OsiSymSolverInterface");
-   }
+   virtual bool isProvenDualInfeasible() const;
+   
     /// Is the given primal objective limit reached?
    //virtual bool isPrimalObjectiveLimitReached() const;
 
@@ -212,10 +211,7 @@ public:
       appropriate type, which can resized and modified as desired.
     */
 
-    virtual CoinWarmStart *getEmptyWarmStart () const{
-       throw CoinError("Error: Function not implemented",
-		       "getEmptyWarmStart", "OsiSymSolverInterface");
-    }
+   virtual CoinWarmStart *getEmptyWarmStart () const;
 
     /** Get warm start information.
 
@@ -248,7 +244,7 @@ public:
    */
    //@{
    /// Get pointer to SYMPHONY environment (eventually we won't need this)
-   sym_environment *getSymphonyEnvironment() const {return env_;}
+   sym_environment *getSymphonyEnvironment() const;
    
    /// Get number of columns
    virtual int getNumCols() const;
@@ -384,11 +380,8 @@ public:
           it is the client's responsibility to free the double pointers in the
           vector using delete[].
       */
-      virtual std::vector<double*> getDualRays(int maxNumRays,
-					       bool fullRay = false) const{
-       throw CoinError("Error: Function not implemented",
-		       "getDualRays", "OsiSymSolverInterface");
-    }
+   virtual std::vector<double*> getDualRays(int maxNumRays,
+                                            bool fullRay = false) const;
       /** Get as many primal rays as the solver can provide. (In case of proven
           dual infeasibility there should be at least one.)
      
@@ -400,10 +393,7 @@ public:
           It is the user's responsibility to free the double pointers in the
           vector using delete[].
       */
-      virtual std::vector<double*> getPrimalRays(int maxNumRays) const{
-       throw CoinError("Error: Function not implemented",
-		       "getPrimalRays", "OsiSymSolverInterface");
-    }
+   virtual std::vector<double*> getPrimalRays(int maxNumRays) const;
   
     //@}
 

@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include "sym_timemeas.h"
+#include "symphony.h"
 
 //extern int getrusage(int who, struct rusage *x);
 
