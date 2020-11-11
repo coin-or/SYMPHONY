@@ -279,7 +279,7 @@ int user_send_lp_data(void *user, void **user_lp)
    /* This gives you access to the user data structure. */
    spp_problem *spp = (spp_problem *) user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    /* This is is the case when we are copying data directly because the LP is
       not running separately. The easiest thing to do here is just to use the
       same user data structure in both the master and the LP. Then this

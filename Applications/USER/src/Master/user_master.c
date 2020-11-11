@@ -24,13 +24,13 @@
 
 /* User include files */
 #include "user.h"
-#ifdef COMPILE_IN_TM
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_LP
 /* fill these in for sequential compilation if needed. */
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 /* fill these in for sequential compilation if needed. */
 #endif
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 /* fill these in for sequential compilation if needed. */
 #endif
 #endif
@@ -315,7 +315,7 @@ int user_send_lp_data(void *user, void **user_lp)
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    /* This is is the case when we are copying data directly because the LP is
       not running separately. The easiest thing to do here is just to use the
       same user data structure in both the master and the LP. Then this
@@ -352,7 +352,7 @@ int user_send_cg_data(void *user, void **user_cg)
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CG)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CG)
    /* This is is the case when we are copying data directly because
       the CG is not running separately. The easiest thing to do here is just
       to use the same user data structure in both the master and the cut
@@ -395,7 +395,7 @@ int user_send_cp_data(void *user, void **user_cp)
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CP)
    /* This is is the case when we are copying data directly because
       the CP is not running separately. The easiest thing to do here is just
       to use the same user data structure in both the master and the cut

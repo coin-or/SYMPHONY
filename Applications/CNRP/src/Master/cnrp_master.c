@@ -38,13 +38,13 @@
 #include "cnrp_macros.h"
 #include "small_graph.h"
 #include "network.h"
-#ifdef COMPILE_IN_TM
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_LP
 #include "cnrp_lp.h"
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 #include "cnrp_cg.h"
 #endif
-#ifdef COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_CP
 #include "cnrp_cp.h"
 #endif
 #endif
@@ -373,7 +373,7 @@ int user_send_lp_data(void *user, void **user_lp)
 {
    cnrp_problem *cnrp = (cnrp_problem *)user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    /* This is the case when we are copying data directly because
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_lp_data() in the LP process.*/
@@ -450,7 +450,7 @@ int user_send_cg_data(void *user, void **user_cg)
 {
    cnrp_problem *cnrp = (cnrp_problem *)user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CG)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CG)
    /* This is is the case when we are copying data directly because
       the CG is not running separately. This code should be virtually
       identical to that of user_receive_cg_data() in the CG process.*/
@@ -530,7 +530,7 @@ int user_send_cp_data(void *user, void **user_cp)
 {
    cnrp_problem *cnrp = (cnrp_problem *)user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CP)
    /* This is is the case when we are copying data directly because
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_cp_data() in the CP process.*/
@@ -627,7 +627,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 
    /* FIXME: This is UGLY! */
 #if (defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)) && \
-   (defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)) && 0
+   (defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)) && 0
       
    problem *p = get_problem_ptr(FALSE);
    cnrp_spec *cnrp_lp = (cnrp_spec *) p->tm->lpp[0]->user;

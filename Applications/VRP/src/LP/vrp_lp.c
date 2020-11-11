@@ -44,7 +44,7 @@
 /*===========================================================================*\
  * Here is where the user must receive all of the data sent from
  * user_send_lp_data() and set up data structures. Note that this function is
- * only called if one of COMPILE_IN_LP or COMPILE_IN_TM is FALSE.
+ * only called if one of SYM_SYM_COMPILE_IN_LP or SYM_SYM_COMPILE_IN_TM is FALSE.
 \*===========================================================================*/
 
 int user_receive_lp_data(void **user)
@@ -973,7 +973,7 @@ int user_free_lp(void **user)
 {
    vrp_lp_problem *vrp = (vrp_lp_problem *)(*user);
 
-#ifndef COMPILE_IN_CG
+#ifndef SYM_SYM_COMPILE_IN_CG
    FREE(vrp->demand);
 #endif
 #if 0

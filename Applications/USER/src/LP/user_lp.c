@@ -32,7 +32,7 @@
 /*===========================================================================*\
  * Here is where the user must receive all of the data sent from
  * user_send_lp_data() and set up data structures. Note that this function is
- * only called if one of COMPILE_IN_LP or COMPILE_IN_TM is FALSE. For 
+ * only called if one of SYM_COMPILE_IN_LP or SYM_COMPILE_IN_TM is FALSE. For 
  * sequential computation, nothing is needed here.
 \*===========================================================================*/
 

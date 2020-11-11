@@ -364,7 +364,7 @@ int user_send_lp_data(void *user, void **user_lp)
    /* This gives you access to the user data structure. */
    mpp_problem *mpp = (mpp_problem *) user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
 
    *user_lp = mpp;
 
@@ -394,7 +394,7 @@ int user_send_cg_data(void *user, void **user_cg)
    /* This gives you access to the user data structure. */
    mpp_problem *mpp = (mpp_problem *) user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CG)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CG)
 
    *user_cg = mpp;
    
@@ -430,7 +430,7 @@ int user_send_cp_data(void *user, void **user_cp)
    /* This gives you access to the user data structure. */
    mpp_problem *mpp = (mpp_problem *) user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CP)
 
    *user_cp = mpp;
 

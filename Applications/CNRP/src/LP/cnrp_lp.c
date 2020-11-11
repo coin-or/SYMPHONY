@@ -47,7 +47,7 @@
 /*===========================================================================*\
  * Here is where the user must receive all of the data sent from
  * user_send_lp_data() and set up data structures. Note that this function is
- * only called if one of COMPILE_IN_LP or COMPILE_IN_TM is FALSE.
+ * only called if one of SYM_COMPILE_IN_LP or SYM_COMPILE_IN_TM is FALSE.
 \*===========================================================================*/
 
 int user_receive_lp_data(void **user)
@@ -134,7 +134,7 @@ int user_free_lp(void **user)
 {
    cnrp_spec *cnrp = (cnrp_spec *)(*user);
    
-#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
+#if !(defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP))
    FREE(cnrp->demand);
    FREE(cnrp->costs);
    FREE(cnrp->edges);

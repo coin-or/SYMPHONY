@@ -29,11 +29,11 @@
 #include "spp.h"
 #include "spp_common.h"
 #include "spp_master_functions.h"
-#ifdef COMPILE_IN_TM
-#ifdef COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_LP
 #include "spp_lp.h"
 #include "spp_lp_functions.h"
-#ifdef COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 #include "spp_cg.h"
 #endif
 #endif
@@ -291,7 +291,7 @@ int user_send_lp_data(void *user, void **user_lp)
    spp_problem *spp = (spp_problem *) user;
    col_ordered *m = spp->cmatrix;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    
    spp_lp_problem *spp_lp = (spp_lp_problem *)
       calloc(1, sizeof(spp_lp_problem));
@@ -340,7 +340,7 @@ int user_send_cg_data(void *user, void **user_cg)
    col_ordered *m = spp->cmatrix;
    int colnum = m->colnum;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CG)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CG)
 
    spp_cg_problem *spp_cg = (spp_cg_problem *)calloc(1,sizeof(spp_cg_problem));
    *user_cg = (void *) spp_cg;

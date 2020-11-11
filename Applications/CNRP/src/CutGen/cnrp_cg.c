@@ -38,7 +38,7 @@
 /*===========================================================================*\
  * Here is where the user must receive all of the data sent from
  * user_send_cg_data() and set up data structures. Note that this function is
- * only called if one of COMPILE_IN_CG, COMPILE_IN_LP, or COMPILE_IN_TM is
+ * only called if one of SYM_COMPILE_IN_CG, SYM_COMPILE_IN_LP, or SYM_COMPILE_IN_TM is
  * FALSE.
 \*===========================================================================*/
 
@@ -122,14 +122,14 @@ int user_free_cg(void **user)
 {
    cg_cnrp_spec *cnrp = (cg_cnrp_spec *)(*user);
 
-#if defined(CHECK_CUT_VALIDITY) && !defined(COMPILE_IN_TM)
+#if defined(CHECK_CUT_VALIDITY) && !defined(SYM_COMPILE_IN_TM)
    if (cnrp->feas_sol_size)
       FREE(cnrp->feas_sol);
 #endif
 #pragma omp master
-#ifndef COMPILE_IN_CG
+#ifndef SYM_COMPILE_IN_CG
 #endif
-#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined(COMPILE_IN_CG))
+#if !(defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined(SYM_COMPILE_IN_CG))
    FREE(cnrp->demand);
 #endif
    FREE(cnrp->edges);
