@@ -164,7 +164,7 @@ CFLAGS += -I`$(CYGPATH_W) $(SYMAPPLDIR)/include` \
 # Libraries necessary to link
 ifeq ($(SYM_BUILD_APP),FALSE)
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
-LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony`
+LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs --static symphony`
 CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony`
 else
 LIBS += -L@libdir@ -lSym @SYMPHONYLIB_LFLAGS@
@@ -172,7 +172,7 @@ CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
 endif
 else
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
-LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony-app`
+LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs --static symphony-app`
 CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony-app`
 else
 LIBS += -L@libdir@ -lSymAppl  @SYMPHONYLIB_LFLAGS@
