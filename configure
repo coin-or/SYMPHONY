@@ -22552,19 +22552,6 @@ if test $in_cg = no || test $in_cp = no ||
       as_fn_error $? "Need PVM to enable distributed parallel execution!" "$LINENO" 5
    fi
    sym_enable_parallel=true;
-else
-   if test $coin_has_pvm = yes; then
-       in_lp=no
-        if false; then
-  SYM_COMPILE_IN_LP_TRUE=
-  SYM_COMPILE_IN_LP_FALSE='#'
-else
-  SYM_COMPILE_IN_LP_TRUE='#'
-  SYM_COMPILE_IN_LP_FALSE=
-fi
-
-       sym_enable_parallel=true;
-   fi
 fi
 
  if $sym_enable_parallel; then
@@ -22712,7 +22699,7 @@ $as_echo "yes" >&6; }
    	gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
    	major_gcc_version=`echo ${gcc_version:0:3}`
    	#AC_MSG_RESULT([$get_gcc_version])
-   	if test ${major_gcc_version} -lt ${gcc_required_version}; then
+   	if test ${major_gcc_version} -gt ${gcc_required_version}; then
        	   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
            sym_openmp=false
@@ -23137,10 +23124,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${SYM_COMPILE_IN_TM_TRUE}" && test -z "${SYM_COMPILE_IN_TM_FALSE}"; then
   as_fn_error $? "conditional \"SYM_COMPILE_IN_TM\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${SYM_COMPILE_IN_LP_TRUE}" && test -z "${SYM_COMPILE_IN_LP_FALSE}"; then
-  as_fn_error $? "conditional \"SYM_COMPILE_IN_LP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${SYM_PARALLEL_TRUE}" && test -z "${SYM_PARALLEL_FALSE}"; then

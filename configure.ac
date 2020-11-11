@@ -659,13 +659,7 @@ if [test $in_cg = no || test $in_cp = no ||
       AC_MSG_ERROR(Need PVM to enable distributed parallel execution!)
    fi
    sym_enable_parallel=true;
-else 
-   if test $coin_has_pvm = yes; then 
-       in_lp=no
-       AM_CONDITIONAL(SYM_COMPILE_IN_LP, false)
-       sym_enable_parallel=true;
-   fi
-fi
+fi   
 
 AM_CONDITIONAL(SYM_PARALLEL, $sym_enable_parallel)
 
@@ -800,7 +794,7 @@ if test $sym_openmp = auto; then
    	gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
    	major_gcc_version=`echo ${gcc_version:0:3}`
    	#AC_MSG_RESULT([$get_gcc_version])
-   	if test ${major_gcc_version} -lt ${gcc_required_version}; then
+   	if test ${major_gcc_version} -gt ${gcc_required_version}; then
        	   AC_MSG_RESULT([no])
            sym_openmp=false
         else
