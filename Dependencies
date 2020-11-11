@@ -1,6 +1,6 @@
 ThirdParty/Glpk   https://github.com/coin-or-tools/ThirdParty-Glpk master
 Data/Sample       https://github.com/coin-or-tools/Data-Sample master
-CoinUtils         https://github.com/coin-or/CoinUtils refactor
-Osi               https://github.com/coin-or/Osi refactor
-Clp               https://github.com/coin-or/Clp refactor
-Cgl               https://github.com/coin-or/Cgl refactor
+CoinUtils         https://github.com/coin-or/CoinUtils master
+Osi               https://github.com/coin-or/Osi master
+Clp               https://github.com/coin-or/Clp master
+Cgl               https://github.com/coin-or/Cgl master
