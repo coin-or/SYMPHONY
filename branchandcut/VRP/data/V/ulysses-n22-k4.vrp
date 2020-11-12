@@ -1,6 +1,6 @@
 NAME: ulysses22.tsp
 TYPE: CVRP
-COMMENT: Odyssey of Ulysses (Groetschel and Padberg), No of trucks: 4, Optimal value: 9179
+COMMENT: Odyssey of Ulysses (Groetschel and Padberg), No of trucks: 4, Optimal value: 9291
 DIMENSION: 22
 EDGE_WEIGHT_TYPE: GEO
 DISPLAY_DATA_TYPE: COORD_DISPLAY
