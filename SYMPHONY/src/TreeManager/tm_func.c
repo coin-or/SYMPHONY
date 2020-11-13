@@ -283,7 +283,8 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
       tm->stat.tree_size++;
       insert_new_node(tm, root);
       tm->phase = 0;
-      tm->lb = 0;
+      tm->lb = -SYM_INFINITY;
+      tm->printed_lb = -SYM_INFINITY;
 #else
       r_bufid = receive_msg(tm->master, TM_ROOT_DESCRIPTION);
       receive_node_desc(tm, root);
