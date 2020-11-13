@@ -42,13 +42,13 @@
 #include "vrp_dg_functions.h"
 #include "vrp_macros.h"
 #include "small_graph.h"
-#ifdef SYM_SYM_COMPILE_IN_TM
-#ifdef SYM_SYM_COMPILE_IN_CP
+#ifdef SYM_COMPILE_IN_TM
+#ifdef SYM_COMPILE_IN_CP
 #include "vrp_cp.h"
 #endif
-#ifdef SYM_SYM_COMPILE_IN_LP
+#ifdef SYM_COMPILE_IN_LP
 #include "vrp_lp.h"
-#ifdef SYM_SYM_COMPILE_IN_CG
+#ifdef SYM_COMPILE_IN_CG
 #include "vrp_cg.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_OUR_DECOMP
@@ -519,7 +519,7 @@ int user_send_lp_data(void *user, void **user_lp)
 {
    vrp_problem *vrp = (vrp_problem *)user;
 
-#if defined(SYM_SYM_COMPILE_IN_TM) && defined(SYM_SYM_COMPILE_IN_LP)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP)
    /* This is the case when we are copying data directly because
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_lp_data() in the LP process.*/
@@ -585,7 +585,7 @@ int user_send_cg_data(void *user, void **user_cg)
 {
    vrp_problem *vrp = (vrp_problem *)user;
 
-#if defined(SYM_SYM_COMPILE_IN_TM) && defined(SYM_SYM_COMPILE_IN_LP) && defined (SYM_SYM_COMPILE_IN_CG)
+#if defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP) && defined (SYM_COMPILE_IN_CG)
    /* This is is the case when we are copying data directly because
       the CG is not running separately. This code should be virtually
       identical to that of user_receive_cg_data() in the CG process.*/
@@ -679,7 +679,7 @@ int user_send_cp_data(void *user, void **user_cp)
 {
    vrp_problem *vrp = (vrp_problem *)user;
 
-#if defined(SYM_SYM_COMPILE_IN_TM) && defined (SYM_SYM_COMPILE_IN_CP)
+#if defined(SYM_COMPILE_IN_TM) && defined (SYM_COMPILE_IN_CP)
    /* This is is the case when we are copying data directly because
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_cp_data() in the CP process.*/
@@ -944,7 +944,7 @@ int user_free_master(void **user)
    FREE(vrp->dist.coordx);
    FREE(vrp->dist.coordy);
    FREE(vrp->dist.coordz);
-#if !(defined(SYM_SYM_COMPILE_IN_TM) && defined(SYM_SYM_COMPILE_IN_LP))
+#if !(defined(SYM_COMPILE_IN_TM) && defined(SYM_COMPILE_IN_LP))
    FREE(vrp->dist.cost);
    FREE(vrp->edges);
    FREE(vrp->demand);

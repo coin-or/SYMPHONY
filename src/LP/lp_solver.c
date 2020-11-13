@@ -2488,7 +2488,6 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
    /* convert sense to bound */
    for(i = 0; i < rcnt; i++){
      switch (sense[i]){
-       printf("%c \n", sense[i]);
      case 'E':
        rlb[i] = rub[i] = rhs[i];
        break;
