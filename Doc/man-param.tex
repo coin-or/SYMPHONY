@@ -631,10 +631,13 @@ output. A node limit less than 0 means there is no limit.
 
 \item[\ptt{gap\_limit} -- double (-1.0).] 
 \sindex[p]{\TP!gap\_limit}
-Target gap limit allowed for solution. When the gap between the lower and 
-the upper bound reaches this point, the solution process will stop and the 
+Target gap limit allowed for solution. When the gap between the lower and
+the upper bound reaches this point, the solution process will stop and the
 best solution found to that point, along with other relevant data, will be
-output. A gap limit less than 0 means there is no limit.
+output. This parameter expresses the target gap as a percentage relative to
+optimality. For example, a gap limit equal to 10 means that the solution
+process will stop when the best solution is within 10\% of optimality.
+Additionally, a gap limit less than 0 means there is no limit.
 
 \item[\ptt{find\_first\_feasible} -- boolean (FALSE).]
 \sindex[p]{\TP!find\_first\_feasible}
@@ -1328,4 +1331,3 @@ the \ptt{verbosity} parameter can be set, let's say, to 2 either by
 setSymParam(OsiSymVerbosity, 2) or by setSymParam(``verbosity'', 2). 
 Note that, this flexibility is also supported for parameter querying 
 functions. 
-
