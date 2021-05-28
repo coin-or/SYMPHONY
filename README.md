@@ -16,9 +16,7 @@ and is freely redistributable. All source code and documentation is Copyright
 
 ## DOWNLOAD
 
-[ ![Download](https://api.bintray.com/packages/coin-or/download/SYMPHONY/images/download.svg?version=5.6) ](https://bintray.com/coin-or/download/SYMPHONY/5.6)
-
-Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/SYMPHONY). Binaries can also be installed on specific platforms, as follows. 
+Binaries for most platforms are archived [here](https://www.coin-or.org/download/binary/SYMPHONY). Binaries can also be installed on specific platforms, as follows. 
 
  * *Linux*: On Debian, SYMPHONY is available in the package `coinor-symphony` and can be installed with apt. On Fedora, SYMPHONY is available in the package `coin-or-SYMPHONY`. Pre-compiled binaries are also available on [BinTray](http://bintray.com/coin-or/download/SYMPHONY) and as part of the [COIN-OR Optimization Suite](https://www.coin-or.org/download/binary/OptimizationSuite/).
  * *Windows*: The easiest way to get SYMPHONY on Windows is to download binaries from [BinTray](http://bintray.com/coin-or/download/SYMPHONY) or just use the Windows installer for the [COIN Optimization Suite](http://www.coin-or.org/download/binary/OptimizationSuite), which provides Visual Studio compatible libraries and binaries (these are slightly out of date, however). 
@@ -30,7 +28,7 @@ Due to license incompatibilities, pre-compiled binaries lack some functionality 
 
 ## Docker Image
 
-A Docker image containing an installed version of SYMPHONYH is available at
+A Docker image containing an installed version of SYMPHONY is available at
 
 https://hub.docker.com/repository/docker/coinor/symphony
 
