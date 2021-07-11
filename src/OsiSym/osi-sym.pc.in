@@ -6,10 +6,10 @@ includedir=@includedir@/coin-or
 
 Name: OsiSym
 Description: COIN-OR Open Solver Interface for SYMPHONY
-URL: https://github.com/coin-or/Osi
+URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lOsiSym
-Libs.private: @OSISYMLIB_LFLAGS_NOPC@
 Cflags: -I${includedir}
-Requires: 
-Requires.private: @OSISYMLIB_PCFILES@
+@COIN_STATIC_BUILD_FALSE@Libs: -L${libdir} -lOsiSym
+@COIN_STATIC_BUILD_FALSE@Requires.private: @OSISYMPHONYLIB_PCFILES@
+@COIN_STATIC_BUILD_TRUE@Libs: -L${libdir} -lOsiClp @OSISYMPHONYLIB_LFLAGS_NOPC@
+@COIN_STATIC_BUILD_TRUE@Requires: @OSISYMPHONYLIB_PCFILES@

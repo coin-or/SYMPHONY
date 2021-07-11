@@ -91,7 +91,7 @@ AC_COIN_CHK_PKG(OsiSpx,[SymphonyLib],[osi-soplex])
 AC_COIN_CHK_PKG(OsiXpr,[SymphonyLib],[osi-xpress])
 AC_COIN_CHK_PKG(OsiGrb,[SymphonyLib],[osi-gurobi])
 
-AC_COIN_CHK_PKG(Glpk,[SymphonyLib],,[build])
+AC_COIN_CHK_PKG(Glpk,[SymphonyLib],[coinglpk])
 
 # Data Packages
 
@@ -104,15 +104,13 @@ AC_COIN_CHK_PKG(Miplib3,,[coindatamiplib3],,dataonly)
 
 AC_COIN_CHK_GNU_READLINE([SymphonyLib])
 
-AC_COIN_FINALIZE_FLAGS([SymphonyLib OsiSymphonyLib SymUnitTest])
-
 #############################################################################
 #                      Check for the LP solver                              #
 #############################################################################
 
 AC_MSG_CHECKING([for SYMPHONY default solver])
 AC_ARG_WITH([lp-solver],
-[AC_HELP_STRING([--with-lp-solver@<:@=lpsolver@:>@],
+[AS_HELP_STRING([--with-lp-solver@<:@=lpsolver@:>@],
                 [specify the LP solver in small
                 letters(default lpsolver=clp)])],
 		[sym_lp_solver=$withval],[sym_lp_solver=clp])
@@ -206,7 +204,7 @@ AM_CONDITIONAL(COIN_CXX_IS_CL,[test $enable_msvc = yes])
 # USE_CGL_CUTS
 #---------------------------------------------------------------------------#
 AC_ARG_ENABLE([cgl-cuts],
-[AC_HELP_STRING([--disable-cgl-cuts],
+[AS_HELP_STRING([--disable-cgl-cuts],
                 [disable generic cut generation])],
 [case "${enableval}" in
    yes) sym_cut_generation=true
@@ -225,7 +223,7 @@ AM_CONDITIONAL(USE_CGL_CUTS, [test $sym_cut_generation = true])
 #---------------------------------------------------------------------------#
 AC_MSG_CHECKING([whether to compile with gmpl])
 AC_ARG_WITH([gmpl],
-[AC_HELP_STRING([--with-gmpl],
+[AS_HELP_STRING([--with-gmpl],
                 [compile with GMPL reader])],
 		[sym_gmpl=$withval],[sym_gmpl=none])
 
@@ -251,7 +249,7 @@ AM_CONDITIONAL(USE_GMPL, [test "$sym_gmpl" = yes])
 
 #AC_MSG_CHECKING([whether we want to compile in sensitivity analysis features])
 AC_ARG_ENABLE([sensitivity-analysis],
-[AC_HELP_STRING([--enable-sensitivity-analysis],
+[AS_HELP_STRING([--enable-sensitivity-analysis],
                 [compile in the  sensitivity analysis features])],
 [case "${enableval}" in
    yes) sym_sensitivity=true
@@ -274,7 +272,7 @@ AM_CONDITIONAL(SENSITIVITY_ANALYSIS, [test $sym_sensitivity = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([root-only],
-[AC_HELP_STRING([--enable-root-only],
+[AS_HELP_STRING([--enable-root-only],
                 [option to only process the root node])],
 [case "${enableval}" in
    yes) sym_root_only=true
@@ -297,7 +295,7 @@ AM_CONDITIONAL(ROOT_NODE_ONLY, [test $sym_root_only = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([frac-branching],
-[AC_HELP_STRING([--enable-frac-branching],
+[AS_HELP_STRING([--enable-frac-branching],
                 [whether to compile in the fractional branching option])],
 [case "${enableval}" in
    yes) sym_frac_branch=true
@@ -317,7 +315,7 @@ AM_CONDITIONAL(COMPILE_FRAC_BRANCHING, [test $sym_frac_branch = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([tests],
-[AC_HELP_STRING([--enable-tests],
+[AS_HELP_STRING([--enable-tests],
                 [whether to perform additional sanity checks (for debugging purposes)])],
 [case "${enableval}" in
    yes) sym_tests=true
@@ -336,7 +334,7 @@ AM_CONDITIONAL(DO_TESTS, [test $sym_tests = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([tm-tests],
-[AC_HELP_STRING([--enable-tm-tests],
+[AS_HELP_STRING([--enable-tm-tests],
                 [more tests...])],
 [case "${enableval}" in
    yes) sym_tm_tests=true
@@ -355,7 +353,7 @@ AM_CONDITIONAL(TM_BASIS_TESTS, [test $sym_tm_tests = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([trace-path],
-[AC_HELP_STRING([--enable-trace-path],
+[AS_HELP_STRING([--enable-trace-path],
                 [additional debugging options])],
 [case "${enableval}" in
    yes) sym_trace_path=true
@@ -374,7 +372,7 @@ AM_CONDITIONAL(TRACE_PATH, [test $sym_trace_path = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([cut-check],
-[AC_HELP_STRING([--enable-cut-check],
+[AS_HELP_STRING([--enable-cut-check],
                 [additional debugging options])],
 [case "${enableval}" in
    yes) sym_cut_check=true
@@ -393,7 +391,7 @@ AM_CONDITIONAL(CHECK_CUT_VALIDITY, [test $sym_cut_check = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([statistics],
-[AC_HELP_STRING([--enable-statistics],
+[AS_HELP_STRING([--enable-statistics],
                 [additional statistics])],
 [case "${enableval}" in
    yes) sym_statistics=true
@@ -412,7 +410,7 @@ AM_CONDITIONAL(STATISTICS, [test $sym_statistics = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([pseudo-costs],
-[AC_HELP_STRING([--enable-pseudo-costs],
+[AS_HELP_STRING([--enable-pseudo-costs],
                 [enable some experimental pseudo-cost branching stuff])],
 [case "${enableval}" in
    yes) sym_pseudo_costs=true
@@ -431,7 +429,7 @@ AM_CONDITIONAL(PSEUDO_COSTS, [test $sym_pseudo_costs = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([draw-graph],
-[AC_HELP_STRING([--enable-draw-graph],
+[AS_HELP_STRING([--enable-draw-graph],
                 [enable IGD graph drawing application])],
 [case "${enableval}" in
    yes) sym_graph=true
@@ -450,7 +448,7 @@ AM_CONDITIONAL(DRAWGRAPH, [test $sym_graph = true])
 #---------------------------------------------------------------------------#
 
 AC_ARG_ENABLE([signal-handler],
-[AC_HELP_STRING([--disable-signal-handler],
+[AS_HELP_STRING([--disable-signal-handler],
                 [disable signal handler])],
 [case "${enableval}" in
    yes) sym_sig_catch=true
@@ -527,7 +525,7 @@ esac
 
 AC_MSG_CHECKING(whether to compile application library)
 AC_ARG_WITH([application],
-[AC_HELP_STRING([--with-application],
+[AS_HELP_STRING([--with-application],
                 [compile the application library])],
 		[sym_appl=$withval],[sym_appl=no])
 
@@ -536,7 +534,7 @@ AC_MSG_RESULT($sym_appl)
 dnl AM_CONDITIONAL(SYM_WITH_APPL, false)
 dnl AC_MSG_CHECKING(whether to compile application library)
 dnl AC_ARG_WITH([application],
-dnl [AC_HELP_STRING([--with-application],
+dnl [AS_HELP_STRING([--with-application],
 dnl                 [specify the application to be compiled with lower case])],
 dnl 		[sym_appl=$withval],[sym_appl=none])
 
@@ -583,7 +581,7 @@ dnl AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 AC_COIN_CHK_LIB(PVM, [SymphonyLib], [-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3], [-I$PVM_ROOT/include], [], [pvm_gettid])
 #AC_COIN_CHECK_USER_LIBRARY([Pvm], [PVM], [pvm3.h], [pvm_gettid])
 AC_ARG_WITH([pvm],
-[AC_HELP_STRING([--with-pvm],
+[AS_HELP_STRING([--with-pvm],
                 [compile in distributed parallel mode (assuming that 
 		pvm is installed and the variable PVM_ROOT is 
 		defined.)])],
@@ -623,14 +621,14 @@ fi
 
 #AC_MSG_CHECKING([whether to compile in cg])
 AC_ARG_WITH([cg],
-[AC_HELP_STRING([--without-cg],
+[AS_HELP_STRING([--without-cg],
                 [compile without cut generator module(default=yes)])],
 [in_cg=$withval],[in_cg=yes])
 AM_CONDITIONAL(SYM_COMPILE_IN_CG, [test "$in_cg" = yes])
 
 #AC_MSG_CHECKING([whether to compile in cp])
 AC_ARG_WITH([cp],
-[AC_HELP_STRING([--without-cp],
+[AS_HELP_STRING([--without-cp],
                 [compile without cut pool module(defualt=yes)])],
 [in_cp=$withval],[in_cp=yes])
 AM_CONDITIONAL(SYM_COMPILE_IN_CP, [test "$in_cp" = yes])
@@ -638,14 +636,14 @@ AM_CONDITIONAL(SYM_COMPILE_IN_CP, [test "$in_cp" = yes])
 
 #AC_MSG_CHECKING([whether to compile in lp])
 AC_ARG_WITH([lp],
-[AC_HELP_STRING([--without-lp],
+[AS_HELP_STRING([--without-lp],
                 [compile without LP solver module(default=yes)])],
 [in_lp=$withval],[in_lp=yes])
 AM_CONDITIONAL(SYM_COMPILE_IN_LP, [test "$in_lp" = yes])
 
 #AC_MSG_CHECKING([whether to compile in tm])
 AC_ARG_WITH([tm],
-[AC_HELP_STRING([--without-tm],
+[AS_HELP_STRING([--without-tm],
                 [compile without tree manager module (default=yes)])],
 [in_tm=$withval],[in_tm=yes])
 AM_CONDITIONAL(SYM_COMPILE_IN_TM, [test "$in_tm" = yes])
@@ -756,7 +754,7 @@ AC_SUBST(MASTEREXT)
 
 
 AC_ARG_ENABLE([openmp],
-[AC_HELP_STRING([--enable-openmp],
+[AS_HELP_STRING([--enable-openmp],
                 [compile in OpenMP features])],
 [case "${enableval}" in
    yes) sym_openmp=true
@@ -814,7 +812,7 @@ if test $sym_openmp = true; then
     SYM_OPENMP_LIBS=
   else
     SYM_OPENMP_FLAGS=-fopenmp
-    SYM_OPENMP_LIBS=-lgomp
+    SYM_OPENMP_LIBS=#"-lgomp -ldl -lpthread"
   fi
 else
   SYM_OPENMP_FLAGS= 
@@ -884,6 +882,8 @@ AC_COIN_VPATH_LINK([Applications/INSTALL
 
 # Here put the location and name of the configuration header file
 AC_CONFIG_HEADER([include/config.h include/config_sym.h include/config_osisym.h])
+
+AC_COIN_FINALIZE_FLAGS([SymphonyLib OsiSymphonyLib SymUnitTest])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE
