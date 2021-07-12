@@ -23401,7 +23401,7 @@ if test $sym_openmp = true; then
     SYM_OPENMP_LIBS=
   else
     SYM_OPENMP_FLAGS=-fopenmp
-    SYM_OPENMP_LIBS=#"-lgomp -ldl -lpthread"
+    SYM_OPENMP_LIBS=-lgomp
   fi
 else
   SYM_OPENMP_FLAGS=

@@ -88,12 +88,13 @@
 \usepackage{splitidx}
 %\usepackage[usenames]{color}
 \usepackage[dvipsnames]{xcolor}
+\usepackage[latin1]{inputenc}
 
 \makeindex
 \newindex[Index of C API Functions]{f}
 \newindex[Index of User Callback API Functions]{cf}
 \newindex[Index of Parameters]{p}
-%\newcommand{\sindex}[1]{}
+\newcommand{\mysindex}[2]{\sindex[#1]{#2}}
 %\newcommand{\printindex}{}
 \def\GP{{Global Parameters}}
 \def\DP{{Draw Graph Parameters}}
