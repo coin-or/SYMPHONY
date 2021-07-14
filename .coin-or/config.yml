@@ -2,44 +2,41 @@ Description:
   Slug: SYMPHONY
   ShortName: SYMPHONY
   LongName:
-  ShortDescription: 		  A callable library for solving mixed-integer linear programs.
+  ShortDescription: A callable library for solving mixed-integer linear programs.
   LongDescription: |2
-"    		 SYMPHONY is an open-source generic MILP
-    		            solver, callable library, and extensible framework
-    		            for implementing customized solvers for
-    		            mixed-integer linear programs (MILPs). SYMPHONY
-    		            can be built in various sequential and parallel
-    		            configurations for either distributed or shared
-    		            memory architectures and can be used \"out of the
-    		            box\" as a solver for generic mixed-integer linear
-    		            programs or customized through a wide variety of
-    		            user callback functions and control parameters.
-    		            SYMPHONY has a number of advanced capabilities
-    		            stemming from the research projects discussed
-    		            above, including the ability to solve
-    		            multi-objective MILPs, the ability to warm start
-    		            its solution procedure, and the ability to perform
-    		            basic sensitivity analyses. SYMPHONY has has been
-    		            deployed in a variety of application areas,
-    		            including computational biology, wireless
-    		            telecommunications, supply chain management,
-    		            transportation services, and air
-    		            transportation."
-  Manager: 		Ted Ralphs, ted at lehigh dot edu 
+    SYMPHONY is an open-source generic MILP
+    solver, callable library, and extensible framework
+    for implementing customized solvers for
+    mixed-integer linear programs (MILPs). SYMPHONY
+    can be built in various sequential and parallel
+    configurations for either distributed or shared
+    memory architectures and can be used \"out of the
+    box\" as a solver for generic mixed-integer linear
+    programs or customized through a wide variety of
+    user callback functions and control parameters.
+    SYMPHONY has a number of advanced capabilities
+    stemming from the research projects discussed
+    above, including the ability to solve
+    multi-objective MILPs, the ability to warm start
+    its solution procedure, and the ability to perform
+    basic sensitivity analyses. SYMPHONY has has been
+    deployed in a variety of application areas,
+    including computational biology, wireless
+    telecommunications, supply chain management,
+    transportation services, and air
+    transportation.
+  Manager: Ted Ralphs, ted at lehigh dot edu 
   Homepage: https://github.com/coin-or/SYMPHONY
   License: Eclipse Public License 2.0
-  LicenseURL: http://www.opensource.org/licenses/eclipse-2.0
-  Zenodo:
-  Appveyor:
-    Status:
-    Slug:
-  Bintray:
-    Package:
+  LicenseURL: http://www.opensource.org/licenses/EPL-2.0
+  Zenodo: 172774599
+  IncludedIn:
+    Package: SYMPHONY
   Language:
-    - 		C
+    - C
   Categories: 
-    - 		           Optimization deterministic linear discrete
-
+    - Optimization deterministic linear discrete
+  PaperCite: http://dx.doi.org/10.1007/0-387-23529-9_5
 Dependencies:
   - Description: ThirdParty wrapper for building Glpk
     URL: https://github.com/coin-or-tools/ThirdParty-Glpk
@@ -51,19 +48,19 @@ Dependencies:
     Required: Required
   - Description: COIN-OR Utilities
     URL: https://github.com/coin-or/CoinUtils
-    Version: 2.11
+    Version: master
     Required: Required
   - Description: Open Solver Interface
     URL: https://github.com/coin-or/Osi
-    Version: 0.108
+    Version: master
     Required: Required
-  - Description: Open Solver Interface
+  - Description: COIN-OR Linear Programming Solver
     URL: https://github.com/coin-or/Clp
-    Version: 1.17
+    Version: master
     Required: Required
-  - Description: Open Solver Interface
+  - Description: Cut Generation Library
     URL: https://github.com/coin-or/Cgl
-    Version: 0.60
+    Version: master
     Required: Required
   - Description: Basic Linear Algebra Subroutines (BLAS)
     URL: http://www.netlib.org/blas
