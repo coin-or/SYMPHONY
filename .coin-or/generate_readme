@@ -143,7 +143,7 @@ separate packages and can be downloaded from http://www.branchandcut.org.
 There is a white paper that guides the user through the development of the
 matching solver.
 
-# DOCUMENTATION
+## ADDITIONAL DOCUMENTATION
 
 If you have downloaded a source distribution, LaTex source for the full
 documentation is available in the SYMPHONY/Doc/ subdirectory. Quick start
@@ -226,7 +226,11 @@ few cases where the optimal solution was not found when using the Gomory cut
 generator, especially in combination with CPLEX. If the solver is not
 performing as it should, try turning off some of the cut generators to see if
 that fixes the problem. 
-"
 
-make_links
+## Project Links
+
+ * [COIN-OR Web Site](http://www.coin-or.org/)
+ * [Discussion formum](https://github.com/coin-or/SYMPHONY/discussions)
+ * [Report a bug](https://github.com/coin-or/SYMPHONY/issues/new)
+"
 
