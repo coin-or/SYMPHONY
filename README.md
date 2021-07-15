@@ -246,3 +246,10 @@ http://coin-or.github.io/SYMPHONY/man-5.6/
  * [Discussion formum](https://github.com/coin-or/SYMPHONY/discussions)
  * [Report a bug](https://github.com/coin-or/SYMPHONY/issues/new)
 
+## ACKNOWLEDGEMENT
+
+SYMPHONY was developed with support from
+  * National Science Foundation grants CMMI-1435453, CMMI-0728011, DMI-0522796,
+    DMI-0534862, DMS-9527124, and CMMI-1130914.
+  * Texas ATP Grant 97-3604-010
+
