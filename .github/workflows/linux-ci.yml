@@ -53,7 +53,7 @@ jobs:
           ADD_ARGS+=( --no-prompt )
           ADD_ARGS+=( --skip='ThirdParty/Metis ThirdParty/Mumps ThirdParty/Blas ThirdParty/Lapack' )
           ADD_BUILD_ARGS=()
-          ADD_BUILD_ARGS+=( --tests main --enable-relocatable )
+          ADD_BUILD_ARGS+=( --tests main --enable-relocatable --disable-mysql )
           ADD_BUILD_ARGS+=( --verbosity 2 )
           [[ ${{ matrix.build_static }} == "true" ]] && \
           ADD_BUILD_ARGS+=( --disable-shared )
