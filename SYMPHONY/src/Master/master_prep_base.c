@@ -651,7 +651,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	    row_sum[row_ind] += matval[j]*col_factor[col_ind];
 	 }
       }
-   } else {
+   } else if (check_cols){
       for (col_ind = 0; col_ind < n; col_ind++){
 	 end = matbeg[col_ind + 1];
 	 for (j = matbeg[col_ind]; j < end; j++){
