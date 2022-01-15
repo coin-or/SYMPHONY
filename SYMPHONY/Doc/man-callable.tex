@@ -36,7 +36,7 @@ and passing it to SYMPHONY. SYMPHONY will then fill up the array.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_open\_environment}
-\sindex[f]{sym\_open\_environmet}
+\mysindex{f}{sym\_open\_environmet}
 \begin{verbatim}
 sym_environment *sym_open_environment()
 \end{verbatim}
@@ -64,7 +64,7 @@ other API subroutines can be called after this point.\\
 % sym_create_copy_environment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \functiondef{sym\_create\_copy\_environment}
-\sindex[f]{sym\_create\_copy\_environmet}
+\mysindex{f}{sym\_create\_copy\_environmet}
 \begin{verbatim}
 sym_environment *sym_create_copy_environment(sym_environment *env)
 \end{verbatim}
@@ -96,7 +96,7 @@ This routine is used to copy the given environment.
 
 \functiondef{sym\_parse\_command\_line}
 \label{sym_parse_command_line}
-\sindex[f]{sym\_parse\_command\_line}
+\mysindex{f}{sym\_parse\_command\_line}
 \begin{verbatim}
 int sym_parse_command_line(sym_environment *env, int argc, char **argv)
 \end{verbatim}
@@ -136,7 +136,7 @@ also invokes the user callback function \hyperref{{\tt user\_readparams()}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_find\_initial\_bounds}
-\sindex[f]{sym\_find\_initial\_bounds}
+\mysindex{f}{sym\_find\_initial\_bounds}
 \begin{verbatim}
 int sym_find_initial_bounds(sym_environment *env)
 \end{verbatim}
@@ -169,7 +169,7 @@ priori bound for the problem.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_load\_problem}
-\sindex[f]{sym\_load\_problem}
+\mysindex{f}{sym\_load\_problem}
 \begin{verbatim}
 int sym_load_problem(sym_environment *env)
 \end{verbatim}
@@ -215,7 +215,7 @@ GMPL/AMPL \\ &file. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_explicit\_load\_problem}
-\sindex[f]{sym\_explicit\_load\_problem}
+\mysindex{f}{sym\_explicit\_load\_problem}
 \begin{verbatim}
 int sym_explicit_load_problem_user(sym_environment * env, int numcols, 
                           int numrows, int *start, int *index, double *value, 
@@ -280,7 +280,7 @@ them.\\
 % sym_read_mps
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \functiondef{sym\_read\_mps}
-\sindex[f]{sym\_read\_mps}
+\mysindex{f}{sym\_read\_mps}
 \begin{verbatim}
 int sym_read_mps(sym_environment *env, char *infile)
 \end{verbatim}
@@ -308,7 +308,7 @@ of the file. \\
 % sym_read_gmpl
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \functiondef{sym\_read\_gmpl}
-\sindex[f]{sym\_read\_gmpl}
+\mysindex{f}{sym\_read\_gmpl}
 \begin{verbatim}
 int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
 \end{verbatim}
@@ -339,7 +339,7 @@ of the data file. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_solve}
-\sindex[f]{sym\_solve}
+\mysindex{f}{sym\_solve}
 \label{sym_solve}
 \begin{verbatim}
 int sym_solve(sym_environment *env)
@@ -397,7 +397,7 @@ user callbacks called during TM processes. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_warm\_solve}
-\sindex[f]{sym\_warm\_solve}
+\mysindex{f}{sym\_warm\_solve}
 \begin{verbatim}
 int sym_warm_solve(sym_environment *env)
 \end{verbatim}
@@ -458,7 +458,7 @@ user callbacks called during TM processes. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_mc\_solve}
-\sindex[f]{sym\_mc\_solve}
+\mysindex{f}{sym\_mc\_solve}
 \begin{verbatim}
 int sym_mc_solve(sym_environment *env)
 \end{verbatim}
@@ -510,7 +510,7 @@ user callbacks activated by user and invoked during TM processes. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_create\_permanent\_cut\_pools}
-\sindex[f]{sym\_create\_permanent\_cut\_pools}
+\mysindex{f}{sym\_create\_permanent\_cut\_pools}
 \begin{verbatim}
 int sym_create_permanent_cut_pools(sym_environment *env, int *cp_num)
 \end{verbatim}
@@ -547,7 +547,7 @@ number of cut pools stored in the environment.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_user\_data}
-\sindex[f]{sym\_set\_user\_data}
+\mysindex{f}{sym\_set\_user\_data}
 \begin{verbatim}
 int sym_set_user_data(sym_environment *env, void *user)
 \end{verbatim}
@@ -588,7 +588,7 @@ Section }{)}{user_initialize}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_user\_data}
-\sindex[f]{sym\_get\_user\_data}
+\mysindex{f}{sym\_get\_user\_data}
 \begin{verbatim}
 int sym_get_user_data(sym_environment *env, void **user)
 \end{verbatim}
@@ -624,7 +624,7 @@ SYMPHONY environment.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_close\_environment}
-\sindex[f]{sym\_close\_environment}
+\mysindex{f}{sym\_close\_environment}
 \begin{verbatim}
 int sym_close_environment(sym_environment *env)
 \end{verbatim}
@@ -664,7 +664,7 @@ function.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_set\_defaults}
-\sindex[f]{sym\_set\_defaults}
+\mysindex{f}{sym\_set\_defaults}
 \begin{verbatim}
 int sym_set_defaults(sym_environment *env)
 \end{verbatim}
@@ -696,7 +696,7 @@ be modified.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_int\_param}
-\sindex[f]{sym\_set\_int\_param}
+\mysindex{f}{sym\_set\_int\_param}
 \begin{verbatim}
 void sym_set_int_param(sym_environment *env, char *key, int value)
 \end{verbatim}
@@ -721,7 +721,7 @@ This routine is used to set an integer type parameter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_dbl\_param}
-\sindex[f]{sym\_set\_dbl\_param}
+\mysindex{f}{sym\_set\_dbl\_param}
 \begin{verbatim}
 void sym_set_int_param(sym_environment *env, char *key, double value)
 \end{verbatim}
@@ -747,7 +747,7 @@ This routine is used to set a double type parameter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_str\_param}
-\sindex[f]{sym\_set\_str\_param}
+\mysindex{f}{sym\_set\_str\_param}
 \begin{verbatim}
 void sym_set_str_param(sym_environment *env, char *key, char *value)
 \end{verbatim}
@@ -772,7 +772,7 @@ This routine is used to set a string type parameter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_int\_param}
-\sindex[f]{sym\_get\_int\_param}
+\mysindex{f}{sym\_get\_int\_param}
 \begin{verbatim}
 int sym_get_int_param(sym_environment *env, char *key)
 \end{verbatim}
@@ -802,7 +802,7 @@ This routine is used to get the value of an integer type parameter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_dbl\_param}
-\sindex[f]{sym\_get\_dbl\_param}
+\mysindex{f}{sym\_get\_dbl\_param}
 \begin{verbatim}
 double sym_get_int_param(sym_environment *env, char *key)
 \end{verbatim}
@@ -832,7 +832,7 @@ This routine is used to get the value of a double type parameter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_str\_param}
-\sindex[f]{sym\_get\_str\_param}
+\mysindex{f}{sym\_get\_str\_param}
 \begin{verbatim}
 char *sym_get_int_param(sym_environment *env, char *key)
 \end{verbatim}
@@ -870,7 +870,7 @@ This routine is used to get the value of a string type parameter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_get\_status}
-\sindex[f]{sym\_get\_status}
+\mysindex{f}{sym\_get\_status}
 \begin{verbatim}
 int sym_get_status(sym_environment *env)
 \end{verbatim}
@@ -925,7 +925,7 @@ user callbacks called during TM processes. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_proven\_optimal}
-\sindex[f]{sym\_is\_proven\_optimal}
+\mysindex{f}{sym\_is\_proven\_optimal}
 \begin{verbatim}
 int sym_is_proven_optimal(sym_environment *env)
 \end{verbatim}
@@ -956,7 +956,7 @@ was solved to optimality.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_proven\_primal\_infeasible}
-\sindex[f]{sym\_is\_proven\_primal\_infeasible}
+\mysindex{f}{sym\_is\_proven\_primal\_infeasible}
 \begin{verbatim}
 int sym_is_proven_primal_infeasible(sym_environment *env)
 \end{verbatim}
@@ -987,7 +987,7 @@ was proven to be infeasible.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_iteration\_limit\_reached}
-\sindex[f]{sym\_is\_iteration\_limit\_reached}
+\mysindex{f}{sym\_is\_iteration\_limit\_reached}
 \begin{verbatim}
 int sym_is_iteration_limit_reached(sym_environment *env)
 \end{verbatim}
@@ -1019,7 +1019,7 @@ parameter was set to true before solving the problem.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_time\_limit\_reached}
-\sindex[f]{sym\_is\_time\_limit\_reached}
+\mysindex{f}{sym\_is\_time\_limit\_reached}
 \begin{verbatim}
 int sym_is_time_limit_reached(sym_environment *env)
 \end{verbatim}
@@ -1050,7 +1050,7 @@ was reached.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_target\_gap\_achieved}
-\sindex[f]{sym\_is\_target\_gap\_achieved}
+\mysindex{f}{sym\_is\_target\_gap\_achieved}
 \begin{verbatim}
 int sym_is_target_gap_achieved(sym_environment *env)
 \end{verbatim}
@@ -1082,7 +1082,7 @@ reached.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_is\_abandoned}
-\sindex[f]{sym\_is\_abandoned}
+\mysindex{f}{sym\_is\_abandoned}
 \begin{verbatim}
 int sym_is_abandoned(sym_environment *env)
 \end{verbatim}
@@ -1121,7 +1121,7 @@ was abandoned for some reason.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_create\_copy\_mip\_desc}
-\sindex[f]{sym\_create\_copy\_mip\_desc}
+\mysindex{f}{sym\_create\_copy\_mip\_desc}
 \begin{verbatim}
 MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
 \end{verbatim}
@@ -1153,7 +1153,7 @@ description loaded to the environment. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_num\_cols}
-\sindex[f]{sym\_get\_num\_cols}
+\mysindex{f}{sym\_get\_num\_cols}
 \begin{verbatim}
 int sym_get_num_cols(sym_environment *env, int *numcols)
 \end{verbatim}
@@ -1185,7 +1185,7 @@ columns.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_num\_rows}
-\sindex[f]{sym\_get\_num\_rows}
+\mysindex{f}{sym\_get\_num\_rows}
 \begin{verbatim}
 int sym_get_num_cols(sym_environment *env, int *numrows)
 \end{verbatim}
@@ -1216,7 +1216,7 @@ This routine is used to get the number of the rows of the current problem.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_num\_elements}
-\sindex[f]{sym\_get\_num\_elements}
+\mysindex{f}{sym\_get\_num\_elements}
 \begin{verbatim}
 int sym_get_num_elements(sym_environment *env, int *numelems)
 \end{verbatim}
@@ -1249,7 +1249,7 @@ non-zero elements.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_col\_lower}
-\sindex[f]{sym\_get\_col\_lower}
+\mysindex{f}{sym\_get\_col\_lower}
 \begin{verbatim}
 int sym_get_col_lower(sym_environment *env, double *collb)
 \end{verbatim}
@@ -1282,7 +1282,7 @@ the number of columns.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_col\_upper}
-\sindex[f]{sym\_get\_col\_upper}
+\mysindex{f}{sym\_get\_col\_upper}
 \begin{verbatim}
 int sym_get_col_upper(sym_environment *env, double *colub)
 \end{verbatim}
@@ -1315,7 +1315,7 @@ the number of columns.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_row\_sense}
-\sindex[f]{sym\_get\_row\_sense}
+\mysindex{f}{sym\_get\_row\_sense}
 \begin{verbatim}
 int sym_get_row_sense(sym_environment *env, char *rowsen)
 \end{verbatim}
@@ -1349,7 +1349,7 @@ the number of rows.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_rhs}
-\sindex[f]{sym\_get\_rhs}
+\mysindex{f}{sym\_get\_rhs}
 \begin{verbatim}
 int sym_get_rhs(sym_environment *env, double *rowrhs)
 \end{verbatim}
@@ -1382,7 +1382,7 @@ least the number of rows.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_row\_range}
-\sindex[f]{sym\_get\_row\_range}
+\mysindex{f}{sym\_get\_row\_range}
 \begin{verbatim}
 int sym_get_row_range(sym_environment *env, double *rowrng)
 \end{verbatim}
@@ -1416,7 +1416,7 @@ least the number of rows.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_row\_lower}
-\sindex[f]{sym\_get\_row\_lower}
+\mysindex{f}{sym\_get\_row\_lower}
 \begin{verbatim}
 int sym_get_row_lower(sym_environment *env, double *rowlb)
 \end{verbatim}
@@ -1450,7 +1450,7 @@ least the number of rows.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_row\_upper}
-\sindex[f]{sym\_get\_row\_upper}
+\mysindex{f}{sym\_get\_row\_upper}
 \begin{verbatim}
 int sym_get_row_upper(sym_environment *env, double *rowub)
 \end{verbatim}
@@ -1483,7 +1483,7 @@ least the number of rows.
 % sym_get_matrix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \functiondef{sym\_get\_matrix}
-\sindex[f]{sym\_get\_matrix}
+\mysindex{f}{sym\_get\_matrix}
 \begin{verbatim}
 int sym_get_matrix(sym_environment *env, int *nz, int *matbeg, int *matind, 
 		   double *matval)
@@ -1520,7 +1520,7 @@ nonzero entries of the constraint matrix in \emph{column order}.  Note that, the
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_obj\_coeff}
-\sindex[f]{sym\_get\_obj\_coeff}
+\mysindex{f}{sym\_get\_obj\_coeff}
 \begin{verbatim}
 int sym_get_obj_coeff(sym_environment *env, double *obj)
 \end{verbatim}
@@ -1554,7 +1554,7 @@ least the number of columns.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_obj2\_coeff}
-\sindex[f]{sym\_get\_obj2\_coeff}
+\mysindex{f}{sym\_get\_obj2\_coeff}
 \begin{verbatim}
 int sym_get_obj2_coeff(sym_environment *env, double *obj2)
 \end{verbatim}
@@ -1588,7 +1588,7 @@ least the number of columns.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_obj\_sense}
-\sindex[f]{sym\_get\_obj\_sense}
+\mysindex{f}{sym\_get\_obj\_sense}
 \begin{verbatim}
 int sym_get_obj_sense(sym_environment *env, int *sense)
 \end{verbatim}
@@ -1621,7 +1621,7 @@ in case of maximization.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_continuous}
-\sindex[f]{sym\_is\_continuous}
+\mysindex{f}{sym\_is\_continuous}
 \begin{verbatim}
 int sym_is_continuous(sym_environment *env, int index, int *value)
 \end{verbatim}
@@ -1655,7 +1655,7 @@ to be at most the number of columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_binary}
-\sindex[f]{sym\_is\_binary}
+\mysindex{f}{sym\_is\_binary}
 \begin{verbatim}
 int sym_is_binary(sym_environment *env, int index, int *value)
 \end{verbatim}
@@ -1690,7 +1690,7 @@ to be at most the number of columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_is\_integer}
-\sindex[f]{sym\_is\_integer}
+\mysindex{f}{sym\_is\_integer}
 \begin{verbatim}
 int sym_is_integer(sym_environment *env, int index, int *value)
 \end{verbatim}
@@ -1724,7 +1724,7 @@ be at most the number of columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_infinity}
-\sindex[f]{sym\_get\_infinity}
+\mysindex{f}{sym\_get\_infinity}
 \begin{verbatim}
 double sym_get_infinity()
 \end{verbatim}
@@ -1749,7 +1749,7 @@ This routine returns the infinity value of SYMPHONY.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_col\_solution}
-\sindex[f]{sym\_get\_col\_solution}
+\mysindex{f}{sym\_get\_col\_solution}
 \begin{verbatim}
 int sym_get_col_solution(sym_environment *env, double *colsol)
 \end{verbatim}
@@ -1782,7 +1782,7 @@ the number of columns. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_sp\_size}
-\sindex[f]{sym\_get\_sp\_size}
+\mysindex{f}{sym\_get\_sp\_size}
 \begin{verbatim}
 int sym_get_sp_size(sym_environment *env, int *size)
 \end{verbatim}
@@ -1816,7 +1816,7 @@ solution pool will be stored after the function call. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_sp\_solution}
-\sindex[f]{sym\_get\_sp\_solution}
+\mysindex{f}{sym\_get\_sp\_solution}
 \begin{verbatim}
 int sym_get_sp_solution(sym_environment *env, int index, double *colsol, 
                         double *objval)
@@ -1854,7 +1854,7 @@ contain the value of the solution after the function call. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_row\_activity}
-\sindex[f]{sym\_get\_row\_activity}
+\mysindex{f}{sym\_get\_row\_activity}
 \begin{verbatim}
 double *sym_get_row_activity(sym_environment *env, double *rowact)
 \end{verbatim}
@@ -1888,7 +1888,7 @@ the number of rows.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_obj\_val}
-\sindex[f]{sym\_get\_obj\_val}
+\mysindex{f}{sym\_get\_obj\_val}
 \begin{verbatim}
 double *sym_get_obj_val(sym_environment *env, double *objval)
 \end{verbatim}
@@ -1920,7 +1920,7 @@ objective value.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_primal\_bound}
-\sindex[f]{sym\_get\_primal\_bound}
+\mysindex{f}{sym\_get\_primal\_bound}
 \begin{verbatim}
 double *sym_get_primal_bound(sym_environment *env, double *ub)
 \end{verbatim}
@@ -1954,7 +1954,7 @@ defined primal heuristics.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_iteration\_count}
-\sindex[f]{sym\_get\_iteration\_count}
+\mysindex{f}{sym\_get\_iteration\_count}
 \begin{verbatim}
 double *sym_get_iteration\_count(sym_environment *env, int *numnodes)
 \end{verbatim}
@@ -1996,7 +1996,7 @@ nodes analyzed so far.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_set\_obj\_coeff}
-\sindex[f]{sym\_set\_obj\_coeff}
+\mysindex{f}{sym\_set\_obj\_coeff}
 \begin{verbatim}
 double *sym_set_obj_coeff(sym_environment *env, int index, double value)
 \end{verbatim}
@@ -2029,7 +2029,7 @@ Note that, it has to be at most the number of columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_obj2\_coeff}
-\sindex[f]{sym\_set\_obj2\_coeff}
+\mysindex{f}{sym\_set\_obj2\_coeff}
 \begin{verbatim}
 double *sym_set_obj2_coeff(sym_environment *env, int index, double value)
 \end{verbatim}
@@ -2064,7 +2064,7 @@ modified.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_col\_lower}
-\sindex[f]{sym\_set\_col\_lower}
+\mysindex{f}{sym\_set\_col\_lower}
 \begin{verbatim}
 double *sym_set_col_lower(sym_environment *env, int index, double value)
 \end{verbatim}
@@ -2097,7 +2097,7 @@ most the number of columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_col\_upper}
-\sindex[f]{sym\_set\_col\_upper}
+\mysindex{f}{sym\_set\_col\_upper}
 \begin{verbatim}
 double *sym_set_col_upper(sym_environment *env, int index, double value)
 \end{verbatim}
@@ -2130,7 +2130,7 @@ the number of columns. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_row\_lower}
-\sindex[f]{sym\_set\_row\_lower}
+\mysindex{f}{sym\_set\_row\_lower}
 \begin{verbatim}
 double *sym_set_row_lower(sym_environment *env, int index, double value)
 \end{verbatim}
@@ -2163,7 +2163,7 @@ number of rows.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_row\_upper}
-\sindex[f]{sym\_set\_row\_upper}
+\mysindex{f}{sym\_set\_row\_upper}
 \begin{verbatim}
 double *sym_set_row_upper(sym_environment *env, int index, double value)
 \end{verbatim}
@@ -2196,7 +2196,7 @@ number of rows.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_row\_type}
-\sindex[f]{sym\_set\_row\_type}
+\mysindex{f}{sym\_set\_row\_type}
 \begin{verbatim}
 int sym_set_row_type(sym_environment *env, int index, char rowsense, 
                      double rowrhs, double rowrng)
@@ -2232,7 +2232,7 @@ number of rows.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_obj\_sense}
-\sindex[f]{sym\_set\_obj\_sense}
+\mysindex{f}{sym\_set\_obj\_sense}
 \begin{verbatim}
 int sym_set_obj_sense(sym_environment *env, int sense)
 
@@ -2268,7 +2268,7 @@ objective sense to be minimization.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_col\_solution}
-\sindex[f]{sym\_set\_col\_solution}
+\mysindex{f}{sym\_set\_col\_solution}
 \begin{verbatim}
 int sym_set_col_solution(sym_environment *env, double *colsol)
 
@@ -2307,7 +2307,7 @@ column solution and will leave this function without success.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_primal\_bound}
-\sindex[f]{sym\_set\_primal\_bound}
+\mysindex{f}{sym\_set\_primal\_bound}
 \begin{verbatim}
 int sym_set_primal_bound(sym_environment *env, double bound)
 
@@ -2342,7 +2342,7 @@ or lower (for maximization) bound.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_continuous}
-\sindex[f]{sym\_set\_continuous}
+\mysindex{f}{sym\_set\_continuous}
 \begin{verbatim}
 int sym_set_continuous(sym_environment *env, int index)
 
@@ -2375,7 +2375,7 @@ it has to be at most the number of columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_integer}
-\sindex[f]{sym\_set\_integer}
+\mysindex{f}{sym\_set\_integer}
 \begin{verbatim}
 int sym_set_integer(sym_environment *env, int index)
 
@@ -2409,7 +2409,7 @@ it has to be at most the number of columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_col\_names}
-\sindex[f]{sym\_set\_col\_names}
+\mysindex{f}{sym\_set\_col\_names}
 \begin{verbatim}
 int sym_set_col_names(sym_environment * env, char **colname)
 \end{verbatim}
@@ -2443,7 +2443,7 @@ columns.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_add\_col}
-\sindex[f]{sym\_add\_col}
+\mysindex{f}{sym\_add\_col}
 \begin{verbatim}
 int sym_add_col(sym_environment *env, int numelems, int *indices, 
                 double *elements, double collb, double colub,
@@ -2488,7 +2488,7 @@ of the column. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_add\_row}
-\sindex[f]{sym\_add\_row}
+\mysindex{f}{sym\_add\_row}
 \begin{verbatim}
 int sym_add_row(sym_environment *env, int numelems, int *indices, 
                 double *elements, char rowsen, double rowrhs,
@@ -2535,7 +2535,7 @@ of the row.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_delete\_cols}
-\sindex[f]{sym\_delete\_cols}
+\mysindex{f}{sym\_delete\_cols}
 \begin{verbatim}
 int sym_delete_cols(sym_environment *env, int num, int * indices)
 \end{verbatim}
@@ -2572,7 +2572,7 @@ one of the {\tt indices} \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_delete\_rows}
-\sindex[f]{sym\_delete\_rows}
+\mysindex{f}{sym\_delete\_rows}
 \begin{verbatim}
 int sym_delete_rows(sym_environment *env, int num, int * indices)
 \end{verbatim}
@@ -2615,7 +2615,7 @@ one of the \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_write\_warm\_start\_desc}
-\sindex[f]{sym\_write\_warm\_start\_desc}
+\mysindex{f}{sym\_write\_warm\_start\_desc}
 \begin{verbatim}
 int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 \end{verbatim}
@@ -2648,7 +2648,7 @@ written to.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_read\_warm\_start}
-\sindex[f]{sym\_read\_warm\_start}
+\mysindex{f}{sym\_read\_warm\_start}
 \begin{verbatim}
 int sym_read_warm_start(char *file, warm_start_desc *ws)
 \end{verbatim}
@@ -2681,7 +2681,7 @@ to be read from the file.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_delete\_warm\_start}
-\sindex[f]{sym\_delete\_warm\_start}
+\mysindex{f}{sym\_delete\_warm\_start}
 \begin{verbatim}
 void sym_delete_warm_start(warm_start_desc *ws)
 \end{verbatim}
@@ -2707,7 +2707,7 @@ deleted.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_warm\_start}
-\sindex[f]{sym\_get\_warm\_start}
+\mysindex{f}{sym\_get\_warm\_start}
 \begin{verbatim}
 warm_start_desc *sym_get_warm_start(sym_environment *env, int copy_warm_start,
 warm_start_desc **ws)
@@ -2743,7 +2743,7 @@ to a copy or the itself of the currently loaded warm start.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_set\_warm\_start}
-\sindex[f]{sym\_set\_warm\_start}
+\mysindex{f}{sym\_set\_warm\_start}
 \begin{verbatim}
 int sym_set_warm_start(sym_environment *env, warm_start_desc *ws)
 \end{verbatim}
@@ -2775,7 +2775,7 @@ loaded to the environment.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_create\_copy\_warm\_start}
-\sindex[f]{sym\_create\_copy\_warm\_start}
+\mysindex{f}{sym\_create\_copy\_warm\_start}
 \begin{verbatim}
 warm_start_desc *sym_create_copy_warm_start(warm_start_desc *ws)
 \end{verbatim}
@@ -2815,7 +2815,7 @@ be copied.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{sym\_get\_lb\_for\_new\_rhs}
-\sindex[f]{sym\_get\_lb\_for\_new\_rhs}
+\mysindex{f}{sym\_get\_lb\_for\_new\_rhs}
 \begin{verbatim}
 int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
                            double *new_rhs_val, double *lb_for_new_rhs)
@@ -2860,7 +2860,7 @@ lower bound obtained for the new problem. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_ub\_for\_new\_rhs}
-\sindex[f]{sym\_get\_ub\_for\_new\_rhs}
+\mysindex{f}{sym\_get\_ub\_for\_new\_rhs}
 \begin{verbatim}
 int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
                            double *new_rhs_val, double *ub_for_new_rhs)
@@ -2906,7 +2906,7 @@ lower bound obtained for the new problem. This value will be set to
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_lb\_for\_new\_obj}
-\sindex[f]{sym\_get\_lb\_for\_new\_obj}
+\mysindex{f}{sym\_get\_lb\_for\_new\_obj}
 \begin{verbatim}
 int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_obj_ind, 
                            double *new_obj_val, double *lb_for_new_obj)
@@ -2949,7 +2949,7 @@ lower bound obtained for the new problem.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_get\_ub\_for\_new\_obj}
-\sindex[f]{sym\_get\_ub\_for\_new\_obj}
+\mysindex{f}{sym\_get\_ub\_for\_new\_obj}
 \begin{verbatim}
 int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_obj_ind, 
                            double *new_obj_val, double *ub_for_new_obj)
