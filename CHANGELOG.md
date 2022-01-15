@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### Release 5.6.18
+  * Switch CI to Github Actions
+  * Switch to automatically generated README
+  * Update documentation for coinbrew and get latex2html working again	
+  * Fix reported bugs (See #171, #177, #180)
+	
 ### Release 5.6.17
   * Update appveyor
   * Fix several reported bugs (see PRs 10-12, Issue 2)
