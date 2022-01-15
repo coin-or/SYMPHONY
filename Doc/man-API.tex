@@ -18,20 +18,21 @@
 
 If you are planning to use the interactive optimizer in a Unix-like
 environment and you are building SYMPHONY from source, it is recommended that
-you run the configuration script (see Section \ref{configuring}) with the
-command-line argument that enables GNU packages, i.e., 
-{\color{Brown}
+you run the configuration script (see Section \ref{building_from_source}) with
+the command-line argument that enables GNU packages, i.e.,
+{\color{brown}
 \begin{verbatim}
- ./configure --enable-gnu-packages 
+./coinbrew fetch build SYMPHONY@\VER --enable-gnu-packages 
 \end{verbatim}
-} This will allow the interactive shell to behave exactly like a Linux
+}
+This will allow the interactive shell to behave exactly like a Linux
 terminal command line, i.e., it will keep the history of the used commands,
 will do command completion, etc. Note that you must have the required packages
 (\code{readline} and \code{history}) installed.
 
 To use SYMPHONY's interactive shell, run the executable without any
 command line arguments, i.e., type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  bin/symphony 
 \end{verbatim}
@@ -54,7 +55,7 @@ to run.
 
 Below is the main menu displayed at the beginning of a new session:
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  *******************************************************
  *   This is SYMPHONY Version 5.6.10                   *
@@ -71,7 +72,7 @@ Below is the main menu displayed at the beginning of a new session:
 \end{verbatim}
 }
 When you type \code{help} or \code{?}, a list of main commands is displayed:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY: help
 
@@ -91,7 +92,7 @@ When you type \code{help} or \code{?}, a list of main commands is displayed:
 \end{verbatim}
 }
 Following is an illustration of a session to read in a sample instance:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY: load 
  Name of the file: sample.mps
@@ -107,7 +108,7 @@ Following is an illustration of a session to read in a sample instance:
 }
 The format of the input file is recognized from the file extension. If there is
 none, you will be prompted to define the input format: 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY: load 
  Name of the file: sample
@@ -125,8 +126,8 @@ none, you will be prompted to define the input format:
 If the input is in AMPL/GMPL format, you will also be prompted to read in a
 data file (note again that in order to enable GMPL/AMPL reader, you have to
 install GLPK---see Section
-\ref{building})): 
-{\color{Brown}
+\ref{building_from_source})): 
+{\color{brown}
 \begin{verbatim}
  SYMPHONY: load 
  Name of the file: sample.mod
@@ -144,7 +145,7 @@ install GLPK---see Section
 After loading the instance, type \code{solve} to solve the 
 corresponding integer program or \code{lpsolve} to solve its linear
 relaxation:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY: solve
 
@@ -175,7 +176,7 @@ the termination code of the solution process will be displayed (see Section
 
 \subsection{Set Menu}\label{set_menu}
 The \code{Set} submenu is used to set SYMPHONY's run-time parameters. To enter
-this submenu, type \code{set}: {\color{Brown}
+this submenu, type \code{set}: {\color{brown}
 \begin{verbatim}
 SYMPHONY: set
 Please type 'help'/'?' to see the list of parameters!
@@ -188,7 +189,7 @@ to enter the new value of that parameter. For instance, in order to
 display more outputs during the solution process, you need to set the 
 \code{verbosity} parameter (set to -1 by default for the interactive shell 
 routines) to a nonnegative integer: 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 SYMPHONY\Set: verbosity
 Value of the parameter: 3
@@ -209,7 +210,7 @@ must follow the name of that parameter. For instance, suppose that the
  time_limit 100
 \end{verbatim}
 Then, type \code{param\_file} to be prompted to read in the parameter file: 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY\Set: param_file
  Name of the parameter file: my_param
@@ -227,7 +228,7 @@ load an instance and solve it with updated run-time parameters.
 The \code{Display} submenu is used to print out results and statistics of the
 solution process after a \code{solve} call. To enter this submenu and see
 available options, type \code{display} and then \code{help} or \code{?}:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY: display
  Please type 'help'/'?' to see the display options!
@@ -248,7 +249,7 @@ available options, type \code{display} and then \code{help} or \code{?}:
 }
 Clearly, in order to display column solutions and the optimal solution value, 
 you need to type \code{solution} and then \code{obj}:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY\Display: solution
  Optimal Solution found!
@@ -265,7 +266,7 @@ you need to type \code{solution} and then \code{obj}:
 }
 You can also display the values of SYMPHONY's run-time parameters (see Section
 \ref{params}) by moving into \code{parameters} submenu: 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY\Display: parameter
  Please type 'help'/'?' to see the list of available parameters!
@@ -273,7 +274,7 @@ You can also display the values of SYMPHONY's run-time parameters (see Section
 \end{verbatim}
 }
 For instance, in order to display the verbosity level, type \code{verbosity}:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  SYMPHONY\Display\Parameter: verbosity 
  The value of verbosity: 3
@@ -291,7 +292,7 @@ level menu commands from the higher level menus. In other words, the user
 has the flexibility to use submenu commands without entering the 
 corresponding submenu. As an instance, all three of the following sessions 
 have the same result: 
-{\color{Brown}
+{\color{brown}
 \begin{itemize}
 \item 
   \begin{verbatim}
@@ -315,7 +316,7 @@ have the same result:
 }
 This flexibility is also enabled for the \code{load} command and the Set 
 submenu. The followings are all valid commands: 
-{\color{Brown}
+{\color{brown}
   \begin{verbatim}
     SYMPHONY: load sample.mps
   \end{verbatim}
@@ -343,19 +344,19 @@ Note that the switches are Unix-style, even in Windows). At a minimum, one must
 specify the name of the file to be read and solved. The following is the
 calling sequence to load in an instance file in MPS format and 
 solve it.
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  ./symphony -F sample.mps
 \end{verbatim}
 } 
 To read and solve a model in LP format, the command would be
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  ./symphony -L sample.lp
 \end{verbatim}
 } 
 To read and solve a GMPL model and associated data file, the command would be
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  ./symphony -F sample.mod -D sample.dat
 \end{verbatim}
@@ -446,7 +447,7 @@ deletes the environment. \\
 default parameter settings.
 \begin{figure}[tb]
 %\centering
-{\color{Brown}
+{\color{brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -463,13 +464,13 @@ C callable library. \label{default_main}}
 \end{figure}
 To read in an MPS file called \code{sample.mps} and solve it using 
 this program, the following command would be issued: \\
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  ./symphony -F sample.mps
 \end{verbatim}
 }
 To read and solve a model in LP format, the command would be
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  ./symphony -L sample.lp
 \end{verbatim}
@@ -479,7 +480,7 @@ call to \ptt{sym\_parse\_} \ptt{command\_line()}, SYMPHONY determines that the
 user wants to read in an MPS file. During the subsequent call to
 \ptt{sym\_load\_problem()}, the file is read and the problem data stored.
 To read an GMPL file, the user would issue the command
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  ./symphony -F sample.mod -D sample.dat
 \end{verbatim}
@@ -503,7 +504,7 @@ changes from depth first search to best first search after the first feasible
 solution is found.
 \begin{figure}[tb]
 %\centering
-{\color{Brown}
+{\color{brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -529,7 +530,7 @@ information. Afterward, the original problem is solved to optimality, then is
 modified and re-solved from the saved checkpoint. 
 \begin{figure}[tb]
 %\centering
-{\color{Brown}
+{\color{brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -570,7 +571,7 @@ desired function. Figure \ref{multi_criteria} shows the code for performing
 this analysis on variable 0. 
 \begin{figure}[tb]
 %\centering
-{\color{Brown}
+{\color{brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -624,7 +625,7 @@ equivalent to our \ptt{sym\_parse\_command\_line()} and
 \ptt{sym\_find\_initial\_bounds()}. Figure \ref{OSI_main} shows the
 program of Figure \ref{default_main} implemented using the OSI interface.
 \begin{figure}[tb]
-{\color{Brown}
+{\color{brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {

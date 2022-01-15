@@ -14,10 +14,20 @@
 
 This chapter is concerned with detailed instructions for building and
 installing SYMPHONY, along with its associated libraries and applications.
+Note that the procedures outlined below may change over time, so please also
+check the current README documentation for the COIN-OR Optimization suite at
+\begin{center}
+\url{https://coin-or.github.io/user_introduction.html}  
+\end{center}
+
+documentation of the \code{coinbrew} build script (referenced below) at
+\begin{center}
+\url{https://coin-or.github.io/coinbrew}.
+\end{center}
 
 \section{Installing the Binary Distribution}
 
-For the users who only need to use SYMPHONY as ablack-box solver solver or
+For the users who only need to use SYMPHONY as a black-box solver solver or
 only need the SYMPHONY callable library in order to develop a custom
 application, there are binary distributions released for different compilers
 and platforms. Each distribution consists of an executable and libraries built
@@ -31,19 +41,22 @@ be easy in most environments and will give you more flexibility. See
 Section~\ref{building_from_source} for more information on additional
 functionality available when building from source.
  
-Binaries for most platforms are available for download from
+Binaries for many platforms are available as assets attached to releases on
+Github. For the current release, the URL is
 \begin{center}
-\url{https://bintray.com/coin-or/download/SYMPHONY}  
+\url{https://github.com/coin-or/SYMPHONY/releases/tag/releases\%2F\VER}  
 \end{center}
-These binaries are built with the following default options:
+In many cases, however, binaries can be installed more easily with a package
+manager. 
 \begin{itemize}
-\item The associated LP solver is the COIN LP solver (CLP).
-\item Cut generation is done with COIN's Cut Generation Library (CGL).
-\item All libraries are compiled statically.
-%\item Library linked with = CLP, CGL, COINUTILS, OSI, OSICLP, OSISYM, 
-\item The optimization level for Linux binaries is ``O2''. 
-\item Only serial executables are included.
-\end{itemize} 
+\item \textbf{Linux}: On Debian/Ubuntu, SYMPHONY is available in the package \code{coinor-symphony} and can be installed with apt. On Fedora, SYMPHONY is available in the package \code{coin-or-SYMPHONY}.
+\item \textbf{Mac OS X}: The easiest way to get SYMPHONY on Mac OS X is
+  through Homebrew (\url{https://brew.sh}).
+  \begin{itemize}
+    \item \code{brew tap coin-or-tools/coinor}
+    \item \code{brew install coin-or-tools/coinor/symphony}
+  \end{itemize}
+\end{itemize}
 
 \subsection{Installation in Unix-like environments}
 \label{building-unix}
@@ -53,18 +66,18 @@ installation directory, such as \code{/usr/local/symphony}.
 %\begin{itemize}
 %\item
 Unpack the distribution with
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
- tar xzvf SYMPHONY-x.y.z-XXX*.tgz
+ tar xzvf SYMPHONY-releases.\VER-XXX.tgz
 \end{verbatim}
 }
-where \code{x.y.z} is the version of SYMPHONY and \code{XXX} indicates the
-platform and the version of compiler used to build the distribution. Switch
-into the root directory of the unpacked distribution.
+where \code{XXX} indicates the platform and the version of compiler used to
+build the distribution. Switch into the root directory of the unpacked
+distribution. 
 
 %\item
 Test the executable by going to the \code{bin} directory and typing 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  ./symphony
 \end{verbatim}
@@ -80,7 +93,7 @@ includes sample files in \code{examples} directory:  \\ \\
 solver using SYMPHONY's C callable functions with user defined input (see
 Section \ref{callable_library}). To test the code, go to the
 \code{examples} directory and type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  make milp 
  milp
@@ -92,7 +105,7 @@ environment variable \code{LD\_LIBRARY\_PATH}.
 solver using SYMPHONY's C++ callable functions (through OsiSym interface)
 with user defined input (see Section \ref{OSI}). To test the code, 
 go to \code{examples} directory and type, 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  make milpOsi
  milpOsi
@@ -103,11 +116,13 @@ go to \code{examples} directory and type,
 If everything is working properly, the libraries, executables and header files
 can be installed in appropriate system directories if desired. This must be
 done by hand. This step will be done automatically if building from source
-using the automatic scripts provided (see below).
+using the automatic scripts provided (see below). It is important to note,
+though, that 
+
 
 \subsection{Installation for Use With Microsoft Visual C++}
 
-Download and unpack the archive \code{symphony-x.y.z-win32-msvcXX.zip} in an
+Download and unpack the archive \code{SYMPHONY-releases.\VER-XXX.zip} in an
 appropriate installation directory, such as \code{C:\bs Program Files (x86)\bs
   SYMPHONY}. 
 
@@ -155,10 +170,7 @@ Chapter~\ref{SYMPHONY-development}.
 \subsubsection{The LP Engine} SYMPHONY requires the use of a third-party
   callable library to solve the LP relaxations once they are formulated. The
 LP solver is called through Open Solver Interface, also available from
-\htmladdnormallink{COIN}{https://github.com/coin-or/Osi}
-\begin{latexonly} 
-(\texttt{https://github.com/coin-or/Osi})
-\end{latexonly}.
+\htmladdnormallink{COIN-OR}{https://github.com/coin-or/Osi}.
 The list of solvers with OSI interfaces currently numbers eight and includes
 both commercial and open source alternatives. By default, SYMPHONY now uses
 the COIN LP solver (Clp). However, if another LP solver is desired, this is
@@ -190,26 +202,39 @@ below).
 
 \paragraph{Building on Linux.}
 
-Most Linux distributions come with all the required tools installed. To obtain
-the source code, the first step is to get the installer that will then
-fetch the source for SYMPHONY and all its dependencies. *You do not need to
-clone SYMPHONY first, just do the following!* Open a terminal and execute
+Most Linux distributions come with all the required tools installed, but to be
+sure, check that you have
+\begin{itemize}
+  \item pkg-config, wget, gcc, g++, make, git, tar
+  \item BLAS and LAPACK
+  \item Optional additions
+    \begin{itemize}
+    \item Metis
+    \item Suitesparse
+    \item libamd
+    \item Cholmod
+    \item Nauty
+    \end{itemize}
+\end{itemize}
 
-{\color{Brown}
+To obtain the source code, the first step is to get the installer that will
+then fetch the source for SYMPHONY and all its dependencies. *You do not need
+to clone SYMPHONY first, just do the following!* Open a terminal and execute
+
+{\color{brown}
 \begin{verbatim}
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 \end{verbatim}
 }
 
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the \code{COIN-OR-OptimizationSuite}
-subdirectory. To execute the script, do
+(including dependencies), use the \code{coinbrew} script.
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-cd COIN-OR-OptimizationSuite
-chmod u+x coin.install.sh
-./coin.install.sh
+cd coinbrew
+chmod u+x coinbrew
+./coinbrew
 \end{verbatim}
 }
 
@@ -219,40 +244,41 @@ you will be prompted interactively to select a project to fetch and build. The
 rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY
+./coinbrew fetch build SYMPHONY@\VER
 \end{verbatim}
 }
 
-The install script invokes a separate \code{configure} script that is
+The \code{coinbrew} script invokes a separate \code{configure} script that is
 auto-generated using the GNU autotools. This script takes a wide range of
 additional options and these options can be specified on the commnd-line when
-running \code{coin.install.sh}. For example, to build with debugging symbols,
+running \code{coinbrew}. For example, to build with debugging symbols,
 do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-debug
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
 \end{verbatim}
 }
 
 To get help with additional options available in running the script, do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin/install.sh --help
+./coinbrew --help
 \end{verbatim}
 }
 
 The above procedures will build all required dependencies and SYMPHONY itself.
-Afterwards, the binaries will be installed in the directory \code{Mibs/build/bin}
-and the libraries in the directory \code{SYMPHONY/build/lib}. If you wish to install in
+Afterwards, the binaries will be installed in the directory
+\code{dist/bin} 
+and the libraries in the directory \code{dist/lib}. If you wish to install in
 a different directory, such as \code{/usr/local}, then run the command
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh install --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir
+./coinbrew fetch build SYMPHONY@\VER --prefix=/path/to/install/dir
 \end{verbatim}
 }
 
@@ -266,32 +292,27 @@ By far, the easiest way to build on Windows is with the GNU autotools and the
 GCC compilers. The first step is to install either
 \begin{itemize}
 \item Msys2 (\url{https://msys2.github.io/})
-\item CYGWIN (\url{http://cygwin.org/})
 \item Windows Subsystem for Linux (\url{https://docs.microsoft.com/en-us/windows/wsl/install-win10})
 \end{itemize}
-If you don't already have CYGWIN installed and don't want to fool around with
+If you don't want to fool around with
 WSL (which is a great option if you already know your way around Unix), it is
 recommended to use MSys2, since it provides a minimal toolset that is easy to
-install. To get MSys2, either download the installer from
-\url{https://msys2.github.io/} or download and unzip MSys2 base from
-\begin{center}
-  \url{http://kent.dl.sourceforge.net/project/msys2/Base/x86\_64/msys2-base-x86\_64-20150512.tar.xz}
-\end{center}
-(this is an out-of-date version, there may be a better place to get an archive
-version).
+install. To get MSys2, download the installer from
+\url{https://msys2.github.io/}.
 
-Following any of the above steps, you should have the \code{bash} command
+Following the above steps, you should have the \code{bash} command
 (with Msys2, be sure to run \code{msys2\_shell.bat} 
-or manually add \code{msys64\bs usr \bs bin}, \code{msys64\bs mingw32\bs bin}, and
+or manually add \code{msys64\bs usr \bs bin}, \code{msys64\bs mingw32\bs bin},
+and 
 \code{msys64\bs mingw64\bs bin} to your Windows path).   
 
 Once you have bash installed and in your \code{PATH}, open a Windows terminal and
 type 
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 bash
-pacman -S make wget tar patch dos2unix diffutils git svn
+pacman -S make wget tar patch dos2unix diffutils git svn pkg-config zip unzip
 \end{verbatim}
 }
 
@@ -299,21 +320,21 @@ To obtain the source code, the first step is to get the installer that will then
 fetch the source for SYMPHONY and all its dependencies. *You do not need to
 clone SYMPHONY first, just do the following!* Open a terminal and execute
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 \end{verbatim}
 }
 
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the \code{COIN-OR-OptimizationSuite}
+(including dependencies), execute the script in the \code{coinbrew}
 subdirectory. To execute the script, do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-cd COIN-OR-OptimizationSuite
-chmod u+x coi.install.sh
-./coin.install.sh
+cd coinbrew
+chmod u+x coinbrew
+./coinbrew
 \end{verbatim}
 }
 
@@ -323,28 +344,28 @@ you will be prompted interactively to select a project to fetch and build. the
 rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY
+./coinbrew fetch build SYMPHONY@\VER
 \end{verbatim}
 }
-The install script invokes a separate \code{configure} script that is
+The \code{coinbrew} script invokes a separate \code{configure} script that is
 auto-generated using the GNU autotools. This script takes a wide range of
 additional options and these options can be specified on the commnd-line when
-running \code{coin.install.sh}. For example, to build with debugging symbols,
+running \code{coinbrew}. For example, to build with debugging symbols,
 do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-debug
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
 \end{verbatim}
 }
 
 To get help with additional options available in running the script, do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin/install.sh --help
+./coinbrew --help
 \end{verbatim}
 }
 
@@ -360,14 +381,12 @@ to your Windows executable search \code{PATH}. You may also consider adding
 It is possible to use almost the exact same commands to build with the Visual
 Studio compilers. Before doing any of the above commands in the Windows
 terminal, first run the \code{vcvarsall.bat} script for your version of Visual
-Studio. Note that you will also need a compatible Fortran compiler if you want
-to build any projects requiring Fortran (\code{ifort} is recommended, but not
-free). Then follow all the steps above, but replace the \code{build} command
-with
+Studio. Then follow all the steps above, but add \code{--enable-msvc} to the
+\code{coinbrew} command.
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-msvc
+./coinbrew fetch build SYMPHONY@\VER --enable-msvc
 \end{verbatim}
 }
 
@@ -381,7 +400,7 @@ obtaining source code). The easiest way to get these missing utilitites is to
 install Homebrew (see http://brew.sh). After installation, open a terminal and
 do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 brew install gcc wget svn git
 \end{verbatim}
@@ -391,17 +410,17 @@ To obtain the source code, the first step is to get the installer that will then
 fetch the source for SYMPHONY and all its dependencies. *You do not need to
 clone SYMPHONY first, just do the following!* Open a terminal and execute
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 \end{verbatim}
 }
 
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the \code{COIN-OR-OptimizationSuite}
+(including dependencies), execute the script in the \code{coinbrew}
 subdirectory. To execute the script, do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 cd COIN-OR-OptimizationSuite
 chmod u+x coi.install.sh
@@ -415,51 +434,48 @@ you will be prompted interactively to select a project to fetch and build. the
 rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY
+./coinbrew fetch build SYMPHONY@\VER
 \end{verbatim}
 }
 
-With this setup, \code{clang} will be used for compiling C++ by default and
-\code{gfortran} will be used for Fortran. Since \code{clang} uses the GNU standard
-library, \code{gfortran} is compatible.
-
-If you want to use the \code{gcc} compiler provided by Homebrew, then replace the
+With this setup, \code{clang} will be used for compiling C++ by default. If
+you want to use the \code{gcc} compiler provided by Homebrew, then replace the
 \code{build} command above with
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh build --no-prompt --main-proj=SYMPHONY CC=gcc-5 CXX=g++-5
+./coinbrew fetch build SYMPHONY@\VER CC=gcc-* CXX=g++-*
 \end{verbatim}
 }
-
+where \code{*} is the version number of \code{gcc}. 
 The install script invokes a separate \code{configure} script that is
 auto-generated using the GNU autotools. This script takes a wide range of
 additional options and these options can be specified on the commnd-line when
-running \code{coin.install.sh}. For example, to build with debugging symbols,
+running \code{coinbrew}. For example, to build with debugging symbols,
 do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-debug
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
 \end{verbatim}
 }
 
 To get help with additional options available in running the script, do
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin/install.sh --help
+./coinbrew --help
 \end{verbatim}
 }
 
 If you wish to install in a different directory, such as \code{/usr/local}, then run
 the command
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh install --no-prompt --main-proj=SYMPHONY --prefix=/path/to/install/dir
+./coinbrew fetch build SYMPHONY@\VER --prefix=/path/to/install/dir
 \end{verbatim}
 }
 
@@ -478,7 +494,7 @@ may want to set.
 \hline
 \texttt{--enable-debug} & compile all projects with debug options set \\
 \texttt{--enable-debug-symphony} & compile only SYMPHONY project with debug options \\
-\texttt{--enable-doscompile} & Under Cygwin, compile so that executables do
+\texttt{--enable-msvc} & Under MSys2, compile so that executables do
 not depend on the CYGWIN DLL \\
 \texttt{--enable-static} & build static libraries \\
 \texttt{--enable-static-executable} &  create a complete static executable \\
@@ -521,19 +537,19 @@ letters (default lpsolver=clp) \\
 
 In order to enable or disable an option, add the option as an argument to the
 \code{coin.install.sh} script. For instance, running 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
-./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-debug
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
 \end{verbatim}
 }
 will compile the source files with the debugging flag.
 
-It is possible to use compilers oter than the default (which is \code{g++}).
-For example, to perform at automated build of SYMPHONY using the MSVC++
+It is possible to use compilers other than the default (which is \code{g++}).
+For example, to perform an automated build of SYMPHONY using the MSVC++
 compiler \code{cl} with GNU autotools in the CYGWIN environment configure with
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
- ./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-doscompile=msvc
+ ./coinbrew fetch build SYMPHONY@\VER --enable-msvc
 \end{verbatim}
 }
 
@@ -543,28 +559,28 @@ sample MPS file called \code{sample.mps} and a sample GMPL/AMPL file called
 \code{sample.dat} are included with the distribution. You can
 use either the command-line or the interactive optimizer. To solve the sample
 MPS model, type
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  bin/symphony -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
 } To solve the GMPL model, use the \code{-F} switch to specify the file name
 and the \code{-D} for the data file name if the input is in GMPL/AMPL format,
 i.e., type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
 \end{verbatim}}
 For more MPS data files for further testing, see the MIPLIB library in the
 \code{Data/} subdirectory. To run the interactive optimizer, execute SYMPHONY
 without any command-line arguments, i.e., type
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
   bin/symphony 
 \end{verbatim}}
 and then type \code{help} or \code{?} to see a list of available commands.
 After the SYMPHONY library and the executable are compiled and tested, you
 can type
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  make clean 
 \end{verbatim}}
@@ -581,9 +597,9 @@ the compiler provides it. This should be the case for all recent versions of
 gcc and recent Microsoft compilers. Clang on OS X does not support OpenMP,
 though it is possible to build a version that does yourself. You can manually
 enable or disable OpenMP support with configure options by doing, e.g.,
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
- ./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-openmp
+ ./coinbrew fetch build SYMPHONY@\VER --enable-openmp
 \end{verbatim}
 } 
 In the Microsoft Visual Studio, enable OpenMP
@@ -595,7 +611,7 @@ After configuring, follow the earlier instructions for building and testing.
 To invoke SYMPHONY from the command-line with multiple threads, specify the
 number of \emph{additional} worker threads with the \code{-p} option, i.e., 
 invoking SYMPHONY with
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
@@ -608,7 +624,7 @@ worker thread (\code{-p 1}). Starting in version 5.6.0, the number of
 threads used is automatically set equal to the number of available cores if no
 option is specified. For a fully sequential run with just one thread, invoke
 SYMPHONY with
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
@@ -641,9 +657,9 @@ this is also explained in the PVM documentation.
 
 To configure for a parallel build with the default parallel configuration,
 invoke the configuration script as follows:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
- ./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --with-pvm
+ ./coinbrew fetch build SYMPHONY@\VER --with-pvm
 \end{verbatim}
 } 
 Note that there are a number of different parallel configurations (see
@@ -703,7 +719,7 @@ on the command line and then typing \code{quit}. As above, invoke SYMPHONY
 using the sample MPS file called \code{sample.mps} included with the
 distribution. To specify the file name, use the \code{-F} command-line option,
 i.e., in the root directory, type
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  bin/symphony_m_EXT -F SYMPHONY/Datasets/sample.mps 
 \end{verbatim}
@@ -729,9 +745,9 @@ your own application with SYMPHONY, see Chapter \ref{SYMPHONY-development}.
 In order to compile SYMPHONY's applications in Unix-like environments, you
 must first compile a version of the callable library with hooks for the
 callback functions.
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
- ./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --with-application
+ ./coinbrew fetch build SYMPHONY@\VER --with-application
  make 
  make install
 \end{verbatim}
@@ -768,7 +784,7 @@ should be similar.
 
 \begin{itemize}
 
-\item Go to \code{MSVisualStudio\bs v8} directory and open the solution file
+\item Go to \code{MSVisualStudio\bs v10} directory and open the solution file
 \code{symphony.sln}. 
 
 \item Note that there are a number of additional preprocessor definitions that
@@ -815,7 +831,7 @@ maintained.
 \item Open a command terminal (choose \code{Run} on the Start menu and type
 \code{cmd} in the dialogue box). Go to the \code{MSVisualStudio\bs v10}
 directory and type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  devenv symphony.sln /Build "Win32|Release"
 \end{verbatim}
@@ -836,7 +852,7 @@ a list of available commands or see Chapter
 \ref{API-overview} for instructions on using the interactive solver.
 
 \item If you modify the source code of SYMPHONY, type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  devenv symphony.sln /Rebuild "Win32|Release"
 \end{verbatim}
@@ -844,16 +860,16 @@ a list of available commands or see Chapter
 in order to clean and rebuild everything.
 \end{itemize} 
 
-\subsubsection{Building with the MSVC++ compiler in CYGWIN}
+\subsubsection{Building with the MSVC++ compiler in MSys2}
 
 It is possible to perform at automated build of SYMPHONY using the MSVC++
-compiler \code{cl} with GNU autotools in the CYGWIN environment. To do so,
+compiler \code{cl} with GNU autotools in the MSys2 environment. To do so,
 follow the instuctions for building in Unix-like environments (see Section
 \ref{getting_started_unix}), except when configuring, use the command
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
- ./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-doscompile=msvc
+ ./coinbrew fetch build SYMPHONY@\VER --enable-msvc
 \end{verbatim}}
 
 \subsubsection{Building SYMPHONY Applications}
@@ -876,7 +892,7 @@ have three options. You can either build using the MSVC++ IDE, build on the
 command-line with MSVC++ executable, or use the NMAKE utility. The below
 instructions are for MSVC++ Version 6, but building in other versions should
 be similar. All of the following commands should be executed in the
-\code{SYMPHONY-\VER\bs Applications\bs XXX\bs MSVisualStudio\bs v8} directory,
+\code{SYMPHONY-\VER\bs Applications\bs XXX\bs MSVisualStudio\bs v10} directory,
 where \code{XXX} is the name of the application to be built.
 
 \paragraph{Building With the MSVC++ Graphical Interface}
@@ -910,7 +926,7 @@ and bound solver.
 \begin{itemize}
 \item Open a command terminal (choose \code{Run} on the Start menu and type
 \code{cmd} in the dialogue box) and type
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  devenv xxx.sln /Build "Win32|Release"
 \end{verbatim}
@@ -919,13 +935,13 @@ where \code{xxx} is the name of the application. This will create the
 release version of the application executable, as above. 
 
 \item To test the executable, type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  Debug\xxx.exe -F ..\..\sample.xxx
 \end{verbatim}
 }
 \item If the source files for the application are modified, type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  devenv user.sln /Rebuild "Win32|Release"
 \end{verbatim}
@@ -933,17 +949,17 @@ release version of the application executable, as above.
 in order to clean and rebuild everything.
 \end{itemize} 
 
-\paragraph{Building with the MSVC++ compiler in CYGWIN}
+\paragraph{Building with the MSVC++ compiler in MSys2}
 
 It is possible to build applications using an automated build of SYMPHONY
-with the MSVC++ compiler \code{cl} using the GNU autotools in the CYGWIN
+with the MSVC++ compiler \code{cl} using the GNU autotools in the MSys2
 environment. To do so, follow the instuctions for building in Unix-like
 environments (see Section \ref{getting_started_unix}), except when
 configuring, use the command
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
- ./coin.install.sh fetch build --no-prompt --main-proj=SYMPHONY --enable-doscompile=msvc
+ ./coinbrew fetch build SYMPHONY@\VER --enable-msvc
 \end{verbatim}}
 
 Afterwards, you can build the individual applications using the ``make''

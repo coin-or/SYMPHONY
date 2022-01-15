@@ -5,7 +5,7 @@
 % SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         %
 % Laci Ladanyi (ladanyi@us.ibm.com).                                        %
 %                                                                           %
-% (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  %
+% (c) Copyright 2000-2022 Ted Ralphs. All Rights Reserved.                  %
 %                                                                           %
 % SYMPHONY is licensed under the Eclipse Public License. Please see         %
 % accompanying file for terms.                                              %
@@ -14,10 +14,12 @@
 
 \documentclass[twoside,11pt]{book}
 
-\usepackage[colorlinks]{hyperref}
-\hypersetup{
-  linkcolor=blue,
-}
+\usepackage{html}
+
+%\usepackage[colorlinks]{hyperref}
+%\hypersetup{
+%  linkcolor=blue,
+%}
 
 \oddsidemargin 0in
 \evensidemargin 0in
@@ -31,6 +33,7 @@
 
 \catcode`\@=11\relax   %allow @ in macro names
 
+%\begin{latexonly}
 \if@twoside         % If two-sided printing.
 \def\ps@headings{\let\@mkboth\markboth
 \def\@oddfoot{}\def\@evenfoot{}%       No feet.
@@ -70,6 +73,7 @@
 \def\sectionmark##1{\markright {\uppercase{\ifnum \c@secnumdepth >\z@
     \thesection\hskip 1em\relax \fi ##1}}}}
 \fi
+%\end{latexonly}
 
 \catcode`\@=12\relax   %disable @ in macro names
 
@@ -77,7 +81,8 @@
 
 \markright{\bf \thesection}{}
 
-\usepackage{epsfig, html}
+%\usepackage{epsfig}
+\usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{fullpage}
@@ -85,17 +90,21 @@
 \usepackage{fancyvrb}
 \usepackage{listings}
 \usepackage{url}
-\usepackage{splitidx}
-%\usepackage[usenames]{color}
-\usepackage[dvipsnames]{xcolor}
 \usepackage[latin1]{inputenc}
-
+%\begin{latexonly}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{splitidx}
 \makeindex
 \newindex[Index of C API Functions]{f}
 \newindex[Index of User Callback API Functions]{cf}
 \newindex[Index of Parameters]{p}
 \newcommand{\mysindex}[2]{\sindex[#1]{#2}}
-%\newcommand{\printindex}{}
+%\end{latexonly}
+\begin{htmlonly}
+\usepackage{xcolor}
+\newcommand{\mysindex}[2]{}
+\end{htmlonly}
+
 \def\GP{{Global Parameters}}
 \def\DP{{Draw Graph Parameters}}
 \def\MP{{Master Module Parameters}}
@@ -103,8 +112,10 @@
 \def\LPP{{LP Parameters}}
 \def\CP{{Cut Pool Parameters}}
 \def\CGP{{Cut Generator Parameters}}
-\def\VER{{5.6.17}}
+\def\VER{{5.6.18}}
+%\begin{latexonly}
 \lstloadlanguages{C++}
+%\end{latexonly}
 
 \newcommand{\be}{\begin{enumerate}}
 \newcommand{\ee}{\end{enumerate}}
@@ -120,7 +131,7 @@
 \newcommand{\ev}{\end{verbatim}}
 \newcommand{\functiondef}[1]{\subsubsection{#1}}
 \newcommand{\firstfuncdef}[1]{\subsubsection{#1}}
-\newcommand{\code}[1]{{\color{Brown}\texttt{#1}}}
+\newcommand{\code}[1]{{\color{brown}\texttt{#1}}}
 %begin{latexonly}
 \renewcommand{\functiondef}[1]{\newpage \item[\Large $\triangleright$] 
 {\color{red}{\bf
@@ -130,7 +141,7 @@
 \Large #1}}}
 %end{latexonly}
 \newcommand{\describe}{\item[{\color{cyan}Description:}] \hfill}
-\newcommand{\args}{\item[{\color{Brown}Arguments:}] \hfill}
+\newcommand{\args}{\item[{\color{brown}Arguments:}] \hfill}
 \newcommand{\returns}{\item[{\color{green}Return values:}] \hfill}
 \newcommand{\postp}{\item[Post-processing:] \hfill}
 \newcommand{\nopostp}{\item[Post-processing:] None \hfill}
@@ -143,7 +154,12 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
 \renewcommand{\Re}{\mathbb{R}}
-\newcommand{\ptt}[1]{{\tt {\color{BrickRed} #1}}} 
+%\begin{latexonly}
+\newcommand{\ptt}[1]{{\tt {\color{BrickRed} #1}}}
+%\end{latexonly}
+\begin{htmlonly}
+\newcommand{\ptt}[1]{{\tt {\color{red} #1}}}
+\end{htmlonly}
 \newcommand{\bs}{{$\backslash$}}
 
 %\htmladdtonavigation{\htmladdnormallink 
@@ -177,7 +193,7 @@ T.K. Ralphs\thanks{Department of Industrial and
 Systems Engineering, Lehigh University, Bethlehem, PA 18017, {\tt 
 \htmladdnormallink{ted@lehigh.edu}{mailto:ted@lehigh.edu}}, 
 {\tt \url{http://coral.ielehigh.edu/\~ted}}} \\
-M. Guzelsoy\thanks{SAS Institute, Cary, NC {\tt
+M. G\"uzelsoy\thanks{SAS Institute, Cary, NC {\tt
   \htmladdnormallink{mguzelsoy@gmail.com}{mailto:mguzelsoy@gmail.com}}} \\
 A. Mahajan\thanks{Department of Industrial Engineering and Operations Research,
   IIT Bombay, India {\tt \htmladdnormallink{amahajan@iitb.ac.in}{mailto:amahajaniitb.ac.in
@@ -202,7 +218,7 @@ A. Mahajan\thanks{Department of Industrial Engineering and Operations Research,
 \begin{rawhtml} 
 <P ALIGN="CENTER"> <STRONG> <FONT SIZE="4">
 <a href="http://coral.ie.lehigh.edu/~ted">T.K. Ralphs</a> <BR>
-M. G\"uzelsoy <BR>
+M. Guzelsoy <BR>
 <a href="http://www.ieor.iitb.ac.in/amahajan">A. Mahajan </a> <BR>
 </P> </FONT> </STRONG> 
 \end{rawhtml}
@@ -217,7 +233,7 @@ M. G\"uzelsoy <BR>
 %\end{rawhtml}
 \begin{rawhtml} <P ALIGN="CENTER"> <STRONG> <FONT SIZE="3">
 PDF version available <A
-HREF="http://www.coin-or.org/doc/SYMPHONY-5.6.15-Manual.pdf">here</A>
+HREF="https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.18-Manual.pdf">here</A>
 </FONT></STRONG></P>
 \end{rawhtml}
 \begin{rawhtml} </P> </FONT> </STRONG> 
@@ -245,7 +261,7 @@ D. Naddef.  </FONT></STRONG></P>
 \begin{rawhtml} <P ALIGN="CENTER"> <STRONG> 
 \end{rawhtml}
 \begin{center}
-{\copyright 2000-2019 Ted Ralphs}
+{\copyright 2000-2022 Ted Ralphs}
 \end{center}
 \begin{rawhtml} </P> </STRONG> 
 \end{rawhtml}
@@ -361,8 +377,10 @@ supported the development of SYMPHONY over the past almost three decades.
 
 \backmatter
 
+%\begin{latexonly}
 \cleardoublepage
 \phantomsection
+%\end{latexonly}
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain}
 \bibliography{/mnt/c/Users/tkral/Documents/Ref/BibFiles/SYMPHONY/bib}
@@ -374,10 +392,12 @@ supported the development of SYMPHONY over the past almost three decades.
 
 %\input{man-consts}
 
-
+%\begin{latexonly}
 \cleardoublepage
 \phantomsection
 %\refstepcounter{chapter}
 \addcontentsline{toc}{chapter}{Index}
 \printindex*
+%\end{latexonly}
+
 \end{document}
