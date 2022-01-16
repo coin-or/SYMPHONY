@@ -1,0 +1,496 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Tree Manager parameters</TITLE>
+<META NAME="description" CONTENT="Tree Manager parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node280.html">
+<LINK REL="previous" HREF="node278.html">
+<LINK REL="next" HREF="node280.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node280.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node275.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node278.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1674"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node280.html">LP parameters</A>
+<B> Up:</B> <A
+ HREF="node275.html">Run-time Parameters</A>
+<B> Previous:</B> <A
+ HREF="node278.html">Draw Graph parameters</A>
+ &nbsp; <B>  <A ID="tex2html1675"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00744000000000000000"></A>
+<A ID="tm_params"></A>
+<BR>
+Tree Manager parameters
+</H2>
+<DL>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> TM_verbosity</FONT></SPAN> &ndash; integer (0).</STRONG></DT>
+<DD>The verbosity of the TM module.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> lp_exe, cg_exe, cp_exe</FONT></SPAN> &ndash; strings (&ldquo;lp&rdquo;, &ldquo;cg&rdquo;,
+&ldquo;cp&rdquo;).</STRONG></DT>
+<DD>The name of the LP, CG, and CP module binaries. Note: when running in
+parallel using PVM, these executables (or links to them) must reside
+in the <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> PVM_ROOT/bin/PVM_ARCH/</FONT></SPAN> directory. Also, be sure to note
+that the executable names may have extensions that depend on the
+configuration of the modules, but the defaults will always be set to
+the name that the makefile produces.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> lp_debug, cg_debug, cp_debug</FONT></SPAN> &ndash; boolean (all <SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Whether the modules should be started under a debugger or not.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_active_nodes</FONT></SPAN> &ndash; integer (1).</STRONG></DT>
+<DD>The maximum number of processors/threads to be used.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_cp_num</FONT></SPAN> &ndash; integer (0).</STRONG></DT>
+<DD>The maximum number of cut pools to be used.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> lp_mach_num, cg_mach_num, cp_mach_num</FONT></SPAN> &ndash; integers
+(all 0).</STRONG></DT>
+<DD>The number of processors in the virtual machine to run LP (CG, CP)
+processes. If this value is 0 then the processes will be assigned to
+processors in round-robin order. Otherwise the next <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> xx_mach_num</FONT></SPAN> lines
+describe the processors where the LP (CG, CP) modules must run. The
+keyword &ndash; value pairs on these lines must be <B>TM_xx_machine</B> and the
+name or IP address of a processor (the processor names need not be distinct).
+In this case the actual processes are assigned in a round robin fashion to the
+processors on this list.
+<BR>
+<BR>
+This feature is useful if a specific software package is needed for
+some module, but that software is not licensed for every node of the
+virtual machine or if a certain process must run on a certain type of
+machine due to resource requirements.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> use_cg</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Whether to use a cut generator or not. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> TM_random_seed</FONT></SPAN> &ndash; integer (17).</STRONG></DT>
+<DD>The random seed used in the TM.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> unconditional_dive_frac</FONT></SPAN> &ndash; double (0.0).</STRONG></DT>
+<DD>The fraction of the nodes on which SYMPHONY randomly dives
+unconditionally into one of the children.
+
+<P>
+<A ID="diving_strategy"></A></DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> diving_strategy</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">BEST_ESTIMATE</SPAN>{0}).</STRONG></DT>
+<DD>The strategy employed when deciding whether to dive or not. 
+<BR>
+<BR>
+The <SPAN style="font-family:monospace">BEST_ESTIMATE</SPAN>{0} strategy continues to dive until the
+lower bound in the child to be dived into exceeds the parameter
+<A HREF="node277.html#upper_bound_estimate"><SPAN  CLASS="texttt">upper_bound_estimate</SPAN></A>, which is 
+given by the user. 
+<BR>
+<BR>
+The <SPAN style="font-family:monospace">COMP_BEST_K</SPAN>{1} strategy computes the average lower bound
+on the best <A HREF="#diving"><SPAN  CLASS="texttt">diving_k</SPAN></A> search tree nodes and
+decides to dive if
+the lower bound of the child to be dived into does not exceed this
+average by more than the fraction <A HREF="#diving"><SPAN  CLASS="texttt">diving_threshold</SPAN></A>.
+
+<BR>
+<BR>
+The <SPAN style="font-family:monospace">COMP_BEST_K_GAP</SPAN>{2} strategy takes the size of the gap
+into account when deciding whether to dive. After the average lower
+bound of the best <A HREF="#diving"><SPAN  CLASS="texttt">diving_k</SPAN></A> nodes is computed, 
+the gap between
+this average lower bound and the current upper bound is computed.
+Diving only occurs if the difference between the computed average
+lower bound and the lower bound of the child to be dived into is at
+most the fraction <A HREF="#diving"><SPAN  CLASS="texttt">diving_threshold</SPAN></A> of the gap.
+<BR>
+<BR>
+Note that fractional diving settings can override these strategies.
+See <A HREF="#fractional_diving">below</A>.
+
+<P>
+<A ID="diving"></A></DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> diving_k, diving_threshold</FONT></SPAN> &ndash; integer, double (1, 0.05).</STRONG></DT>
+<DD>See above.
+
+<P>
+<A ID="fractional_diving"></A></DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fractional_diving_ratio, fractional_diving_num</FONT></SPAN> &ndash;
+integer (0.02, 0).</STRONG></DT>
+<DD><P>
+Diving occurs automatically if the number of fractional variables in
+the child to be dived into is less than <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fractional_diving_num</FONT></SPAN>
+or the fraction of total variables that are fractional is less than <SPAN style="font-family:monospace">fractional_diving_ratio</SPAN>. This overrides the other diving rules.
+Note that in order for this option to work, the code must be compiled
+with <SPAN style="font-family:monospace">FRACTIONAL_BRANCHING</SPAN> defined. This is the default. See the
+makefile for more details.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> node_selection_rule</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">LOWEST_LP_FIRST</SPAN>{0}).</STRONG></DT>
+<DD>The rule for selecting the next search tree node to be processed. This rule
+selects the one with lowest lower bound. Other possible values are: <SPAN style="font-family:monospace">HIGHEST_LP_FIRST</SPAN>{1}, <SPAN style="font-family:monospace">BREADTH_FIRST_SEARCH</SPAN>{2} and <SPAN style="font-family:monospace">DEPTH_FIRST_SEARCH</SPAN>{3}.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> load_balance_level</FONT></SPAN></STRONG></DT>
+<DD>&ndash; integer (-1).] 
+
+A naive attempt at load balancing on problems where significant time
+is spent in the root node, contributing to a lack of parallel
+speed-up. Only a prescribed number of iterations (<SPAN style="font-family:monospace">load_balance_iter</SPAN>) are performed in the root node (and in each
+subsequent node on
+a level less than or equal to <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> load_balance_level</FONT></SPAN>) before
+branching is forced in order to provide additional subproblems for the
+idle processors to work on. This doesn't work well in general.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> load_balance_iter</FONT></SPAN></STRONG></DT>
+<DD>&ndash; integer (-1).] 
+
+Works in tandem with the <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> load_balance_level</FONT></SPAN> to attempt some
+simple load balancing. See the above description.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> tighten_root_bounds</FONT></SPAN></STRONG></DT>
+<DD>&ndash; boolean (TRUE).]
+
+Whether to tighten the global bounds on variables using the reduced costs
+from the root node.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> status_interval</FONT></SPAN></STRONG></DT>
+<DD>&ndash; integer (5).]
+
+How often to print status messages to the screen. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> keep_description_of_pruned</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">DISCARD</SPAN>{0}).</STRONG></DT>
+<DD>Whether to keep the description of pruned search tree nodes or not.
+The reasons to do this are (1) if the user wants to write out a proof
+of optimality using the logging function, (2) for debugging, or (3) to
+get a visual picture of the tree using the software VBCTOOL.
+Otherwise, keeping the pruned nodes around just takes up memory. 
+
+<P>
+There are three options if it is desired to keep some description of
+the pruned nodes around. First, their full description can be written
+out to disk and freed from memory (<SPAN style="font-family:monospace">KEEP_ON_DISK_FULL</SPAN>{1}). There
+is not really too much you can do with this kind of file, but
+theoretically, it contains a full record of the solution process and
+could be used to provide a certificate of optimality (if we were using
+exact arithmetic) using an independent verifier. In this case, the
+line following <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> keep_description_of_pruned</FONT></SPAN> should be a line
+containing the keyword <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> pruned_node_file_name</FONT></SPAN> with its
+corresponding value being the name of a file to which a description of
+the pruned nodes can be written. The file does not need to exist and
+will be over-written if it does exist.
+
+<P>
+If you have the software VBCTOOL, then
+you can alternatively just write out the information VBCTOOL needs to
+display the tree (<SPAN style="font-family:monospace">KEEP_ON_DISK_VBC_TOOL</SPAN>{2}). 
+
+<P>
+Finally, the user can set the value to of this parameter to <SPAN style="font-family:monospace">KEEP_IN_MEMORY</SPAN>{2}, in which case all pruned nodes will be kept in
+memory and written out to the regular log file if that option is
+chosen. This is really only useful for debugging. Otherwise, pruned
+nodes should be flushed.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> keep_warm_start</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Turning this parameter on will have exactly the same impact with 
+setting the <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> keep_description_of_pruned</FONT></SPAN> to 
+<SPAN style="font-family:monospace">KEEP_IN_MEMORY</SPAN>{2}. This will allow SYMPHONY to keep all the
+necessary information obtained from the branching tree of the original 
+problem to be able to warm start after a parameter or problem data 
+modification. Thus, if it is intended to warm start later, the user 
+should set this parameter before solving the original problem.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_limit</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">SYM_INFINITY</SPAN>).</STRONG></DT>
+<DD>Setting this parameter will start the warm start routine using only the 
+first <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_limit</FONT></SPAN> nodes generated during the 
+previous solve procedure. The rest of the tree will be trimmed. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_ratio</FONT></SPAN> &ndash; double (<SPAN style="font-family:monospace">0.0</SPAN>).</STRONG></DT>
+<DD>Setting this parameter will start the warm start routine using only the 
+first <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_ratio</FONT></SPAN>% of the nodes generated during the 
+previous solve procedure. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_level</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">SYM_INFINITY</SPAN>).</STRONG></DT>
+<DD>Setting this parameter will start the warm start routine using all the
+nodes above the level <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_level</FONT></SPAN> of the 
+tree generated during the previous solve procedure. The rest of the tree 
+will be trimmed. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_level_ratio</FONT></SPAN> &ndash; double (<SPAN style="font-family:monospace">0.0</SPAN>).</STRONG></DT>
+<DD>Setting this parameter will start the warm start routine using all the
+nodes above the level <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_node_level</FONT></SPAN>% of the 
+warm start tree depth. The rest of the tree will be trimmed
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> logging</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">NO_LOGGING</SPAN>{0}).</STRONG></DT>
+<DD>Whether or not to write out the state of the search tree and all other
+necessary data to disk periodically in order to allow a warm start in
+the case of a system crash or to allow periodic viewing with VBCTOOL.
+
+<P>
+If the value of this parameter is set to <SPAN style="font-family:monospace">FULL_LOGGING</SPAN>{1},
+then all information needed to warm start the calculation will written
+out periodically. The next two lines of the parameter file following
+should contain the keywords <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> tree_log_file_name</FONT></SPAN> and <SPAN style="font-family:monospace">cut_log_file_name</SPAN> along with corresponding file names as values.
+These will be the files used to record the search tree and related
+data and the list of cuts needed to reconstruct the tree.
+
+<P>
+If the value of the parameter is set to <SPAN style="font-family:monospace">VBC_TOOL</SPAN>{2}, then
+only the information VBCTOOL needs to display the tree will be
+logged. This is not really a very useful option since a &ldquo;live&rdquo; picture
+of the tree can be obtained using the <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> vbc_emulation</FONT></SPAN> parameter
+described below.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> logging_interval</FONT></SPAN> &ndash; integer (1800).</STRONG></DT>
+<DD>Interval (in seconds) between writing out the above log files.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start</FONT></SPAN> &ndash; boolean (0).</STRONG></DT>
+<DD>Used to allow the tree manager to make a warm start by reading in
+previously written log files. If this option is set, then the two line
+following must start with the keywords <SPAN style="font-family:monospace">warm_start_tree_file_name</SPAN> and <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> warm_start_cut_file_name</FONT></SPAN>
+and include the appropriate file names as the corresponding values.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> vbc_emulation</FONT></SPAN></STRONG></DT>
+<DD>&ndash; integer (<SPAN style="font-family:monospace">NO_VBC_EMULATION</SPAN>{0}).] 
+
+Determines whether or not to employ the VBCTOOL emulation mode. If
+one of these modes is chosen, then the tree will be displayed in
+&ldquo;real time&rdquo; using the VBCTOOL Software. When using the option <SPAN style="font-family:monospace">VBC_EMULATION_LIVE</SPAN>{2} and piping the output directly to VBCTOOL, the
+tree will be displayed as it is constructed, with color coding
+indicating the status of each node. With <SPAN style="font-family:monospace">VBC_EMULATION_FILE</SPAN>{1} selected, a log file will be produced which
+can later be read into VBCTOOL to produce an emulation of the
+solution process at any desired speed. If <SPAN style="font-family:monospace">VBC_EMULATION_FILE</SPAN>
+is selected, the the following line should contain the keyword <SPAN style="font-family:monospace">vbc_emulation_file_name</SPAN> along with the corresponding file name
+for a value.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> price_in_root</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Whether to price out variables in the root node before the second
+phase starts (called <EM>repricing the root</EM>). 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> trim_search_tree</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Whether to trim the search tree before the second phase starts or not. Useful
+only if there are two phases. (It is very useful then.)
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> colgen_in_first_phase, colgen_in_second_phase</FONT></SPAN> &ndash;
+integers (both 4).</STRONG></DT>
+<DD>These parameters determine if and when to do
+column generation in the first and second phase of the algorithm. The
+value of each parameter is obtained by setting the last four bits.
+The last two bits refer to what to do when attempting to prune a node.
+If neither of the last two bits are set, then we don't do
+anything&mdash;we just prune it. If only the last bit is set, then we
+simply save the node for the second phase without doing any column
+generation (yet). If only the second to last bit is set, then we do
+column generation immediately and resolve if any new columns are
+found. The next two higher bits determine whether or not to do column
+generation before branching. If only the third lowest bit is set, then no
+column generation occurs before branching. If only the fourth lowest bit is
+set, then column generation is attempted before branching. The default
+is not to generate columns before branching or fathoming, which
+corresponds to only the third lowest bit being set, resulting in a
+default value of 4.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> time_limit</FONT></SPAN> &ndash; double (-1.0).</STRONG></DT>
+<DD>Number of seconds of wall-clock time allowed for solution. When this
+time limit is reached, the solution process will stop and the best
+solution found to that point, along with other relevant data, will be
+output. A time limit less than 0.0 means there is no limit.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> node_limit</FONT></SPAN> &ndash; integer (-1).</STRONG></DT>
+<DD>Number of nodes allowed to be analyzed during the solution. When this
+node limit is reached, the solution process will stop and the best
+solution found to that point, along with other relevant data, will be
+output. A node limit less than 0 means there is no limit. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> gap_limit</FONT></SPAN> &ndash; double (-1.0).</STRONG></DT>
+<DD>Target gap limit used to determine when the solver should terminate. When the
+gap between the lower and the upper bound reaches this point, the solution
+process will stop and the best solution found to that point, along with other
+relevant data, will be output. This parameter expresses the target gap as a
+percentage relative to the current lower bound. For example, a gap limit equal
+to 10 means that the solution process will stop when the best solution is
+within 10% of the current lower bound (which is a proxy for the optimal value
+itself). Additionally, a gap limit less than or equal to 0 means the solution
+produced is the exact optimum.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> find_first_feasible</FONT></SPAN> &ndash; boolean (FALSE).</STRONG></DT>
+<DD>Whether to stop after finding the first feasible solution or not. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> sensitivity_analysis</FONT></SPAN> &ndash; boolean (FALSE).</STRONG></DT>
+<DD>If the user wants to do the rudimentary sensitivity analysis, which will 
+give a lower bound for the problem modified by the right hand side, then, 
+this parameter has to be set before solving the original problem. If it 
+is set, SYMPHONY will keep the necessary information from the solution 
+processes of the original problem to be able to do the sensitivity analysis 
+later.  
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node280.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node275.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node278.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1674"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node280.html">LP parameters</A>
+<B> Up:</B> <A
+ HREF="node275.html">Run-time Parameters</A>
+<B> Previous:</B> <A
+ HREF="node278.html">Draw Graph parameters</A>
+ &nbsp; <B>  <A ID="tex2html1675"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

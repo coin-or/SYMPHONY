@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Building in a Windows Terminal</TITLE>
+<META NAME="description" CONTENT="Building in a Windows Terminal">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node32.html">
+<LINK REL="previous" HREF="node30.html">
+<LINK REL="next" HREF="node32.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node32.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node29.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node30.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html530"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node32.html">Building with the MSVC++</A>
+<B> Up:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A
+ HREF="node30.html">Building with the MSVC++</A>
+ &nbsp; <B>  <A ID="tex2html531"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00323200000000000000"></A>
+<A ID="using_msdev"></A>
+<BR>
+Building in a Windows Terminal
+</H3>
+
+<P>
+These instructions are for MSVC++ Version 10. Instructions for other versions
+should be similar, though project files for earlier versions are not well
+maintained. 
+
+<P>
+
+<UL>
+<LI>Open a command terminal (choose 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Run</SPAN></FONT> on the Start menu and type
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">cmd</SPAN></FONT> in the dialogue box). Go to the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">MSVisualStudio
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>v10</SPAN></FONT>
+directory and type 
+
+<PRE>
+ devenv symphony.sln /Build "Win32|Release"
+</PRE>This will create both the 32-bit release version of SYMPHONY, including the
+library 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">libSymphony.lib</SPAN></FONT> and the executable 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">symphony</SPAN></FONT>. Of course,
+other configurations are suported as well and binaries will be created
+side-by-side in the appropriate directories according to platform and
+configuration selected. The library, together with the header files in
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">SYMPHONY
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>include
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT></SPAN></FONT>, can then be used to call SYMPHONY from any
+C/C++ code. The API for calling SYMPHONY is described in Section
+<A HREF="node46.html#callable_library">3.3</A>.
+
+<P>
+</LI>
+<LI>Test the executable by opening Windows Explorer and double-clicking
+on 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">symphony.exe</SPAN></FONT> in the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Debug
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT></SPAN></FONT> subdirectory. This should open a Window in
+which the interactive solver will appear. Type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">help</SPAN></FONT> or 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">?</SPAN></FONT> to see
+a list of available commands or see Chapter
+<A HREF="node37.html#API-overview">3</A> for instructions on using the interactive solver.
+
+<P>
+</LI>
+<LI>If you modify the source code of SYMPHONY, type 
+
+<PRE>
+ devenv symphony.sln /Rebuild "Win32|Release"
+</PRE>
+in order to clean and rebuild everything.
+</LI>
+</UL> 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node32.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node29.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node30.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html530"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node32.html">Building with the MSVC++</A>
+<B> Up:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A
+ HREF="node30.html">Building with the MSVC++</A>
+ &nbsp; <B>  <A ID="tex2html531"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

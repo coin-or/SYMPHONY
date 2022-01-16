@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Set Menu</TITLE>
+<META NAME="description" CONTENT="Set Menu">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node43.html">
+<LINK REL="previous" HREF="node41.html">
+<LINK REL="next" HREF="node43.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node38.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html582"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node43.html">Display Menu</A>
+<B> Up:</B> <A
+ HREF="node38.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A
+ HREF="node41.html">Main Menu</A>
+ &nbsp; <B>  <A ID="tex2html583"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00414000000000000000"></A><A ID="set_menu"></A>
+<BR>
+Set Menu
+</H2>
+The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Set</SPAN></FONT> submenu is used to set SYMPHONY's run-time parameters. To enter
+this submenu, type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">set</SPAN></FONT>: 
+<PRE>
+SYMPHONY: set
+Please type 'help'/'?' to see the list of parameters!
+SYMPHONY\Set:
+</PRE>
+You can override the default value of a parameter by typing the name of 
+the parameter. You will then be prompted 
+to enter the new value of that parameter. For instance, in order to 
+display more outputs during the solution process, you need to set the 
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">verbosity</SPAN></FONT> parameter (set to -1 by default for the interactive shell 
+routines) to a nonnegative integer: 
+
+<PRE>
+SYMPHONY\Set: verbosity
+Value of the parameter: 3
+Setting verbosity to: 3
+SYMPHONY\Set:
+</PRE> 
+A confirmation message will also be displayed. Note that typing 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">help</SPAN></FONT>
+or 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">?</SPAN></FONT> displays only a subset of the most commonly used run-time
+parameters. However, you are allowed to set any of the parameters given in
+Section <A HREF="node275.html#params">6.4</A>. Additionally, you can set the values of parameters using
+a parameter file as an input. In such a file, the new value of each parameter
+must follow the name of that parameter. For instance, suppose that the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">my_param</SPAN></FONT> file consists of the following lines:
+<PRE>
+ verbosity 3
+ node_selection_rule 3
+ time_limit 100
+</PRE>
+Then, type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">param_file</SPAN></FONT> to be prompted to read in the parameter file: 
+
+<PRE>
+ SYMPHONY\Set: param_file
+ Name of the parameter file: my_param
+ Setting verbosity to: 3
+ Setting node_selection_rule to: 3
+ Setting time_limit to: 100
+ SYMPHONY\Set:
+</PRE>
+At this point, you can return to the main menu by typing 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">back</SPAN></FONT>,  
+load an instance and solve it with updated run-time parameters. 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node38.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html582"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node43.html">Display Menu</A>
+<B> Up:</B> <A
+ HREF="node38.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A
+ HREF="node41.html">Main Menu</A>
+ &nbsp; <B>  <A ID="tex2html583"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

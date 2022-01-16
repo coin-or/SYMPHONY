@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Fault Tolerance</TITLE>
+<META NAME="description" CONTENT="Fault Tolerance">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node96.html">
+<LINK REL="next" HREF="node98.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node98.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node94.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node96.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html805"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node98.html">Developing Custom Applications</A>
+<B> Up:</B> <A
+ HREF="node94.html">Parallelizing BCP</A>
+<B> Previous:</B> <A
+ HREF="node96.html">Inter-process Communication</A>
+ &nbsp; <B>  <A ID="tex2html806"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00553000000000000000"></A>
+<A ID="fault-tolerance"></A>
+<BR>
+Fault Tolerance
+</H2> 
+
+<P>
+Fault tolerance is an important consideration for solving large problems on
+computing networks whose nodes may fail unpredictably. The tree manager tracks
+the status of all processes and can restart them as necessary. Since the state
+of the entire tree is known at all times, the most that will be lost if an NP
+module or cut generator is killed is the work that had been completed on that
+particular search node. To protect against the tree manager itself or a cut
+pool being killed, full logging capabilities have been implemented. If
+desired, the tree manager can write out the entire state of the tree to disk
+periodically, allowing a warm restart if a fault occurs. Similarly, the cut
+pool process can be warm-started from a log file. This not only allows for
+fault tolerance but also for full reconfiguration in the middle of solving a
+long-running problem. Such reconfiguration could consist of anything from
+adding more processors to moving the entire solution process to another
+network.
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

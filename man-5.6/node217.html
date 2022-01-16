@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_initialize_root_node</TITLE>
+<META NAME="description" CONTENT="user_initialize_root_node">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node218.html">
+<LINK REL="previous" HREF="node216.html">
+<LINK REL="next" HREF="node218.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node218.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node216.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1493"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node218.html">user_receive_feasible_solution</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node216.html">user_start_heurs</A>
+ &nbsp; <B>  <A ID="tex2html1494"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00731700000000000000"></A>
+<A ID="user_initialize_root_node"></A>
+<BR>
+user_initialize_root_node
+</H3>
+
+<PRE>
+int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
+                              int *basecutnum, int *extravarnum,  int **extravars,
+                              char *obj_sense, double *obj_offset,
+                              char ***colnames, int *colgen_strat)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+In this function, the user must specify the list of indices for the base and
+extra variables. The option to specify a variable as base is provided simply
+for efficiency reasons. If there is no reasonable way to come up with a set of
+base variables, then all variables should be specified as extra (see Section
+<A HREF="node65.html#variables">4.3.2.1</A> for a discussion of base and extra variables). If the function
+returns <SPAN  CLASS="texttt">USER_DEFAULT</SPAN> and sets <SPAN  CLASS="texttt">extravarnum</SPAN>, then SYMPHONY
+will put all variables indexed from 0 to <SPAN  CLASS="texttt">extravarnum</SPAN> in the set of
+extra variables by default. If an MPS or GMPL/AMPL file was read in using
+SYMPHONY's built-in parser, i.e., the default behavior of
+<A HREF="node214.html#user_io"><SPAN  CLASS="texttt">user_io</SPAN></A> was not modified,
+then <SPAN  CLASS="texttt">extravarnum</SPAN> need not be set. 
+<BR>
+<BR>
+In this function, the user may also specify column names for display
+purposes. If the <SPAN  CLASS="texttt">colnames</SPAN> array is allocated, then SYMPHONY will use
+for displaying solutions. If the data was read in from either an MPS or
+GMPL/AMPL file, then the column names will be set automatically.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *basevarnum</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Pointer to the number of base variables.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int **basevars</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Pointer to an array containing a list of
+user indices of the base variables to be active in the root.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *basecutnum</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>The number of base constraints.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *extravarnum</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Pointer to the number of extra active
+variables in the root.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int **extravars</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Pointer to an array containing a list of
+user indices of the extra variables to be active in the root.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">char *obj_sense</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Whether to negate the objective function value
+when printing the solution, set to either <SPAN  CLASS="texttt">MAXIMIZE</SPAN> or
+<SPAN  CLASS="texttt">MINIMIZE</SPAN>. Note that SYMPHONY always minimizes&mdash;<SPAN  CLASS="textbf">this only
+effects the printing of the solution</SPAN>. The default is <SPAN  CLASS="texttt">MINIMIZE</SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *obj_offset</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>A specified constant to be added to the
+objective function value when printing out the solution.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int ***colnames</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Pointer to an array containing a list of
+column names to be used for display purposes.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *colgen_strat</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>The default strategy or one that has
+been read in from the parameter file is passed in, but the user is free
+to change it. See <SPAN style="font-family:monospace">colgen_strat</SPAN> in the description of
+parameters for details on how to set it.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. SYMPHONY stops.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>The required data are filled in.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>All variables indexed 0 to <SPAN  CLASS="texttt">extravarnum</SPAN> are put 
+in the extra set (The user must set <SPAN  CLASS="texttt">extravarnum</SPAN> unless an MPS or
+GMPL/AMPL file was read in by SYMPHONY.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+The array of base and extra indices are sorted.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node218.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node216.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1493"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node218.html">user_receive_feasible_solution</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node216.html">user_start_heurs</A>
+ &nbsp; <B>  <A ID="tex2html1494"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

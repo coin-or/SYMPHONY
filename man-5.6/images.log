@@ -1,0 +1,926 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.3.23)  15 JAN 2022 22:58
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**./images.tex
+(./images.tex
+LaTeX2e <2017-04-15>
+Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk11.clo
+File: bk11.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@chapter=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+) (/usr/local/share/texmf/tex/latex/html/html.sty (/usr/share/texlive/texmf-dis
+t/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2018/02/06 v6.86b Hypertext links for LaTeX
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
+Package: hobsub-generic 2016/05/16 v1.14 Bundle oberdiek, subset generic (HO)
+Package: hobsub 2016/05/16 v1.14 Construct package bundles (HO)
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
+Package ifvtex Info: VTeX not detected.
+Package: intcalc 2016/05/16 v1.2 Expandable calculations with integers (HO)
+Package: ifpdf 2017/03/15 v3.2 Provides the ifpdf switch
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+Package: pdftexcmds 2018/01/21 v0.26 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+Package: pdfescape 2016/05/16 v1.14 Implements pdfTeX's escape features (HO)
+Package: bigintcalc 2016/05/16 v1.4 Expandable calculations on big integers (HO
+)
+Package: bitset 2016/05/16 v1.2 Handle bit-vector datatype (HO)
+Package: uniquecounter 2016/05/16 v1.3 Provide unlimited unique counter (HO)
+)
+Package hobsub Info: Skipping package `hobsub' (already loaded).
+Package: letltxmacro 2016/05/16 v1.5 Let assignment for LaTeX macros (HO)
+Package: hopatch 2016/05/16 v1.3 Wrapper for package hooks (HO)
+Package: xcolor-patch 2016/05/16 xcolor patch
+Package: atveryend 2016/05/16 v1.9 Hooks at the very end of document (HO)
+Package atveryend Info: \enddocument detected (standard20110627).
+Package: atbegshi 2016/06/09 v1.18 At begin shipout hook (HO)
+Package: refcount 2016/05/16 v3.5 Data extraction from label references (HO)
+Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
+) (/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks14
+) (/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty
+Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
+) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+)
+\@linkdim=\dimen103
+\Hy@linkcounter=\count88
+\Hy@pagecounter=\count89
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2018/02/06 v6.86b Hyperref: PDFDocEncoding definition (HO)
+)
+\Hy@SavedSpaceFactor=\count90
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg
+File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
+)
+Package hyperref Info: Hyper figures OFF on input line 4509.
+Package hyperref Info: Link nesting OFF on input line 4514.
+Package hyperref Info: Hyper index ON on input line 4517.
+Package hyperref Info: Plain pages OFF on input line 4524.
+Package hyperref Info: Backreferencing OFF on input line 4529.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4762.
+\c@Hy@tempcnt=\count91
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip10
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 5115.
+\XeTeXLinkMargin=\dimen104
+\Fld@menulength=\count92
+\Field@Width=\dimen105
+\Fld@charsize=\dimen106
+Package hyperref Info: Hyper figures OFF on input line 6369.
+Package hyperref Info: Link nesting OFF on input line 6374.
+Package hyperref Info: Hyper index ON on input line 6377.
+Package hyperref Info: backreferencing OFF on input line 6384.
+Package hyperref Info: Link coloring OFF on input line 6389.
+Package hyperref Info: Link coloring with OCG OFF on input line 6394.
+Package hyperref Info: PDF/A mode OFF on input line 6399.
+LaTeX Info: Redefining \ref on input line 6439.
+LaTeX Info: Redefining \pageref on input line 6443.
+\Hy@abspage=\count93
+\c@Item=\count94
+\c@Hfootnote=\count95
+)
+Package hyperref Info: Driver: hpdftex.
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2018/02/06 v6.86b Hyperref driver for pdfTeX
+\Fld@listcount=\count96
+\c@bookmark@seq@number=\count97
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
+Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+82.
+)
+\Hy@SectionHShift=\skip43
+)
+Package: html 1999/07/19 v1.38 hypertext commands for latex2html (nd, hws, rrm)
+
+\c@lpart=\count98
+\c@lchapter=\count99
+\c@lsection=\count100
+\c@lsubsection=\count101
+\c@lsubsubsection=\count102
+\c@lparagraph=\count103
+\c@lsubparagraph=\count104
+\c@lsubsubparagraph=\count105
+\ptrfile=\write3
+)
+\headwidth=\skip44
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+) (/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 99.
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen107
+\Gin@req@width=\dimen108
+) (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2017/09/02 v2.17a AMS math features
+\@mathmargin=\skip45
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks15
+\ex@=\dimen109
+)) (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen110
+) (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count106
+LaTeX Info: Redefining \frac on input line 213.
+\uproot@=\count107
+\leftroot@=\count108
+LaTeX Info: Redefining \overline on input line 375.
+\classnum@=\count109
+\DOTSCASE@=\count110
+LaTeX Info: Redefining \ldots on input line 472.
+LaTeX Info: Redefining \dots on input line 475.
+LaTeX Info: Redefining \cdots on input line 596.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen111
+LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
+\macc@depth=\count111
+\c@MaxMatrixCols=\count112
+\dotsspace@=\muskip11
+\c@parentequation=\count113
+\dspbrk@lvl=\count114
+\tag@help=\toks16
+\row@=\count115
+\column@=\count116
+\maxfields@=\count117
+\andhelp@=\toks17
+\eqnshift@=\dimen112
+\alignsep@=\dimen113
+\tagshift@=\dimen114
+\tagwidth@=\dimen115
+\totwidth@=\dimen116
+\lineht@=\dimen117
+\@envbody=\toks18
+\multlinegap=\skip46
+\multlinetaggap=\skip47
+\mathdisplay@stack=\toks19
+LaTeX Info: Redefining \[ on input line 2817.
+LaTeX Info: Redefining \] on input line 2818.
+) (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)) (/usr/share/texlive/texmf-dist/tex/latex/preprint/fullpage.sty
+Package: fullpage 1999/02/23 1.1 (PWD)
+\FP@margin=\skip48
+) (/usr/share/texlive/texmf-dist/tex/latex/easy/easyeqn.sty
+Document Style `easyeqn' v1.94 <2002/03/18>.
+(/usr/share/texlive/texmf-dist/tex/latex/easy/easy.sty
+Document Style `easy' v1.1 <2001/05/31>.
+Package: easy 2001/05/31 v1.1
+\@easy@level=\count118
+\@easy@ncol=\count119
+\@easy@nrow=\count120
+\@easy@cnt=\count121
+\@easy@boxviii=\box28
+\@easy@minxviii=\dimen118
+\@easy@minyviii=\dimen119
+\@easy@maxxviii=\dimen120
+\@easy@maxyviii=\dimen121
+\@easy@boxvii=\box29
+\@easy@minxvii=\dimen122
+\@easy@minyvii=\dimen123
+\@easy@maxxvii=\dimen124
+\@easy@maxyvii=\dimen125
+\@easy@boxvi=\box30
+\@easy@minxvi=\dimen126
+\@easy@minyvi=\dimen127
+\@easy@maxxvi=\dimen128
+\@easy@maxyvi=\dimen129
+\@easy@boxv=\box31
+\@easy@minxv=\dimen130
+\@easy@minyv=\dimen131
+\@easy@maxxv=\dimen132
+\@easy@maxyv=\dimen133
+\@easy@boxiv=\box32
+\@easy@minxiv=\dimen134
+\@easy@minyiv=\dimen135
+\@easy@maxxiv=\dimen136
+\@easy@maxyiv=\dimen137
+\@easy@boxiii=\box33
+\@easy@minxiii=\dimen138
+\@easy@minyiii=\dimen139
+\@easy@maxxiii=\dimen140
+\@easy@maxyiii=\dimen141
+\@easy@boxii=\box34
+\@easy@minxii=\dimen142
+\@easy@minyii=\dimen143
+\@easy@maxxii=\dimen144
+\@easy@maxyii=\dimen145
+\@easy@boxi=\box35
+\@easy@minxi=\dimen146
+\@easy@minyi=\dimen147
+\@easy@maxxi=\dimen148
+\@easy@maxyi=\dimen149
+\@easy@hsizexxx=\dimen150
+\@easy@vsizexxx=\dimen151
+\@easy@hsizexxix=\dimen152
+\@easy@vsizexxix=\dimen153
+\@easy@hsizexxviii=\dimen154
+\@easy@vsizexxviii=\dimen155
+\@easy@hsizexxvii=\dimen156
+\@easy@vsizexxvii=\dimen157
+\@easy@hsizexxvi=\dimen158
+\@easy@vsizexxvi=\dimen159
+\@easy@hsizexxv=\dimen160
+\@easy@vsizexxv=\dimen161
+\@easy@hsizexxiv=\dimen162
+\@easy@vsizexxiv=\dimen163
+\@easy@hsizexxiii=\dimen164
+\@easy@vsizexxiii=\dimen165
+\@easy@hsizexxii=\dimen166
+\@easy@vsizexxii=\dimen167
+\@easy@hsizexxi=\dimen168
+\@easy@vsizexxi=\dimen169
+\@easy@hsizexx=\dimen170
+\@easy@vsizexx=\dimen171
+\@easy@hsizexix=\dimen172
+\@easy@vsizexix=\dimen173
+\@easy@hsizexviii=\dimen174
+\@easy@vsizexviii=\dimen175
+\@easy@hsizexvii=\dimen176
+\@easy@vsizexvii=\dimen177
+\@easy@hsizexvi=\dimen178
+\@easy@vsizexvi=\dimen179
+\@easy@hsizexv=\dimen180
+\@easy@vsizexv=\dimen181
+\@easy@hsizexiv=\dimen182
+\@easy@vsizexiv=\dimen183
+\@easy@hsizexiii=\dimen184
+\@easy@vsizexiii=\dimen185
+\@easy@hsizexii=\dimen186
+\@easy@vsizexii=\dimen187
+\@easy@hsizexi=\dimen188
+\@easy@vsizexi=\dimen189
+\@easy@hsizex=\dimen190
+\@easy@vsizex=\dimen191
+\@easy@hsizeix=\dimen192
+\@easy@vsizeix=\dimen193
+\@easy@hsizeviii=\dimen194
+\@easy@vsizeviii=\dimen195
+\@easy@hsizevii=\dimen196
+\@easy@vsizevii=\dimen197
+\@easy@hsizevi=\dimen198
+\@easy@vsizevi=\dimen199
+\@easy@hsizev=\dimen256
+\@easy@vsizev=\dimen257
+\@easy@hsizeiv=\dimen258
+\@easy@vsizeiv=\dimen259
+\@easy@hsizeiii=\dimen260
+\@easy@vsizeiii=\dimen261
+\@easy@hsizeii=\dimen262
+\@easy@vsizeii=\dimen263
+\@easy@hsizei=\dimen264
+\@easy@vsizei=\dimen265
+\@easy@dash@len=\dimen266
+\@easy@dash@sep=\dimen267
+)
+Package: easyeqn 2001/05/31 v1.1
+\@EQ@leftmargin=\dimen268
+\@EQ@col@sep=\dimen269
+\@EQ@EQN@BOX=\box36
+) (/usr/share/texlive/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2008/02/07
+
+Style option: `fancyvrb' v2.7a, with DG/SPQR fixes, and firstline=lastline fix 
+<2008/02/07> (tvz)
+\FV@CodeLineNo=\count122
+\FV@InFile=\read1
+\FV@TabBox=\box37
+\c@FancyVerbLine=\count123
+\FV@StepNumber=\count124
+\FV@OutFile=\write4
+) (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count125
+\lst@gtempboxa=\box38
+\lst@token=\toks20
+\lst@length=\count126
+\lst@currlwidth=\dimen270
+\lst@column=\count127
+\lst@pos=\count128
+\lst@lostspace=\dimen271
+\lst@width=\dimen272
+\lst@newlines=\count129
+\lst@lineno=\count130
+\lst@maxwidth=\dimen273
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
+\c@lstnumber=\count131
+\lst@skipnumbers=\count132
+\lst@framebox=\box39
+) (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2015/06/04 1.6 listings configuration
+))
+Package: listings 2015/06/04 1.6 (Carsten Heinz)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2015/03/17 v1.2c Input encoding file
+\inpenc@prehook=\toks21
+\inpenc@posthook=\toks22
+(/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def
+File: latin1.def 2015/03/17 v1.2c Input encoding file
+)) (/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 2016/06/17 v3.0m Driver-dependent file (DPC,SPQR)
+)) (/usr/share/texlive/texmf-dist/tex/latex/splitindex/splitidx.sty
+Package: splitidx 2016/02/18 v1.2c multiple indices for LaTeX
+)
+\@indexfile=\write5
+\openout5 = `images.idx'.
+
+Writing index file images.idx
+Using splitted index at images.idx
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2015/06/04 1.6 listings language file
+)
+\sizebox=\box40
+\lthtmlwrite=\write6
+(/usr/share/texmf/tex/latex/preview/preview.sty
+Package: preview 2017/04/24 11.91 (AUCTeX/preview-latex)
+(/usr/share/texlive/texmf-dist/tex/generic/luatex85/luatex85.sty
+Package: luatex85 2016/06/15 v1.4 pdftex aliases for luatex
+) (/usr/share/texmf/tex/latex/preview/prtightpage.def
+\PreviewBorder=\dimen274
+)
+\pr@snippet=\count133
+\pr@box=\box41
+\pr@output=\toks23
+)
+\lthtmlPageBox=\box42
+\lthtmlCropMarkHeight=\dimen275
+\lthtmlCropMarkDepth=\dimen276
+(./images.aux)
+\openout1 = `images.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+\AtBeginShipoutBox=\box43
+Package hyperref Info: Link coloring OFF on input line 212.
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
+)
+\c@section@level=\count134
+)
+LaTeX Info: Redefining \ref on input line 212.
+LaTeX Info: Redefining \pageref on input line 212.
+LaTeX Info: Redefining \nameref on input line 212.
+(./images.out) (./images.out)
+\@outlinefile=\write7
+\openout7 = `images.out'.
+
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count135
+\scratchdimen=\dimen277
+\scratchbox=\box44
+\nofMPsegments=\count136
+\nofMParguments=\count137
+\everyMPshowfont=\toks24
+\MPscratchCnt=\count138
+\MPscratchDim=\dimen278
+\MPnumerator=\count139
+\makeMPintoPDFobject=\count140
+\everyMPtoPDFconversion=\toks25
+) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+\c@lstlisting=\count141
+Preview: Fontsize 10.95pt
+Preview: PDFoutput 1
+
+latex2htmlLength hsize=349.0pt
+
+latex2htmlLength vsize=650.43001pt
+
+latex2htmlLength hoffset=0.0pt
+
+latex2htmlLength voffset=0.0pt
+
+latex2htmlLength topmargin=0.0pt
+
+latex2htmlLength topskip=0.00003pt
+
+latex2htmlLength headheight=0.0pt
+
+latex2htmlLength headsep=0.0pt
+
+latex2htmlLength parskip=7.22743pt
+
+latex2htmlLength oddsidemargin=0.0pt
+
+latex2htmlLength evensidemargin=0.0pt
+
+LaTeX Font Info:    Try loading font information for U+msa on input line 249.
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 249.
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+
+:tex2html_wrap_inline22391:lthtmlCropMarkHeight:=14.2125pt
+
+:tex2html_wrap_inline22391:lthtmlCropMarkDepth:=2.73749pt:1ex:=4.71457pt
+Preview: Tightpage -32891 -32891 32891 32891
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (229.35762pt too wide) in paragraph at lines 266--308
+[][] 
+ []
+
+
+:figure431:lthtmlCropMarkHeight:=456.39967pt
+
+:figure431:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[2]
+
+:figure800:lthtmlCropMarkHeight:=123.23753pt
+
+:figure800:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[3]
+
+:figure825:lthtmlCropMarkHeight:=177.63756pt
+
+:figure825:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[4]
+
+:figure832:lthtmlCropMarkHeight:=245.63759pt
+
+:figure832:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[5]
+
+:tex2html_wrap_inline22516:lthtmlCropMarkHeight:=13.22179pt
+
+:tex2html_wrap_inline22516:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[6]
+
+:tex2html_wrap_inline22518:lthtmlCropMarkHeight:=15.52922pt
+
+:tex2html_wrap_inline22518:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[7]
+
+:figure840:lthtmlCropMarkHeight:=123.23753pt
+
+:figure840:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[8]
+
+:figure856:lthtmlCropMarkHeight:=108.725pt
+
+:figure856:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[9]
+
+:tex2html_wrap_inline22531:lthtmlCropMarkHeight:=13.48248pt
+
+:tex2html_wrap_inline22531:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[10]
+
+:tex2html_wrap_inline22533:lthtmlCropMarkHeight:=15.8129pt
+
+:tex2html_wrap_inline22533:lthtmlCropMarkDepth:=0.42812pt:1ex:=4.71457pt
+[11]
+
+:tex2html_wrap_inline22535:lthtmlCropMarkHeight:=13.60416pt
+
+:tex2html_wrap_inline22535:lthtmlCropMarkDepth:=0.42812pt:1ex:=4.71457pt
+[12]
+
+:tex2html_wrap_inline22543:lthtmlCropMarkHeight:=13.60416pt
+
+:tex2html_wrap_inline22543:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[13]
+
+:tex2html_wrap_inline22547:lthtmlCropMarkHeight:=10.71457pt
+
+:tex2html_wrap_inline22547:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[14]
+
+:tex2html_wrap_inline22551:lthtmlCropMarkHeight:=13.48248pt
+
+:tex2html_wrap_inline22551:lthtmlCropMarkDepth:=2.12917pt:1ex:=4.71457pt
+[15]
+
+:tex2html_wrap_inline22553:lthtmlCropMarkHeight:=13.48248pt
+
+:tex2html_wrap_inline22553:lthtmlCropMarkDepth:=3.06699pt:1ex:=4.71457pt
+[16]
+Overfull \hbox (120.75499pt too wide) in paragraph at lines 551--552
+[][] 
+ []
+
+
+:tex2html_wrap10512:lthtmlCropMarkHeight:=136.21791pt
+
+:tex2html_wrap10512:lthtmlCropMarkDepth:=124.74294pt:1ex:=4.71457pt
+[17]
+
+:tex2html_wrap_inline22570:lthtmlCropMarkHeight:=14.2125pt
+
+:tex2html_wrap_inline22570:lthtmlCropMarkDepth:=2.73749pt:1ex:=4.71457pt
+[18]
+
+:tex2html_wrap_inline22572:lthtmlCropMarkHeight:=13.48248pt
+
+:tex2html_wrap_inline22572:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[19]
+
+:tex2html_wrap_inline22574:lthtmlCropMarkHeight:=15.44032pt
+
+:tex2html_wrap_inline22574:lthtmlCropMarkDepth:=1.48888pt:1ex:=4.71457pt
+[20]
+
+:tex2html_wrap_inline22576:lthtmlCropMarkHeight:=15.44032pt
+
+:tex2html_wrap_inline22576:lthtmlCropMarkDepth:=0.42812pt:1ex:=4.71457pt
+[21]
+
+:tex2html_wrap_inline22578:lthtmlCropMarkHeight:=13.48248pt
+
+:tex2html_wrap_inline22578:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[22]
+
+:tex2html_wrap_inline22580:lthtmlCropMarkHeight:=13.48248pt
+
+:tex2html_wrap_inline22580:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[23]
+
+:tex2html_wrap_inline22584:lthtmlCropMarkHeight:=13.48248pt
+
+:tex2html_wrap_inline22584:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[24]
+
+:tex2html_wrap_indisplay22588:lthtmlCropMarkHeight:=14.2125pt
+
+:tex2html_wrap_indisplay22588:lthtmlCropMarkDepth:=2.73749pt:1ex:=4.71457pt
+[25]
+Overfull \hbox (120.75499pt too wide) in paragraph at lines 626--627
+[][] 
+ []
+
+
+:tex2html_wrap10526:lthtmlCropMarkHeight:=60.3533pt
+
+:tex2html_wrap10526:lthtmlCropMarkDepth:=48.87831pt:1ex:=4.71457pt
+[26]
+Overfull \hbox (120.75499pt too wide) in paragraph at lines 656--657
+[][] 
+ []
+
+
+:tex2html_wrap10532:lthtmlCropMarkHeight:=95.4179pt
+
+:tex2html_wrap10532:lthtmlCropMarkDepth:=83.94292pt:1ex:=4.71457pt
+[27]
+
+:displaymath22627:lthtmlCropMarkHeight:=54.29997pt
+
+:displaymath22627:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[28]
+
+:tex2html_wrap_inline22629:lthtmlCropMarkHeight:=10.71457pt
+
+:tex2html_wrap_inline22629:lthtmlCropMarkDepth:=2.12917pt:1ex:=4.71457pt
+[29]
+
+:tex2html_wrap_inline22631:lthtmlCropMarkHeight:=10.71457pt
+
+:tex2html_wrap_inline22631:lthtmlCropMarkDepth:=2.12917pt:1ex:=4.71457pt
+[30]
+
+:tex2html_wrap_inline22633:lthtmlCropMarkHeight:=12.96387pt
+
+:tex2html_wrap_inline22633:lthtmlCropMarkDepth:=2.12917pt:1ex:=4.71457pt
+[31]
+
+:tex2html_wrap_inline22635:lthtmlCropMarkHeight:=13.60416pt
+
+:tex2html_wrap_inline22635:lthtmlCropMarkDepth:=2.12917pt:1ex:=4.71457pt
+[32]
+
+:tex2html_wrap_inline22637:lthtmlCropMarkHeight:=13.05666pt
+
+:tex2html_wrap_inline22637:lthtmlCropMarkDepth:=1.48888pt:1ex:=4.71457pt
+[33]
+
+:tex2html_wrap_indisplay22639:lthtmlCropMarkHeight:=14.2125pt
+
+:tex2html_wrap_indisplay22639:lthtmlCropMarkDepth:=2.73749pt:1ex:=4.71457pt
+[34]
+
+:tex2html_wrap_inline22641:lthtmlCropMarkHeight:=10.71457pt
+
+:tex2html_wrap_inline22641:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[35]
+
+:tex2html_wrap_inline22643:lthtmlCropMarkHeight:=13.4181pt
+
+:tex2html_wrap_inline22643:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[36]
+
+:tex2html_wrap_inline22645:lthtmlCropMarkHeight:=13.05666pt
+
+:tex2html_wrap_inline22645:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[37]
+
+:tex2html_wrap_inline22647:lthtmlCropMarkHeight:=15.52922pt
+
+:tex2html_wrap_inline22647:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[38]
+
+:tex2html_wrap_inline22649:lthtmlCropMarkHeight:=13.05666pt
+
+:tex2html_wrap_inline22649:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[39]
+
+:tex2html_wrap_indisplay22653:lthtmlCropMarkHeight:=16.07672pt
+
+:tex2html_wrap_indisplay22653:lthtmlCropMarkDepth:=2.73749pt:1ex:=4.71457pt
+[40]
+
+:tex2html_wrap_inline22720:lthtmlCropMarkHeight:=14.2125pt
+
+:tex2html_wrap_inline22720:lthtmlCropMarkDepth:=2.73749pt:1ex:=4.71457pt
+[41]
+
+:tex2html_wrap_inline22722:lthtmlCropMarkHeight:=13.22179pt
+
+:tex2html_wrap_inline22722:lthtmlCropMarkDepth:=2.12917pt:1ex:=4.71457pt
+[42]
+
+:tex2html_wrap_inline22808:lthtmlCropMarkHeight:=12.96387pt
+
+:tex2html_wrap_inline22808:lthtmlCropMarkDepth:=1.48888pt:1ex:=4.71457pt
+[43]
+
+:tex2html_wrap_inline22810:lthtmlCropMarkHeight:=12.96387pt
+
+:tex2html_wrap_inline22810:lthtmlCropMarkDepth:=1.48888pt:1ex:=4.71457pt
+[44]
+Overfull \hbox (77.79266pt too wide) in paragraph at lines 915--1019
+[][] 
+ []
+
+
+:tex2html_wrap13886:lthtmlCropMarkHeight:=347.45393pt
+
+:tex2html_wrap13886:lthtmlCropMarkDepth:=336.99155pt:1ex:=4.71457pt
+[45]
+Overfull \hbox (77.79616pt too wide) in paragraph at lines 1024--1103
+[][] 
+ []
+
+
+:tex2html_wrap13892:lthtmlCropMarkHeight:=304.78079pt
+
+:tex2html_wrap13892:lthtmlCropMarkDepth:=293.43388pt:1ex:=4.71457pt
+[46]
+
+:tex2html_wrap_inline24419:lthtmlCropMarkHeight:=12.3875pt
+
+:tex2html_wrap_inline24419:lthtmlCropMarkDepth:=0.9125pt:1ex:=4.71457pt
+[47]
+
+:tex2html_wrap_inline24421:lthtmlCropMarkHeight:=12.96387pt
+
+:tex2html_wrap_inline24421:lthtmlCropMarkDepth:=1.48888pt:1ex:=4.71457pt
+[48]
+
+:tex2html_wrap_inline24423:lthtmlCropMarkHeight:=10.01727pt
+
+:tex2html_wrap_inline24423:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[49]
+
+:tex2html_wrap_inline24425:lthtmlCropMarkHeight:=12.96387pt
+
+:tex2html_wrap_inline24425:lthtmlCropMarkDepth:=1.48888pt:1ex:=4.71457pt
+[50]
+
+:tex2html_wrap_inline24427:lthtmlCropMarkHeight:=15.52922pt
+
+:tex2html_wrap_inline24427:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[51]
+
+:tex2html_wrap_inline24429:lthtmlCropMarkHeight:=14.8943pt
+
+:tex2html_wrap_inline24429:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[52]
+
+:tex2html_wrap_inline24433:lthtmlCropMarkHeight:=12.69167pt
+
+:tex2html_wrap_inline24433:lthtmlCropMarkDepth:=2.43333pt:1ex:=4.71457pt
+[53]
+
+:tex2html_wrap_inline24437:lthtmlCropMarkHeight:=10.01727pt
+
+:tex2html_wrap_inline24437:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[54]
+
+:tex2html_wrap_inline24506:lthtmlCropMarkHeight:=10.71457pt
+
+:tex2html_wrap_inline24506:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[55]
+
+:tex2html_wrap_inline25022:lthtmlCropMarkHeight:=13.05666pt
+
+:tex2html_wrap_inline25022:lthtmlCropMarkDepth:=0.9125pt:1ex:=4.71457pt
+[56]
+
+:tex2html_wrap_inline25149:lthtmlCropMarkHeight:=14.86255pt
+
+:tex2html_wrap_inline25149:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[57]
+
+:tex2html_wrap_inline25519:lthtmlCropMarkHeight:=13.05666pt
+
+:tex2html_wrap_inline25519:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[58]
+
+:tex2html_wrap_inline25521:lthtmlCropMarkHeight:=13.05666pt
+
+:tex2html_wrap_inline25521:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[59]
+
+:tex2html_wrap_inline25523:lthtmlCropMarkHeight:=13.05666pt
+
+:tex2html_wrap_inline25523:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[60]
+
+:tex2html_wrap_inline25650:lthtmlCropMarkHeight:=15.4384pt
+
+:tex2html_wrap_inline25650:lthtmlCropMarkDepth:=3.269pt:1ex:=4.71457pt
+[61]
+
+:tex2html_wrap_inline25652:lthtmlCropMarkHeight:=13.22179pt
+
+:tex2html_wrap_inline25652:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[62]
+
+:tex2html_wrap_inline25656:lthtmlCropMarkHeight:=15.4384pt
+
+:tex2html_wrap_inline25656:lthtmlCropMarkDepth:=3.269pt:1ex:=4.71457pt
+[63]
+
+:tex2html_wrap_inline25658:lthtmlCropMarkHeight:=10.71457pt
+
+:tex2html_wrap_inline25658:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[64]
+
+:tex2html_wrap_inline25660:lthtmlCropMarkHeight:=14.2125pt
+
+:tex2html_wrap_inline25660:lthtmlCropMarkDepth:=2.73749pt:1ex:=4.71457pt
+[65]
+
+:tex2html_wrap_inline25662:lthtmlCropMarkHeight:=15.52922pt
+
+:tex2html_wrap_inline25662:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[66]
+
+:tex2html_wrap_inline25664:lthtmlCropMarkHeight:=10.71457pt
+
+:tex2html_wrap_inline25664:lthtmlCropMarkDepth:=0.0pt:1ex:=4.71457pt
+[67]
+Overfull \hbox (106.24802pt too wide) in paragraph at lines 1311--1380
+[][] 
+ []
+
+
+:tex2html_wrap18432:lthtmlCropMarkHeight:=205.1716pt
+
+:tex2html_wrap18432:lthtmlCropMarkDepth:=195.29837pt:1ex:=4.71457pt
+[68]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1384.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1384.
+(./images.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1384.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1384.
+
+Package rerunfilecheck Info: File `images.out' has not changed.
+(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1384.
+ ) 
+Here is how much of TeX's memory you used:
+ 9243 strings out of 492982
+ 130107 string characters out of 6134896
+ 284907 words of memory out of 5000000
+ 12695 multiletter control sequences out of 15000+600000
+ 10067 words of font info for 39 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 35i,12n,35p,224b,371s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmtt8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbo
+ls/msbm10.pfb>
+Output written on images.pdf (68 pages, 151908 bytes).
+PDF statistics:
+ 269 PDF objects out of 1000 (max. 8388607)
+ 186 compressed objects within 2 object streams
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
