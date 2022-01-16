@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Building SYMPHONY Applications</TITLE>
+<META NAME="description" CONTENT="Building SYMPHONY Applications">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node25.html">
+<LINK REL="next" HREF="node29.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html517"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+<B> Up:</B> <A
+ HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A
+ HREF="node27.html">Distributed-memory architectures</A>
+ &nbsp; <B>  <A ID="tex2html518"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00322400000000000000"></A>
+<A ID="build_appl_unix"></A>
+<BR>
+Building SYMPHONY Applications
+</H3>
+
+<P>
+There are a number of sample applications available as examples of how to do
+customized development with SYMPHONY. These include customized solvers for the
+matching problem, the set partitioning problem (simple and advanced versions),
+the vehicle routing and traveling salesman problems, the mixed postman
+problem, the multi-criteria knapsack problem, and the capacitated network
+routing problem. These applications are contained in the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">SYMPHONY/Applications/</SPAN></FONT> subdirectory in the distribution. There is also
+a white paper that guides the user through the development of the MATCH solver
+in the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">SYMPHONY/Doc/</SPAN></FONT> directory. For detailed instructions on developing
+your own application with SYMPHONY, see Chapter <A HREF="node98.html#SYMPHONY-development">5</A>.
+
+<P>
+In order to compile SYMPHONY's applications in Unix-like environments, you
+must first compile a version of the callable library with hooks for the
+callback functions.
+
+<PRE>
+ ./coinbrew fetch build SYMPHONY@\VER --with-application
+ make 
+ make install
+</PRE> This will create the application library called 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">libSymAppl</SPAN></FONT> to be used
+while building custom applications. Note that that the generic sequential
+library and executable will also be made and installed.
+
+<P>
+After building the library, go to one of the application subdirectories in the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">SYMPHONY/Applications/</SPAN></FONT> directory and type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">make</SPAN></FONT> there to build
+the corresponding application. For more information, including the parallel
+configuration instructions, see the INSTALL file of the corresponding
+application.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node29.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node27.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html517"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+<B> Up:</B> <A
+ HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A
+ HREF="node27.html">Distributed-memory architectures</A>
+ &nbsp; <B>  <A ID="tex2html518"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

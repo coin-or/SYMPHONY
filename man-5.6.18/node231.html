@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>cut_data</TITLE>
+<META NAME="description" CONTENT="cut_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node233.html">
+<LINK REL="previous" HREF="node229.html">
+<LINK REL="next" HREF="node232.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node232.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node230.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1553"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node232.html">waiting_row</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node230.html">cut_data</A>
+ &nbsp; <B>  <A ID="tex2html1554"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00732300000000000000"></A>
+<A ID="cut_data"></A>
+<BR>
+cut_data
+</H3>
+
+<P>
+Another of the internally defined data structures that the user has to
+deal with frequently is the <SPAN style="font-family:monospace">cut_data</SPAN> data structure, used to
+store the packed form of cuts. This structure has 8 fields listed
+below.
+<DL>
+<DT><STRONG><SPAN style="font-family:monospace">int size</SPAN> &ndash;</STRONG></DT>
+<DD>The size of the <SPAN style="font-family:monospace">coef</SPAN> array.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">char *coef</SPAN> &ndash;</STRONG></DT>
+<DD>An array containing the packed form of the
+cut, which is defined and constructed by the user. Given this packed
+form and a list of the variables active in the current relaxation, the
+user must be able to construct the corresponding constraint.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">double rhs</SPAN> &ndash;</STRONG></DT>
+<DD>The right hand side of the constraint.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">double range</SPAN> &ndash;</STRONG></DT>
+<DD>The range of the constraint. It is zero for
+a standard form constraint. Otherwise, the row activity level is
+limited to between <SPAN style="font-family:monospace">rhs</SPAN> and <!-- MATH
+ ${\tt rhs}+{\tt range}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 1.98ex; vertical-align: -0.62ex; " SRC="img53.png"
+ ALT="${\tt rhs}+{\tt range}$"></SPAN>.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">char type</SPAN> &ndash;</STRONG></DT>
+<DD>A user-defined type identifier that represents the
+general class that the cut belongs to.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">char sense</SPAN> &ndash;</STRONG></DT>
+<DD>The sense of the constraint. Can be either 'L' 
+(<SPAN CLASS="MATH"><IMG STYLE="height: 1.79ex; vertical-align: -0.42ex; " SRC="img43.png"
+ ALT="$\leq$"></SPAN>), 'E' (<SPAN CLASS="MATH"><IMG STYLE="height: 0.64ex; vertical-align: -0.11ex; " SRC="img54.png"
+ ALT="$=$"></SPAN>), 'G' (<SPAN CLASS="MATH"><IMG STYLE="height: 1.79ex; vertical-align: -0.42ex; " SRC="img44.png"
+ ALT="$\geq$"></SPAN>) or 'R' (ranged). This may be evident
+from the <SPAN style="font-family:monospace">type</SPAN>.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">char deletable</SPAN> &ndash;</STRONG></DT>
+<DD>Determines whether or not a cut can be
+deleted once added to the formulation. <SPAN style="font-family:monospace">TRUE</SPAN> by default.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">char branch</SPAN> &ndash;</STRONG></DT>
+<DD>Determines whether the cut can be branched
+on or not. Possible initial values are <SPAN style="font-family:monospace">DO_NOT_BRANCH_ON_THIS_ROW</SPAN>
+and <SPAN style="font-family:monospace">ALLOWED_TO_BRANCH_ON</SPAN>.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">int name</SPAN> &ndash;</STRONG></DT>
+<DD>Identifier used by SYMPHONY. The user should not
+set this.
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A ID="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A ID="tex2html1555"
+  HREF="node232.html">waiting_row</A>
+</UL>
+<!--End of Table of Child-Links-->
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node232.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node230.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1553"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node232.html">waiting_row</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node230.html">cut_data</A>
+ &nbsp; <B>  <A ID="tex2html1554"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

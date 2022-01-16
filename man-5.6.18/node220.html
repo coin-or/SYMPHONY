@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_send_cg_data</TITLE>
+<META NAME="description" CONTENT="user_send_cg_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node221.html">
+<LINK REL="previous" HREF="node219.html">
+<LINK REL="next" HREF="node221.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node221.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node219.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1499"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node221.html">user_send_cp_data</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node219.html">user_send_lp_data</A>
+ &nbsp; <B>  <A ID="tex2html1500"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007311000000000000000"></A>
+<A ID="user_send_cg_data"></A>
+<BR>
+user_send_cg_data
+</H3>
+
+<PRE>
+int user_pack_cg_data(void *user, void **user_cg)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+If the user wishes to employ parallelism and wants a separate cut generator
+module, this function can be used to send all problem-specific data that will
+be needed by the cut generator module to perform separation. This could
+include instance data, as well as user parameter settings (see Section
+<A HREF="node108.html#communication">5.5.1</A> for a discussion of this). This is one of the few places
+where the user may need to worry about the configuration of the modules. If
+either the tree manager or the LP are running as a separate process (either
+<SPAN style="font-family:monospace">COMPILE_IN_LP</SPAN> or <SPAN style="font-family:monospace">COMPILE_IN_TM</SPAN> are <SPAN style="font-family:monospace">FALSE</SPAN> in the <SPAN style="font-family:monospace">make</SPAN> file), then the data will be sent and received through message-passing.
+See <A HREF="node258.html#user_receive_cg_data"><SPAN style="font-family:monospace">user_receive_cg_data</SPAN></A> for more discussion. Otherwise, it can be
+copied through shared memory. The easiest solution, which is set up by default
+is to simply copy over a pointer to a single user data structure where
+instance data is stored. The code for the two cases is put in the same source
+file by use of <SPAN style="font-family:monospace">#ifdef</SPAN> statements. See the comments in the code stub for
+this function for more details.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void **user_cg</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>Pointer to the user-defined data
+structure for the cut generator module.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. SYMPHONY stops.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Packing is done.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>No data to send to the cut generator (no separation
+performed).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node221.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node219.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1499"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node221.html">user_send_cp_data</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node219.html">user_send_lp_data</A>
+ &nbsp; <B>  <A ID="tex2html1500"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

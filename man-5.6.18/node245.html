@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_select_child</TITLE>
+<META NAME="description" CONTENT="user_select_child">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node246.html">
+<LINK REL="previous" HREF="node244.html">
+<LINK REL="next" HREF="node246.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node246.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node244.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1583"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node246.html">user_print_branch_stat</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node244.html">user_compare_candidates</A>
+ &nbsp; <B>  <A ID="tex2html1584"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007321500000000000000"></A>
+<A ID="user_select_child"></A>
+<BR>
+user_select_child
+</H3>
+
+<PRE>
+int user_select_child(void *user, double ub, branch_obj *can, char *action)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+By the time this function is invoked, the candidate for branching has
+been chosen. Based on this information and the current best upper
+bound, the user has to decide what to do with each child. Possible
+actions for a child are <SPAN style="font-family:monospace">KEEP_THIS_CHILD</SPAN> (the child will be
+kept at this LP for further processing, i.e., the process <EM>dives</EM> into that child), <SPAN style="font-family:monospace">PRUNE_THIS_CHILD</SPAN> (the child will be
+pruned based on some problem specific property&mdash;no questions
+asked...), <SPAN style="font-family:monospace">PRUNE_THIS_CHILD_FATHOMABLE</SPAN> (the child will be
+pruned based on its pre-solved LP relaxation) and <SPAN style="font-family:monospace">RETURN_THIS_CHILD</SPAN> (the child will be sent back to tree manager).
+Note that at most one child can be kept at the current LP module.
+
+<P>
+There are two default options&mdash;in both of them, objective values of the
+pre-solved LP relaxations are compared (for those children whose pre-solve
+did not terminate with primal infeasibility or high cost). One rule
+prefers the child with the lowest objective function value and the
+other prefers the child with the higher objective function value.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=271>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=271>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int ub</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=271>The current best upper bound.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">branch_obj *can</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=271>The branching candidate.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=271>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">char *action</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=271>Array of actions for the children. The array is
+already allocated to length <SPAN style="font-family:monospace">can-&gt;number</SPAN>.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Error. <SPAN style="font-family:monospace">DEFAULT</SPAN> is used.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>User filled out <SPAN style="font-family:monospace">*action</SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Regulated by the <SPAN style="font-family:monospace">select_child_default</SPAN>
+parameter, which is initially set to <SPAN style="font-family:monospace">PREFER_LOWER_OBJ_VALUE</SPAN>,
+unless overridden by the user.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">PREFER_HIGHER_OBJ_VALUE</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Choose child with the highest
+objective value.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">PREFER_LOWER_OBJ_VALUE</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Choose child with the lowest
+objective value.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">PREFER_MORE_FRACTIONAL</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Choose child with the most fractional
+variables. Fractional branching options are 
+only available if the fractional branching compile-time option is set in the
+makefile.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">PREFER_LESS_FRACTIONAL</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=266>Choose child with the lowest number of
+fractional variables.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+Checks which children can be fathomed based on the
+objective value of their pre-solved LP relaxation.
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">branch()</SPAN>.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node246.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node244.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1583"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node246.html">user_print_branch_stat</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node244.html">user_compare_candidates</A>
+ &nbsp; <B>  <A ID="tex2html1584"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_same_cuts</TITLE>
+<META NAME="description" CONTENT="user_same_cuts">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node249.html">
+<LINK REL="previous" HREF="node247.html">
+<LINK REL="next" HREF="node249.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node249.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node247.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1589"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node249.html">user_unpack_cuts</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node247.html">user_add_to_desc</A>
+ &nbsp; <B>  <A ID="tex2html1590"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007321800000000000000">
+user_same_cuts</A>
+</H3>
+
+<PRE>
+int user_same_cuts (void *user, cut_data *cut1, cut_data *cut2, 
+                    int *same_cuts)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Determine whether the two cuts are comparable (the normals of the half-spaces
+corresponding to the cuts point in the same direction) and if yes, which one
+is stronger. The default is to declare the cuts comparable only if the <SPAN style="font-family:monospace">type</SPAN>, <SPAN style="font-family:monospace">sense</SPAN> and <SPAN style="font-family:monospace">coef</SPAN> fields of the two cuts are the same byte by
+byte; and if this is the case to compare the right hand sides to decide which
+cut is stronger.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">cut_data *cut1</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>The first cut.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">cut_data *cut2</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>The second cut.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *same_cuts</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>Possible values: <SPAN style="font-family:monospace">SAME</SPAN>, <SPAN style="font-family:monospace">FIRST_CUT_BETTER</SPAN>, <SPAN style="font-family:monospace">SECOND_CUT_BETTER</SPAN> and <SPAN style="font-family:monospace">DIFFERENT</SPAN> (i.e., not
+comparable).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=296>Error. <SPAN style="font-family:monospace">DEFAULT</SPAN> is used.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=296>User did the comparison, filled out <SPAN style="font-family:monospace">*same_cuts</SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=296>Compare byte by byte (see above).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">process_message()</SPAN> when a <SPAN style="font-family:monospace">PACKED_CUT</SPAN>
+arrives.
+
+<P>
+</DD>
+<DT><STRONG>Note:</STRONG></DT>
+<DD>
+
+<P>
+This function is used to check whether a newly arrived cut is already
+in the local pool. If so, or if it is weaker than a cut in the local
+pool, then the new cut is discarded; if it is stronger then a cut in
+the local pool, then the new cut replaces the old one and if the new
+is different from all the old ones, then it is added to the local pool.
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node249.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node247.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1589"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node249.html">user_unpack_cuts</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node247.html">user_add_to_desc</A>
+ &nbsp; <B>  <A ID="tex2html1590"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

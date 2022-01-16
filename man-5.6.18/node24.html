@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Advanced Configuration Options</TITLE>
+<META NAME="description" CONTENT="Advanced Configuration Options">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node25.html">
+<LINK REL="previous" HREF="node20.html">
+<LINK REL="next" HREF="node25.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node25.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node23.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html507"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node25.html">Building for parallel architectures</A>
+<B> Up:</B> <A
+ HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A
+ HREF="node23.html">Building on OS X.</A>
+ &nbsp; <B>  <A ID="tex2html508"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00322200000000000000">
+Advanced Configuration Options</A>
+</H3>
+
+<P>
+The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coin.install.sh</SPAN></FONT> script supports many advnaced configuration
+options. See Figure&nbsp;<A HREF="#conf_opts">2.1</A> for a list of some of the options the user
+may want to set.  
+
+<P>
+
+<DIV class="CENTER"><A ID="conf_opts"></A><A ID="4950"></A>
+<TABLE>
+<CAPTION class="BOTTOM"><STRONG>Figure 2.1:</STRONG>
+A list of useful configuration options</CAPTION>
+<TR><TD><IMG STYLE="height: 153.19ex; " SRC="img2.png"
+ ALT="\begin{figure}\begin{tabular}{ll}
+\hline
+\texttt{--enable-debug} &amp; compile all p...
+...t{--without-tm} &amp; compile without tree manager module
+\end{tabular}
+\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+In order to enable or disable an option, add the option as an argument to the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coin.install.sh</SPAN></FONT> script. For instance, running 
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
+</PRE>
+will compile the source files with the debugging flag.
+
+<P>
+It is possible to use compilers other than the default (which is 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">g++</SPAN></FONT>).
+For example, to perform an automated build of SYMPHONY using the MSVC++
+compiler 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">cl</SPAN></FONT> with GNU autotools in the CYGWIN environment configure with
+
+<PRE>
+ ./coinbrew fetch build SYMPHONY@\VER --enable-msvc
+</PRE>
+
+<P>
+To test out the optimizer manually. a
+sample MPS file called 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">sample.mps</SPAN></FONT> and a sample GMPL/AMPL file called
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">sample.mod</SPAN></FONT> together with its data file
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">sample.dat</SPAN></FONT> are included with the distribution. You can
+use either the command-line or the interactive optimizer. To solve the sample
+MPS model, type
+
+<PRE>
+ bin/symphony -F SYMPHONY/Datasets/sample.mps
+</PRE> To solve the GMPL model, use the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">-F</SPAN></FONT> switch to specify the file name
+and the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">-D</SPAN></FONT> for the data file name if the input is in GMPL/AMPL format,
+i.e., type 
+
+<PRE>
+ bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
+</PRE>
+For more MPS data files for further testing, see the MIPLIB library in the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Data/</SPAN></FONT> subdirectory. To run the interactive optimizer, execute SYMPHONY
+without any command-line arguments, i.e., type
+
+<PRE>
+  bin/symphony
+</PRE>
+and then type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">help</SPAN></FONT> or 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">?</SPAN></FONT> to see a list of available commands.
+After the SYMPHONY library and the executable are compiled and tested, you
+can type
+
+<PRE>
+ make clean
+</PRE>
+if you want to save disk space. That's it! Now you are ready to use SYMPHONY
+callable library or solve generic MILP problems through the executable.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node25.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node23.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html507"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node25.html">Building for parallel architectures</A>
+<B> Up:</B> <A
+ HREF="node19.html">Building in Unix-like environments</A>
+<B> Previous:</B> <A
+ HREF="node23.html">Building on OS X.</A>
+ &nbsp; <B>  <A ID="tex2html508"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
