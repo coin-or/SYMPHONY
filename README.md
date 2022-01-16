@@ -1,4 +1,4 @@
-# SYMPHONY 5.6
+# SYMPHONY 5.6.18
 
 [![A COIN-OR Project](https://coin-or.github.io/coin-or-badge.png)](https://www.coin-or.org)
 
@@ -38,9 +38,9 @@ Paper: http://dx.doi.org/10.1007/0-387-23529-9_5
 
 ## CURRENT BUILD STATUS
 
-[![Windows Builds](https://github.com/coin-or/SYMPHONY/actions/workflows/windows-ci.yml/badge.svg?branch=stable/5.6)](https://github.com/coin-or/SYMPHONY/actions/workflows/windows-ci.yml?query=branch%3Astable/5.6)
+[![Windows Builds](https://github.com/coin-or/SYMPHONY/actions/workflows/windows-ci.yml/badge.svg?branch=releases/5.6.18)](https://github.com/coin-or/SYMPHONY/actions/workflows/windows-ci.yml?query=branch%3Areleases/5.6.18)
 
-[![Linux and MacOS Builds](https://github.com/coin-or/SYMPHONY/actions/workflows/linux-ci.yml/badge.svg?branch=stable/5.6)](https://github.com/coin-or/SYMPHONY/actions/workflows/linux-ci.yml?query=branch%3Astable/5.6)
+[![Linux and MacOS Builds](https://github.com/coin-or/SYMPHONY/actions/workflows/linux-ci.yml/badge.svg?branch=releases/5.6.18)](https://github.com/coin-or/SYMPHONY/actions/workflows/linux-ci.yml?query=branch%3Areleases/5.6.18)
 
 ## DOWNLOAD
 
@@ -102,7 +102,7 @@ following on the command line.
 ```
 wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
 chmod u+x coinbrew
-./coinbrew fetch SYMPHONY@5.6
+./coinbrew fetch SYMPHONY@5.6.18
 ./coinbrew build SYMPHONY
 ```
 For more detailed instructions on coinbrew, see https://coin-or.github.io/coinbrew.
