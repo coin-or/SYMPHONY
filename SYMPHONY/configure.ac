@@ -710,11 +710,11 @@ fi
 WHATTOMAKELIBS="libSym.la"
 WHATTOMAKEBINS="symphony$EXEEXT"
 if test $sym_appl = yes ; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-   WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
    if test $dependency_linking = yes ; then
        WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
    fi
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+   WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
 fi
 WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 
@@ -752,11 +752,11 @@ if test $sym_enable_parallel = true; then
     WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
     WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
     if test $sym_appl = yes ; then 
-       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
-       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl$MASTEREXT.la"
        if test $dependency_linking = yes ; then
        	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
        fi
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl$MASTEREXT.la"
     fi
     WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
