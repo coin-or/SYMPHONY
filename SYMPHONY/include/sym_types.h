@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -295,11 +295,7 @@ typedef struct BRANCH_OBJ{
 /*===========================================================================*/
 
 typedef struct STR_INT{
-#ifdef _OPENMP
-   char      *str;
-#else
    char       str[MAX_LINE_LENGTH +1];
-#endif
    int        code;
 }str_int;
 

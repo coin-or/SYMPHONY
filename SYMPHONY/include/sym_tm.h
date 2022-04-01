@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -59,8 +59,9 @@ typedef struct TM_PROB{
    int             has_ub;
    char            has_ub_estimate;
    double          start_time;
-   double          ub;       /* the best global upper bound found */
-   double          lb;       /* the best global lower bound known */
+   double          ub;         /* the best global upper bound found */
+   double          lb;         /* the best global lower bound known */
+   double          printed_lb; /* the lower bound we print for user */
    lp_sol          best_sol;
    double          obj_offset; /* constant to be added to the objective value*/
    char            obj_sense;  /* objective sense*/

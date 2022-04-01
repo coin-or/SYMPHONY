@@ -84,6 +84,8 @@ int main(int argc, char **argv)
      
      CALL_FUNCTION( sym_find_initial_bounds(env) );
      
+     sym_set_int_param(env, "do_primal_heuristic", FALSE);
+
      CALL_FUNCTION( sym_solve(env) );
    }
      

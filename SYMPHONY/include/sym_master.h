@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -181,4 +181,5 @@ double check_feasibility_new_rhs PROTO((bc_node *node, MIPdesc *mip,
 char check_solution PROTO((sym_environment *env, lp_sol *sol,
 				       double * colsol = NULL));
 int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
+void free_master PROTO((sym_environment *env));
 #endif

@@ -7,7 +7,7 @@
 /*                                                                           */
 /* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -24,12 +24,14 @@
 #include <pvmtev.h>
 #endif
 
+#include "sym_messages.h"
 #include "sym_master.h"
 #include "sym_master_u.h"
 #include "sym_macros.h"
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
 #include "sym_lp_solver.h"
+#include "sym_primal_heuristics.h"
 //#include "sym_lp.h"
 #include "sym_tm.h"
 
@@ -4753,6 +4755,80 @@ int trim_warm_tree(sym_environment *env, bc_node *n)
 	 trim_warm_tree(env, n->children[i]);
    }
    return(0);
+}
+
+/*===========================================================================*/
+
+void free_master(sym_environment *env)
+{
+   int i;
+   MIPdesc *tmp;
+   
+   FREE(env->best_sol.xind);
+   FREE(env->best_sol.xval);
+   
+   if ((tmp = env->mip)){
+      free_mip_desc(env->mip);
+      FREE(env->mip);
+   }
+
+   if(env->prep_mip && env->prep_mip != tmp){
+      free_mip_desc(env->prep_mip);
+      FREE(env->prep_mip);
+   }else{ //We made a copy, so don't free it again
+      env->prep_mip = NULL;
+   }
+   
+   if (env->rootdesc){
+      FREE(env->rootdesc->desc);
+      FREE(env->rootdesc->uind.list);
+      FREE(env->rootdesc->not_fixed.list);
+      FREE(env->rootdesc->cutind.list);
+      FREE(env->rootdesc);
+   }
+
+   if (env->base){
+      FREE(env->base->userind);
+      FREE(env->base);
+   }
+
+#ifdef COMPILE_IN_TM
+   if (env->warm_start){
+      free_subtree(env->warm_start->rootnode);
+      if(env->warm_start->best_sol.has_sol){
+	 FREE(env->warm_start->best_sol.xind);
+	 FREE(env->warm_start->best_sol.xval);
+      }
+      if (env->warm_start->cuts){
+	 for (i = env->warm_start->cut_num - 1; i >= 0; i--){
+	    if (env->warm_start->cuts[i]){
+	       FREE(env->warm_start->cuts[i]->coef);
+	    }
+	    FREE(env->warm_start->cuts[i]);
+	 }
+      }
+
+      FREE(env->warm_start->cuts);
+      FREE(env->warm_start);
+   }
+#ifdef COMPILE_IN_CP
+   if (env->cp){
+      for (i = 0; i < env->par.tm_par.max_cp_num; i++){
+	 env->cp[i]->msgtag = YOU_CAN_DIE;
+	 cp_close(env->cp[i]);
+      }
+      FREE(env->cp);
+   }
+#endif
+#ifdef COMPILE_IN_LP
+   if (env->sp){
+      sp_free_sp(env->sp);
+      FREE(env->sp);
+   }
+#endif
+#endif
+   
+   return;   
 }
 
 /*===========================================================================*/

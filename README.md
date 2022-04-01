@@ -1,27 +1,55 @@
-# SYMPHONY Version 5.6.10 README
+# SYMPHONY Version 5.6 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
-2000-2015 by Ted Ralphs and others. This README may be redistributed freely.
+2000-2019 by Ted Ralphs and others. This README may be redistributed freely.
+
+# CURRENT BUILD STATUS
+
+[![Build Status](https://travis-ci.org/coin-or/SYMPHONY.svg?branch=master)](https://travis-ci.org/coin-or/SYMPHONY)
+
+[![Build status](https://ci.appveyor.com/api/projects/status/220ltxwv2w2ac51s/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/symphony/branch/master)
+
+## CITE
+
+[![DOI](https://zenodo.org/badge/23689820.svg)](https://zenodo.org/badge/latestdoi/23689820)
+
+## DOWNLOAD
+
+[ ![Download](https://api.bintray.com/packages/coin-or/download/SYMPHONY/images/download.svg?version=5.6) ](https://bintray.com/coin-or/download/SYMPHONY/5.6)
+
+Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/SYMPHONY). Binaries can also be installed on specific platforms, as follows. 
+
+ * *Linux*: On Debian, SYMPHONY is available in the package `coinor-symphony` and can be installed with apt. On Fedora, SYMPHONY is available in the package `coin-or-SYMPHONY`. Pre-compiled binaries are also available on [BinTray](http://bintray.com/coin-or/download/SYMPHONY) and as part of the [COIN-OR Optimization Suite](https://www.coin-or.org/download/binary/OptimizationSuite/).
+ * *Windows*: The easiest way to get SYMPHONY on Windows is to download binaries from [BinTray](http://bintray.com/coin-or/download/SYMPHONY) or just use the Windows installer for the [COIN Optimization Suite](http://www.coin-or.org/download/binary/OptimizationSuite), which provides Visual Studio compatible libraries and binaries (these are slightly out of date, however). 
+ * *OS X*: The easiest way to get SYMPHONY on OSX is through Homebrew. It can be installed with
+   * `brew tap coin-or-tools/coinor`
+   * `brew install symphony`.
+
+Due to license incompatibilities, pre-compiled binaries lack some functionality and are not available for the distributed parallel version of SYMPHONY. If binaries are not available for your platform for the latest version and you would like to request them to be built and posted, feel free to let us know on the mailing list or by opening an [issue](https://github.com/coin-or/SYMPHONY/newissue).
 
 # DOCUMENTATION
 
 If you have downloaded a source distribution, LaTex source for the full documentation is available in the SYMPHONY/Doc/ subdirectory. Quick start guides and pointers to other on-line documentation can be found at the project Wiki:
 
-https://projects.coin-or.org/SYMPHONY
+https://github.com/coin-or/SYMPHONY/wiki
 
-The on-line version of the manual is available here:
+The PDF version of the manual is available here:
 
-http://www.coin-or.org/SYMPHONY/man-5.6/
+https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.17-Manual.pdf
 
-What follows is a very brief and possibly out-of-date quick summary of
+An on-line version that is for a slightly earlier release is here:
+
+http://coin-or.github.io/SYMPHONY/man-5.6/
+
+What follows is a very brief summary of
 installation and usage. Please see the documentation for more details.
 
-## INSTALLATION
+## BUILDING FROM SOURCE
 
 If you downloaded a source distribution and would like instructions on
 building SYMPHONY or you downloaded a binary distribution and would like to
-know how to install it, please see the INSTALL file.
+know how to install it, please see the [INSTALL](https://github.com/coin-or/SYMPHONY/blob/master/INSTALL.md) file.
 
 ## USING SYMPHONY
 
@@ -53,7 +81,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         [ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]
         [-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]
         [ -u ub ] [ -p procs ] [ -k rule ] [ -v level ] [ -c rule ]
-        [ -m max ] [ -z n ] [-o tree_out_file]
+        [ -m max ] [ -z n ] [-o tree_out_file] [-w 0/1]
 
 
         -F model: model should be read in from file 'model'
@@ -71,6 +99,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         -q 0/1: whether or not to tighten root bounds
         -r 0/1: whether or not to do reduced cost tightening
         -j 0/1: whether or not to generate cgl cuts
+        -w 0/1: whether or not to use hot starting in strong branching
         -e n: set pre-processing level to 'n'
         -i iters: allow a max of 'iters' iterations in presolve
         -t time: set wallclock time limit to 'time'
@@ -150,17 +179,13 @@ Compiled, but not well tested: SPX
 
 ### SEQUENTIAL
 
-Known configurations that build and pass unit test
-
-- gcc 4.* on LINUX
-- MSVC++ Version 9-11 compiler in CYGWIN using the autotools 
-- MSVC++ Version 9-11 IDE
-- gcc 4.* on Mac OSX 10.4.8
-- clang
+Sequential configurations are now automatically built and tested on Linux, OS X, and Windows using
+ * [Travis-CI](https://travis-ci.org/coin-or/symphony)
+ * [Appveyor](https://ci.appveyor.com/project/tkralphs/symphony)
 
 ### SHARED MEMORY PARLLEL (OpenMP)
 
-Builds and passes unit test with gcc 4.* and CLP on LINUX.
+Builds and passes unit test with gcc 4 and 5 and CLP on LINUX.
 
 ### DISTRIBUTED MEMORY PARALLEL (PVM)
 
@@ -204,12 +229,13 @@ that fixes the problem.
 See the Depdencies file for a list of the external COIN-OR libraries on which
 SYMPHONY depends.
 
+### BUG REPORTS
+
+To report a bug please file a ticket at 
+
+https://github.com/coin-or/SYMPHONY/issues/new
+
 ## SUPPORT
-
-### LIST SERVE
-
-There is a list serve for SYMPHONY users. To subscribe, go to 
-http://list.coin-or.org/mailman/listinfo/coin-symphony 
 
 ### AUTHORS
 
@@ -218,15 +244,49 @@ SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and Laci Ladanyi
 Mahajan (amahajan@iitb.ac.in.edu) have been instrumental in development since
 version 5.0.
 
-### BUG REPORTS
+### ACKNOWLEDGEMENTS
 
-To report a bug please file a ticket at 
+SYMPHONY was developed with support from
 
-https://projects.coin-or.org/SYMPHONY/newticket
-
-Please note the version of SYMPHONY you are using when filing the ticket.
+* National Science Foundation (Grants CMMI-1435453, CMMI-0728011, DMI-0522796, DMI-0534862, DMS-9527124, CMMI-1130914)
+* Texas ATP Grant 97-3604-010
+* Cornell University
+* Lehigh University
+* Zuse Institute Berlin
+* Research Campus Modal "Mathematical Optimization and Data Analysis 
+Laboratories" funded by the German Federal Ministry of Education and Research
+(BMBF Grant 05M14ZAM) and by the DFG SFB/Transregio 154
 
 ## CHANGELOG
+
+### Release 5.6.17
+  * Update appveyor
+  * Fix several reported bugs (see PRs 10-12, Issue 2)
+
+### Release 5.6.16
+  * Fix problem with appveyor configuration
+
+### Release 5.6.15
+  * Fix for configuration issue with OpenMP when building with Visual Studio
+    compiler under Msys2
+  * Fix for bugs in PVM version
+  * Fix for bugs in computing lower bounds
+  * Fix for compilation error with gcc 6
+  * Other minor fixes
+  * Enabling binary uploads with BinTray
+
+### Release 5.6.14
+  * Fixing small bug with re-setting environment in user applications.
+  * Fixing some memory errors arising with applications when extra variables are used.
+  * Fixing small bug with tracking variable indices in branching.
+  * Moving code inside critical block to prevent memory access errors in shared memory parallel mode.
+  * Added switches for turning hot starting on and off
+  * Updates to documentation
+  * Small fixes
+  * Added support for Travis and Appveyor
+
+### Release 5.6.13
+  * Release to update externals and pick up bug fixes in other projects
 
 ### Release 5.6.12
   * Fixed function for determining duals and reduced costs.

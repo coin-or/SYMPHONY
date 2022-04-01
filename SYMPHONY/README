@@ -1,4 +1,4 @@
-SYMPHONY Version 5.6.12 README
+SYMPHONY Version 5.6.16 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
@@ -25,6 +25,10 @@ installation and usage. Please see the documentation for more details.
 ******************************************************************************
 *                              INSTALLATION                                  *
 ******************************************************************************
+
+Binaries for most platforms are available for download from Bintray:
+
+https://bintray.com/coin-or/download/SYMPHONY
 
 If you downloaded a source distribution and would like instructions on
 building SYMPHONY or you downloaded a binary distribution and would like to
@@ -61,7 +65,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         [ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]
         [-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]
         [ -u ub ] [ -p procs ] [ -k rule ] [ -v level ] [ -c rule ]
-        [ -m max ] [ -z n ] [-o tree_out_file]
+        [ -m max ] [ -z n ] [-o tree_out_file] [-w 0/1]
 
 
         -F model: model should be read in from file 'model'
@@ -79,6 +83,7 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         -q 0/1: whether or not to tighten root bounds
         -r 0/1: whether or not to do reduced cost tightening
         -j 0/1: whether or not to generate cgl cuts
+        -w 0/1: whether or not to use hot starting in strong branching
         -e n: set pre-processing level to 'n'
         -i iters: allow a max of 'iters' iterations in presolve
         -t time: set wallclock time limit to 'time'
@@ -163,15 +168,13 @@ SEQUENTIAL
 
 Known configurations that build and pass unit test
 
-- gcc 4.* on LINUX
-- MSVC++ Version 9-11 compiler in CYGWIN using the autotools 
-- MSVC++ Version 9-11 IDE
-- gcc 4.* on Mac OSX 10.4.8
-- clang
+Sequential configurations are now automatically built and tested on Linux, OS X, and Windows using
+ * [Travis-CI](https://travis-ci.org/coin-or/symphony)
+ * [Appveyor](https://ci.appveyor.com/project/tkralphs/symphony)
 
 SHARED MEMORY PARLLEL (OpenMP)
 
-Builds and passes unit test with gcc 4.* and CLP on LINUX.
+Builds and passes unit test with gcc 4 and 5 and CLP on LINUX.
 
 DISTRIBUTED MEMORY PARALLEL (PVM)
 
@@ -242,8 +245,46 @@ https://projects.coin-or.org/SYMPHONY/newticket
 
 Please note the version of SYMPHONY you are using when filing the ticket.
 
+ACKNOWLEDGEMENTS
+
+SYMPHONY was developed with support from
+
+* National Science Foundation (Grants CMMI-1435453, CMMI-0728011, DMI-0522796, DMI-0534862, DMS-9527124, CMMI-1130914)
+* Texas ATP Grant 97-3604-010
+* Cornell University
+* Lehigh University
+* Zuse Institute Berlin
+* Research Campus Modal "Mathematical Optimization and Data Analysis 
+Laboratories" funded by the German Federal Ministry of Education and Research
+(BMBF Grant 05M14ZAM) and by the DFG SFB/Transregio 154
+
 WHAT'S NEW
 ==========
+
+# Release 5.6.16
+  * Fix problem with appveyor configuration
+
+# Release 5.6.15
+  * Fix for configuration issue with OpenMP when building with Visual Studio
+    compiler under Msys2
+  * Fix for bugs in PVM version
+  * Fix for bugs in computing lower bounds
+  * Fix for compilation error with gcc 6
+  * Other minor fixes
+  * Enabling binary uploads with BinTray
+                
+# Release 5.6.14
+  * Fixing small bug with re-setting environment in user applications.
+  * Fixing some memory errors arising with applications when extra variables are used.
+  * Fixing small bug with tracking variable indices in branching.
+  * Moving code inside critical block to prevent memory access errors in shared memory parallel mode.
+  * Added switches for turning hot starting on and off
+  * Updates to documentation
+  * Small fixes
+  * Added support for Travis and Appveyor
+
+# Release 5.6.13
+  * Release to update externals and pick up bug fixes in other projects
 
 # Release 5.6.12
   * Fixed function for determining duals and reduced costs.

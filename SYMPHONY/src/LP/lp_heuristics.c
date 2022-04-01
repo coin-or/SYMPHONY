@@ -7,7 +7,7 @@
 /*                                                                           */
 /* The author of this file is Ashutosh Mahajan                               */
 /*                                                                           */
-/* (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2006-2019 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -210,9 +210,6 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
             new_solution_value += x_ip[i]*mip_obj[i];
          }
          if (new_solution_value<solution_value-p->par.granularity-lpetol) {
-	    /* we found what we wanted */
-	    memcpy(betterSolution, x_ip, n*DSIZE);
-
 	    /* we found what we wanted */
 	    memcpy(betterSolution, x_ip, n*DSIZE);
 

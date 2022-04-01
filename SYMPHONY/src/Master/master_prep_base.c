@@ -7,7 +7,7 @@
 /*                                                                           */
 /* The author of this file is Menal Guzelsoy                                 */
 /*                                                                           */
-/* (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2006-2019 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -4113,6 +4113,12 @@ int prep_initialize_mipinfo(PREPdesc *P)
    //   char obj_sense = env->mip->obj_sense;
 
    if (mip->mip_inf){
+      FREE(mip->mip_inf->c_ind);
+      FREE(mip->mip_inf->c_val);
+      FREE(mip->mip_inf->c_beg);
+      FREE(mip->mip_inf->c_sense);
+      FREE(mip->mip_inf->c_rhs);
+      FREE(mip->mip_inf->c_tmp);
       FREE(mip->mip_inf->rows);
       FREE(mip->mip_inf->cols);
       FREE(mip->mip_inf);

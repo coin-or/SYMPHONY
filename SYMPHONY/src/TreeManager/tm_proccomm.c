@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -716,7 +716,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    receive_dbl_array(&n->lower_bound, 1);
 #ifdef DO_TESTS
    if (n->lower_bound < old_lower_bound - 10){
-      printf("#####Error: lower bound descrease in node from %.3f to %.3f\n",
+      printf("#####Error: lower bound decrease in node from %.3f to %.3f\n",
 	     old_lower_bound, n->lower_bound);
    }
 #endif
@@ -988,6 +988,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
       s_bufid = init_send(DataInPlace);
       ch = (char) dive;
       send_char_array(&ch, 1);
+      send_int_array(&keep, 1);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
 	 /* Give the index of the node kept and also the index of the
 	  * branching cut if necessary */
@@ -1137,7 +1138,7 @@ void process_ub_message(tm_prob *tm)
 
 void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 {
-   int old_cutnum = tm->cut_num, new_cutnum = cutnum, *itmp, i;
+   int old_cutnum, new_cutnum = cutnum, *itmp, i;
    cut_data **cuts;
 #ifndef COMPILE_IN_LP   
    int s_bufid;
@@ -1149,10 +1150,10 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 #endif
 #pragma omp critical (cut_pool)
    {
+      old_cutnum = tm->cut_num;
       REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, old_cutnum +
 	      new_cutnum, (old_cutnum / tm->stat.created + 5) * BB_BUNCH);
       cuts = tm->cuts;
-      tm->cut_num += new_cutnum;
       for (i = 0; i < new_cutnum; i++){
 #ifdef COMPILE_IN_LP
 	 cuts[old_cutnum + i] = rows[i].cut;
@@ -1164,6 +1165,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 	 cuts[itmp[i]]->name = itmp[i];
 #endif
       }
+      tm->cut_num += new_cutnum;
    }
 #ifndef COMPILE_IN_LP
    if (sender){ /* Do we have to return the names? */

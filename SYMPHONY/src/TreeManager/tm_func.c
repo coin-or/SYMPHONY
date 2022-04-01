@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -393,17 +393,20 @@ int solve(tm_prob *tm)
 	    }
  
 	    if (ramp_up){
-	       ramp_up_tm += (wall_clock(NULL) -
-				no_work_start) * (tm->lp.free_num + 1);
+	       ramp_up_tm = wall_clock(NULL) - start_time;
 	    }
 	    if (ramp_down){
-	       ramp_down_time += (wall_clock(NULL) -
-				  no_work_start) * (tm->lp.free_num + 1);
+	       ramp_down_time += wall_clock(NULL) - no_work_start;
 	    }
 	       
-	    if (!tm->lp.free_num){
+#ifdef COMPILE_IN_LP
+	    if (tm->active_node_num >= tm->par.max_active_nodes-1){
+#else
+            if (!tm->lp.free_num){
+#endif
 	       ramp_down = FALSE;
 	       ramp_up = FALSE;
+               //printf("Ramp-up %f %d %d\n", ramp_up_tm, tm->par.max_active_nodes, tm->active_node_num);
 	    }else if (ramp_up){
 	       no_work_start = wall_clock(NULL);
 	    }else{
@@ -742,12 +745,6 @@ void print_tree_status(tm_prob *tm)
    }
 #endif
 
-#ifdef _OPENMP
-   int thread_num = omp_get_thread_num();
-#else
-   int thread_num = 0;
-#endif
-
    if (tm->par.output_mode > 0) {
      if (tm->stat.print_stats_cnt < 1 || tm->par.verbosity > 1) {
        printf("%7s ","Time");     
@@ -786,10 +783,10 @@ void print_tree_status(tm_prob *tm)
      find_tree_lb(tm);
      if (tm->lb > -SYM_INFINITY) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
-	 obj_ub = -tm->lb + tm->obj_offset;
+	 obj_ub = -tm->printed_lb + tm->obj_offset;
 	 printf("%19.2f ", obj_ub);
        } else {
-	 obj_lb = tm->lb + tm->obj_offset;
+	 obj_lb = tm->printed_lb + tm->obj_offset;
 	 printf("%19.2f ", obj_lb);
        }
      } else {
@@ -879,11 +876,11 @@ void print_tree_status(tm_prob *tm)
 	 printf("\nError opening vbc emulation file\n\n");
       }else{
 	 PRINT_TIME(tm, f);
-	 fprintf(f, "L %.2f \n", tm->lb);
+	 fprintf(f, "L %.2f \n", tm->printed_lb);
 	 fclose(f); 
       }
    }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-      printf("$L %.2f\n", tm->lb);
+      printf("$L %.2f\n", tm->printed_lb);
    }
 
 #if 0
@@ -1070,6 +1067,21 @@ bc_node *del_best_node(tm_prob *tm)
    if (size == 0)
       return(NULL);
 
+#ifdef DO_TESTS
+   for (int i = tm->samephase_candnum; i >= 1; i--){
+      //printf("Node %i, LB: %f\n", tm->samephase_cand[i]->bc_index,
+      //     tm->samephase_cand[i]->lower_bound);
+      if ((2*i <= tm->samephase_candnum &&
+           tm->samephase_cand[i]->lower_bound >
+           tm->samephase_cand[2*i]->lower_bound) ||
+          (2*i+1 <= tm->samephase_candnum &&
+           tm->samephase_cand[i]->lower_bound >
+           tm->samephase_cand[2*i+1]->lower_bound)){
+         printf("#####Warning: heap corruption detected\n");
+      }
+   }
+#endif
+
    best_node = list[1];
    
    temp = list[1] = list[size];
@@ -1099,6 +1111,22 @@ bc_node *del_best_node(tm_prob *tm)
       }
    }
    list[pos] = temp;
+
+#ifdef DO_TESTS
+   for (int i = tm->samephase_candnum; i >= 1; i--){
+      //printf("Node %i, LB: %f\n", tm->samephase_cand[i]->bc_index,
+      //     tm->samephase_cand[i]->lower_bound);
+      if ((2*i <= tm->samephase_candnum &&
+           tm->samephase_cand[i]->lower_bound >
+           tm->samephase_cand[2*i]->lower_bound) ||
+          (2*i+1 <= tm->samephase_candnum &&
+           tm->samephase_cand[i]->lower_bound >
+           tm->samephase_cand[2*i+1]->lower_bound)){
+         printf("#####Warning: heap corruption detected\n");
+      }
+   }
+#endif
+
    return(best_node);
 }
 
@@ -1133,9 +1161,21 @@ OPENMP_ATOMIC_WRITE
 #pragma omp critical (tree_update)
 {
    int pos, ch, size = tm->samephase_candnum;
-   bc_node **list;
+   bc_node **list = tm->samephase_cand;
    int rule = tm->par.node_selection_rule;
-
+   
+#ifdef DO_TESTS
+   if (size > 0){
+      for (int i = size; i >= 1; i--){
+         //printf("Node %i, LB: %f\n", list[i]->bc_index, list[i]->lower_bound);
+         if ((2*i <= size && list[i]->lower_bound > list[2*i]->lower_bound) ||
+             (2*i+1 <= size && list[i]->lower_bound > list[2*i+1]->lower_bound)){
+            printf("#####Warning: heap corruption detected\n");
+         }
+      }
+   }
+#endif
+   
    tm->samephase_candnum = pos = ++size;
 
    if (tm->par.verbosity > 10)
@@ -1145,8 +1185,9 @@ OPENMP_ATOMIC_WRITE
 
    REALLOC(tm->samephase_cand, bc_node *,
 	   tm->samephase_cand_size, size + 1, BB_BUNCH);
-   list = tm->samephase_cand;
 
+   list = tm->samephase_cand;
+   
    while ((ch=pos>>1) != 0){
       if (node_compar(tm, rule, list[ch], node)){
 	 list[pos] = list[ch];
@@ -1156,6 +1197,16 @@ OPENMP_ATOMIC_WRITE
       }
    }
    list[pos] = node;
+
+#ifdef DO_TESTS
+   for (int i = size; i >= 1; i--){
+      if ((2*i <= size && list[i]->lower_bound > list[2*i]->lower_bound) ||
+          (2*i+1 <= size && list[i]->lower_bound > list[2*i+1]->lower_bound)){
+         printf("#####Warning: heap corruption detected\n");
+      }
+   }
+#endif
+   
 } /* End critical Region */
 
 }
@@ -1172,6 +1223,7 @@ int node_compar(tm_prob *tm, int rule, bc_node *node0, bc_node *node1)
 
    int ret_ind = 0;
 
+#if 0
    double n0_rhs, n1_rhs;
    int n0_ind, n1_ind;
    n1_ind = node1->parent->bobj.name;
@@ -1191,6 +1243,7 @@ int node_compar(tm_prob *tm, int rule, bc_node *node0, bc_node *node1)
 
    n0_frac = fabs(node0->parent->bobj.value - n0_rhs);
    n1_frac = fabs(node1->parent->bobj.value - n1_rhs);
+#endif
    
    /* solves acc3 without swap 
       if(node1->lower_bound < node0->lower_bound - 1e-4) ret_ind = 1;
@@ -1203,20 +1256,21 @@ int node_compar(tm_prob *tm, int rule, bc_node *node0, bc_node *node1)
 
    switch(rule){
     case LOWEST_LP_FIRST:      
-      if(node1->lower_bound < node0->lower_bound - 1e-4) ret_ind = 1;
-      else if (node1->lower_bound < node0->lower_bound + 1e-4) {
-	 if(node1->bc_level > node0->bc_level) ret_ind = 1;
-	 else if(node1->bc_level == node0->bc_level)
-	    if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
-	 //if(tm->has_ub){
-	 // if(node1->bc_level > node0->bc_level) ret_ind = 1;
-	 // else if(node1->bc_level == node0->bc_level)
-	 //    if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
-	 //}else
-	 //  if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
-	 //  else if(node1->frac_cnt == node0->frac_cnt) 
-	 //     if (node1->bc_level > node0->bc_level) ret_ind = 1;
-      }
+      if(node1->lower_bound < node0->lower_bound) ret_ind = 1;
+      //if(node1->lower_bound < node0->lower_bound - 1e-4) ret_ind = 1;
+      //else if (node1->lower_bound < node0->lower_bound + 1e-4) {
+      // if(node1->bc_level > node0->bc_level) ret_ind = 1;
+      // else if(node1->bc_level == node0->bc_level)
+      //    if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
+	 ////if(tm->has_ub){
+	 //// if(node1->bc_level > node0->bc_level) ret_ind = 1;
+	 //// else if(node1->bc_level == node0->bc_level)
+	 ////    if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
+	 ////}else
+	 ////  if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
+	 ////  else if(node1->frac_cnt == node0->frac_cnt) 
+	 ////     if (node1->bc_level > node0->bc_level) ret_ind = 1;
+      //}
       //return(node1->lower_bound < node0->lower_bound ? 1:0);
       return ret_ind;
       //switch(rule){
@@ -1331,12 +1385,12 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #ifdef TRACE_PATH
    int optimal_path = -1;
 #endif
-      
+   
    /* before we start to generate the children we must figure out if we'll
     * dive so that we can put the kept child into the right location */
    if (*keep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE))
       dive = olddive == DO_DIVE ? DO_DIVE : shall_we_dive(tm, objval[*keep]);
-
+   
    node->children = (bc_node **) calloc(bobj->child_num, sizeof(bc_node *));
    if (node->bc_level == tm->stat.max_depth)
       tm->stat.max_depth++;
@@ -1359,6 +1413,14 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       child->bc_index = tm->stat.tree_size++;
       child->bc_level = node->bc_level + 1;
       child->lower_bound = objval[i];
+#ifdef DO_TESTS
+      if (child->lower_bound < tm->lb - .001 ||
+          child->lower_bound < node->lower_bound - .001){
+         printf("#####Warning: lower bound decrease detected after branching\n");
+         printf("     From parent: %f\n", node->lower_bound - child->lower_bound);
+         printf("     From global: %f\n", tm->lb - child->lower_bound);
+      }
+#endif
       child->frac_cnt = node->frac_cnt; 
       child->frac_avg = node->frac_avg; 
 #ifdef COMPILE_IN_LP
@@ -1377,9 +1439,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }else{
 	    PRINT_TIME(tm, f);
 	    fprintf(f, "N %i %i %i\n", node->bc_index+1, child->bc_index+1,
-		  feasible[i] ? VBC_FEAS_SOL_FOUND :
-		  ((dive != DO_NOT_DIVE && *keep == i) ?
-		   VBC_ACTIVE_NODE : VBC_CAND_NODE));
+                    feasible[i] ? VBC_FEAS_SOL_FOUND :
+                    ((dive != DO_NOT_DIVE && *keep == i) ?
+                     VBC_ACTIVE_NODE : VBC_CAND_NODE));
 	 }
       } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	 FILE *f;
@@ -1432,7 +1494,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	  (tm->has_ub && tm->ub - tm->par.granularity < objval[i] &&
 	   node->desc.nf_status == NF_CHECK_NOTHING)){
 	 /* this last can happen if the TM got the new bound but it hasn't
-	   * been propagated to the LP yet */
+          * been propagated to the LP yet */
 #else /*We only want to process the root node in this case - discard others*/
       if (TRUE){	 
 #endif
@@ -1442,9 +1504,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		   child->bc_index, child->bc_level);
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 }
-
+         
 	 child->node_status = NODE_STATUS__PRUNED;
-
+         
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
 	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -1459,9 +1521,10 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }
 #endif
 	 if (tm->par.keep_description_of_pruned == DISCARD ||
-	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
+	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL ||
+             tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL){
 	    child->parent = node;
-	    if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
+	    if (tm->par.keep_description_of_pruned != DISCARD)
 #pragma omp critical (write_pruned_node_file)
 	       write_pruned_nodes(tm, child);
 #pragma omp critical (tree_update)
@@ -1477,129 +1540,13 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		default:
 		  vbc_node_pr_reason = VBC_PRUNED;
 	       }
-	       /* following is no longer needed because this care is taken
-		* care of in install_new_ub
-		*/
-	       /*
-	       if (feasible[i]) {
-		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
-	       }
-	       */
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
 				  VBC_PRUNED);
 	    }
-
-	    if (--child_num == 0){
-	       *keep = -1;
-	       return(DO_NOT_DIVE);
-	    }
-	    if (*keep == child_num) *keep = i;
-#ifdef TRACE_PATH
-	    if (optimal_path == child_num) optimal_path = i;
-#endif
-	    action[i] = action[child_num];
-	    objval[i] = objval[child_num];
-	    feasible[i--] = feasible[child_num];
-	    continue;
-	 }
-      }else{
-	 child->node_status = NODE_STATUS__CANDIDATE;
-	 /* child->lp = child->cg = 0;   zeroed out by calloc */
-	 child->cp = node->cp;
-      }
-
-      /* child->children = NULL;   zeroed out by calloc */
-      /* child->child_num = 0;   zeroed out by calloc */
-      /* child->died = 0;   zeroed out by calloc */
-      desc = &child->desc;
-      /* all this is set by calloc
-       * desc->uind.type = 0;            WRT_PARENT and no change
-       * desc->uind.size = 0;
-       * desc->uind.added = 0;
-       * desc->uind.list = NULL;
-       
-       * desc->not_fixed.type = 0;       WRT_PARENT and no change
-       * desc->not_fixed.size = 0;
-       * desc->not_fixed.added = 0;
-       * desc->not_fixed.list = NULL;
-
-       * desc->cutind.type = 0;          WRT_PARENT and no change
-       * desc->cutind.size = 0;
-       * desc->cutind.added = 0;
-       * desc->cutind.list = NULL;
-
-       * desc->basis.basis_exists = FALSE;    This has to be validated!!!
-       * desc->basis.{[base,extra][rows,vars]}
-                    .type = 0;           WRT_PARENT and no change
-                    .size = 0;
-		    .list = NULL;
-		    .stat = NULL;
-       */
-
-      if (node->desc.basis.basis_exists){
-	 desc->basis.basis_exists = TRUE;
-      }
-
-      /* If we have a non-base, new branching cut then few more things
-         might have to be fixed */
-      if (new_branching_cut && bobj->name >= 0){
-	 /* Fix cutind and the basis description */
-	 desc->cutind.size = 1;
-	 desc->cutind.added = 1;
-	 desc->cutind.list = (int *) malloc(ISIZE);
-	 desc->cutind.list[0] = bobj->name;
-	 if (desc->basis.basis_exists){
-	    desc->basis.extrarows.size = 1;
-	    desc->basis.extrarows.list = (int *) malloc(ISIZE);
-	    desc->basis.extrarows.list[0] = bobj->name;
-	    desc->basis.extrarows.stat = (int *) malloc(ISIZE);
-	    desc->basis.extrarows.stat[0] = SLACK_BASIC;
-	 }
-      }
-
-      desc->desc_size = node->desc.desc_size;
-      desc->desc = node->desc.desc;
-      desc->nf_status = node->desc.nf_status;
-
-#ifdef SENSITIVITY_ANALYSIS
-      //Anahita
-      child->intcpt = bobj->intcpt[i];
-      if (tm->par.sensitivity_rhs){ //&& //Anahita 
-	  //action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
-	 child->duals = bobj->duals[i];
-	 bobj->duals[i] = 0;
-	 //Anahita
-	 if (bobj->rays){
-	    child->rays = bobj->rays[i];
-	    bobj->rays[i] = 0;
-	 }
-      }
-      if (tm->par.sensitivity_bounds){
-	 //Ted
-	 child->dj = bobj->dj[i];
-	 bobj->dj[i] = 0;
-      }      
-#endif
-
-      if (child->node_status != NODE_STATUS__PRUNED && feasible[i]){
-	 if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	    child->sol_size = bobj->sol_sizes[i];
-	    child->sol_ind = bobj->sol_inds[i];
-	    bobj->sol_inds[i]=0;
-	    child->sol = bobj->solutions[i];
-	    bobj->solutions[i] = 0;
-	    child->feasibility_status = NOT_PRUNED_HAS_CAN_SOLUTION;
-	 }
-      }
-      
-      if (child->node_status == NODE_STATUS__PRUNED){
-
-	 if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	 
-	    child->feasibility_status = OVER_UB_PRUNED;
-	    
+	 }else{ /* tm->par.keep_description_of_pruned == KEEP_IN_MEMORY */
+	    child->feasibility_status = OVER_UB_PRUNED;	   
 	    if (feasible[i]){
 	       child->sol_size = bobj->sol_sizes[i];
 	       child->sol_ind = bobj->sol_inds[i];
@@ -1608,74 +1555,98 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       bobj->solutions[i] = 0;
 	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	    }
-	    //Anahita to keep status of over_ub 
-	    if ((action[i] == PRUNE_THIS_CHILD_INFEASIBLE)
-		//Not sure why we want this. Ted
-		//&& (!tm->par.sensitivity_analysis)
-		){
-	      child->feasibility_status = INFEASIBLE_PRUNED;
+	    if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
+	       child->feasibility_status = INFEASIBLE_PRUNED;
 	    }
-	 }
-
-#ifdef TRACE_PATH
-	 if (child->optimal_path){
-	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
-	    sleep(600);
-	    if (tm->par.logging){
-	       write_tm_info(tm, tm->par.tree_log_file_name, NULL, FALSE);
-	       write_subtree(tm->rootnode, tm->par.tree_log_file_name, NULL,
-			     TRUE, tm->par.logging);
-	       write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
-	    }
-	    exit(1);
-	 }
+         }
+      }else{
+	 child->node_status = NODE_STATUS__CANDIDATE;
+	 /* child->lp = child->cg = 0;   zeroed out by calloc */
+	 child->cp = node->cp;
+         if (feasible[i]){
+            if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+               child->sol_size = bobj->sol_sizes[i];
+               child->sol_ind = bobj->sol_inds[i];
+               bobj->sol_inds[i]=0;
+               child->sol = bobj->solutions[i];
+               bobj->solutions[i] = 0;
+               child->feasibility_status = NOT_PRUNED_HAS_CAN_SOLUTION;
+            }
+         }
+      }
+      
+      if (child->node_status == NODE_STATUS__CANDIDATE ||
+          tm->par.keep_description_of_pruned != DISCARD){
+         desc = &child->desc;
+         
+         if (node->desc.basis.basis_exists){
+            desc->basis.basis_exists = TRUE;
+         }
+         
+         /* If we have a non-base, new branching cut then few more things
+            might have to be fixed */
+         if (new_branching_cut && bobj->name >= 0){
+            /* Fix cutind and the basis description */
+            desc->cutind.size = 1;
+            desc->cutind.added = 1;
+            desc->cutind.list = (int *) malloc(ISIZE);
+            desc->cutind.list[0] = bobj->name;
+            if (desc->basis.basis_exists){
+               desc->basis.extrarows.size = 1;
+               desc->basis.extrarows.list = (int *) malloc(ISIZE);
+               desc->basis.extrarows.list[0] = bobj->name;
+               desc->basis.extrarows.stat = (int *) malloc(ISIZE);
+               desc->basis.extrarows.stat[0] = SLACK_BASIC;
+            }
+         }
+         
+         desc->desc_size = node->desc.desc_size;
+         desc->desc = node->desc.desc;
+         desc->nf_status = node->desc.nf_status;
+         
+#ifdef SENSITIVITY_ANALYSIS
+         //Anahita
+         child->intcpt = bobj->intcpt[i];
+         if (tm->par.sensitivity_rhs){ //&& //Anahita 
+            //action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
+            child->duals = bobj->duals[i];
+            bobj->duals[i] = 0;
+            //Anahita
+            if (bobj->rays){
+               child->rays = bobj->rays[i];
+               bobj->rays[i] = 0;
+            }
+         }
+         if (tm->par.sensitivity_bounds){
+            //Ted
+            child->dj = bobj->dj[i];
+            bobj->dj[i] = 0;
+         }      
 #endif
-	 if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
-	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
-#pragma omp critical (write_pruned_node_file)
-	    write_pruned_nodes(tm, child);
-#pragma omp critical (tree_update)
-	    if (tm->par.vbc_emulation== VBC_EMULATION_FILE_NEW) {
-	       int vbc_node_pr_reason;
-	       switch (action[i]) {
-		case PRUNE_THIS_CHILD_INFEASIBLE:
-		  vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
-		  break;
-		case PRUNE_THIS_CHILD_FATHOMABLE:
-		  vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
-		  break;
-		default:
-		  vbc_node_pr_reason = VBC_PRUNED;
-	       }
-	       /* following is no longer needed because this care is taken
-		* care of in install_new_ub
-		*/
-	       /*
-		  if (feasible[i]) {
-		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
-	       }
-	       */
-	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
-	    } else {
-	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-				  VBC_PRUNED);
-	    }
-
-	    if (--child_num == 0){
-	       *keep = -1;
-	       return(DO_NOT_DIVE);
-	    }
-	    if (*keep == child_num) *keep = i;
+      }
+      
+      if (child->node_status == NODE_STATUS__PRUNED){
+         if (--child_num == 0){
+            *keep = -1;
+            return(DO_NOT_DIVE);
+         }
+         if (*keep == child_num){
+            *keep = i;
+         }else if (*keep == i){
+            /*We pruned the child we were supposed to keep*/
+            dive = DO_NOT_DIVE;
+         }
 #ifdef TRACE_PATH
-	    if (optimal_path == child_num) optimal_path = i;
+         if (optimal_path == child_num){
+            optimal_path = i;
+         }
 #endif
-	    action[i] = action[child_num];
-	    objval[i] = objval[child_num];
-	    feasible[i--] = feasible[child_num];
-	 }
+         action[i] = action[child_num];
+         objval[i] = objval[child_num];
+         feasible[i--] = feasible[child_num];
 	 continue;
       }
-
+      
       if (tm->phase == 0 &&
 	  !(tm->par.colgen_strat[0] & FATHOM__GENERATE_COLS__RESOLVE) &&
 	  (feasible[i] == LP_D_UNBOUNDED ||
@@ -1697,6 +1668,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }
       }
    }
+
    if (node->cp)
 #ifdef COMPILE_IN_CP
       tm->nodes_per_cp[node->cp] += np_cp;
@@ -2191,6 +2163,8 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    /* Remove nodes that can now be fathomed from the list */
 #pragma omp critical (tree_update)
    {
+      int var_index;
+   
       rule = tm->par.node_selection_rule;
       list = tm->samephase_cand;
       char has_exchanged = FALSE;
@@ -2200,13 +2174,17 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	 if (tm->has_ub &&
 	     node->lower_bound >= tm->ub-tm->par.granularity){
 #ifdef COMPILE_IN_LP
-	    if(node->parent){
-	       for(j = 0; j < node->parent->bobj.child_num; j++){
-		  if(node->parent->children[j] == node){
-		     if(node->parent->bobj.sense[j] == 'L'){
-			tm->br_inf_down[node->parent->bobj.name]++;
+	    if (node->parent && node->parent->bobj.type == BRANCHING_VARIABLE){
+	       for (j = 0; j < node->parent->bobj.child_num; j++){
+		  if (node->parent->children[j] == node){
+		     var_index = (node->parent->bobj.name < 0 ?
+			/* base variable : extra variable */
+				  (-node->parent->bobj.name-1) :
+				  (node->parent->bobj.name + tm->bvarnum));
+		     if (node->parent->bobj.sense[j] == 'L'){
+			tm->br_inf_down[var_index]++;
 		     }else{
-			tm->br_inf_up[node->parent->bobj.name]++;
+			tm->br_inf_up[var_index]++;
 		     }
 		  }
 	       }
@@ -3945,7 +3923,7 @@ void sym_catch_c(int num)
 
 int find_tree_lb(tm_prob *tm)
 {
-   double lb = MAXDOUBLE;
+   double lb = -SYM_INFINITY;
    bc_node **samephase_cand;
 
 #pragma omp critical (tree_update)
@@ -3954,6 +3932,20 @@ int find_tree_lb(tm_prob *tm)
       if (tm->samephase_candnum > 0){
 	 if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
 	    lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+#ifdef DO_TESTS
+	    for (int i = tm->samephase_candnum; i >= 1; i--){
+               //printf("Node %i, LB: %f\n", tm->samephase_cand[i]->bc_index,
+               //     tm->samephase_cand[i]->lower_bound);
+               if ((2*i <= tm->samephase_candnum &&
+                    tm->samephase_cand[i]->lower_bound >
+                    tm->samephase_cand[2*i]->lower_bound) ||
+                   (2*i+1 <= tm->samephase_candnum &&
+                    tm->samephase_cand[i]->lower_bound >
+                    tm->samephase_cand[2*i+1]->lower_bound)){
+                  printf("#####Warning: heap corruption detected\n");
+               }
+	    }
+#endif
 	 } else {
 	    samephase_cand = tm->samephase_cand;
 	    for (int i = tm->samephase_candnum; i >= 1; i--){
@@ -3977,8 +3969,22 @@ int find_tree_lb(tm_prob *tm)
       lb = tm->ub;
    }
    */
+#ifdef DO_TESTS
+   if (lb < tm->lb - .001 && tm->stat.analyzed > 1){
+      printf("#####Warning: global lower bound decrease detected: %f\n",
+             tm->lb - lb);
+   }
+#endif
    tm->lb = lb;
- }
+   // In parallel execution, the lower bound can be slightly non-monotonic in rare
+   // circumstances. This is algorithmically expected, but we keep the bound in the output
+   // non-monotonic because this is what the user expects. 
+   if (tm->stat.analyzed <= 1 || tm->printed_lb >= SYM_INFINITY){
+      tm->printed_lb = lb;
+   }else{
+      tm->printed_lb = MAX(lb, tm->printed_lb);
+   }
+}
    return 0;
 }
 

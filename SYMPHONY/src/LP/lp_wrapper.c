@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* The OSI interface in this file was written by Menal Guzelsoy.             */
 /* The OSL interface was written by Ondrej Medek.                            */
@@ -628,7 +628,7 @@ int create_subproblem_u(lp_prob *p)
    rows = lp_data->rows;
    if (p->bc_level){
       bobj = p->bdesc + p->bc_level - 1;
-      p->branch_var = bobj->name;
+      p->branch_var = -1;
       p->branch_dir = bobj->sense;
       status = lp_data->status;
       for (i = 0; i < p->bc_level; i++){
@@ -638,6 +638,7 @@ int create_subproblem_u(lp_prob *p)
 	    j = bobj->name < 0 ? /* base variable : extra variable */
 	       -bobj->name-1 :
 	       bfind(bobj->name, d_uind, desc->uind.size) + bvarnum;
+	    p->branch_var = j;
 	    switch (bobj->sense){
 	     case 'E':
 	       change_lbub(lp_data, j, bobj->rhs, bobj->rhs);

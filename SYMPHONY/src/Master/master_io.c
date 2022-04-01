@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -45,10 +45,10 @@ void usage(void)
 	  "[ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]\n\t"
 	  "[-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]\n\t"
           "[ -u ub ] [ -p procs ] [ -k rule ] [ -v level ] [ -c rule ]\n\t"
-	  "[ -m max ] [ -z n ] [-o tree_out_file]\n\t"
+	  "[ -m max ] [ -z n ] [-o tree_out_file] [-w 0/1]\n\t"
 	  "\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 #ifndef USE_SYM_APPLICATION
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t\n\n",
 	  "-F model: model should be read in from file 'model'",
@@ -69,6 +69,7 @@ void usage(void)
 	  "-q 0/1: whether or not to tighten root bounds",
 	  "-r 0/1: whether or not to do reduced cost tightening",
 	  "-j 0/1: whether or not to generate cgl cuts",
+	  "-w 0/1: whether or not to use hot starting in strong branching ",
 	  "-e n: set pre-processing level to 'n'",
 	  "-i iters: allow a max of 'iters' iterations in presolve",
 	  "-t time: set wallclock time limit to 'time'",
@@ -574,8 +575,9 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-	       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
-		  cp_par->verbosity = env->par.verbosity = tmpi;
+	       prep_par->verbosity = tm_par->verbosity = lp_par->verbosity =
+               cg_par->verbosity = cp_par->verbosity = env->par.verbosity =
+               tmpi;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
@@ -723,6 +725,19 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
 	 }
 	 break;
+       case 'w':
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       lp_par->use_hot_starts = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;
        default:
 	 if (c < 'A'){
 	    printf("Warning: Ignoring unrecognized command-line switch -%c\n",
@@ -837,12 +852,14 @@ void print_statistics(node_times *tim, problem_stat *stat,
       printf("  Separation                %.3f\n", tim->separation); 
       printf("  Primal Heuristics         %.3f\n", tim->primal_heur); 
       printf("  Communication             %.3f\n", tim->communication);
-#ifndef COMPILE_IN_LP
       printf("=================== Parallel Overhead ======================\n");
       printf("  Communication         %.3f\n", tim->communication);
       printf("  Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
+#ifndef COMPILE_IN_LP
       printf("  Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
+#endif
       printf("  Ramp Down Time        %.3f\n", tim->ramp_down_time);
+#ifndef COMPILE_IN_LP
       printf("  Idle Time (Node Pack) %.3f\n", tim->start_node);
       printf("  Idle Time (Nodes)     %.3f\n", tim->idle_node);
       printf("  Idle Time (Names)     %.3f\n", tim->idle_names);

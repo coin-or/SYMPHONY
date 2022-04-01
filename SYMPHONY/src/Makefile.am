@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2015 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2019 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -386,7 +386,7 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 	libSymAppl_tm_cp.la libSymAppl_tm_lp_cg.la libSymAppl_tm_lp_cg_cp.la \
 	libSymAppl_m_tm.la libSymAppl_m_tm_lp.la libSymAppl_m_tm_cp.la \
 	libSymAppl_m_tm_lp_cg.la libSymAppl_m_tm_lp_cg_cp.la \
-	libSymAppl_cp.la libSym_m.la libSymAppl_m.la libSymApplStubs.la
+	libSymAppl_cp.la libSym_m.la libSymApplStubs.la libSymAppl_m.la 
 #$(WHATTOMAKELIBS) $(WHATTOMAKEBINS)
 #if !SYM_PARALLEL
 

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -775,78 +775,13 @@ int process_own_messages_u(sym_environment *env, int msgtag)
 
 int free_master_u(sym_environment *env)
 {
-   int i;
-   MIPdesc *tmp;
-   
 #ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_free_master(&env->user) );
 #endif
-   FREE(env->best_sol.xind);
-   FREE(env->best_sol.xval);
-   
-   if (tmp = env->mip){
-      free_mip_desc(env->mip);
-      FREE(env->mip);
-   }
 
-   if(env->prep_mip && env->prep_mip != tmp){
-      free_mip_desc(env->prep_mip);
-      FREE(env->prep_mip);
-   }else{ //We made a copy, so don't free it again
-      env->prep_mip = NULL;
-   }
-   
-   if (env->rootdesc){
-      FREE(env->rootdesc->desc);
-      FREE(env->rootdesc->uind.list);
-      FREE(env->rootdesc->not_fixed.list);
-      FREE(env->rootdesc->cutind.list);
-      FREE(env->rootdesc);
-   }
-
-   if (env->base){
-      FREE(env->base->userind);
-      FREE(env->base);
-   }
-
-#ifdef COMPILE_IN_TM
-   if (env->warm_start){
-      free_subtree(env->warm_start->rootnode);
-      if(env->warm_start->best_sol.has_sol){
-	 FREE(env->warm_start->best_sol.xind);
-	 FREE(env->warm_start->best_sol.xval);
-      }
-      if (env->warm_start->cuts){
-	 for (i = env->warm_start->cut_num - 1; i >= 0; i--){
-	    if (env->warm_start->cuts[i]){
-	       FREE(env->warm_start->cuts[i]->coef);
-	    }
-	    FREE(env->warm_start->cuts[i]);
-	 }
-      }
-
-      FREE(env->warm_start->cuts);
-      FREE(env->warm_start);
-   }
-#ifdef COMPILE_IN_CP
-   if (env->cp){
-      for (i = 0; i < env->par.tm_par.max_cp_num; i++){
-	 env->cp[i]->msgtag = YOU_CAN_DIE;
-	 cp_close(env->cp[i]);
-      }
-      FREE(env->cp);
-   }
-#endif
-#ifdef COMPILE_IN_LP
-   if (env->sp){
-      sp_free_sp(env->sp);
-      FREE(env->sp);
-   }
-#endif
-#endif
+   free_master(env);
    
    return(FUNCTION_TERMINATED_NORMALLY);   
 }
 
 /*===========================================================================*/
-

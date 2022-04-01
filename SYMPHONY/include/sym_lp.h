@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -197,7 +197,7 @@ int lp_initialize PROTO((lp_prob *p, int master_tid));
 int process_chain PROTO((lp_prob *p));
 int fathom_branch PROTO((lp_prob *p));
 int check_bounds PROTO((lp_prob *p, int *termcode));
-int fathom PROTO((lp_prob *p, int primal_feasible));
+int fathom PROTO((lp_prob *p, int primal_feasible, int time_limit_reached));
 int repricing PROTO((lp_prob *p));
 int bfind PROTO((int key, int *table, int size));
 int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx));

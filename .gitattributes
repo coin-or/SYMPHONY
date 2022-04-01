@@ -1,7 +1,9 @@
 * text=auto !eol
+.coin-or/projDesc.xml -text
 /.travis.yml -text
 /AUTHORS -text
 /Dependencies -text
+/INSTALL.md -text
 /LICENSE -text
 /Makefile.am -text
 /Makefile.in -text

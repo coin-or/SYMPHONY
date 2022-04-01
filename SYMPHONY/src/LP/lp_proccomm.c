@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -518,6 +518,15 @@ void send_node_desc(lp_prob *p, int node_type)
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;   
+#ifdef DO_TESTS
+   if (n->bc_index && (n->lower_bound < p->tm->lb - .001 ||
+                       n->lower_bound < n->parent->lower_bound - .001)){
+      printf("#####Warning: lower bound decrease detected\n");
+      printf("     From parent: %f\n", n->parent->lower_bound - n->lower_bound);
+      printf("     From global: %f\n", p->tm->lb - n->lower_bound);
+   }
+#endif
+
    p->tm->stat.analyzed++;
    
    if (p->bc_level > 0) {
@@ -691,8 +700,15 @@ void send_node_desc(lp_prob *p, int node_type)
 
    if ((!repricing || n->node_status != NODE_STATUS__PRUNED)
        && node_type != INFEASIBLE_PRUNED){ //Anahita
-
       n->lower_bound = p->objval;
+#ifdef DO_TESTS
+      if (n->bc_index && (n->lower_bound < p->tm->lb - .001 ||
+                          n->lower_bound < n->parent->lower_bound - .001)){
+         printf("#####Warning: lower bound decrease detected\n");
+         printf("     From parent: %f\n", n->parent->lower_bound - n->lower_bound);
+         printf("     From global: %f\n", p->tm->lb - n->lower_bound);
+      }
+#endif
 
       new_lp_desc = create_explicit_node_desc(p);
       
@@ -1627,6 +1643,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 	 }
       }while (! r_bufid);
       receive_char_array(&dive, 1);
+      receive_int_array(keep, 1);
       /* get the new nodenum (and the index of the branching cut if unknown)
        * if we dive */
       p->comp_times.idle_diving += wall_clock(NULL) - start;

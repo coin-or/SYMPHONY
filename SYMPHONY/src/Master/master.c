@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -67,7 +67,7 @@ void sym_version(void)
 {
    printf("\n");
    printf("==  Welcome to the SYMPHONY MILP Solver \n");
-   printf("==  Copyright 2000-2015 Ted Ralphs and others \n");
+   printf("==  Copyright 2000-2019 Ted Ralphs and others \n");
    printf("==  All Rights Reserved. \n");
    printf("==  Distributed under the Eclipse Public License 1.0 \n");
    if (strcmp(SYMPHONY_VERSION, "trunk")){
@@ -180,7 +180,7 @@ int sym_reset_environment(sym_environment *env)
    
    int obj_sense = env->mip->obj_sense;
    
-   CALL_WRAPPER_FUNCTION( free_master_u(env) );
+   free_master(env);
 
 #if (!defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
     !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)) && defined(__PVM__)
@@ -218,7 +218,7 @@ int sym_set_defaults(sym_environment *env)
    /************************* Global defaults ********************************/
    env->ub = 0;
    env->has_ub = FALSE;
-   env->lb = -MAXDOUBLE;
+   env->lb = -SYM_INFINITY;
    env->termcode = TM_NO_PROBLEM;
    env->par.verbosity = 0;
    env->par.random_seed = 17;
@@ -858,7 +858,7 @@ int sym_solve(sym_environment *env)
       if (!env->par.tm_par.rs_mode_enabled){
 #ifdef _OPENMP
 	 env->par.tm_par.max_active_nodes = omp_get_num_procs();
-	 PRINT(env->par.verbosity, -1,
+	 PRINT(env->par.verbosity, 0,
 	       ("Automatically setting number of threads to %d\n\n",
 		env->par.tm_par.max_active_nodes));
 #else

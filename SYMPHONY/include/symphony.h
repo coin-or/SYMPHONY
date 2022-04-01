@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2005-2015 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2005-2019 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -188,6 +188,11 @@ typedef struct WARM_START_DESC warm_start_desc;
 typedef struct SYM_ENVIRONMENT sym_environment;
 typedef struct CUT_POOL cut_pool;
 
+#ifdef __cplusplus
+extern "C" // Export C names when in C
+{
+#endif
+   
 /*===========================================================================*/
 /*===================== Interface functions (master.c) ======================*/
 /*===========================================================================*/
@@ -337,5 +342,8 @@ sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
 int sym_test PROTO((sym_environment *env, int argc, char **argv,
 		    int *test_status));
-  
+#ifdef __cplusplus
+} // end extern "C"
+#endif
+
 #endif
