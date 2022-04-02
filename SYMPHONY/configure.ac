@@ -86,14 +86,18 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils osi], [SymphonyLib])
-if test $coin_has_coindepend != yes ; then
-  AC_MSG_ERROR([Required package CoinUtils or Osi not available.])
+AC_COIN_CHECK_PACKAGE(CoinUtils, [coinutils], [SymphonyLib])
+if test $coin_has_coinutils != yes ; then
+  AC_MSG_ERROR([Required package CoinUtils not available.])
+fi
+AC_COIN_CHECK_PACKAGE(Osi, [osi], [SymphonyLib])
+if test $coin_has_osi != yes ; then
+  AC_MSG_ERROR([Required package Osi not available.])
 fi
 
-AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp],  [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(DyLP, [osi-dylp], [SymphonyLib])
-AC_COIN_CHECK_PACKAGE(Vol,  [osi-vol],  [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp clp],  [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(DyLP, [osi-dylp dylp], [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Vol,  [osi-vol vol],  [SymphonyLib])
 AC_COIN_CHECK_PACKAGE(Cgl,  [cgl],      [SymphonyLib])
 
 AC_COIN_CHECK_PACKAGE(OsiTests, [osi-unittests])
