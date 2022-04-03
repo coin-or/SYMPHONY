@@ -962,7 +962,8 @@ int start_node(tm_prob *tm, int thread_num)
 	     best_node->node_status = NODE_STATUS__PRUNED;
 	     best_node->feasibility_status = OVER_UB_PRUNED;
 
-	     if(best_node->parent){
+	     if(tm->br_inf_down != NULL && tm->br_inf_up != NULL &&
+                best_node->parent){
 	       for(int i = 0; i < best_node->parent->bobj.child_num; i++){
 		 if(best_node->parent->children[i] == best_node){
 		   if(best_node->parent->bobj.sense[i] == 'L'){

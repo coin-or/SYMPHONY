@@ -48,7 +48,8 @@ int resolve_node(sym_environment *env, bc_node *node)
    bc_node **path, *n;
    int level = node->bc_level;
 
-   int *matbeg = 0, *matind= 0, size, nzcnt = 0, return_value, iterd = 0;
+   int *matbeg = 0, *matind= 0, size, nzcnt = 0, total_nzcnt = 0;
+   int return_value, iterd = 0;
    double *matval = 0, colsol;
    int i, j = 0, cnt = 0, *xind = 0;
    double *xval = 0, *rhs = 0, lpetol = 9.9999999999999995e-07;
@@ -362,6 +363,8 @@ int resolve_node(sym_environment *env, bc_node *node)
    desc = new_desc;
 
    if (desc->cutind.size > 0){
+      lp_data->tmp.c = (char*) calloc(lp_data->m, CSIZE);
+      lp_data->tmp.d = (double*) calloc(lp_data->m, DSIZE);
       size = desc->cutind.size;
       sense  = (char*) malloc(size*CSIZE);
       rhs = (double*) malloc(size*DSIZE);
@@ -373,15 +376,16 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    if (i == desc->cutind.list[j]){
 	       cut = env->warm_start->cuts[i];
 	       nzcnt = ((int *) (cut->coef))[0];
-	       sense[j] = cut->sense;
+               total_nzcnt += nzcnt;
+               sense[j] = cut->sense;
 	       rhs[j] = cut->rhs;
 	       matbeg[j+1] = matbeg[j] + nzcnt;
 	    }
 	 }
       }
 
-      matind = (int *) malloc(nzcnt*ISIZE);
-      matval = (double *) malloc(nzcnt*DSIZE);
+      matind = (int *) malloc(total_nzcnt*ISIZE);
+      matval = (double *) malloc(total_nzcnt*DSIZE);
 
       for (i = 0; i<env->warm_start->cut_num; i++){
 	 for(j=0; j<desc->cutind.size; j++){
@@ -396,8 +400,7 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    }
 	 }
       }
-      nzcnt = matbeg[j];
-      add_rows(lp_data, size, nzcnt, rhs, sense, matbeg, matind, matval);
+      add_rows(lp_data, size, total_nzcnt, rhs, sense, matbeg, matind, matval);
    }
 
    /*----------------------------------------------------------------------- */
@@ -4527,7 +4530,7 @@ double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip, branch_desc *bpath
 
    //change the rhs!
 
-   //FIXME! cange_rhs needs lp_data->tmp.c and lp_data->tmp.d???
+   //FIXME! change_rhs needs lp_data->tmp.c and lp_data->tmp.d???
    
    lp_data->tmp.c = (char*) calloc(mip->m, CSIZE);
    lp_data->tmp.d = (double*) calloc(mip->m, DSIZE);
