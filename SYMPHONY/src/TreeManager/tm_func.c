@@ -1383,7 +1383,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
    int np_cp = 0, np_sp = 0;
    int dive = DO_NOT_DIVE, i;
    bc_node *child;
-   int child_num;
+   int child_num, node_status;
 #ifdef TRACE_PATH
    int optimal_path = -1;
 #endif
@@ -1507,7 +1507,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 }
          
-	 child->node_status = NODE_STATUS__PRUNED;
+	 node_status = child->node_status = NODE_STATUS__PRUNED;
          
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
@@ -1562,7 +1562,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    }
          }
       }else{
-	 child->node_status = NODE_STATUS__CANDIDATE;
+	 node_status = child->node_status = NODE_STATUS__CANDIDATE;
 	 /* child->lp = child->cg = 0;   zeroed out by calloc */
 	 child->cp = node->cp;
          if (feasible[i]){
@@ -1577,7 +1577,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
          }
       }
       
-      if (child->node_status == NODE_STATUS__CANDIDATE ||
+      if (node_status == NODE_STATUS__CANDIDATE ||
           tm->par.keep_description_of_pruned != DISCARD){
          desc = &child->desc;
          
@@ -1627,7 +1627,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #endif
       }
       
-      if (child->node_status == NODE_STATUS__PRUNED){
+      if (node_status == NODE_STATUS__PRUNED){
          if (--child_num == 0){
             *keep = -1;
             return(DO_NOT_DIVE);
