@@ -1625,9 +1625,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
             bobj->dj[i] = 0;
          }      
 #endif
-      }
-      
-      if (node_status == NODE_STATUS__PRUNED){
+      } else if (node_status == NODE_STATUS__PRUNED){
          if (--child_num == 0){
             *keep = -1;
             return(DO_NOT_DIVE);
