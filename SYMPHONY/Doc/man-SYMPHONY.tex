@@ -85,7 +85,7 @@ according to default settings.
 
 \subsection{Unix}
 
-First, download, configure, and compile SYMPHONY as described in Section
+First, download and build SYMPHONY as described in Section
 \ref{build_appl_unix}. This will generate the required library and makefiles
 for each application. After this, typing \code{make} in the
 \code{SYMPHONY/Applications/USER/} subdirectory should successfully build the
@@ -104,7 +104,7 @@ MSVisualStudio \bs v8} directory.
 \subsubsection{Using the MSDEV Utility}
 \begin{itemize}
 \item Open a command line terminal and type
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  devenv user.sln /Build "Win32|Release"
 \end{verbatim}
@@ -114,13 +114,13 @@ the executable \code{user} and the SYMPHONY library needed for linking with
 applications.
 
 \item To test the executable, type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  Debug\user.exe -F ..\..\sample.user
 \end{verbatim}
 }
 \item If USER source files are modified, type 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
  devenv user.sln /make all /rebuild
 \end{verbatim}
@@ -343,7 +343,7 @@ serially even if you eventually intend to run in a fully distributed
 environment. This does make the coding marginally more complex, but
 believe me, it's worth the effort. The vast majority of your code will
 be the same for either case. Make sure to use the configuration flag to
-\code{--enable-debug} while configuring (see Section \ref{configuring}). 
+\code{--enable-debug} while building (see Section \ref{building_from_source}). 
 
 \subsection{Debugging with PVM}
 \label{debugging-PVM}
@@ -400,7 +400,7 @@ known feasible solution. Then for each cut passed into the function, the user
 can check whether the cut is satisfied by the feasible solution. If not, then
 there is a problem! Of course, the problem could also be with the checking
 routine. To enable this functionality, the user must configure SYMPHONY with
-the flag \code{--enable-cut-check} (see Section \ref{configuring}). 
+the flag \code{--enable-cut-check} (see Section \ref{building_from_source}). 
 
 Tracing the optimal path can alert the user when the subproblem which admits a
 particular known feasible solution (at least according to the branching
@@ -414,7 +414,7 @@ time the subproblem which admits this feasible solution is branched on, the
 branch that continues to admit the solution is marked. When one of these
 marked subproblems is pruned, the user is notified. To enable this
 functionality, the user must configure SYMPHONY with the flag
-\code{--enable-trace-path} (see Section \ref{configuring}). 
+\code{--enable-trace-path} (see Section \ref{building_from_source}). 
 
 
 \subsection{Using the Interactive Graph Drawing Software}
@@ -455,7 +455,7 @@ current LP relaxation to a file in MPS format. This file can then be read into
 the LP solver interactively or examined by hand for errors.  Many times, CPLEX
 gives much more explicit error messages interactively than through the
 callable library. The form of the function is
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 void write_mps(LPdata *lp_data, char *fname)
 \end{verbatim}
@@ -495,7 +495,7 @@ use the template structure \code{USER\_PROBLEM} in the file
 need the number of nodes and the cost matrix. In addition, we also need a way
 of assigning an index to each possible assignment. Here is the data
 structure: 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 typedef struct USER_PROBLEM{
    int              numnodes;
@@ -526,7 +526,7 @@ read the file in with the \code{match\_read\_data()} routine in
 %FIXME: Here, we don't need to pass in the user data structure...just return
 %it. We also don't need to pass in the sym_enviroment 
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 int match_read_data(user_problem *prob, char *infile)
 {
@@ -563,7 +563,7 @@ description of each subproblem dynamically using the
 \code{user\_create\_subproblem()} callback (see \code{user\_lp.c}), but
 this is more complicated and unnecessary here.
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 int match_load_problem(sym_environment *env, user_problem *prob){
    
@@ -632,7 +632,7 @@ a user data structure, read in the data, create the corresponding IP,
 load it to the environment and ask SYMPHONY to solve it 
 (\code{CALL\_FUNCTION} is just a macro to take care of the return values):  
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 int main(int argc, char **argv)
 {
@@ -660,7 +660,7 @@ int main(int argc, char **argv)
 OK, that's it. That defines an integer program, and if you compile and
 optimize it, the rest of the system will come together to solve this problem.
 Here is a data file to use:
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 6
 0 1 1 3 3 3
@@ -678,7 +678,7 @@ back from variables to the nodes. That was the use of the \code{node1} and
 \code{user\_display\_solution()} in \code{user\_master.c} to print 
 out the solution:
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
                           double *values, double objval)
@@ -709,7 +709,7 @@ value 1 among them (such a set defines a cut that requires at least one edge
 out of any odd set). We can do this by brute force checking of triples, as
 follows:
 
-{\color{Brown}
+{\color{brown}
 \begin{verbatim}
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
                    int index, double objval, int *indices, double *values,
