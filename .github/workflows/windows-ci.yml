@@ -5,6 +5,7 @@ on:
     branches:
       - 'master'
       - 'stable/*'
+      - WS
   pull_request:
     branches:
       - '**'
