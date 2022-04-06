@@ -26,7 +26,7 @@ transportation services, and air transportation.
 
 SYMPHONY is written in C and is released as open source under the [Eclipse Public License 2.0](http://www.opensource.org/licenses/EPL-2.0).
 
-It is distributed under the auspices of the [COIN-OR Foundation](https://www.coin-or.org)
+It is distributed under the auspices of the [COIN-OR Foundation](https://www.coin-or.org).
 
 The SYMPHONY development site is https://github.com/coin-or/SYMPHONY.
 
@@ -76,8 +76,8 @@ If binaries are not available for your platform for the latest version and you w
 Source code can be obtained either by
 
  * Downloading a snapshot of the source code for the latest release version of SYMPHONY from the
- [releases](https://github.com/coin-or/SYMPHONY/releases) page.
- * Cloning this repository from [Github](https://github.com/coin-or/SYMPHONY) or 
+ [releases](https://github.com/coin-or/SYMPHONY/releases) page,
+ * Cloning this repository from [Github](https://github.com/coin-or/SYMPHONY), or 
  * Using the [coinbrew](https://github.com/coin-or/coinbrew) script to get the project and all dependencies (recommended, see below).   
 
 ### Dependencies
@@ -93,11 +93,12 @@ OS by default).
 
 ## BUILDING from source
 
-The quick start assumes you are in a bash shell. 
+These quick start instructions assumes you are in a bash shell. 
 
 ### Using `coinbrew`
 
-To build SYMPHONY from source, obtain the `coinbrew` script, do
+To download and build SYMPHONY from source, execute the 
+following on the command line. 
 ```
 wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
 chmod u+x coinbrew
@@ -226,6 +227,71 @@ separate packages and can be downloaded from http://www.branchandcut.org.
 There is a white paper that guides the user through the development of the
 matching solver.
 
+## CURRENT TESTING STATUS
+
+SYMPHONY can be used in a very large number of possible configurations and
+we simply aren't able to test them all. Below is a rough idea of the testing
+status of various configurations to date. If you need a certain configuration,
+I would be happy to help you get it running. Please let me know.
+
+## LP INTERFACES
+
+**The native interfaces for OSL and CPLEX have been deprecated**
+**Only LP solvers with OSI interfaces are supported**
+
+Well tested: CPLEX, CLP
+
+Well tested, but have some stability or other issues: GLPK
+
+Compiled, but not well tested: SPX
+
+## TESTED CONFIGURATIONS
+
+### SEQUENTIAL
+
+Sequential configurations are now automatically built and tested on Linux, OS X, and Windows using Github Actions (see above for status).
+
+### SHARED MEMORY PARLLEL (OpenMP)
+
+Builds and passes unit test with gcc and CLP on LINUX.
+
+### DISTRIBUTED MEMORY PARALLEL (PVM)
+
+Known configurations that build and pass unit test
+
+- gcc on LINUX with PVM 3.4
+
+### APPLICATIONS
+
+- SYMPHONY (used as a generic MILP solver): Well tested.
+
+- MATCH (matching): Tested, but not very extensively.
+
+- MPP (mixed postman problem): Tested, but not very extensively.
+
+- VRP (vehicle routing problem): Well tested.
+
+- CNRP (capacitates network routing problem): Well tested.
+
+- MCKP (multi criteria knapsack problem): Well tested.
+
+- SPP (set partitioning problem): Tested, but not very extensively.
+
+- SPP+CUTS (set partitioning problem with cutting planes): Tested, but not very 
+extensively.
+
+### CUT GENERATORS
+
+Cut generators are supplied by the Cut Generation Library (CGL). The cut
+generators that are turned on by default have been well tested. Two cut
+generators that are part ofthe CGL are turned off by default because of known
+issues. These are lift and project cuts and the simple rounding cuts. The
+generator for Gomory cuts works well, but has somenumerical issues. We found a
+few cases where the optimal solution was not found when using the Gomory cut
+generator, especially in combination with CPLEX. If the solver is not
+performing as it should, try turning off some of the cut generators to see if
+that fixes the problem. 
+
 ## ADDITIONAL DOCUMENTATION
 
 If you have downloaded a source distribution, LaTex source for the full
@@ -242,9 +308,17 @@ http://coin-or.github.io/SYMPHONY/man-5.6/
 
 ## Project Links
 
+ * [Code of Conduct](https://www.coin-or.org/code-of-conduct/)
  * [COIN-OR Web Site](http://www.coin-or.org/)
  * [Discussion formum](https://github.com/coin-or/SYMPHONY/discussions)
  * [Report a bug](https://github.com/coin-or/SYMPHONY/issues/new)
+
+### AUTHORS
+
+SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and Laci Ladanyi
+(ladanyi@us.ibm.com). Menal Guzelsoy (menal.guzelsoy@gmail.com) and Ashutosh
+Mahajan (amahajan@iitb.ac.in.edu) have been instrumental in development since
+version 5.0.
 
 ## ACKNOWLEDGEMENT
 
@@ -252,4 +326,10 @@ SYMPHONY was developed with support from
   * National Science Foundation grants CMMI-1435453, CMMI-0728011, DMI-0522796,
     DMI-0534862, DMS-9527124, and CMMI-1130914.
   * Texas ATP Grant 97-3604-010
+  * Cornell University
+  * Lehigh University
+  * Zuse Institute Berlin
+  * Research Campus Modal 'Mathematical Optimization and Data Analysis 
+Laboratories' funded by the German Federal Ministry of Education and Research
+(BMBF Grant 05M14ZAM) and by the DFG SFB/Transregio 154
 
