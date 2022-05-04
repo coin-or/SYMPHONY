@@ -35,7 +35,7 @@ computational biology, wireless telecommunications, supply chain management,
 transportation services, and air transportation. 
 "
 
-make_build_info
+make_build_info no_conda
 
 echo "## USING SYMPHONY
 
