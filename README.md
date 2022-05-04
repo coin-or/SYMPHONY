@@ -2,6 +2,11 @@
 
 [![A COIN-OR Project](https://coin-or.github.io/coin-or-badge.png)](https://www.coin-or.org)
 
+Projects such as this one are maintained by a small group of volunteers under
+the auspices of the non-profit [COIN-OR Foundation](https://www.coin-or.org)
+and we need your help! Please consider [sponsoring our
+activities](https://github.com/sponsors/coin-or).
+
 [![Latest Release](https://img.shields.io/github/v/release/coin-or/SYMPHONY?sort=semver)](https://github.com/coin-or/SYMPHONY/releases)
 
 _This file is auto-generated from [config.yml](.coin-or/config.yml) using the 
@@ -62,14 +67,38 @@ releases in Github
 are archived as part of SYMPHONY
 [here](https://www.coin-or.org/download/binary/SYMPHONY).
 
- * *Linux*: On Debian/Ubuntu, SYMPHONY is available in the package `coinor-symphony` and can be installed with apt. On Fedora, SYMPHONY is available in the package `coin-or-SYMPHONY`.
+ * *Linux* (see https://repology.org/project/coin-or-symphony/versions for a complete listing): 
+   * arch:
+     ```
+     $ sudo pacman -S  coin-or-symphony
+     ```
+   * Debian/Ubuntu:
+     ```
+     $ sudo apt-get install  coinor-symphony coinor-libsymphony-dev
+     ```
+   * Fedora/Redhat/CentOS:
+     ```
+     $ sudo yum install  coin-or-SYMPHONY coin-or-SYMPHONY-devel
+     ```
+   * freebsd:
+     ```
+     $ sudo pkg install math/symphony
+     ```
+   * linuxbrew:
+     ```
+     $ brew install symphony
+     ```
  * *Windows*: The easiest way to get SYMPHONY on Windows is to download an archive as described above.
  * *Mac OS X*: The easiest way to get SYMPHONY on Mac OS X is through [Homebrew](https://brew.sh).
-   * `brew tap coin-or-tools/coinor`
-   * `brew install coin-or-tools/coinor/symphony`
+     ```
+     $ brew tap coin-or-tools/coinor
+     $ brew install coin-or-tools/coinor/symphony
+     ```
 
-Due to license incompatibilities, pre-compiled binaries lack some functionality.
-If binaries are not available for your platform for the latest version and you would like to request them to be built and posted, feel free to let us know on the mailing list.
+Due to license incompatibilities, pre-compiled binaries lack some 
+functionality. If binaries are not available for your platform for the latest 
+version and you would like to request them to be built and posted, feel free 
+to let us know on the mailing list. 
 
 ### Source
 
