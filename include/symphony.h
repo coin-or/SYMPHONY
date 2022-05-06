@@ -186,6 +186,7 @@
 typedef struct MIPDESC MIPdesc;
 typedef struct WARM_START_DESC warm_start_desc;
 typedef struct SYM_ENVIRONMENT sym_environment;
+typedef struct CUT_POOL cut_pool;
 
 #include "SymConfig.h"
 
@@ -220,6 +221,7 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env);
 SYMPHONYLIB_EXPORT int sym_mc_solve(sym_environment *env);
 SYMPHONYLIB_EXPORT int sym_create_permanent_cut_pools(sym_environment *env,
                                                           int *cp_num); 
+SYMPHONYLIB_EXPORT cut_pool **sym_get_permanent_cut_pools(sym_environment *env);
 SYMPHONYLIB_EXPORT int sym_explicit_load_problem(sym_environment
                                      *env, int numcols, 
 				     int numrows, int *start, int *index, 
@@ -344,9 +346,13 @@ SYMPHONYLIB_EXPORT int sym_get_dbl_param(sym_environment *env,
 SYMPHONYLIB_EXPORT int sym_get_str_param(sym_environment *env,
                                              const char *key, char **value);
 SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env,
-                                                  int cnt, int *new_rhs_ind,
-                                                  double *new_rhs_val,
-                                                  double *lb_for_new_rhs);
+                                              int rhs_cnt, int *new_rhs_ind,
+                                              double *new_rhs_val,
+                                              int lb_cnt, int *new_lb_ind,
+                                              double *new_lb_val,
+                                              int ub_cnt, int *new_ub_ind,
+                                              double *new_ub_val,
+                                              double *lb_for_new_rhs);
 SYMPHONYLIB_EXPORT int sym_get_ub_for_new_rhs(sym_environment *env,
                                                   int cnt, int *new_rhs_ind,
                                                   double *new_rhs_val,

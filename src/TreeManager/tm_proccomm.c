@@ -632,12 +632,28 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       if (n->sol){
 	 FREE(n->sol);
 	 FREE(n->duals);
+	 FREE(n->rays); //Anahita
+	 FREE(n->dj); //Ted
       }
       receive_int_array(&n->sol_size, 1);
       n->sol = (double *) malloc (DSIZE * n->sol_size);
       receive_dbl_array(n->sol, n->sol_size);
-      n->duals = (double *) malloc (DSIZE * tm->bcutnum);
-      receive_dbl_array(n->duals, tm->bcutnum);
+      if (tm->par.sensitivity_rhs){
+	 int have_ray;
+	 n->duals = (double *) malloc (DSIZE * tm->bcutnum);
+	 receive_dbl_array(n->duals, tm->bcutnum);
+	 //Anahita
+	 receive_int_array(&have_ray, 1);
+	 if (have_ray){
+	    n->rays = (double *) malloc (DSIZE * tm->bcutnum); //Anahita
+	    receive_dbl_array(n->rays, tm->bcutnum);
+	 }
+      }
+      if (tm->par.sensitivity_bounds){
+	 //solution is not stored sparsely here, so sol_size is the # of vars
+	 n->dj = (double *) malloc (DSIZE * n->sol_size); //Ted
+	 receive_dbl_array(n->dj, n->sol_size);
+      }
    }
 #endif
    receive_char_array(&repricing, 1);

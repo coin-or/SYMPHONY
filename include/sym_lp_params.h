@@ -58,6 +58,8 @@ typedef struct CGL_PARAMS{
    int               generate_cgl_lift_and_project_cuts_freq;
    int               generate_cgl_landp_cuts_freq;
 
+   int               gomory_globally_valid;
+
    int               gomory_generated_in_root;
    int               redsplit_generated_in_root;
    int               knapsack_generated_in_root;
@@ -120,6 +122,13 @@ typedef struct LP_PARAMS{
     */
    int               should_warmstart_chain;
 
+   /* 
+    * should we do initial_solve() or dual_simplex() in each iteration while
+    * processing a node. This option is mainly because some data in Clp
+    * seems to get corrupted when warm starting repeatedly. This option
+    * may be help, particularly when using the sensitivity analysis functions.
+    */
+   int               should_warmstart_node;
 
    int               try_to_recover_from_error;
    /* ZERO_ONE_PROBLEM / INTEGER_PROBLEM / MIXED_INTEGER_PROBLEM */
@@ -241,7 +250,8 @@ typedef struct LP_PARAMS{
    double            mc_tau;   /* Weight on second objective */
 
    int               sensitivity_analysis;
-
+   int               sensitivity_bounds;
+   int               sensitivity_rhs;
 
    int               disable_obj; 
    int               no_impr_in_obj; 
@@ -333,6 +343,10 @@ typedef struct LP_PARAMS{
 
    /* to avoid nested for loops, check if userind's are in order */
    int               is_userind_in_order;
+
+   int               cuts_strong_branch; //Anahita
+
+   int               is_recourse_prob; //Anahita
 }lp_params;
 
 #endif

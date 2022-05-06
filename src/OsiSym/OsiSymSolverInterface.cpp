@@ -105,12 +105,33 @@ void OsiSymSolverInterface::resolve()
 
 /*===========================================================================*/
 /*===========================================================================*/
+//Anahita
+double** OsiSymSolverInterface::getDualPruned(double** dual_pieces,
+					      int MAX_ALLOWABLE_NUM_PIECES)
+{
+   int num_pieces;
+   if (!sym_get_dual_pruned(env_, dual_pieces, &num_pieces, 
+			    MAX_ALLOWABLE_NUM_PIECES)){
+      return (dual_pieces);
+   } else {
+      return (NULL);
+   }
+}
 
-double OsiSymSolverInterface::getLbForNewRhs(int cnt, int *index, 
-						  double * value)
+/*===========================================================================*/
+/*===========================================================================*/
+
+double OsiSymSolverInterface::getLbForNewRhs(int rhs_cnt, 
+					     int *rhs_ind, double *rhs_val,
+					     int lb_cnt, 
+					     int *lb_ind, double *lb_val,
+					     int ub_cnt, 
+					     int *ub_ind, double *ub_val)
 {
    double newBound;
-   if (!sym_get_lb_for_new_rhs(env_, cnt, index, value, &newBound)){
+   if (!sym_get_lb_for_new_rhs(env_, rhs_cnt, rhs_ind, rhs_val,
+			       lb_cnt, lb_ind, lb_val, ub_cnt, ub_ind, ub_val,
+			       &newBound)){
       return (newBound);
    } else {
       return (-sym_get_infinity());
@@ -1517,10 +1538,8 @@ const double * OsiSymSolverInterface::getColSolution() const
 
 /*===========================================================================*/
 /*===========================================================================*/
-
-const double * OsiSymSolverInterface::getRowActivity() const
+const double * OsiSymSolverInterface::getRowActivity() const   
 {
-   
    if(!rowact_){
       rowact_ = new double[getNumRows()];
    }
@@ -1556,6 +1575,20 @@ const double * OsiSymSolverInterface::getRowActivity() const
       return (rowact_);
    }
 }
+//old version
+
+// {
+   
+//    if(!rowact_){
+//       rowact_ = new double[getNumRows()];
+//    }
+
+//    if(!sym_get_row_activity(env_, rowact_)){
+//       return (rowact_);
+//    } else {
+//       return (0);
+//    }
+// }
 
 /*===========================================================================*/
 /*===========================================================================*/

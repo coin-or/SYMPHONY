@@ -69,9 +69,14 @@ public:
    /// Invoke solver's multi-criteria enumeration algorithm
    virtual void multiCriteriaBranchAndBound();
 
+   /// Anahita : get the description of dual pieces from the ws tree.
+   virtual double** getDualPruned(double** dual_pieces,
+				  int MAX_ALLOWABLE_NUM_PIECES);
+
    /// Get a lower bound for the new rhs problem using the warm start tree.
-   virtual double getLbForNewRhs(int cnt, int *index, 
-				 double * value);
+   virtual double getLbForNewRhs(int rhs_cnt, int *rhs_index, double * rhs_val,
+				 int lb_cnt, int *lb_index, double * lb_val,
+				 int ub_cnt, int *ub_index, double * ub_val);
    /// Get an upper bound for the new rhs problem using the warm start tree.
    virtual double getUbForNewRhs(int cnt, int *index, 
 				 double * value);
@@ -347,14 +352,14 @@ public:
       /// Get pointer to array[getNumCols()] of primal variable values
    virtual const double * getColSolution() const;
   
-      /// Get pointer to array[getNumRows()] of dual variable values
-      virtual const double * getRowPrice() const;
-  
-      /// Get a pointer to array[getNumCols()] of reduced costs
-      virtual const double * getReducedCost() const;
-  
-      /** Get pointer to array[getNumRows()] of row activity levels (constraint
-  	matrix times the solution vector). */
+   /// Get pointer to array[getNumRows()] of dual variable values
+   virtual const double * getRowPrice() const;
+   
+   /// Get a pointer to array[getNumCols()] of reduced costs
+   virtual const double * getReducedCost() const;
+   
+   /** Get pointer to array[getNumRows()] of row activity levels (constraint
+       matrix times the solution vector). */
    virtual const double * getRowActivity() const;
   
       /// Get objective function value

@@ -122,7 +122,7 @@ OS by default).
 
 ## BUILDING from source
 
-These quick start instructions assumes you are in a bash shell. 
+These quick start instructions assume you are in a bash shell. 
 
 ### Using `coinbrew`
 

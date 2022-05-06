@@ -302,12 +302,18 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    // tm_par->gap_limit = 0.0;
    tm_par->find_first_feasible = FALSE;
    tm_par->sensitivity_analysis = FALSE;
+   tm_par->sensitivity_bounds = FALSE;
+   tm_par->sensitivity_rhs = FALSE;
    tm_par->rs_mode_enabled = FALSE; 
    tm_par->rs_lp_iter_limit = 1000000;
    tm_par->output_mode = 1;
 
    tm_par->tighten_root_bounds = TRUE;
+
+   tm_par->max_sp_size = 10;
    /************************** lp defaults ***********************************/
+   lp_par->cuts_strong_branch = 0; //Anahita
+   lp_par->is_recourse_prob = 0; //Anahita
    lp_par->verbosity = 0;
    lp_par->debug_lp = FALSE;
    lp_par->granularity = tm_par->granularity;
@@ -318,6 +324,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
    lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
    lp_par->should_warmstart_chain = TRUE; /* see header file for description */
+   lp_par->should_warmstart_node = TRUE; /* see header file for description */
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #ifdef SYM_COMPILE_IN_LP
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
@@ -395,6 +402,8 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->cgl.generate_cgl_rounding_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_landp_cuts = DO_NOT_GENERATE;
+
+   lp_par->cgl.gomory_globally_valid = FALSE;
 
    lp_par->cgl.probing_is_expensive = FALSE;
    lp_par->cgl.probing_root_max_look = 100;
@@ -491,6 +500,8 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
    lp_par->sensitivity_analysis = FALSE;
+   lp_par->sensitivity_bounds = FALSE;
+   lp_par->sensitivity_rhs = FALSE;
    lp_par->use_sos_branching = FALSE;
    lp_par->sos_branching_max_level = 10;
 
@@ -879,7 +890,6 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 
    start_time = sym_wall_clock(NULL);
 
-   double *tmp_sol;
    lp_sol *best_sol = &(env->best_sol);
 
    if(best_sol->has_sol && env->mip->is_modified){
@@ -895,6 +905,18 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 
    termcode = sym_presolve(env);
 
+   //Gomory cuts are globally valid for binary problems
+   int prob_type;
+   if (env->prep_mip){
+      prob_type = env->prep_mip->mip_inf->prob_type;
+   }else{
+      prob_type = env->mip->mip_inf->prob_type;
+   }
+   if (prob_type == BINARY_TYPE || prob_type != BIN_CONT_TYPE ||
+      prob_type == BIN_INT_TYPE){
+      env->par.lp_par.cgl.gomory_globally_valid = TRUE;
+   }
+   
    if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
       termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
       termcode == PREP_OTHER_ERROR){
@@ -1076,7 +1098,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
        * epsilon
        */
       env->par.tm_par.granularity = env->par.lp_par.granularity = 
-         fabs((double)granularity - 1e-7);
+         fabs((double)granularity - 1e-7); //Anahita
    }
    PRINT(env->par.verbosity, 0, ("granularity set at %f\n",
             env->par.tm_par.granularity));
@@ -1131,6 +1153,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 #ifdef SYM_COMPILE_IN_CP
    if (env->cp && env->par.use_permanent_cut_pools){
       tm->cpp = env->cp;
+      tm->par.keep_cut_pools = TRUE;
    }else{
       CALL_WRAPPER_FUNCTION( send_cp_data_u(env, 0) );
    }
@@ -1141,32 +1164,64 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 #endif
 #endif
 
-   // Check stored solution to see if it is still feasible
-
-   if (best_sol->has_sol){
-      tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-      for (i = 0; i < best_sol->xlength; i++){
-	 if (best_sol->xind[i] >= env->mip->n){
-	    //The stored solution has the wrong dimension
-	    //This seems to happen in the Osi unit test
-	    break;
-	 }
-	 tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
-      }
-      if (i == best_sol->xlength){
-	 sym_set_col_solution(env, tmp_sol);
-      }else{
-	 best_sol->has_sol = FALSE;
-	 FREE(best_sol->xind);
-	 FREE(best_sol->xval);
-	 best_sol->xlength = 0;
-      }
-      FREE(tmp_sol);
+#if 0
+   if (!best_sol->has_sol){
+      env->has_ub = FALSE;
+      env->ub = 0.0;
+      
+      env->warm_start->has_ub = env->best_sol.has_sol = 
+	 env->warm_start->best_sol.has_sol = FALSE;
+      env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+      env->warm_start->lb = -MAXDOUBLE;
+      env->warm_start->best_sol.xlength = 0;
+      FREE(env->warm_start->best_sol.xind);
+      FREE(env->warm_start->best_sol.xval);
+   }else {
+      env->has_ub = env->warm_start->has_ub;
+      env->ub = env->warm_start->ub;
+      env->lb = env->warm_start->lb;
    }
+   env->lb = -MAXDOUBLE;
+#endif
    
-   //   memset(&(env->best_sol), 0, sizeof(lp_sol));
-
    if (env->warm_start && env->par.tm_par.warm_start){
+      //check stored solution for feasibility
+      if (env->sp && env->par.prep_par.level <= 2){
+	 double min = SYM_INFINITY;
+	 lp_sol sol;
+	 int min_ind = -1;
+	 for (i = 0; i < env->sp->num_solutions; i++){
+	    sol.xlength = env->sp->solutions[i]->xlength;
+	    sol.xind = env->sp->solutions[i]->xind;
+	    sol.xval = env->sp->solutions[i]->xval;
+	    if (check_solution(env, &sol) > 0){
+	       if ((env->sp->solutions[i]->objval = sol.objval) < min){
+		  min = env->sp->solutions[i]->objval;
+		  min_ind = i;
+	       }
+	    }
+	    if (min < SYM_INFINITY){
+	       double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+	       for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
+		  assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
+		  tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
+		     env->sp->solutions[min_ind]->xval[j];
+	       }
+	       sym_set_col_solution(env, tmp_sol);
+	       FREE(tmp_sol);
+	    }
+	 }
+	 //Transfer ownership to the Tree Manager
+	 tm->sp = env->sp;
+	 env->sp = NULL;
+      }else{
+	 if (best_sol->objval > env->warm_start->best_sol.objval){
+	    FREE(best_sol->xind);
+	    FREE(best_sol->xval);
+	    env->best_sol = env->warm_start->best_sol;
+	    memset(&(env->warm_start->best_sol), 0, sizeof(lp_sol));
+	 }
+      }
       /* Load warm start info */
       tm->rootnode = env->warm_start->rootnode;
       tm->cuts = env->warm_start->cuts;
@@ -1175,34 +1230,54 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
       tm->stat = env->warm_start->stat;
       tm->comp_times = env->warm_start->comp_times;
       tm->lb = env->warm_start->lb;
-      if (env->warm_start->has_ub){
-	 if (env->warm_start->ub < tm->ub || !tm->has_ub){
-	    tm->ub = env->warm_start->ub;
+      if (env->has_ub){
+	 if (env->ub < tm->ub || !tm->has_ub){
+	    tm->ub = env->ub;
 	 }
 	 tm->has_ub = TRUE;
       }
-      if (best_sol->objval > env->warm_start->best_sol.objval){
+      tm->phase = env->warm_start->phase;
+   }else{
+      if (env->warm_start){
+	 /* Otherwise, free what was saved */
+	 free_subtree(env->warm_start->rootnode);
+	 if(env->warm_start->best_sol.xlength){
+	    FREE(env->warm_start->best_sol.xind);
+	    FREE(env->warm_start->best_sol.xval);
+	 }
+	 if (env->warm_start->cuts){
+	    for (i = env->warm_start->cut_num - 1; i >= 0; i--)
+	       if (env->warm_start->cuts[i]){
+		  FREE(env->warm_start->cuts[i]->coef);
+		  FREE(env->warm_start->cuts[i]);
+	       }
+	    FREE(env->warm_start->cuts);
+	 }
+      }
+      if (best_sol->has_sol){
+	 if (env->par.prep_par.level <= 2){
+	    double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+	    for (i = 0; i < best_sol->xlength; i++){
+	       assert(best_sol->xind[i] < env->mip->n);
+	       tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
+	    }
+	    if (i == best_sol->xlength){
+	       sym_set_col_solution(env, tmp_sol);
+	    }else{
+	       best_sol->has_sol = FALSE;
+	    }
+	    FREE(tmp_sol);
+	 }
+      }else{
+	 best_sol->has_sol = FALSE;
+      }
+      if (best_sol->has_sol == FALSE){
+	 best_sol->xlength = 0;
 	 FREE(best_sol->xind);
 	 FREE(best_sol->xval);
-	 env->best_sol = env->warm_start->best_sol;
-      }
-      tm->phase = env->warm_start->phase;
-   }else if (env->warm_start){
-      /* Otherwise, free what was saved */
-      free_subtree(env->warm_start->rootnode);
-      if(env->warm_start->best_sol.xlength){
-	 FREE(env->warm_start->best_sol.xind);
-	 FREE(env->warm_start->best_sol.xval);
-      }
-      if (env->warm_start->cuts){
-	 for (i = env->warm_start->cut_num - 1; i >= 0; i--)
-	    if (env->warm_start->cuts[i]){
-	       FREE(env->warm_start->cuts[i]->coef);
-	       FREE(env->warm_start->cuts[i]);
-	    }
-	 FREE(env->warm_start->cuts);
       }
    }
+ 
    /* Now the tree manager owns everything */
    FREE(env->warm_start);
    
@@ -1383,9 +1458,13 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
     * Solve the problem and receive solutions                         
    \*------------------------------------------------------------------------*/
 #ifdef SYM_COMPILE_IN_LP
-   sp_initialize(tm);
+   if (!tm->sp){
+      sp_initialize(tm);
+   }
 #endif
 
+   //To allow printing of columns header for solution status info
+   tm->stat.print_stats_cnt = 0;
    tm->start_time += start_time;
 
    termcode = solve(tm);
@@ -1464,6 +1543,22 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 		best_sol->xval, DSIZE * best_sol->xlength);	
       }
    }
+
+#ifdef SYM_COMPILE_IN_LP
+   if (env->sp){
+      sp_free_sp(env->sp);
+      FREE(env->sp);
+   }
+   env->sp = tm->sp;
+   if(env->orig_mip){
+      for (i = 0; i < env->sp->num_solutions; i++){
+	 prep_merge_solution(env->orig_mip, env->mip,
+			     &(env->sp->solutions[i]->xlength), 
+			     &(env->sp->solutions[i]->xind),
+			     &(env->sp->solutions[i]->xval));
+	 }
+   }
+#endif
 
    tm->rootnode = NULL;
    tm->cuts = NULL;
@@ -1585,21 +1680,6 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 		       tm->has_ub, tm->sp, tm->par.output_mode);
    }
    temp = termcode;
-#ifdef SYM_COMPILE_IN_LP
-   if (env->sp){
-      sp_free_sp(env->sp);
-      FREE(env->sp);
-   }
-   env->sp = tm->sp;
-   if(env->orig_mip){
-      for (i = 0; i < env->sp->num_solutions; i++){
-	 prep_merge_solution(env->orig_mip, env->mip,
-			     &(env->sp->solutions[i]->xlength), 
-			     &(env->sp->solutions[i]->xind),
-			     &(env->sp->solutions[i]->xval));
-	 }
-   }
-#endif
    
    if(env->par.verbosity >=-1 ) {
 #ifdef SYM_COMPILE_IN_LP
@@ -1688,24 +1768,28 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 	return(sym_solve(env));
       }
       
+#if 0
+      //This doesn't seem to be the right thing, although it's been here for
+      //a long time!
       if(env->mip->change_num){
+
 	 env->has_ub = FALSE;
 	 env->ub = 0.0;
 	 env->lb = -MAXDOUBLE;
 	 
-	 env->warm_start->has_ub = env->best_sol.has_sol = 
-	    env->warm_start->best_sol.has_sol = FALSE;
-	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
-	 env->warm_start->lb = -MAXDOUBLE;
-	 env->warm_start->best_sol.xlength = 0;
-	 FREE(env->warm_start->best_sol.xind);
-	 FREE(env->warm_start->best_sol.xval);
+	 //env->warm_start->has_ub = env->best_sol.has_sol = 
+	 //   env->warm_start->best_sol.has_sol = FALSE;
+	 //env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+	 //env->warm_start->lb = -MAXDOUBLE;
+	 //env->warm_start->best_sol.xlength = 0;
+	 //FREE(env->warm_start->best_sol.xind);
+	 //FREE(env->warm_start->best_sol.xval);
       }else {
 	 env->has_ub = env->warm_start->has_ub;
 	 env->ub = env->warm_start->ub;
 	 env->lb = env->warm_start->lb;
       }
-
+#endif
       if(env->par.multi_criteria){
 	 env->has_ub = env->has_mc_ub;
 	 env->ub = env->mc_ub;
@@ -1715,6 +1799,7 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 	 change_type = env->mip->change_type[i];
 	 if(change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED || 
 	    change_type == OBJ_COEFF_CHANGED || change_type == COLS_ADDED){
+#if 0
 	    if(change_type == OBJ_COEFF_CHANGED){
 	       if(env->par.lp_par.do_reduced_cost_fixing && !env->par.multi_criteria){		 
 		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
@@ -1722,13 +1807,30 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 		  printf("for now!\n"); 
 		  return(FUNCTION_TERMINATED_ABNORMALLY);   
 	       }
-	    } else{
-	       if(env->par.lp_par.cgl.generate_cgl_cuts){
-		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
-		  printf("rhs or column bounds change when cuts exist, for now!\n"); 
+	    } else if (change_type == COL_BOUNDS_CHANGED){
+	       int prob_type;
+	       if (env->prep_mip){
+		  prob_type = env->prep_mip->mip_inf->prob_type;
+	       }else{
+		  prob_type = env->mip->mip_inf->prob_type;
+	       }
+	       if(env->par.lp_par.cgl.generate_cgl_cuts &&
+		  prob_type != BINARY_TYPE &&
+		  prob_type != BIN_CONT_TYPE &&
+		  prob_type != BIN_INT_TYPE){
+		  printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
+		  printf("column bound changes when cuts exist unless the\n");
+		  printf("problem is binary\n");
+		  return(FUNCTION_TERMINATED_ABNORMALLY);
+	       } 
+	    } else if (change_type == RHS_CHANGED){
+	       if(env->par.lp_par.cgl.generate_cgl_cuts){ 
+		  printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
+		  printf("RHS changes when cuts exist\n");
 		  return(FUNCTION_TERMINATED_ABNORMALLY);
 	       } 
 	    }
+#endif
 	    if(!env->mip->cru_vars_num){
 	       analyzed = env->warm_start->stat.analyzed;
 	       depth = env->warm_start->stat.max_depth;
@@ -1781,7 +1883,7 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 	       env->warm_start->ub += etol;
 	    }
 	    
-	    if(cut_num > 0){
+	    if (cut_num > 0){
 	       upd_cuts = (cut_data **)malloc(sizeof(cut_data *)*env->warm_start->allocated_cut_num);
 	       tmp_ind = (int *)malloc(ISIZE*ws_cnum);
 	       for(i = 0; i < ws_cnum; i++){
@@ -2641,6 +2743,14 @@ SYMPHONYLIB_EXPORT int sym_create_permanent_cut_pools(sym_environment *env,
 /*===========================================================================*/
 /*===========================================================================*/
 
+SYMPHONYLIB_EXPORT cut_pool **sym_get_permanent_cut_pools(sym_environment *env)
+{
+   return(env->cp);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 SYMPHONYLIB_EXPORT int sym_explicit_load_problem(sym_environment *env,
                               int numcols, int numrows,
 			      int *start, int *index, double *value,         
@@ -2653,8 +2763,8 @@ SYMPHONYLIB_EXPORT int sym_explicit_load_problem(sym_environment *env,
    int i = 0;
 
    if ((!numcols && !numrows) || numcols < 0 || numrows <0){
-      printf("sym_explicit_load_problem():The given problem is empty or incorrect ");
-      printf("problem description!\n");
+      printf("sym_explicit_load_problem(): The given problem is empty or the");
+      printf("problem description is incorrect!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3971,12 +4081,11 @@ SYMPHONYLIB_EXPORT int sym_set_obj_sense(sym_environment *env, int sense)
 SYMPHONYLIB_EXPORT int sym_set_col_solution(sym_environment *env,
                                             double * colsol)
 {
-   int i, j, nz = 0,*matBeg, *matInd;
-   double value, *rowAct = NULL, *matVal; 
+   int i, nz = 0;
+   lp_sol * sol;
    char feasible;
    double lpetol =  9.9999999999999995e-07;
-   lp_sol * sol;
-   int * tmp_ind;
+   double *tmp_sol;
 
    if (!env->mip || !env->mip->n){
       if(env->par.verbosity >= 1){
@@ -3985,103 +4094,42 @@ SYMPHONYLIB_EXPORT int sym_set_col_solution(sym_environment *env,
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   /* Feasibility Check*/
-
-   /* step 1. check for bounds and integrality */   
-   for (i = env->mip->n - 1; i >= 0; i--){
-      if (colsol[i] < env->mip->lb[i] - lpetol || 
-	  colsol[i] > env->mip->ub[i] + lpetol)
-	 break;
-      if (!env->mip->is_int[i])
-	 continue; /* Not an integer variable */
-      value = colsol[i];
-      if (colsol[i] > env->mip->lb[i] && colsol[i] < env->mip->ub[i]
-	  && colsol[i]-floor(colsol[i]) > lpetol &&
-	  ceil(colsol[i])-colsol[i] > lpetol){
-	 break;  
-      }
-   }
-
-   feasible = i < 0 ? true : false;
-   
-   /* step 2. check for the constraint matrix */
-   
-   if (feasible){      
-      rowAct = (double*) calloc(env->mip->m, DSIZE);
-      matBeg = env->mip->matbeg;
-      matVal = env->mip->matval;
-      matInd = env->mip->matind;
-
-      for(i = 0; i < env->mip->n; i++){
-	 for(j = matBeg[i]; j<matBeg[i+1]; j++){
-	    rowAct[matInd[j]] += matVal[j] * colsol[i];
-	 }
-      }	 
- 
-      for(i = 0; i < env->mip->m; i++){
-	 switch(env->mip->sense[i]){
-	  case 'L': 
-	     if (rowAct[i] > env->mip->rhs[i] + lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'G':
-	     if (rowAct[i] < env->mip->rhs[i] - lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'E':
-	     if (!((rowAct[i] > env->mip->rhs[i] - lpetol) && 
-		   (rowAct[i] < env->mip->rhs[i] + lpetol)))
-		feasible = FALSE;
-	     break;
-	  case 'R':
-	     if (rowAct[i] > env->mip->rhs[i] + lpetol || 
-		 rowAct[i] < env->mip->rhs[i] - env->mip->rngval[i] - lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'N':
-	  default:
-	     break;
-	 }
-	 
-	 if (!feasible) 
-	    break;
-      }
-   }
-
-   tmp_ind = (int*)malloc(ISIZE*env->mip->n);
-
-   for (i = 0; i < env->mip->n; i++){
-      if (colsol[i] > lpetol || colsol[i] < - lpetol){
-	 tmp_ind[nz] = i;
-	 nz++;
-      }
-   }
-
    sol = &(env->best_sol);
-   if(sol->xlength){
-      FREE(sol->xind);
-      FREE(sol->xval);
-   }
    
-   sol->xlength = nz;
-   sol->objval = 0.0;
-   sol->has_sol = FALSE;
-   
-   if(nz){
-      sol->xval = (double*)calloc(nz,DSIZE);
-      sol->xind = (int*)malloc(ISIZE*nz);
-      memcpy(sol->xind, tmp_ind, ISIZE*nz);
-      for (i = 0; i < nz; i++){
-	 sol->xval[i] = colsol[tmp_ind[i]];
-	 sol->objval += sol->xval[i] * env->mip->obj[tmp_ind[i]]; 
-      }
-   }
+   feasible = check_solution(env, sol, colsol);
 
-   FREE(tmp_ind);
-   
-   if (feasible){
+   if (feasible == TRUE){
       /* now, it is feasible, set the best_sol to colsol */
       //FIXME
+      
+      if (colsol){
+	 if (sol->xlength){
+	    FREE(sol->xind);
+	    FREE(sol->xval);
+	 }
+   
+	 int *tmp_ind = (int *) malloc(ISIZE*env->mip->n);
+
+	 for (i = 0; i < env->mip->n; i++){
+	    if (colsol[i] > lpetol || colsol[i] < - lpetol){
+	       tmp_ind[nz] = i;
+	       nz++;
+	    }
+	 }
+      
+	 sol->xlength = nz;
+	 
+	 if(nz){
+	    sol->xval = (double *) malloc(DSIZE*nz);
+	    sol->xind = (int *) malloc(ISIZE*nz);
+	    memcpy(sol->xind, tmp_ind, ISIZE*nz);
+	    for (i = 0; i < nz; i++){
+	       sol->xval[i] = colsol[tmp_ind[i]];
+	    }
+	 }
+	 
+	 FREE(tmp_ind);
+      }
       
       if (env->has_ub_estimate){
 	 if (env->ub_estimate > sol->objval)
@@ -4102,17 +4150,15 @@ SYMPHONYLIB_EXPORT int sym_set_col_solution(sym_environment *env,
       }
       sol->has_sol = TRUE; 
    }else{
-      //      env->best_sol.objval = SYM_INFINITY;
-      env->best_sol.objval = 0.0;
+      sol->has_sol = FALSE;
+      sol->xlength = 0;
+      FREE(sol->xind);
+      FREE(sol->xval);
    }  
-
-   if (rowAct){
-      FREE(rowAct);
-   }
 
    //env->mip->is_modified = FALSE; 
    
-   return(feasible ? FUNCTION_TERMINATED_NORMALLY:
+   return((feasible == TRUE) ? FUNCTION_TERMINATED_NORMALLY:
 	  FUNCTION_TERMINATED_ABNORMALLY);      
 }
 
@@ -5164,8 +5210,7 @@ SYMPHONYLIB_EXPORT int sym_set_warm_start (sym_environment *env,
       printf("sym_set_warm_start():The warm_start desc. is empty!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
-   
-   warm_start_desc * ws_copy = create_copy_warm_start(ws);
+   warm_start_desc * ws_copy = create_copy_warm_start(ws);   
    sym_delete_warm_start(env->warm_start);
    env->warm_start = ws_copy;
    
@@ -5509,6 +5554,16 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
       *value = tm_par->sensitivity_analysis;
       return(0);
+   }
+   else if (strcmp(key, "sensitivity_bounds") == 0 ||
+	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
+      *value = tm_par->sensitivity_analysis;
+      return(0);
+   }
+   else if (strcmp(key, "sensitivity_rhs") == 0 ||
+	    strcmp(key, "TM_sensitivity_rhs") == 0 ){
+      *value = tm_par->sensitivity_analysis;
+      return(0);
    }else if (strcmp(key, "output_mode") == 0 ||
 	    strcmp(key, "TM_output_mode") == 0){
       *value = tm_par->output_mode;
@@ -5516,6 +5571,10 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
    }else if (strcmp(key, "tighten_root_bounds") == 0 ||
 	    strcmp(key, "TM_tighten_root_bounds") == 0){
       *value = tm_par->tighten_root_bounds;
+      return(0);
+   }else if (strcmp(key, "max_sp_size") == 0 ||
+	    strcmp(key, "TM_max_sp_size") == 0){
+      *value = tm_par->max_sp_size;
       return(0);
    }
      
@@ -5552,6 +5611,11 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
    else if (strcmp(key, "should_warmstart_chain") == 0 ||
 	    strcmp(key, "LP_should_warmstart_chain") == 0){
       *value = lp_par->should_warmstart_chain;
+      return(0);
+   }
+   else if (strcmp(key, "should_warmstart_node") == 0 ||
+	    strcmp(key, "LP_should_warmstart_node") == 0){
+      *value = lp_par->should_warmstart_node;
       return(0);
    }
    else if (strcmp(key, "should_reuse_lp") == 0 ||
@@ -5661,9 +5725,21 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
       *value = lp_par->base_constraints_always_effective;
       return(0);
    }
+   
    else if (strcmp(key, "branch_on_cuts") == 0 ||
 	    strcmp(key, "LP_branch_on_cuts") == 0){
       *value = lp_par->branch_on_cuts;
+      return(0);
+   }
+   //Anahita
+   else if (strcmp(key, "cuts_strong_branch") == 0 ||
+	    strcmp(key, "LP_cuts_strong_branch") == 0){
+      *value = lp_par->cuts_strong_branch;
+      return(0);
+   }
+   else if (strcmp(key, "is_recourse_prob") == 0 ||
+	    strcmp(key, "LP_is_recourse_prob") == 0){
+      *value = lp_par->is_recourse_prob;
       return(0);
    }
    else if (strcmp(key, "discard_slack_cuts") == 0 ||
@@ -6025,6 +6101,64 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
    else if (strcmp(key, "check_which") == 0 ||
          strcmp(key, "CP_check_which") == 0){
       *value = cp_par->check_which;
+   }
+   /*************************************************************************
+    ***                     preprocessing - parameters                    ***
+    *************************************************************************/ 
+
+   if (strcmp(key, "prep_level") == 0){
+      *value = env->par.prep_par.level;
+   }
+   else if (strcmp(key, "prep_dive_level") == 0){
+      *value = env->par.prep_par.dive_level;
+   }
+   else if (strcmp(key, "prep_impl_dive_level") == 0){
+      *value = env->par.prep_par.impl_dive_level;
+   }
+   else if (strcmp(key, "prep_impl_limit") == 0){
+      *value = env->par.prep_par.impl_limit;
+   }
+   else if (strcmp(key, "prep_iter_limit") == 0){
+      *value = env->par.prep_par.iteration_limit;
+   }
+   else if (strcmp(key, "prep_do_probing") == 0){
+      *value = env->par.prep_par.do_probe;
+   }
+   else if (strcmp(key, "prep_do_sr") == 0){
+      *value = env->par.prep_par.do_single_row_rlx;
+   }
+   else if (strcmp(key, "prep_verbosity") == 0){
+      *value = env->par.prep_par.verbosity;
+   }
+   else if (strcmp(key, "prep_reduce_mip") == 0){
+      *value = env->par.prep_par.reduce_mip;
+   }
+   else if (strcmp(key, "prep_probing_verbosity") == 0){
+      *value = env->par.prep_par.probe_verbosity;
+   }
+   else if (strcmp(key, "prep_probing_level") == 0){
+      *value = env->par.prep_par.probe_level;
+   }
+   else if (strcmp(key, "prep_display_stats") == 0){
+      *value = env->par.prep_par.display_stats;
+   }
+   else if (strcmp(key, "max_sr_cnt") == 0){
+      *value = env->par.prep_par.max_sr_cnt;
+   }
+   else if (strcmp(key, "max_aggr_row_cnt") == 0){
+      *value = env->par.prep_par.max_aggr_row_cnt;
+   }
+   else if (strcmp(key, "keep_row_ordered") == 0){
+      *value = env->par.prep_par.keep_row_ordered;
+   }
+   else if (strcmp(key, "write_mps") == 0){
+      *value = env->par.prep_par.write_mps;
+   }
+   else if (strcmp(key, "write_lp") == 0){
+      *value = env->par.prep_par.write_lp;
+   }
+   else if (strcmp(key, "prep_time_limit") == 0){
+      *value = env->par.prep_par.time_limit;
    }
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
@@ -6403,17 +6537,64 @@ sym_environment * sym_create_copy_environment (sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env, int cnt,
-                                              int *new_rhs_ind,
-                                              double *new_rhs_val,
-                                              double *lb_for_new_rhs)
+SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env,
+			   int rhs_cnt, int *new_rhs_ind, double *new_rhs_val,
+			   int lb_cnt, int *new_lb_ind, double *new_lb_val,
+			   int ub_cnt, int *new_ub_ind, double *new_ub_val,
+			   double *lb_for_new_rhs)
 {
 #ifdef SENSITIVITY_ANALYSIS
-#ifdef USE_CGL_CUTS
-   printf("sym_get_lb_for_new_rhs():\n");
-   printf("SYMPHONY can not do sensitivity analysis when cuts are present, for now!\n"); 
-   return(FUNCTION_TERMINATED_ABNORMALLY);
+   if (!env || !env->mip || 
+      !env->par.tm_par.sensitivity_analysis){ 
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("Trying to read an empty problem, an empty problem description"); 
+      printf(" or tree nodes were not kept in memory!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else if (!env->par.tm_par.sensitivity_rhs && rhs_cnt != 0){
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("RHS analysis parameter not set, cannot change RHS\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else if (!env->par.tm_par.sensitivity_bounds &&
+	     (lb_cnt != 0 || ub_cnt != 0)){
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("Bounds analysis parameter not set, cannot change RHS.\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else if (!env->warm_start){
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("No warm start, cannot do sensitivity analysis.\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }else{
+      branch_desc *bpath = (branch_desc *) malloc (env->warm_start->stat.max_depth*
+				      sizeof(branch_desc));
+      *lb_for_new_rhs = get_lb_for_new_rhs(env->warm_start->rootnode, env->mip,
+					   bpath,
+					   rhs_cnt, new_rhs_ind, new_rhs_val,
+					   lb_cnt, new_lb_ind, new_lb_val,
+					   ub_cnt, new_ub_ind, new_ub_val);
+      FREE(bpath);
+      return(FUNCTION_TERMINATED_NORMALLY);
+   }
 #else
+   printf("sym_get_lb_for_new_rhs():\n");
+   printf("Sensitivity analysis features are not enabled.\n");
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(FUNCTION_TERMINATED_ABNORMALLY);
+#endif
+ }
+
+/*===========================================================================*/
+/*===========================================================================*/
+//Anahita
+int sym_get_dual_pruned(sym_environment *env, double ** dual_pieces,
+			int* num_pieces,
+			int MAX_ALLOWABLE_NUM_PIECES)
+{
+#ifdef SENSITIVITY_ANALYSIS
+/* #ifdef U */
+/*    printf("sym_get_lb_for_new_rhs():\n"); */
+/*    printf("SYMPHONY can not do sensitivity analysis when cuts are present, for now!\n");  */
+/*    return(FUNCTION_TERMINATED_ABNORMALLY); */
+/* #else */
    if (!env || !env->mip || 
       !env->par.tm_par.sensitivity_analysis){ 
       printf("sym_get_lb_for_new_rhs():\n");
@@ -6431,22 +6612,27 @@ SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env, int cnt,
 	 /* check if we only have the root node, then no need to call 
 	    recursive algorithm */
 	 int i; 
-	 if(env->warm_start->stat.analyzed == 1) {
-	    *lb_for_new_rhs =  env->warm_start->rootnode->lower_bound;
-	    for(i=0; i<cnt; i++){ 
-	       *lb_for_new_rhs += 
-		  env->warm_start->rootnode->duals[new_rhs_ind[i]]*
-		  (new_rhs_val[i] - env->mip->rhs[new_rhs_ind[i]]);
+	 *num_pieces = 0;
+	 if(!env->warm_start->rootnode->children) {
+	    //set number of pieces to 1
+	    *num_pieces = 1;
+	    //allocate memory for the single piece
+	    dual_pieces[0] = (double*) malloc ((1 + env->mip->m) * sizeof(double));
+	    //set the objective
+	    dual_pieces[0][0] =  env->warm_start->rootnode->lower_bound;
+	    for(i=0; i<env->mip->m; i++){ 
+	       dual_pieces[0][i+1]=
+		  env->warm_start->rootnode->duals[i];
 	    }	    
-	 } else {
-	    *lb_for_new_rhs =  
-	       get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
-				  new_rhs_ind, new_rhs_val);
-	 }
+	  } else { 
+	    get_dual_pruned(env->warm_start->rootnode, env->mip,
+			       dual_pieces, num_pieces,
+			       MAX_ALLOWABLE_NUM_PIECES);
+	     }
       }
       return(FUNCTION_TERMINATED_NORMALLY);	 
    }
-#endif
+   //#endif
 #else
    printf("sym_get_lb_for_new_rhs():\n");
    printf("Sensitivity analysis features are not enabled.\n"); 
@@ -6623,20 +6809,21 @@ SYMPHONYLIB_EXPORT int sym_test(sym_environment *env, int argc, char **argv,
   int termcode = 0, verbosity;
   int i, file_num = 45;
   char mps_files[45][MAX_FILE_NAME_LENGTH +1] = {
-     "air03", "air04", "air05", "bell3a", "blend2", "cap6000", "dcmulti", "dsbmip",
-     "egout", "enigma", "fiber", "fixnet6", "flugpl", "gen", "gesa2", "gesa2_o",
-     "gesa3", "gesa3_o", "gt2", "khb05250", "l152lav", "lseu", "misc03", "misc06",
-     "misc07", "mitre", "mod008", "mod010", "mod011", "nw04", "p0033", "p0201",
-     "p0282", "p0548", "p2756", "pp08a", "pp08aCUTS", "qnet1", "qnet1_o", "rentacar",
-     "rgn", "stein27", "stein45", "vpm1", "vpm2" };
+     "air03", "air04", "air05", "bell3a", "blend2", "cap6000", "dcmulti",
+     "dsbmip", "egout", "enigma", "fiber", "fixnet6", "flugpl", "gen",
+     "gesa2", "gesa2_o", "gesa3", "gesa3_o", "gt2", "khb05250", "l152lav",
+     "lseu", "misc03", "misc06", "misc07", "mitre", "mod008", "mod010",
+     "mod011", "nw04", "p0033", "p0201", "p0282", "p0548", "p2756", "pp08a",
+     "pp08aCUTS", "qnet1", "qnet1_o", "rentacar", "rgn", "stein27",
+     "stein45", "vpm1", "vpm2" };
   
   double sol[45] = {340160, 56137, 26374, 878430.316, 7.599, -2451377, 188182,
 		    -305.198, 568.10, 0, 405935.18, 3983, 1201500, 112313.363,
-		    25779856.371, 25779856.371, 27991042.647, 27991042.647, 21166,
-		    106940226, 4722, 1120, 3360, 12850.86, 2810, 115155, 307,
-		    6548, -54558535, 16862, 3089, 7615, 258411, 8691, 3124, 7350,
-		    7350, 16029.693, 16029.693, 30356760.98, 82.20, 18, 30, 20,
-		    13.75};
+		    25779856.371, 25779856.371, 27991042.647, 27991042.647,
+		    21166, 106940226, 4722, 1120, 3360, 12850.86, 2810, 115155,
+		    307, 6548, -54558535, 16862, 3089, 7615, 258411, 8691,
+		    3124, 7350, 7350, 16029.693, 16029.693, 30356760.98, 82.20,
+		    18, 30, 20, 13.75};
 
   char *mps_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
@@ -6649,7 +6836,7 @@ SYMPHONYLIB_EXPORT int sym_test(sym_environment *env, int argc, char **argv,
   *test_status = 0;
 
   sym_parse_command_line(env, argc, argv);
-  
+    
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   while (true) {
@@ -6672,7 +6859,7 @@ SYMPHONYLIB_EXPORT int sym_test(sym_environment *env, int argc, char **argv,
     strcpy(mps_dir, env->par.test_dir);
   }
 
-  for(i = 0; i<file_num; i++){
+  for(i = 0; i < file_num; i++){
 
     strcpy(infile, "");
     if (dirsep == '/')

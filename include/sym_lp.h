@@ -122,6 +122,9 @@ typedef struct LP_PROB{
    int           bound_changes_in_iter;
    int           vars_recently_fixed_to_ub;
    LPdata       *lp_data;
+   double        objval; /* To save the objective value of the node */
+   double       *dualsol; /* To save the duals of the node */
+   double       *dj; /* To save the reduced costs of the node */
    MIPdesc      *mip; /* Holds the MIP description when read in from MPS */
    
    double        last_gap;
@@ -367,7 +370,7 @@ int generate_column_u PROTO((lp_prob *p, int lpcutnum, cut_data **cuts,
 			     double *obj, double *ub, double *lb));
 void print_stat_on_cuts_added_u PROTO((lp_prob *p, int added_rows));
 void purge_waiting_rows_u PROTO((lp_prob *p));
-int generate_cuts_in_lp_u PROTO((lp_prob *p));
+int generate_cuts_in_lp_u PROTO((lp_prob *p, double *xx));
 int analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
 					   double *values, int length,
 					   double *true_objval, double etol,

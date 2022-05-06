@@ -136,6 +136,7 @@ SYMPHONY/MSVisualStudio/v9/unitTest.sln -text
 SYMPHONY/MSVisualStudio/v9/unitTest.vcproj -text
 SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
+SYMPHONY/Osi.patch -text
 SYMPHONY/compile -text
 SYMPHONY/config.guess -text
 SYMPHONY/config.sub -text

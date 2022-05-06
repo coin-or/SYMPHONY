@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY MILP Solver Framework.                  */
+/* This file is part of the SYMPHOY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -962,7 +962,8 @@ int start_node(tm_prob *tm, int thread_num)
 	     best_node->node_status = NODE_STATUS__PRUNED;
 	     best_node->feasibility_status = OVER_UB_PRUNED;
 
-	     if(best_node->parent){
+	     if(tm->br_inf_down != NULL && tm->br_inf_up != NULL &&
+                best_node->parent){
 	       for(int i = 0; i < best_node->parent->bobj.child_num; i++){
 		 if(best_node->parent->children[i] == best_node){
 		   if(best_node->parent->bobj.sense[i] == 'L'){
@@ -1386,12 +1387,12 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #ifdef TRACE_PATH
    int optimal_path = -1;
 #endif
-      
+   
    /* before we start to generate the children we must figure out if we'll
     * dive so that we can put the kept child into the right location */
    if (*keep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE))
       dive = olddive == DO_DIVE ? DO_DIVE : shall_we_dive(tm, objval[*keep]);
-
+   
    node->children = (bc_node **) calloc(bobj->child_num, sizeof(bc_node *));
    if (node->bc_level == tm->stat.max_depth)
       tm->stat.max_depth++;
@@ -1440,9 +1441,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }else{
 	    PRINT_TIME(tm, f);
 	    fprintf(f, "N %i %i %i\n", node->bc_index+1, child->bc_index+1,
-		  feasible[i] ? VBC_FEAS_SOL_FOUND :
-		  ((dive != DO_NOT_DIVE && *keep == i) ?
-		   VBC_ACTIVE_NODE : VBC_CAND_NODE));
+                    feasible[i] ? VBC_FEAS_SOL_FOUND :
+                    ((dive != DO_NOT_DIVE && *keep == i) ?
+                     VBC_ACTIVE_NODE : VBC_CAND_NODE));
 	 }
       } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	 FILE *f;
@@ -1495,7 +1496,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	  (tm->has_ub && tm->ub - tm->par.granularity < objval[i] &&
 	   node->desc.nf_status == NF_CHECK_NOTHING)){
 	 /* this last can happen if the TM got the new bound but it hasn't
-	   * been propagated to the LP yet */
+          * been propagated to the LP yet */
 #else /*We only want to process the root node in this case - discard others*/
       if (TRUE){	 
 #endif
@@ -1507,6 +1508,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }
 
 	 node_status = child->node_status = NODE_STATUS__PRUNED;
+
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
 	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -1558,7 +1560,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
 	       child->feasibility_status = INFEASIBLE_PRUNED;
 	    }
-	 }
+         }
       }else{
 	 node_status = child->node_status = NODE_STATUS__CANDIDATE;
 	 /* child->lp = child->cg = 0;   zeroed out by calloc */
@@ -1574,7 +1576,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
             }
          }
       }
-
+      
       if (node_status == NODE_STATUS__CANDIDATE ||
           tm->par.keep_description_of_pruned != DISCARD){
          desc = &child->desc;
@@ -1605,15 +1607,25 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
          desc->nf_status = node->desc.nf_status;
          
 #ifdef SENSITIVITY_ANALYSIS
-         if (tm->par.sensitivity_analysis && 
-             action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
+         //Anahita
+         child->intcpt = bobj->intcpt[i];
+         if (tm->par.sensitivity_rhs){ //&& //Anahita 
+            //action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
             child->duals = bobj->duals[i];
             bobj->duals[i] = 0;
+            //Anahita
+            if (bobj->rays){
+               child->rays = bobj->rays[i];
+               bobj->rays[i] = 0;
+            }
          }
+         if (tm->par.sensitivity_bounds){
+            //Ted
+            child->dj = bobj->dj[i];
+            bobj->dj[i] = 0;
+         }      
 #endif
-      }
-
-      if (node_status == NODE_STATUS__PRUNED){
+      } else if (node_status == NODE_STATUS__PRUNED){
          if (--child_num == 0){
             *keep = -1;
             return(DO_NOT_DIVE);
@@ -1634,7 +1646,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
          feasible[i--] = feasible[child_num];
 	 continue;
       }
-
+      
       if (tm->phase == 0 &&
 	  !(tm->par.colgen_strat[0] & FATHOM__GENERATE_COLS__RESOLVE) &&
 	  (feasible[i] == LP_D_UNBOUNDED ||
@@ -1656,6 +1668,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }
       }
    }
+
    if (node->cp)
 #ifdef SYM_COMPILE_IN_CP
       tm->nodes_per_cp[node->cp] += np_cp;
@@ -2211,6 +2224,9 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	       } else {
 		  purge_pruned_nodes(tm, node, VBC_PRUNED);
 	       }
+	    }
+	    if (tm->par.sensitivity_analysis){
+	       node->feasibility_status = OVER_UB_PRUNED;
 	    }
 	 }
 	 if (has_exchanged) {
@@ -3695,6 +3711,10 @@ void free_tree_node(bc_node *n)
    FREE(n->sol_ind);
 #ifdef SENSITIVITY_ANALYSIS
    FREE(n->duals);
+   //Anahita
+   FREE(n->duals);
+   //Ted
+   FREE(n->dj);
 #endif
    FREE(n->children);
 
@@ -3710,8 +3730,8 @@ void free_tree_node(bc_node *n)
    FREE(n->bobj.sos_cnt);
    FREE(n->bobj.sos_ind);
 #endif
-
-   FREE(n->bobj.solutions); //added by asm4
+   // Anahita
+   //FREE(n->bobj.solutions); //added by asm4
 
    FREE(n->desc.uind.list);
    free_basis(&n->desc.basis);
@@ -3795,10 +3815,16 @@ int tm_close(tm_prob *tm, int termcode)
       for (i = 0; i < tm->par.max_cp_num; i++){
 	 tm->comp_times.cut_pool += tm->cpp[i]->cut_pool_time;
 	 tm->stat.cuts_in_pool += tm->cpp[i]->cut_num;
-	 tm->cpp[i]->msgtag = YOU_CAN_DIE;
-	 cp_close(tm->cpp[i]);
+      	 if (!tm->par.keep_cut_pools){
+      	    tm->cpp[i]->msgtag = YOU_CAN_DIE;
+      	    cp_close(tm->cpp[i]);
+      	 }else{
+      	    tm->cpp[i]->cut_pool_time = 0;
+      	 }
       }
-      FREE(tm->cpp);
+      if (!tm->par.keep_cut_pools){
+      	 FREE(tm->cpp);
+      }
    }
 #else
    for (i = 0; i < tm->par.max_cp_num;){

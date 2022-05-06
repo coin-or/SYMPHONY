@@ -368,7 +368,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
     * generated these cuts, she must have tested whether the violation is
     * positive, i.e., she must knew the violations.) Also, the generated cuts
     * are added to the list of waiting rows. */
-   CALL_WRAPPER_FUNCTION( generate_cuts_in_lp_u(p) );
+   CALL_WRAPPER_FUNCTION( generate_cuts_in_lp_u(p, lp_data->x) );
    p->comp_times.separation += used_time(&p->tt);
    if (no_more_cuts_count > 0){
       /* Receive cuts if we have sent out the lp solution somewhere. */
@@ -569,49 +569,47 @@ void send_node_desc(lp_prob *p, int node_type)
 #endif
 
 #ifdef SENSITIVITY_ANALYSIS
-      if (tm->par.sensitivity_analysis && 
-	  !(node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE)){
+   if (tm->par.sensitivity_analysis && node_type != DISCARDED_NODE){
+      if (tm->par.sensitivity_rhs){
 	 if (n->duals){
 	    FREE(n->duals);
 	 }
-	 n->duals = (double *) malloc (DSIZE * p->base.cutnum);
-	 memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
+	 n->duals = p->dualsol;
+	 p->dualsol = NULL;
+	 //Anahita
+	 if (node_type == INFEASIBLE_PRUNED){
+	    if (n->rays){
+	       FREE(n->rays);
+	    }
+	    n->rays = (double *) malloc (DSIZE * p->base.cutnum);
+	    if (lp_data->raysol){
+	       memcpy(n->rays, lp_data->raysol, DSIZE*p->base.cutnum);
+	    }
+	 }
       }
-#endif	 
+      if (tm->par.sensitivity_bounds){
+	 //Ted
+	 if (n->dj){
+	    FREE(n->dj);
+	 }
+	 n->dj = p->dj;
+	 p->dj = NULL;
+      }
+   }
+
+   //Anahita
+   n->intcpt = lp_data->intcpt;
+#endif
 
 #ifdef SYM_COMPILE_IN_LP
+   n->lower_bound = p->objval; /*lp_data->objval gets over-written
+				 in branching */
    int *indices;
    double *values;
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
 
       n->node_status = NODE_STATUS__PRUNED;
-
-      if (tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){       
-	 if (node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE){
-	    if (n->feasibility_status != NOT_PRUNED_HAS_CAN_SOLUTION){
-	       n->feasibility_status = INFEASIBLE_PRUNED;      
-	    }
-	 }
-	 if (node_type == FEASIBLE_PRUNED) {
-	    indices = lp_data->tmp.i1;
-	    values = lp_data->tmp.d;
-
-	    n->sol_size = collect_nonzeros(p, lp_data->x, indices, values);
-	    n->sol_ind = (int *) malloc (ISIZE * n->sol_size);
-	    n->sol = (double *) malloc (DSIZE * n->sol_size);
-	    memcpy(n->sol, values, DSIZE*n->sol_size);
-	    memcpy(n->sol_ind, indices, ISIZE*n->sol_size);
-	    n->feasibility_status = FEASIBLE_PRUNED;      
-	 }
-      
-	 if (node_type == OVER_UB_PRUNED ){
-	    n->feasibility_status = OVER_UB_PRUNED;      
-	    if (n->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){	    
-	       n->feasibility_status = FEASIBLE_PRUNED;      
-	    } 
-	 }
-      }
 
 #ifdef TRACE_PATH
       if (n->optimal_path){
@@ -661,19 +659,47 @@ void send_node_desc(lp_prob *p, int node_type)
       }
    }
 
+   if (tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){       
+      if (node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE){
+	 if (n->feasibility_status != NOT_PRUNED_HAS_CAN_SOLUTION){
+	    n->feasibility_status = INFEASIBLE_PRUNED;      
+	 }
+      }
+      if (node_type == FEASIBLE_PRUNED){
+	 indices = lp_data->tmp.i1;
+	 values = lp_data->tmp.d;
+	 
+	 n->sol_size = collect_nonzeros(p, lp_data->x, indices, values);
+	 n->sol_ind = (int *) malloc (ISIZE * n->sol_size);
+	 n->sol = (double *) malloc (DSIZE * n->sol_size);
+	 memcpy(n->sol, values, DSIZE*n->sol_size);
+	 memcpy(n->sol_ind, indices, ISIZE*n->sol_size);
+	 n->feasibility_status = FEASIBLE_PRUNED;      
+      }
+      
+      if (node_type == OVER_UB_PRUNED ){
+	 n->feasibility_status = OVER_UB_PRUNED;      
+	 if (n->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){	    
+	    n->feasibility_status = FEASIBLE_PRUNED;      
+	 } 
+      }
+      if (node_type == NODE_BRANCHED_ON){
+	 n->feasibility_status = NODE_BRANCHED_ON;
+      }
+   }
+
    if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
       n->node_status = (node_type == TIME_LIMIT ?
 			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
-      //I think lp_data->objval is the latest objective value from branching subproblem
-      //here and thus is not valid 
-      //n->lower_bound = lp_data->objval;
+      n->lower_bound = p->objval;
       insert_new_node(tm, n);
       if (!repricing)
 	 return;
    }
 
-   if (!repricing || n->node_status != NODE_STATUS__PRUNED){
-
+   if ((!repricing || n->node_status != NODE_STATUS__PRUNED)
+       && node_type != INFEASIBLE_PRUNED){ //Anahita
+      n->lower_bound = p->objval;
 #ifdef DO_TESTS
       if (n->bc_index && (n->lower_bound < p->tm->lb - .001 ||
                           n->lower_bound < n->parent->lower_bound - .001)){
@@ -682,9 +708,6 @@ void send_node_desc(lp_prob *p, int node_type)
          printf("     From global: %f\n", p->tm->lb - n->lower_bound);
       }
 #endif
-      //I think lp_data->objval is the latest objective value from branching subproblem
-      //here and thus is not valid 
-      //n->lower_bound = lp_data->objval;
 
       new_lp_desc = create_explicit_node_desc(p);
       
@@ -855,7 +878,7 @@ void send_node_desc(lp_prob *p, int node_type)
 		  }
 	       }
 	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir,
-		       lp_data->objval+p->mip->obj_offset, sum_inf, num_inf);
+		       p->objval+p->mip->obj_offset, sum_inf, num_inf);
 	       fprintf(f, "%s\n", reason);
 	       FREE(reason);
 	       fclose(f); 
@@ -1034,7 +1057,22 @@ void send_node_desc(lp_prob *p, int node_type)
       send_int_array(&p->desc->uind.size, 1);
       send_dbl_array(lp_data->x, p->desc->uind.size);
       //send_int_array(&p->base.cutnum, 1);
-      send_dbl_array(lp_data->dualsol, p->base.cutnum);
+      if (p->par.sensitivity_rhs){
+	 send_dbl_array(lp_data->dualsol, p->base.cutnum);
+      //Anahita
+	 if (lp_data->raysol){
+	    int have_ray = TRUE;
+	    send_int_array(&have_ray, 1);
+	    send_dbl_array(lp_data->raysol, p->base.cutnum);
+	 }else{
+	    int have_ray = FALSE;
+	    send_int_array(&have_ray, 1);
+	 }
+      }
+      if (p->par.sensitivity_bounds){
+	 //Ted
+	 send_dbl_array(lp_data->dj, p->lp_data->n);
+      }
    }
 #endif
    if ((node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
@@ -1064,7 +1102,7 @@ void send_node_desc(lp_prob *p, int node_type)
    send_char_array(&repricing, 1);
    ch = (char) node_type;
    send_char_array(&ch, 1);
-   send_dbl_array(&lp_data->objval, 1);
+   send_dbl_array(&p->objval, 1);
    if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
       send_msg(p->tree_manager, LP__NODE_DESCRIPTION);
       freebuf(s_bufid);

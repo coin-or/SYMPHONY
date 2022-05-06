@@ -137,8 +137,8 @@ void ws_free_subtree PROTO((sym_environment *env, bc_node *root,
 			    int change_type, int check_solution, int update_stats));
 void check_better_solution PROTO((sym_environment * env, bc_node *root, 
 				  int delete_node, int change_type));
-int copy_node PROTO((bc_node * n_to, bc_node *n_from));
-int copy_tree PROTO((bc_node *root_to, bc_node *root_from));
+int copy_node PROTO((warm_start_desc * ws, bc_node * n_to, bc_node *n_from));
+int copy_tree PROTO((warm_start_desc * ws, bc_node *root_to, bc_node *root_from));
 int read_node PROTO((bc_node * node, FILE *f));
 int read_tree PROTO((bc_node * root, FILE *f));
 int write_node PROTO((bc_node *node, FILE *f));
@@ -148,8 +148,17 @@ warm_start_desc *create_copy_warm_start PROTO((warm_start_desc * ws));
 MIPdesc *create_copy_mip_desc PROTO((MIPdesc *mip));
 sym_environment *create_copy_environment PROTO((sym_environment *env));
 
-double get_lb_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
-				 int *ind, double *val));
+//Anahita
+void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
+			       double ** dual_pieces, int *num_pieces,
+			       int MAX_ALLOWABLE_NUM_PIECES));
+double get_lb_for_new_rhs PROTO((bc_node *node, MIPdesc *mip, branch_desc *bpath,
+				 int rhs_cnt, int *new_rhs_ind,
+				 double *new_rhs_val,
+				 int lb_cnt, int *new_lb_ind,
+				 double *new_lb_val,
+				 int ub_cnt, int *new_ub_ind,
+				 double *new_ub_val));
 double get_ub_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
 #if 0
@@ -158,8 +167,17 @@ double get_lb_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt,
 #endif
 double get_ub_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
-int check_feasibility_new_rhs PROTO((bc_node * node, MIPdesc * mip, 
-					int cnt, int *ind, double *val));
+double check_feasibility_new_rhs PROTO((bc_node *node, MIPdesc *mip,
+					branch_desc *bpath,
+					int rhs_cnt,
+					int *new_rhs_ind, double *new_rhs_val,
+					int lb_cnt,
+					int *new_lb_ind, double *new_lb_val,
+					int ub_cnt,
+					int *new_ub_ind, double *new_ub_val,
+					double *objval));
+char check_solution PROTO((sym_environment *env, lp_sol *sol,
+				       double * colsol = NULL));
 int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
 void free_master PROTO((sym_environment *env));
 #endif

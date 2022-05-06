@@ -83,9 +83,14 @@ typedef struct TM_PARAMS{
    int         rs_lp_iter_limit;
    
    int         sensitivity_analysis;
+   int         sensitivity_bounds;
+   int         sensitivity_rhs;
    int         output_mode;
+   int         keep_cut_pools;
 
    int         tighten_root_bounds;
+
+   int         max_sp_size;
 }tm_params;
 
 #endif

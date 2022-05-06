@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 #include "sym_lp.h"
+#include "sym_cp.h"
 #include "sym_qsort.h"
 #include "sym_proccomm.h"
 #include "sym_messages.h"
@@ -1535,10 +1536,21 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          }
 
 #ifdef SENSITIVITY_ANALYSIS
-         if (p->tm->par.sensitivity_analysis){      
-            can->duals = (double **) calloc(maxnum, sizeof(double *));
-         }else{
-            can->duals = NULL;	 
+	 if (p->par.sensitivity_rhs){
+	    can->duals = (double **) calloc(maxnum, sizeof(double *));
+	    //Anahita
+	    can->rays = (double **) calloc(maxnum, sizeof(double *));
+	 }else{
+	    can->duals = NULL;
+	    //Anahita
+	    can->rays = NULL;
+	 }
+	 if (p->par.sensitivity_bounds){
+	    //Ted
+	    can->dj = (double **) calloc(maxnum, sizeof(double *));
+	 }else{
+	    //Ted
+	    can->dj = NULL; 
          }
 #endif
 #ifdef COMPILE_FRAC_BRANCHING
@@ -1555,11 +1567,23 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   sizeof(int *));	
             can->sol_sizes = (int *) calloc(MAX_CHILDREN_NUM, ISIZE);	
          }
+
 #ifdef SENSITIVITY_ANALYSIS
-         if (p->par.sensitivity_analysis){      
+         if (p->par.sensitivity_rhs){      
             can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+	    //Anahita
+	    can->rays = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+	 }else{
+            can->duals = NULL;
+	    //Anahita
+	    can->rays = NULL;
+	 }
+         if (p->par.sensitivity_bounds){      
+            //Ted
+	    can->dj = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
          }else{
-            can->duals = NULL;	 
+	    //Ted
+	    can->dj = NULL;
          }
 #endif
 #endif
@@ -1602,26 +1626,105 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                }
                check_ub(p);
                /* The original basis is in lp_data->lpbas */
-               if (should_use_hot_starts) {
-                  can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
-                  total_iters+=*(can->iterd+j);
-               } else {
-		  load_basis(lp_data, cstat, rstat);
-                  can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
-                  total_iters+=*(can->iterd+j);
-               }
-               p->lp_stat.lp_calls++;
+	       if (!p->par.cuts_strong_branch){
+		  if (should_use_hot_starts) {
+		     can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+		     total_iters+=*(can->iterd+j);
+		     
+		  } else {
+		     load_basis(lp_data, cstat, rstat);
+		     can->termcode[j] = initial_lp_solve(lp_data, can->iterd+j);
+		     total_iters+=*(can->iterd+j);
+		     
+		  }
+		  p->lp_stat.lp_calls++; 
+	       }
+	       else{
+		     
+		  bool keep_going = TRUE;
+		  int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
+		  int real_nzcnt, matbeg = 0, ind = 0;
+		  double quality, *tmp_matval, *matval;
+		  cut_pool *cp = p->tm->cpp[p->cut_pool];
+		  cp_cut_data **cp_cut;
+		  while (keep_going){
+		     if (should_use_hot_starts) {
+			can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+			total_iters+=*(can->iterd+j);
+		     } else {
+			load_basis(lp_data, cstat, rstat);
+			can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+			total_iters+=*(can->iterd+j);
+		     }
+		     iter_num++;
+		     keep_going = FALSE;
+		     for (ind = 0, cp_cut = cp->cuts; ind < cp->cut_num;
+			  ind++, cp_cut++){
+			check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
+				    &quality, lp_data->x);
+			if (violated){
+			   keep_going = TRUE;
+			   real_nzcnt = 0;
+			   nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
+			   tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
+			   tmp_matind =
+			      (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
+			   matval = (double *) malloc(nzcnt * DSIZE);
+			   matind = (int *) malloc(nzcnt * ISIZE);
+			   if (p->par.is_userind_in_order) {
+			      memcpy(matind, tmp_matind, nzcnt*ISIZE);
+			      memcpy(matval, tmp_matval, nzcnt*DSIZE);
+			      real_nzcnt = nzcnt;
+			   } else {
+			      for (j = 0; j < lp_data->n; j++){
+				 for (k = 0; k < nzcnt; k++){
+				    if (tmp_matind[k] == lp_data->vars[j]->userind){
+				       matind[real_nzcnt]   = j;
+				       matval[real_nzcnt++] = tmp_matval[k];
+				    }
+				 }
+			      }
+			   }
+			   add_rows(lp_data, 1, real_nzcnt,
+				    &(&(*cp_cut)->cut)->rhs,
+				    &(&(*cp_cut)->cut)->sense,
+				    &matbeg, matind, matval);
+			}
+		     }
+		  }
+		  p->lp_stat.lp_calls++;
+	       }
                p->lp_stat.str_br_lp_calls++;
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
                //get_x(lp_data);
-
 #ifdef SENSITIVITY_ANALYSIS
+	       //Anahita
+	       can->intcpt[j] = lp_data->intcpt;
+	       
                if (p->par.sensitivity_analysis){      
                   get_dj_pi(lp_data);
-                  can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
-                  memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-               }
+		  if (p->par.sensitivity_rhs){
+		     can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
+		     memcpy(can->duals[j], lp_data->dualsol,
+			    DSIZE*p->base.cutnum);
+		     //Anahita
+		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
+			get_dual_ray(lp_data);
+			if (lp_data->raysol){
+			   can->rays[j] =
+			      (double *) malloc(DSIZE*p->base.cutnum);
+			   memcpy(can->rays[j], lp_data->raysol,
+				  DSIZE*p->base.cutnum);
+			}
+		     }
+		  }
+		  if (p->par.sensitivity_bounds){
+		     //Ted
+		     can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
+		     memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
+		  }
+	       }
 #endif
 
                if (can->termcode[j] == LP_OPTIMAL){
@@ -1719,15 +1822,33 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
 
-
-               //get_x(lp_data);
-
 #ifdef SENSITIVITY_ANALYSIS
+	       //Anahita
+	       can->intcpt[j] = lp_data->intcpt;
+
                if (p->par.sensitivity_analysis){      
                   get_dj_pi(lp_data);
-                  can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
-                  memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-               }
+		  if (p->par.sensitivity_rhs){
+		     can->duals[j] = (double *) malloc(DSIZE*p->base.cutnum);
+		     memcpy(can->duals[j], lp_data->dualsol,
+			    DSIZE*p->base.cutnum);
+		     //Anahita
+		     if (can->termcode[j] == LP_D_UNBOUNDED){ 
+			get_dual_ray(lp_data);
+			if (lp_data->raysol){
+			   can->rays[j] =
+			      (double *) malloc(DSIZE*p->base.cutnum);
+			   memcpy(can->rays[j], lp_data->raysol,
+				  DSIZE*p->base.cutnum);
+			}
+		     }
+		  }
+		  if (p->par.sensitivity_bounds){
+		     //Ted
+		     can->dj[j] = (double *) malloc (DSIZE*p->lp_data->n);
+		     memcpy(can->dj[j], lp_data->dj, DSIZE*p->lp_data->n);
+		  }
+	       }
 #endif
 
                if (can->termcode[j] == LP_OPTIMAL){
@@ -2542,12 +2663,76 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       }
    }
 
-   //   if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
-   if (should_use_hot_starts) {
-      *termstatus = solve_hotstart(lp_data, iterd);
-   } else {
-      load_basis(lp_data, cstat, rstat);
-      *termstatus = dual_simplex(lp_data, iterd);
+   if (p->par.cuts_strong_branch) {
+   
+      bool keep_going = TRUE;
+      int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
+      int orig_row_num = lp_data->m;
+      int real_nzcnt, matbeg = 0, ind_i = 0, ind_j = 0, ind_k = 0;
+      double quality, *tmp_matval, *matval;
+      cut_pool *cp = p->tm->cpp[p->cut_pool];
+      cp_cut_data **cp_cut;
+      while (keep_going && iter_num < 1 &&
+	     (!p->has_ub ||
+	      (p->has_ub &&
+	       lp_data->objval < p->ub - p->par.granularity + lp_data->lpetol))){
+	 if (should_use_hot_starts && iter_num == 0) {
+	    *termstatus = solve_hotstart(lp_data, iterd);
+	    //total_iters+=*iterd;
+	 } else {
+	    *termstatus = dual_simplex(lp_data, iterd);
+	    //total_iters+=*iterd;
+	 }
+	 iter_num++;
+	 keep_going = FALSE;
+	 for (ind_i = 0, cp_cut = cp->cuts; ind_i < cp->cut_num;
+	      ind_i++, cp_cut++){
+	    check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
+			&quality, lp_data->x);
+	    if (violated){
+	       keep_going = TRUE;
+	       real_nzcnt = 0;
+	       nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
+	       tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
+	       tmp_matind =
+		  (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
+	       matval = (double *) malloc(nzcnt * DSIZE);
+	       matind = (int *) malloc(nzcnt * ISIZE);
+	       if (p->par.is_userind_in_order) {
+		  memcpy(matind, tmp_matind, nzcnt*ISIZE);
+		  memcpy(matval, tmp_matval, nzcnt*DSIZE);
+		  real_nzcnt = nzcnt;
+	       } else {
+		  for (ind_j = 0; ind_j < lp_data->n; ind_j++){
+		     for (ind_k = 0; ind_k < nzcnt; ind_k++){
+			if (tmp_matind[ind_k] == lp_data->vars[ind_j]->userind){
+			   matind[real_nzcnt]   = ind_j;
+			   matval[real_nzcnt++] = tmp_matval[ind_k];
+			}
+		     }
+		  }
+	       }
+	       add_rows(lp_data, 1, real_nzcnt, &(&(*cp_cut)->cut)->rhs,
+			&(&(*cp_cut)->cut)->sense, &matbeg, matind, matval);
+	    }
+	 }
+	 size_lp_arrays(lp_data, TRUE, FALSE, 0, 0, 0);
+      }
+      int *which = lp_data->tmp.i1;
+      for (ind_i = orig_row_num; ind_i < lp_data->m; ind_i++){
+	 which[ind_i - orig_row_num] = ind_i;
+      }
+      lp_data->si->deleteRows(lp_data->m - orig_row_num, which);
+      lp_data->nz = lp_data->si->getNumElements();
+      lp_data->m -= (lp_data->m - orig_row_num);
+   }
+   else{
+      if (should_use_hot_starts) {
+	 *termstatus = solve_hotstart(lp_data, iterd);
+      } else {
+	 load_basis(lp_data, cstat, rstat);
+	 *termstatus = dual_simplex(lp_data, iterd);
+      }
    }
    
    if (*termstatus == LP_D_INFEASIBLE || *termstatus == LP_D_OBJLIM || 

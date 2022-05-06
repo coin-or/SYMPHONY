@@ -77,7 +77,7 @@ int lp_initialize(lp_prob *p, int master_tid)
 
    p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));
    p->lp_data->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-   
+
 #pragma omp critical (lp_solver)
    open_lp_solver(p->lp_data);
 
@@ -326,7 +326,8 @@ int fathom_branch(lp_prob *p)
 	 write_lp(lp_data, name);
       }
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
-			       p->bc_level < 1))) {
+			       p->bc_level < 1)) ||
+	  p->par.should_warmstart_node == FALSE) {
          if (p->bc_index == 0) {
             PRINT(verbosity, 0, ("solving root lp relaxation\n"));
          }
@@ -334,6 +335,22 @@ int fathom_branch(lp_prob *p)
       } else {
 	 termcode = dual_simplex(lp_data, &iterd);
       }
+      p->objval = lp_data->objval;
+      #ifdef SENSITIVITY_ANALYSIS
+      // Save for later, since they get over-written during branching
+      if (p->par.sensitivity_rhs){
+	 if (!p->dualsol){
+	    p->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+	 }
+	 memcpy(p->dualsol, lp_data->dualsol, lp_data->maxm * DSIZE);
+      }
+      if (p->par.sensitivity_bounds){
+	 if(!p->dj){
+	    p->dj = (double *) malloc(lp_data->maxn * DSIZE);
+	 }
+	 memcpy(p->dj, lp_data->dj, lp_data->maxn * DSIZE);
+      }
+      #endif
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
          if (p->par.should_reuse_lp == TRUE) {
@@ -441,7 +458,17 @@ OPENMP_ATOMIC_UPDATE
 	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }
 
-       case LP_D_UNBOUNDED: /* the primal problem is infeasible */
+       case LP_D_UNBOUNDED: //the primal problem is infeasible 
+       /* 	  {char aname[50] = ""; //Anahita */
+       /* 	    printf("####### LP dual unbounded\n"); */
+       /* 	    sprintf(aname, "matrix.%i.%i", p->bc_index, p->iter_num); */
+       /* 	    write_mps(lp_data, aname); */
+       /* 	    //	    write_lp(lp_data, aAname); */
+       /* 	  }  */
+	 
+
+
+
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
 	 if (num_errors == 1 && !rs_mode_enabled){
@@ -511,7 +538,6 @@ OPENMP_ATOMIC_UPDATE
 
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
-      /* is_feasible_u() fills up lp_data->x, too!! */
       feas_status = is_feasible_u(p, FALSE, FALSE);
       if (feas_status == IP_FEASIBLE ||
 	  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
@@ -553,7 +579,6 @@ OPENMP_ATOMIC_UPDATE
 	 /*------------------------------------------------------------------*\
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
-
 #ifdef USE_SYM_APPLICATION
 	    if ((cut_term = receive_cuts(p, first_in_loop,
                         no_more_cuts_count)) >=0 ){
@@ -562,7 +587,8 @@ OPENMP_ATOMIC_UPDATE
                return(ERROR__USER);
             }
 #else
-         if (!check_tailoff(p)) {
+	    if (!check_tailoff(p) || (p->par.cuts_strong_branch &&
+				      p->tm->cpp[p->cut_pool]->cuts_to_add_num > 0)) {
             if ((cut_term = receive_cuts(p, first_in_loop,
                         no_more_cuts_count)) >=0 ){
                cuts += cut_term;
@@ -583,6 +609,7 @@ OPENMP_ATOMIC_UPDATE
 	    continue;
 	 }
       }
+
 
       PRINT(verbosity, 2,
 	    ("\nIn iteration %i, before calling branch()\n", p->iter_num));
@@ -672,7 +699,7 @@ OPENMP_ATOMIC_UPDATE
             }
 	    printf("\n\n");
 	 }
-#ifdef DO_TESTS
+#if 0
 	 if (cuts == 0 && p->bound_changes_in_iter == 0){
 	    printf("Error! Told not to branch, but there are no new cuts or ");
 	    printf("bound changes!\n");
@@ -2884,7 +2911,15 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
          CglGomory *gomory = new CglGomory;
          should_use_cgl_generator(p, &should_generate, i, (void *)gomory);
          if (should_generate == TRUE) {
+#if 0
+	    CglTreeInfo treeInfo;
+	    if (p->par.cgl.gomory_globally_valid){
+	       treeInfo.options |= 16;
+	    }
+	    gomory->generateCuts(*(p->lp_data->si), cutlist, treeInfo);
+#else
 	    gomory->generateCuts(*(p->lp_data->si), cutlist);
+#endif
 	    *was_tried = TRUE;	    
          }
          delete gomory;
@@ -2959,6 +2994,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    //const double etol500 = lpetol * 500;
    const double etol100 = lpetol * 100;
    const double etol1000 = lpetol * 1000;
+   const double etol100000 = lpetol * 100000; //Anahita
    const double *x     = lp_data->x;
    OsiRowCut    row_cut;
    var_desc     **vars = lp_data->vars;
@@ -3069,26 +3105,31 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       }
       //v_level = 1; 
       coeff_ratio = min_coeff/max_coeff; 
-      /* check quality */
+      /* check quality */ //Anahita
+      // critical to performance
+      bool bad_small_coeff_cond = min_coeff > 0 && min_coeff < etol1000;
+      bool bad_coeff_ratio_cond = max_coeff > 0 && coeff_ratio < etol1000;
+
       if (num_elements>0) {
-         if ( (max_coeff > 0 && coeff_ratio < etol1000)||
-	      (min_coeff > 0 && min_coeff < etol1000) ) {
+         if ( (bad_coeff_ratio_cond)||
+      	      (bad_small_coeff_cond) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
-	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
-	    num_poor_quality++;
-	    //is_deleted[i] = TRUE;
-	    continue;
+      	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
+      	    num_poor_quality++;
+      	    //is_deleted[i] = TRUE;
+      	    continue;
          }
       }
       
       if (violation < etol10){//*v_level){
-         PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
-			    violation));
+         PRINT(verbosity,5,("violation = %f. Threw out cut.\n",
+      			    violation));
          num_unviolated++;
          //is_deleted[i] = TRUE;
          continue;
       }//else printf("violation - %f \n", violation);
-
+      
+      
       /* check if sense is 'R' */
       if (row_cut.sense()=='R') {
          PRINT(verbosity,5,("cut #%d has a range. thrown out.\n", i));

@@ -1,0 +1,14 @@
+Index: Osi/src/OsiCommonTest/OsiSolverInterfaceTest.cpp
+===================================================================
+--- Osi/src/OsiCommonTest/OsiSolverInterfaceTest.cpp	(revision 2035)
++++ Osi/src/OsiCommonTest/OsiSolverInterfaceTest.cpp	(working copy)
+@@ -3802,6 +3802,9 @@
+ 
+     // make sure col solution is something reasonable,
+     // that is between upper and lower bounds
++    OSIUNITTEST_CATCH_SEVERITY_EXPECTED(exmip1Si->initialSolve(), return, 
++					*exmip1Si, "OsiSolverInterfaceCommonUnitTest: exmip1 initialSolve",
++					TestOutcome::ERROR, solverName == "vol");
+     const double * cs = exmip1Si->getColSolution();
+     int c;
+     bool okColSol=true;

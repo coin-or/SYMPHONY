@@ -35,13 +35,8 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
    
    if (sp->num_solutions == sp->max_solutions && 
          sp->solutions[0]->objval>=obj_value+p->lp_data->lpetol) {
-      /* delete first solution and move everything up by 1 */
+      /* delete first solution */
       sp_delete_solution(sp,0);
-      /*
-      for (i=0;i<(sp->max_solutions-1);i++) {
-         sp->solutions[i] = sp->solutions[i+1];
-      }
-      */
    } else if (sp->num_solutions == sp->max_solutions) {
       /* pool is full and the new solution is worse than any stored solution
        */
@@ -101,7 +96,7 @@ int sp_initialize(tm_prob *tm)
    int i;
    tm->sp = (sp_desc*)malloc(sizeof(sp_desc));
    sp_desc *sp = tm->sp;
-   sp->max_solutions = 10;
+   sp->max_solutions = tm->par.max_sp_size;
    sp->num_solutions = 0;
    sp->total_num_sols_found = 0;
    sp->solutions = (sp_solution **) malloc(sp->max_solutions*sizeof(sp_solution*));

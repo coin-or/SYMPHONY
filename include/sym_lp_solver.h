@@ -202,6 +202,12 @@ typedef struct LPDATA{
    double    *x;           /* maxn */ /* BB */
    double    *dj;          /* maxn */ /* BB */
    double    *dualsol;     /* maxm */ /* BB */
+#ifdef SENSITIVITY_ANALYSIS
+   //Anahita
+   double    *raysol;
+   double    intcpt;
+   //
+#endif
    double    *slacks;      /* maxm */
    double    *ub;
    double    *lb;
@@ -273,6 +279,14 @@ void get_row PROTO((LPdata *lp_data, int i,
 int get_proof_of_infeas PROTO((LPdata *lp_data, int *infind));
 void get_x PROTO((LPdata *lp_data));
 void get_dj_pi PROTO((LPdata *lp_data));
+
+//Anahita
+void get_dual_ray PROTO((LPdata *lp_data));
+
+//Anahita
+void get_dual_farkas_ray PROTO((LPdata *lp_data));
+
+
 void get_slacks PROTO((LPdata *lp_data));
 void change_range PROTO((LPdata *lp_data, int rowind, double value));
 void change_rhs PROTO((LPdata *lp_data,

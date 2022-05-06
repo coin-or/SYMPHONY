@@ -38,19 +38,18 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-/* not used now! to be used later!*/
 int resolve_node(sym_environment *env, bc_node *node)
 {
    node_desc * desc = &node->desc;
    LPdata *lp_data = (LPdata*)calloc(1, sizeof(LPdata));
-   lp_data->mip = create_copy_mip_desc(env->mip); //FIXME!!!
    lp_sol *best_sol = &(env->warm_start->best_sol);
    branch_desc *bpath;
    branch_obj *bobj;
    bc_node **path, *n;
    int level = node->bc_level;
 
-   int *matbeg = 0, *matind= 0, size, nzcnt = 0, return_value, iterd = 0;
+   int *matbeg = 0, *matind= 0, size, nzcnt = 0, total_nzcnt = 0;
+   int return_value, iterd = 0;
    double *matval = 0, colsol;
    int i, j = 0, cnt = 0, *xind = 0;
    double *xval = 0, *rhs = 0, lpetol = 9.9999999999999995e-07;
@@ -295,12 +294,21 @@ int resolve_node(sym_environment *env, bc_node *node)
 
    //   lp_data->mip->m += new_desc->cutind.size;
 
-   lp_data->m = lp_data->mip->m;
-   lp_data->n = lp_data->mip->n;
+   lp_data->m = env->mip->m;
+   lp_data->n = env->mip->n;
 
    open_lp_solver(lp_data);
-   load_lp_prob(lp_data, 0, 0);
+   //This is a bit of a hack to avoid making a full copy of env->mip 
+   //Should be calling load_lp_prob(lp_data, 0, 0);
+   //Perhaps make MIPdesc an argument of load_lp_prob??
 
+   MIPdesc *mip = env->mip;
+   lp_data->si->loadProblem(lp_data->n, lp_data->m,
+			    mip->matbeg, mip->matind,
+			    mip->matval, mip->lb,
+			    mip->ub, mip->obj,
+			    mip->sense, mip->rhs,
+			    mip->rngval);
 
    /*------------------------------------------------------------------------*\
     * Now go through the branching stuff
@@ -355,6 +363,8 @@ int resolve_node(sym_environment *env, bc_node *node)
    desc = new_desc;
 
    if (desc->cutind.size > 0){
+      lp_data->tmp.c = (char*) calloc(lp_data->m, CSIZE);
+      lp_data->tmp.d = (double*) calloc(lp_data->m, DSIZE);
       size = desc->cutind.size;
       sense  = (char*) malloc(size*CSIZE);
       rhs = (double*) malloc(size*DSIZE);
@@ -366,15 +376,16 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    if (i == desc->cutind.list[j]){
 	       cut = env->warm_start->cuts[i];
 	       nzcnt = ((int *) (cut->coef))[0];
-	       sense[j] = cut->sense;
+               total_nzcnt += nzcnt;
+               sense[j] = cut->sense;
 	       rhs[j] = cut->rhs;
 	       matbeg[j+1] = matbeg[j] + nzcnt;
 	    }
 	 }
       }
 
-      matind = (int *) malloc(nzcnt*ISIZE);
-      matval = (double *) malloc(nzcnt*DSIZE);
+      matind = (int *) malloc(total_nzcnt*ISIZE);
+      matval = (double *) malloc(total_nzcnt*DSIZE);
 
       for (i = 0; i<env->warm_start->cut_num; i++){
 	 for(j=0; j<desc->cutind.size; j++){
@@ -389,8 +400,7 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    }
 	 }
       }
-      nzcnt = matbeg[j];
-      add_rows(lp_data, size, nzcnt, rhs, sense, matbeg, matind, matval);
+      add_rows(lp_data, size, total_nzcnt, rhs, sense, matbeg, matind, matval);
    }
 
    /*----------------------------------------------------------------------- */
@@ -423,6 +433,11 @@ int resolve_node(sym_environment *env, bc_node *node)
       }
       load_basis(lp_data, cstat, rstat);
    }
+
+   size_lp_arrays(lp_data, FALSE, TRUE, lp_data->m, lp_data->n, nzcnt);
+
+   // This is a hack. If lp_data->slacks is allocated, we crash
+   FREE(lp_data->slacks);
    
    return_value = dual_simplex(lp_data, &iterd);
    
@@ -430,15 +445,23 @@ int resolve_node(sym_environment *env, bc_node *node)
       return_value == LP_D_INFEASIBLE){
       node->feasibility_status = INFEASIBLE_PRUNED;
       node->node_status = NODE_STATUS__PRUNED;
+#ifdef SENSITIVITY_ANALYSIS
+      if (lp_data->raysol){
+	 if (!node->rays){
+	    node->rays = (double *) malloc(lp_data->m*DSIZE);
+	 }
+	 memcpy(node->rays, lp_data->raysol, lp_data->m*DSIZE);
+      }
+#endif
    }
 
    if(return_value == LP_OPTIMAL || return_value == LP_D_OBJLIM || 
       return_value == LP_D_ITLIM){
-      lp_data->x = (double *)malloc(DSIZE*lp_data->n);
+      //lp_data->x = (double *)malloc(DSIZE*lp_data->n);
       get_x(lp_data);
-      for(i = lp_data->n; i>=0; i--){
+      for(i = lp_data->n-1; i>=0; i--){
 	 colsol = lp_data->x[i];
-	 if(lp_data->mip->is_int[i]){
+	 if(env->mip->is_int[i]){
 	    if(colsol-floor(colsol) > env->par.lp_par.granularity &&
 	       ceil(colsol)-colsol > env->par.lp_par.granularity){
 	       break;
@@ -448,6 +471,20 @@ int resolve_node(sym_environment *env, bc_node *node)
       if(i<0){
 	 node->node_status = NODE_STATUS__PRUNED;
 	 node->feasibility_status = FEASIBLE_PRUNED;
+
+	 FREE(node->sol_ind);
+	 FREE(node->sol);
+
+	 node->sol_ind = xind = (int *)malloc(ISIZE*lp_data->n);
+	 node->sol = xval = (double *)malloc(DSIZE*lp_data->n);	    
+	 
+	 for (i = 0; i < lp_data->n; i++){
+	    if (lp_data->x[i] > lpetol || lp_data->x[i] < -lpetol){
+	       xind[cnt] = i;
+	       xval[cnt++] = lp_data->x[i];
+	    }
+	 }
+	 node->sol_size = cnt;
 
 	 if((env->warm_start->has_ub && 
 	     lp_data->objval < env->warm_start->ub)||
@@ -463,15 +500,6 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    FREE(best_sol->xind);
 	    FREE(best_sol->xval);
 	    
-	    xind = (int *)malloc(ISIZE*lp_data->n);
-	    xval = (double *)malloc(DSIZE*lp_data->n);	    
-	    	    
-	    for (i = 0; i < lp_data->n; i++){
-	       if (lp_data->x[i] > lpetol || lp_data->x[i] < -lpetol){
-		  xind[cnt] = i;
-		  xval[cnt++] = lp_data->x[i];
-	       }
-	    }
 	    best_sol->xind = (int *)malloc(ISIZE*cnt);
 	    best_sol->xval = (double *)malloc(DSIZE*cnt);	    
 	    memcpy(best_sol->xind, xind, ISIZE*cnt);
@@ -480,8 +508,21 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    best_sol->xlevel = node->bc_level;
 	    best_sol->xindex = node->bc_index;
 	    best_sol->lpetol = lpetol;
-	 }  	 
+	 }else{
+	    node->sol_size = 0;
+	    FREE(node->sol_ind);
+	    FREE(node->sol);
+	    node->node_status = NODE_STATUS__CANDIDATE;
+	 }
       }
+#ifdef SENSITIVITY_ANALYSIS
+      if (lp_data->dualsol){
+	 if (!node->duals){
+	    node->duals = (double *) malloc(lp_data->m*DSIZE);
+	 }
+	 memcpy(node->duals, lp_data->dualsol, lp_data->m*DSIZE);
+      }
+#endif
    }
 
    for(i = 0; i < 2*(level+1)+BB_BUNCH; i++){
@@ -520,11 +561,8 @@ int resolve_node(sym_environment *env, bc_node *node)
       FREE(desc);
    }
    node->lower_bound = lp_data->objval;
-   free_mip_desc(lp_data->mip);
    free_lp_arrays(lp_data);
    close_lp_solver(lp_data);  
-   FREE(xind);
-   FREE(xval);
    FREE(lp_data);
 
    return(FUNCTION_TERMINATED_NORMALLY);
@@ -533,11 +571,11 @@ int resolve_node(sym_environment *env, bc_node *node)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num, int *cuts_ind, char *cru_vars, 
-		      int change_type)
+int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
+		      int *cuts_ind, char *cru_vars, int change_type)
 {
 
-   int i, resolve = 0;
+   int i, resolve = 1;
    char deletable = TRUE;   
 
    if (root){
@@ -580,7 +618,9 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num, int *cu
 		 resolve_node(env, root);		 
 	      }
 	   }
-	   root->feasibility_status = 0; // or? ROOT_NODE;
+	   if (resolve == 0){
+	      root->feasibility_status = 0; // or? ROOT_NODE;
+	   }
 	 }
       } else{
 	 if(root->bobj.child_num > 0){
@@ -1181,7 +1221,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 /*===========================================================================*/
 /*===========================================================================*/
 
-int copy_node(bc_node * n_to, bc_node *n_from)
+int copy_node(warm_start_desc *ws, bc_node * n_to, bc_node *n_from)
 {
 
    if (!n_to || !n_from){
@@ -1213,7 +1253,23 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 	 memcpy(n_to->sol_ind, n_from->sol_ind, n_from->sol_size * ISIZE);
       }
    }
-  
+
+#ifdef SENSITIVITY_ANALYSIS
+   //FIXME: This is a bit fragile. Assumes variable list doesn't
+   //change, etc.
+   if (n_from->duals){
+      n_to->duals = (double *) malloc(ws->rootnode->desc.uind.size*DSIZE);
+      memcpy(n_to->duals, n_from->duals,
+	     ws->rootnode->desc.uind.size*DSIZE);
+   }
+   
+   if (n_from->rays){
+      n_to->rays = (double *) malloc(n_from->desc.uind.size*DSIZE);
+      memcpy(n_to->rays, n_from->rays,
+	     n_from->desc.uind.size*DSIZE);
+   }
+#endif
+   
 #ifdef TRACE_PATH
    n_to->optimal_path = n_from->optimal_path;
 #endif 
@@ -1402,7 +1458,8 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int copy_tree(bc_node *root_to, bc_node *root_from)
+int copy_tree(warm_start_desc *ws,
+	      bc_node *root_to, bc_node *root_from)
 {
    int i, childNum;
 
@@ -1412,14 +1469,14 @@ int copy_tree(bc_node *root_to, bc_node *root_from)
    }
    
    if (root_from){
-      copy_node(root_to, root_from);      
+      copy_node(ws, root_to, root_from);      
       childNum = root_to->bobj.child_num;      
       if (childNum) {
 	 root_to->children = (bc_node **) calloc(sizeof(bc_node*), childNum);
 	 for (i = 0; i < childNum; i++){
 	    root_to->children[i] = (bc_node *) calloc(1, sizeof(bc_node));
 	    root_to->children[i]->parent = root_to;
-	    copy_tree(root_to->children[i], root_from->children[i]); 
+	    copy_tree(ws, root_to->children[i], root_from->children[i]); 
 	 }
       }      
    }
@@ -1459,8 +1516,7 @@ int write_node(bc_node *node, FILE*f)
    else{
       fprintf(f," PARENT_INDEX    : -1\n");
    }
-
-   fprintf(f, " CHILDREN        : %i %i %i\n", (int)node->bobj.type,
+   fprintf(f, " CHILDREN        : %i %i %i\n", (int)node->bobj.type, 
            node->bobj.name, node->bobj.child_num);
    for (i = 0; i < node->bobj.child_num; i++){
       fprintf(f, "%i %c %f %f %i\n", node->children[i]->bc_index,
@@ -1810,8 +1866,7 @@ warm_start_desc *create_copy_warm_start(warm_start_desc *ws)
 	     CSIZE* ws_copy->cuts[i]->size);
    }
    ws_copy->rootnode = (bc_node*)calloc(1,sizeof(bc_node));	 
-   copy_tree(ws_copy->rootnode, ws->rootnode);
-
+   copy_tree(ws, ws_copy->rootnode, ws->rootnode);
 
    if(ws->best_sol.xlength){
       ws_copy->best_sol.xind = (int*) malloc (ISIZE * ws->best_sol.xlength);
@@ -2204,86 +2259,361 @@ sym_environment *create_copy_environment (sym_environment *env)
    
    return(env_copy);
 }   
-
 /*===========================================================================*/
 /*===========================================================================*/
-double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind, 
-			  double *val)
+//Anahita
+void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
+			    double ** dual_pieces, int *cur_piece_no,
+			    int MAX_ALLOWABLE_NUM_PIECES))
 {
 #ifdef SENSITIVITY_ANALYSIS
-   int i, j, retval;
-   double min = SYM_INFINITY;
+   int i, j;
    bc_node * child;
 
    if(root){   
-
-      root->C_LP = root->lower_bound;
-      for(i=0; i<cnt; i++){ 
-	 root->C_LP += root->duals[ind[i]]*(val[i] - mip->rhs[ind[i]]);
-      }
+      //this is an inermediate node, do nothing immediately,
+      //dive to children
+     
 
       for(i = 0; i < root->bobj.child_num; i++){
 
 	 child = root->children[i];
-	 child->C_LP = 0.0;
-
-	 if(child->node_status == NODE_STATUS__PRUNED){
-	    if(child->feasibility_status == FEASIBLE_PRUNED ||
-	       child->feasibility_status == OVER_UB_PRUNED){
-	       
-	       if (child->feasibility_status == FEASIBLE_PRUNED){
-		  for(j = 0; j< child->sol_size; j++){
-		     child->C_LP += mip->obj[child->sol_ind[j]] * child->sol[j];
-		  }
-	       } else{
-		  printf("OVER_UB_PRUNED!\n");
-		  child->C_LP = child->lower_bound;
-	       }
-
-	       for(j=0; j<cnt; j++){
-		  child->C_LP += child->duals[ind[j]] *
-		     (val[j]- mip->rhs[ind[j]]);
-	       }
-	       child->B_IP = child->C_LP; 
-	    }			    
-	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
-	       
-	       child->B_IP = SYM_INFINITY;
-	       retval = check_feasibility_new_rhs(child, mip, cnt, ind, val);
-	       /* if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
-		   retval == LP_D_INFEASIBLE){
-		   child->B_IP = SYM_INFINITY;
-	       } */
-	       if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM || 
-		  retval == LP_D_ITLIM){
-		  child->B_IP = -SYM_INFINITY;
-	       }
+	 
+	 
+	 //temp
+	 bool leaf_node = 1;
+	 if (child->children){
+	    leaf_node = 0;
+	 }
+	 printf ("level %d, child->node_status is %d and child->feasibility_status is %d.\n", child->bc_index, child->node_status, child->feasibility_status);
+	 
+	  if (child->node_status == NODE_STATUS__ITERATION_LIMIT){
+	       printf("This child is pruned because of iteration limit");
 	    }
-	    else {
-	       printf("get_lb_for_new_rhs(): Unknown error!\n");
+	  //end temp
+	 if(child->node_status == NODE_STATUS__PRUNED || leaf_node){
+	    if (*cur_piece_no >  MAX_ALLOWABLE_NUM_PIECES){
+	       printf("MAX_ALLOWABLE_NUM_PIECES reached...terminating..\n");
+	       exit(1);
+	    }
+	    if(child->feasibility_status == FEASIBLE_PRUNED ||
+	       child->feasibility_status == OVER_UB_PRUNED ||
+	       child->feasibility_status == PRUNED_HAS_CAN_SOLUTION || leaf_node
+	       ){
+	       
+	       //if pruned node is int feasible or it is
+	       //over UB pruned, get the dual info
+	       
+	       //allocate memory for dual_pieces
+	       dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
+	       
+	       //write dual info ***CHECK***
+	       dual_pieces[*cur_piece_no] [0] = child->intcpt; //buildCpx
+	       //dual_pieces[*cur_piece_no] [0] = child->lower_bound;//buildCpx-3
+	       for (j = 0; j < mip->m; j++){
+		  dual_pieces[*cur_piece_no][j+1] = child->duals[j];
+	       }
+	       //increment
+	       (*cur_piece_no)++;
+	    }			    
+	    
+	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
+	       printf("Infeasible node...Examining rays/duals\n");
+	       //sleep(2);//check if the node was pruned by dual bound exceed
+
+	       if (child->duals && child->rays){
+		  printf("HUH! Both duals and rays\n");
+	       }
+	       if (child->duals && !child->rays){
+		  printf("HUH! Just duals\n");
+		  exit(1);
+	       }
+	       if (!child->duals && child->rays){
+		  printf("HUH! Just rays\n");
+		  exit(1);
+	       }
+
+	       //Combine the solutions
+		       
+	       double Lambda = 1;
+
+	       dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
+	       
+	       dual_pieces[*cur_piece_no] [0] = Lambda*child->intcpt;
+	       for (j = 0; j < mip->m; j++){
+	       	  dual_pieces[*cur_piece_no][j+1] = 99999*Lambda*child->rays[j];
+	       }
+	       //increment
+	       (*cur_piece_no)++;
+
+	       
+	       /* //write dual+ray info */
+	       /* /\* here child-duals has the dual info */
+	       /* 	  and child-lowerbound is the dual obj-->first we get the */
+	       /* 	  intercept of the duals. Later we will work on rays *\/ */
+	       /* child->lower_bound; */
+
+	       /* /\* */
+	       /* 	  child-incpt has the reduced cost info that is the variable bounds*their */
+	       /* 	  duals, with rays *\/ */
+	       /* dual_pieces[*cur_piece_no] [0] = child->lower_bound; */
+	       /* for (j = 0; j < mip->m; j++){ */
+	       /* 	  dual_pieces[*cur_piece_no][j+1] = child->duals[j] + Lambda* */
+	       /* 	     child->rays[i]; */
+	       /* } */
+	       
+	    }//end of infeasible nodes
+	    else { //status unknown
+	       printf("get_dual_pruned(): Unknown error!\n");
 	       exit(1);
 	    } 	 
-	 }
+	 } //if not pruned, recurse 
 	 else {
-	    child->B_IP = get_lb_for_new_rhs(child, mip, cnt, ind, val); 
+	    get_dual_pruned(child, mip, dual_pieces, cur_piece_no,
+			    MAX_ALLOWABLE_NUM_PIECES); 
 	 }
-	 
-	 if(child->B_IP < min)
-	    min = child->B_IP;
-      }     
+      }//child loop
+   } //if root end
+   
+#else
+   printf("get_dual_pruned():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+#endif
+} 
 
-      if(root->C_LP > min )
-	 return (root->C_LP);
-      else
-	 return (min);
+/*===========================================================================*/
+/*===========================================================================*/
+double get_lb_for_new_rhs(bc_node *node, MIPdesc *mip, branch_desc *bpath,
+			  int rhs_cnt, int *new_rhs_ind, double *new_rhs_val,
+			  int lb_cnt, int *new_lb_ind, double *new_lb_val,
+			  int ub_cnt, int *new_ub_ind, double *new_ub_val)
+{
+#ifdef SENSITIVITY_ANALYSIS
+   int i, j, k,retval;
+   double min = -SYM_INFINITY;
+   bc_node * child;
+   double lb = 0, objval = -SYM_INFINITY;
+   int level = node->bc_level;
+   branch_obj * bobj;
+   
+   if(!node){
+      printf("Warning: NULL pointer in get_lb_for_new_rhs()\n");
+      return(-SYM_INFINITY);
    }
 
-   return (min);
+#if 0
+   bc_node **path, *n;
+   branch_desc *bpath ;
+
+   path = (bc_node **) malloc((2*(level+1)+BB_BUNCH)*sizeof(bc_node *));
+   bpath = (branch_desc *) malloc 
+      ((2*(level+1)+BB_BUNCH)*sizeof(branch_desc));
+
+   for (i = level, n = node; i >= 0; n = n->parent, i--)
+      path[i] = n;
+
+   for (i = 0; i < level; i++){
+      for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
+	 if (path[i]->children[j] == path[i+1])
+	    break;
+      bobj = &path[i]->bobj;
+      bpath[i].type = bobj->type;
+      bpath[i].name = bobj->name;
+      bpath[i].sense = bobj->sense[j];
+      bpath[i].rhs = bobj->rhs[j];
+      bpath[i].range = bobj->range[j];
+      bpath[i].branch = bobj->branch[j];
+   }
 #else
+   if (level > 0){
+      for (j = node->parent->bobj.child_num - 1; j >= 0; j--)
+	 if (node->parent->children[j] == node)
+	    break;
+      
+      bobj = &(node->parent->bobj);
+      bpath[level-1].type = bobj->type;
+      bpath[level-1].name = bobj->name;
+      bpath[level-1].sense = bobj->sense[j];
+      bpath[level-1].rhs = bobj->rhs[j];
+      bpath[level-1].range = bobj->range[j];
+      bpath[level-1].branch = bobj->branch[j];
+   }
+#endif
+      
+   //Start with the previous bound
+   if(node->feasibility_status == FEASIBLE_PRUNED ||
+      node->feasibility_status == OVER_UB_PRUNED ||
+      node->feasibility_status == NODE_BRANCHED_ON){
+      node->C_LP = node->lower_bound;
+#ifdef CHECK_DUAL_SOLUTION
+      for (i = 0; i < mip->m; i++){
+	 lb += node->duals[i]*mip->rhs[i];
+      }
+      for (i = 0; i < mip->n; i++){
+	 if (node->dj[i] >= 0){
+	    lb += node->dj[i]*mip->lb[i];
+	 }else{
+	    lb += node->dj[i]*mip->ub[i];
+	 }
+      }
+      //This is just to check the lower bound value
+      for (i = 0; i < level; i++){
+	 if (bpath[i]->type == BRANCHING_VARIABLE){
+	    switch (bpath[i]->sense){
+	     case 'E':
+	       if (bpath[i]->rhs < mip->ub[j]){
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->ub[j]);
+	       }else{
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->lb[j]);
+	       }
+	       break;
+	     case 'L':
+	       if (node->dj[j] <= 0){
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->ub[j]);
+	       }
+	       break;
+	     case 'G':
+	       if (node->dj[j] >= 0){
+		  lb += node->dj[j] * (bpath[i]->rhs - mip->lb[j]);
+	       }
+	       break;
+	     case 'R':
+	       printf("Warning: Ranged constraints not handled!\n");
+	       exit(1);
+	       break;
+	    }
+	 }else{ /* BRANCHING_CUT */
+	    printf("Warning: Branching cuts not handled!\n");
+	    exit(1);
+	 }
+      }
+      if (fabs(node->lower_bound - lb) >= .5){
+	 printf("Error!\n");
+      }
+#endif
+      
+      //Modify
+      char sense;
+      for (i = 0; i < lb_cnt; i++){
+	 if (node->dj[new_lb_ind[i]] <= 0){
+	    continue;
+	 }
+	 for (j = 0; j < level; j++){
+	    if (bpath[j].type == BRANCHING_VARIABLE){
+	       k = bpath[j].name;   //assuming no extra vars!
+	       sense = bpath[j].sense;
+	       if (new_lb_ind[i] == k){
+		  if (new_lb_val[i] > bpath[j].rhs){
+		     if (sense == 'G'){
+			node->C_LP +=
+			   node->dj[k]*(new_lb_val[i] - bpath[j].rhs);
+			break;
+		     }else{ 
+			//New lower bound makes this node infeasible
+			return(node->C_LP = node->B_IP = SYM_INFINITY);
+		     }
+		  }
+		  //At this point, we don't need to continue the loop 
+		  break;
+	       }
+	    }
+	 }
+	 //This means we did not branch on new_ub_ind[i], so we adjust as usual
+	 if (j == level){
+	    node->C_LP += node->dj[new_lb_ind[i]] *
+	       (new_lb_val[i]- mip->lb[new_lb_ind[i]]);
+	 }
+      }
+      for (i = 0; i < ub_cnt; i++){
+	 if (node->dj[new_ub_ind[i]] >= 0){
+	    continue;
+	 }
+	 for (j = 0; j < level; j++){
+	    if (bpath[j].type == BRANCHING_VARIABLE){
+	       k = bpath[j].name;   //assuming no extra vars!
+	       sense = bpath[j].sense;
+	       if (new_ub_ind[i] == k){
+		  if (new_ub_val[i] < bpath[j].rhs){
+		     if (sense == 'L'){
+			node->C_LP +=
+			   node->dj[k]*(new_ub_val[i] - bpath[j].rhs);
+			break;
+		     }else{ 
+			//New lower bound makes this node infeasible
+			return(node->C_LP = node->B_IP = SYM_INFINITY);
+		     }
+		  }
+		  //At this point, we don't need to continue the loop 
+		  break;
+	       }
+	    }
+	 }
+	 if (j == level){
+	    //This means we did not branch on new_ub_ind[i], so we adjust as usual
+	    node->C_LP += node->dj[new_ub_ind[i]] *
+	       (new_ub_val[i]- mip->ub[new_ub_ind[i]]);
+	 }
+      }
+      for (i = 0; i < rhs_cnt; i++){ 
+	 node->C_LP += node->duals[new_rhs_ind[i]]*
+	    (new_rhs_val[i] - mip->rhs[new_rhs_ind[i]]);
+      }
+      node->B_IP = node->C_LP;
+   }else if (node->feasibility_status == INFEASIBLE_PRUNED){
+      
+      node->B_IP = SYM_INFINITY;
+      retval = check_feasibility_new_rhs(node, mip, bpath,
+					 rhs_cnt,
+					 new_rhs_ind, new_rhs_val,
+					 lb_cnt,
+					 new_lb_ind, new_lb_val,
+					 ub_cnt,
+					 new_ub_ind, new_ub_val,
+					 &objval);
+      if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM ||
+	 retval == LP_D_ITLIM){
+	 node->B_IP = objval;
+      }else{
+	 node->B_IP = SYM_INFINITY;
+      }
+   }else {
+      printf("get_lb_for_new_rhs(): Unknown feasiblility status!\n");
+      exit(1);
+   }
+
+   if (node->bobj.child_num > 0){
+      min = SYM_INFINITY;
+   }
+   for (i = 0; i < node->bobj.child_num; i++){
+      
+      child = node->children[i];
+      
+      child->B_IP = get_lb_for_new_rhs(child, mip, bpath,
+				       rhs_cnt, new_rhs_ind, new_rhs_val,
+				       lb_cnt, new_lb_ind, new_lb_val,
+				       ub_cnt, new_ub_ind, new_ub_val); 
+      
+      if(child->B_IP < min){
+	 min = child->B_IP;
+      }
+   }     
+
+#ifdef CHECK_DUAL_SOLUTION
+   if (node->bobj.child_num == 0){
+      printf("%.3f %.3f %.3f\n", node->B_IP, node->lower_bound, lb);
+   }
+#endif
+
+   return (node->B_IP > min ? node->B_IP : min);
+
+#else
+
    printf("get_lb_for_new_rhs():\n");
    printf("Sensitivity analysis features are not enabled.\n"); 
    printf("Please rebuild SYMPHONY with these features enabled\n");
    return(-SYM_INFINITY);
+
 #endif
 } 
 
@@ -2291,7 +2621,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 /*===========================================================================*/
 
 double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt, 
-				int *ind, double *val)
+			  int *ind, double *val)
 {
 #ifdef SENSITIVITY_ANALYSIS
    int i, j, n;
@@ -2477,44 +2807,30 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip, 
-				 int cnt, int *ind, double *val)
+double check_feasibility_new_rhs(bc_node *node, MIPdesc *mip, branch_desc *bpath,
+				 int rhs_cnt,
+				 int *new_rhs_ind, double *new_rhs_val,
+				 int lb_cnt,
+				 int *new_lb_ind, double *new_lb_val,
+				 int ub_cnt,
+				 int *new_ub_ind, double *new_ub_val,
+				 double *objval)
 {
 #ifdef SENSITIVITY_ANALYSIS
    int i, j;
    int level = node->bc_level;
-   bc_node **path, *n;
-   branch_desc *bpath ;
    branch_obj * bobj;
    int retval, iterd;
    LPdata * lp_data;
+   double lb, ub;
 
    double * old_obj = mip->obj;
    //   mip->obj = (double*)calloc(mip->n, DSIZE);
    
-   lp_data = (LPdata *) malloc (sizeof(LPdata));
+   lp_data = (LPdata *) calloc (1, sizeof(LPdata));
    lp_data->mip = mip;
    lp_data->n = mip->n;
    lp_data->m = mip->m;
-
-   path = (bc_node **) malloc((2*(level+1)+BB_BUNCH)*sizeof(bc_node *));
-   bpath = (branch_desc *) malloc 
-      ((2*(level+1)+BB_BUNCH)*sizeof(branch_desc));
-
-   for (i = level, n = node; i >= 0; n = n->parent, i--)
-      path[i] = n;
-
-   for (i = 0; i < level; i++, bpath++){
-      for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
-	 if (path[i]->children[j] == path[i+1])
-	    break;
-      bobj = &path[i]->bobj;
-      bpath->type = bobj->type;
-      bpath->name = bobj->name;
-      bpath->sense = bobj->sense[j];
-      bpath->rhs = bobj->rhs[j];      bpath->range = bobj->range[j];
-      bpath->branch = bobj->branch[j];
-   }
 
    //load_the problem
 
@@ -2523,50 +2839,68 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
 
    //change the rhs!
 
-   //FIXME! cange_rhs needs lp_data->tmp.c and lp_data->tmp.d???
+   //FIXME! change_rhs needs lp_data->tmp.c and lp_data->tmp.d???
    
    lp_data->tmp.c = (char*) calloc(mip->m, CSIZE);
    lp_data->tmp.d = (double*) calloc(mip->m, DSIZE);
 
-   change_rhs(lp_data, cnt, ind, val);
+   change_rhs(lp_data, rhs_cnt, new_rhs_ind, new_rhs_val);
+   for (i = 0; i < lb_cnt; i++){
+      change_lbub(lp_data, new_lb_ind[i],
+		  new_lb_val[i], mip->lb[new_lb_ind[i]]);
+   }
+   for (i = 0; i < ub_cnt; i++){
+      change_lbub(lp_data, new_ub_ind[i],
+		  mip->lb[new_ub_ind[i]], new_ub_val[i]);
+   }
    
    //add the branching changes
 
-   bpath = bpath - level;   
-   if(level){
-      for (i = 0; i < level; i++, bpath++){
-	 //	 bpath = bpath + i;
-	 if (bpath->type == BRANCHING_VARIABLE){
-	    j = bpath->name;   //assuming no extra vars! 
-	    switch (bpath->sense){
-	    case 'E':
-	       change_lbub(lp_data, j, bpath->rhs, bpath->rhs);
-	       break;
-	     case 'L':
-	       change_ub(lp_data, j, bpath->rhs);
-	       break;
-	     case 'G':
-	       change_lb(lp_data, j, bpath->rhs);
-	       break;
-	     case 'R':
-	       change_lbub(lp_data, j, bpath->rhs, bpath->rhs + bpath->range);
-	       break;
+   for (i = 0; i < level; i++){
+      if (bpath[i].type == BRANCHING_VARIABLE){
+	 j = bpath[i].name;   //assuming no extra vars! 
+	 switch (bpath[i].sense){
+	  case 'E':
+	    change_lbub(lp_data, j, bpath[i].rhs, bpath[i].rhs);
+	    break;
+	  case 'L':
+	    get_ub(lp_data, j, &ub);
+	    if (bpath[i].rhs < ub){
+	       change_ub(lp_data, j, bpath[i].rhs);
 	    }
-	 }else{ /* BRANCHING_CUT */
-	    j = bpath->name;
-	    change_row(lp_data, j, bpath->sense, bpath->rhs, bpath->range);
+	    break;
+	  case 'G':
+	    get_lb(lp_data, j, &lb);
+	    if (bpath[i].rhs > lb){
+	       change_lb(lp_data, j, bpath[i].rhs);
+	    }
+	    break;
+	  case 'R':
+	    change_lbub(lp_data, j, bpath[i].rhs,
+			bpath[i].rhs + bpath[i].range);
+	    break;
 	 }
+      }else{ /* BRANCHING_CUT */
+	 j = bpath[i].name;
+	 change_row(lp_data, j, bpath[i].sense,
+		    bpath[i].rhs, bpath[i].range);
       }
    }
     
    //see whether it is feasible!   
-   
-   retval = dual_simplex(lp_data, &iterd);
+
+   size_lp_arrays(lp_data, FALSE, TRUE, mip->m, mip->n, mip->nz);
+   //get_slacks call crashes here, but we can turn it off by deallocating
+   FREE(lp_data->slacks);
+   if ((retval = dual_simplex(lp_data, &iterd)) == LP_OPTIMAL){
+      *objval = lp_data->objval;
+   }
    close_lp_solver(lp_data);   
 
    lp_data->mip = NULL;
    FREE(lp_data);
-   bpath -= level;
+
+#if 0
    FREE(bpath);
 
    for(i=0; i<(level+1); i++){
@@ -2575,6 +2909,7 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
    }
 
    FREE(path);
+#endif
 
    return (retval);
 #else
@@ -2583,6 +2918,99 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
    printf("Please rebuild SYMPHONY with these features enabled\n");
    return(0);
 #endif
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
+{
+   int i, j, nz = 0, *matBeg, *matInd;
+   double value, *rowAct = NULL, *matVal; 
+   char feasible;
+   double lpetol =  9.9999999999999995e-07;
+   double *tmp_sol;
+   double *obj = env->mip->obj;
+   
+   if (colsol){
+      tmp_sol = colsol;
+   }else{
+      tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+      for (i = 0; i < sol->xlength; i++){
+	 assert(sol->xind[i] < env->mip->n);
+	 tmp_sol[sol->xind[i]] = sol->xval[i];
+      }
+   }
+
+   sol->objval = 0;
+   /* step 1. check for bounds and integrality */   
+   for (i = env->mip->n - 1; i >= 0; i--){
+      if (tmp_sol[i] < env->mip->lb[i] - lpetol || 
+	  tmp_sol[i] > env->mip->ub[i] + lpetol)
+	 break;
+      if (!env->mip->is_int[i])
+	 continue; /* Not an integer variable */
+      value = tmp_sol[i];
+      if (tmp_sol[i] > env->mip->lb[i] && tmp_sol[i] < env->mip->ub[i]
+	  && tmp_sol[i]-floor(tmp_sol[i]) > lpetol &&
+	  ceil(tmp_sol[i])-tmp_sol[i] > lpetol){
+	 break;  
+      }
+      sol->objval += tmp_sol[i]*obj[i];
+   }
+
+   feasible = i < 0 ? true : false;
+   
+   /* step 2. check for the constraint matrix */
+   
+   if (feasible){      
+      rowAct = (double*) calloc(env->mip->m, DSIZE);
+      matBeg = env->mip->matbeg;
+      matVal = env->mip->matval;
+      matInd = env->mip->matind;
+	 
+      for(i = 0; i < env->mip->n; i++){
+	 for(j = matBeg[i]; j<matBeg[i+1]; j++){
+	    rowAct[matInd[j]] += matVal[j] * tmp_sol[i];
+	 }
+      }	 
+ 
+      for(i = 0; i < env->mip->m; i++){
+	 switch(env->mip->sense[i]){
+	  case 'L': 
+	     if (rowAct[i] > env->mip->rhs[i] + lpetol)
+		feasible = FALSE;
+	     break;
+	  case 'G':
+	     if (rowAct[i] < env->mip->rhs[i] - lpetol)
+		feasible = FALSE;
+	     break;
+	  case 'E':
+	     if (!((rowAct[i] > env->mip->rhs[i] - lpetol) && 
+		   (rowAct[i] < env->mip->rhs[i] + lpetol)))
+		feasible = FALSE;
+	     break;
+	  case 'R':
+	     if (rowAct[i] > env->mip->rhs[i] + lpetol || 
+		 rowAct[i] < env->mip->rhs[i] - env->mip->rngval[i] - lpetol)
+		feasible = FALSE;
+	     break;
+	  case 'N':
+	  default:
+	     break;
+	 }
+	 
+	 if (!feasible) 
+	    break;
+      }
+      FREE(rowAct);
+   }
+
+   if (!colsol) {
+      FREE(tmp_sol);
+   }
+
+   return(feasible);
 }
 
 /*===========================================================================*/
