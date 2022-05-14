@@ -6585,9 +6585,10 @@ SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env,
 /*===========================================================================*/
 /*===========================================================================*/
 //Anahita
-int sym_get_dual_pruned(sym_environment *env, double ** dual_pieces,
-			int* num_pieces,
-			int MAX_ALLOWABLE_NUM_PIECES)
+SYMPHONYLIB_EXPORT int sym_get_dual_pruned(sym_environment *env,
+                                           double ** dual_pieces,
+                                           int* num_pieces,
+                                           int MAX_ALLOWABLE_NUM_PIECES)
 {
 #ifdef SENSITIVITY_ANALYSIS
 /* #ifdef U */

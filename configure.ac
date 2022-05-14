@@ -96,6 +96,9 @@ AC_COIN_CHK_PKG(Glpk,[SymphonyLib],[coinglpk])
 # Data Packages
 
 AC_COIN_CHK_PKG(OsiTests,[SymUnitTest],[osi-unittests])
+if test $coin_has_ositests != yes ; then
+  AC_MSG_ERROR([Required package OsiTests is not available.])
+fi
 AC_COIN_CHK_PKG(Sample,,[coindatasample],,dataonly)
 AC_COIN_CHK_PKG(Netlib,,[coindatanetlib],,dataonly)
 AC_COIN_CHK_PKG(Miplib3,,[coindatamiplib3],,dataonly)

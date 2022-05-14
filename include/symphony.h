@@ -353,6 +353,10 @@ SYMPHONYLIB_EXPORT int sym_get_lb_for_new_rhs(sym_environment *env,
                                               int ub_cnt, int *new_ub_ind,
                                               double *new_ub_val,
                                               double *lb_for_new_rhs);
+SYMPHONYLIB_EXPORT int sym_get_dual_pruned(sym_environment *env,
+                                           double ** dual_pieces,
+                                           int* num_pieces,
+                                           int MAX_ALLOWABLE_NUM_PIECES);
 SYMPHONYLIB_EXPORT int sym_get_ub_for_new_rhs(sym_environment *env,
                                                   int cnt, int *new_rhs_ind,
                                                   double *new_rhs_val,

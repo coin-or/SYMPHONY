@@ -702,7 +702,7 @@ uninstall-am:
 @COIN_HAS_MIPLIB3_FALSE@	  echo "Downloading required test files to $(top_srcdir)/miplib3"; \
 @COIN_HAS_MIPLIB3_FALSE@	  mkdir $(top_srcdir)/miplib3; \
 @COIN_HAS_MIPLIB3_FALSE@	  for file in $(testFILES); do \
-@COIN_HAS_MIPLIB3_FALSE@	    (echo $$file; svn cat https://projects.coin-or.org/svn/Data/miplib3/stable/1.2/$$file.gz >> $(top_srcdir)/miplib3/$$file.gz) \
+@COIN_HAS_MIPLIB3_FALSE@	    (echo $$file; wget https://github.com/coin-or-tools/Data-miplib3/raw/master/$$file.gz; mv $$file.gz $(top_srcdir)/miplib3) \
 @COIN_HAS_MIPLIB3_FALSE@	  done; \
 @COIN_HAS_MIPLIB3_FALSE@	  fi; \
 @COIN_HAS_MIPLIB3_FALSE@	  echo "Uncompressing files"; \

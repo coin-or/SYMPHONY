@@ -80,7 +80,7 @@ check_files:
 	  echo "Downloading required test files to $(top_srcdir)/miplib3"; \
 	  mkdir $(top_srcdir)/miplib3; \
 	  for file in $(testFILES); do \
-	    (echo $$file; svn cat https://projects.coin-or.org/svn/Data/miplib3/stable/1.2/$$file.gz >> $(top_srcdir)/miplib3/$$file.gz) \
+	    (echo $$file; wget https://github.com/coin-or-tools/Data-miplib3/raw/master/$$file.gz; mv $$file.gz $(top_srcdir)/miplib3) \
 	  done; \
 	  fi; \
 	  echo "Uncompressing files"; \

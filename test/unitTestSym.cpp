@@ -22,22 +22,11 @@
 #include "omp.h"
 #endif
 
-#ifdef COIN_HAS_OSITESTS
 #include "OsiUnitTests.hpp"
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverInterface.hpp"
 
 using namespace OsiUnitTest;
-
-#else
-#include <cstring>
-
-void testingMessage( const char * const msg ) {
-  std::cout.flush() ;
-  std::cerr << msg;
-}
-
-#endif
 
 #include "symphony.h"
 
@@ -64,7 +53,6 @@ int main (int argc, const char *argv[])
   */
   WindowsErrorPopupBlocker();
 
-#ifdef COIN_HAS_OSITESTS
   /*
     Process command line parameters.
   */
@@ -124,11 +112,6 @@ int main (int argc, const char *argv[])
   {
     testingMessage( "***Skipped Testing of OsiSymSolverInterface on Netlib problems, use -testOsiSolverInterface to run them.***\n" );
   }
-#else
-  /* a very light version of "parameter processing": check if user call with -miplib3Dir=<dir> */
-  if( argc >= 2 && strncmp(argv[1], "-miplib3Dir", 11) == 0 )
-    miplib3Dir = argv[1]+12;
-#endif
 
   if (miplib3Dir.length() > 0) {
     int test_status;
@@ -153,18 +136,12 @@ int main (int argc, const char *argv[])
     sym_set_int_param(env, "verbosity", -10);
     sym_test(env, symargc, symargv, &test_status);
 
-#ifdef COIN_HAS_OSITESTS
     OSIUNITTEST_ASSERT_WARNING(test_status == 0, {}, "symphony", "testing MIPLIB");
-#else
-    if (test_status > 0)
-      testingMessage( "Warning: some instances may not have returned a correct solution\n");
-#endif
   }
 
   /*
     We're done. Report on the results.
   */
-#ifdef COIN_HAS_OSITESTS
   std::cout.flush();
   outcomes.print();
 
@@ -178,10 +155,4 @@ int main (int argc, const char *argv[])
     std::cerr << "All tests completed successfully\n";
 
   return nerrors - nerrors_expected;
-#else
-
-  testingMessage( "All tests completed successfully\n" );
-
-  return 0;
-#endif
 }
