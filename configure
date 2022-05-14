@@ -22431,7 +22431,7 @@ then :
    ;;
 esac
 else $as_nop
-  sym_sensitivity=false
+  sym_sensitivity=true
 fi
 
 #if test $sym_sensitivity = true; then

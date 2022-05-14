@@ -262,7 +262,7 @@ AC_ARG_ENABLE([sensitivity-analysis],
    *) AC_MSG_ERROR(bad value ${enableval} for --enable-sensitivity-analysis)
    ;;
 esac],
-[sym_sensitivity=false])
+[sym_sensitivity=true])
 #if test $sym_sensitivity = true; then
 #  AC_MSG_RESULT([yes])
 #else
