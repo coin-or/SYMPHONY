@@ -1181,44 +1181,12 @@ int sym_solve(sym_environment *env)
    }
    env->lb = -MAXDOUBLE;
 #endif
-   
+
    if (env->warm_start && env->par.tm_par.warm_start){
-      //check stored solution for feasibility
-      if (env->sp && env->par.prep_par.level <= 2){
-	 double min = SYM_INFINITY;
-	 lp_sol sol;
-	 int min_ind = -1;
-	 for (i = 0; i < env->sp->num_solutions; i++){
-	    sol.xlength = env->sp->solutions[i]->xlength;
-	    sol.xind = env->sp->solutions[i]->xind;
-	    sol.xval = env->sp->solutions[i]->xval;
-	    if (check_solution(env, &sol) > 0){
-	       if ((env->sp->solutions[i]->objval = sol.objval) < min){
-		  min = env->sp->solutions[i]->objval;
-		  min_ind = i;
-	       }
-	    }
-	    if (min < SYM_INFINITY){
-	       double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-	       for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
-		  assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
-		  tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
-		     env->sp->solutions[min_ind]->xval[j];
-	       }
-	       sym_set_col_solution(env, tmp_sol);
-	       FREE(tmp_sol);
-	    }
-	 }
 	 //Transfer ownership to the Tree Manager
+      if (env->sp){
 	 tm->sp = env->sp;
 	 env->sp = NULL;
-      }else{
-	 if (best_sol->objval > env->warm_start->best_sol.objval){
-	    FREE(best_sol->xind);
-	    FREE(best_sol->xval);
-	    env->best_sol = env->warm_start->best_sol;
-	    memset(&(env->warm_start->best_sol), 0, sizeof(lp_sol));
-	 }
       }
       /* Load warm start info */
       tm->rootnode = env->warm_start->rootnode;
@@ -1228,12 +1196,14 @@ int sym_solve(sym_environment *env)
       tm->stat = env->warm_start->stat;
       tm->comp_times = env->warm_start->comp_times;
       tm->lb = env->warm_start->lb;
-      if (env->has_ub){
-	 if (env->ub < tm->ub || !tm->has_ub){
-	    tm->ub = env->ub;
+#if 0
+      if (env->warm_start->has_ub){
+	 if (env->warm_start->ub < tm->ub || !tm->has_ub){
+	    tm->ub = env->warm_start->ub;
 	 }
 	 tm->has_ub = TRUE;
       }
+#endif
       tm->phase = env->warm_start->phase;
    }else{
       if (env->warm_start){
@@ -1481,6 +1451,14 @@ int sym_solve(sym_environment *env)
       env->warm_start->ub = tm->ub;
    }
    env->par.tm_par.warm_start = FALSE;
+   env->warm_start->trim_tree = DO_NOT_TRIM;		  	    
+   env->mip->change_num = 0;
+   env->mip->var_type_modified = FALSE;
+   env->mip->new_col_num = 0;
+   if(env->mip->cru_vars_num){
+      FREE(env->mip->cru_vars);
+      env->mip->cru_vars_num = 0;
+   }
 
 #ifdef COMPILE_IN_LP
    int thread_num;
@@ -1788,6 +1766,55 @@ int sym_warm_solve(sym_environment *env)
 	 env->lb = env->warm_start->lb;
       }
 #endif
+      if (env->warm_start){
+         env->warm_start->has_ub = env->best_sol.has_sol = 
+            env->warm_start->best_sol.has_sol = FALSE;
+         env->warm_start->ub = env->best_sol.objval = env->warm_start->best_sol.objval = 0.0;
+         env->warm_start->lb = -MAXDOUBLE;
+      }
+
+      //check stored solution for feasibility
+      if (env->sp && env->par.prep_par.level <= 2){
+	 double min = SYM_INFINITY;
+	 lp_sol sol;
+	 int min_ind = -1;
+	 for (i = 0; i < env->sp->num_solutions; i++){
+	    sol.xlength = env->sp->solutions[i]->xlength;
+	    sol.xind = env->sp->solutions[i]->xind;
+	    sol.xval = env->sp->solutions[i]->xval;
+	    if (check_solution(env, &sol) > 0){
+	       if ((env->sp->solutions[i]->objval = sol.objval) < min){
+		  min = env->sp->solutions[i]->objval;
+		  min_ind = i;
+	       }
+	    }
+	    if (min < SYM_INFINITY){
+	       double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+	       for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
+		  assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
+		  tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
+		     env->sp->solutions[min_ind]->xval[j];
+	       }
+	       sym_set_col_solution(env, tmp_sol);
+	       FREE(tmp_sol);
+               env->warm_start->has_ub = env->best_sol.has_sol = 
+                  env->warm_start->best_sol.has_sol = TRUE;
+               env->warm_start->ub = env->warm_start->best_sol.objval = min;
+	    }
+	 }
+      }else{
+         if (check_solution(env, &env->warm_start->best_sol) <= 0){
+            FREE(env->warm_start->best_sol.xind);
+            FREE(env->warm_start->best_sol.xval);
+            env->warm_start->best_sol.has_sol = FALSE;
+         }else{
+	    FREE(env->best_sol.xind);
+	    FREE(env->best_sol.xval);
+	    env->best_sol = env->warm_start->best_sol;
+	    memset(&(env->warm_start->best_sol), 0, sizeof(lp_sol));
+	 }
+      }
+
       if(env->par.multi_criteria){
 	 env->has_ub = env->has_mc_ub;
 	 env->ub = env->mc_ub;
@@ -1873,7 +1900,8 @@ int sym_warm_solve(sym_environment *env)
 	       env->warm_start->stat.created =
 	       env->warm_start->stat.tree_size = 1; //for root node */	   
 
-	    update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind, cru_vars, change_type);
+	    update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind,
+                              cru_vars, change_type);
 
 	    /* FIXME!!!! feasible solutions are getting lost in a sequence of warm-solve---
 	       for a temporary fix, increase ub a litte... */
@@ -1930,20 +1958,12 @@ int sym_warm_solve(sym_environment *env)
 	       }
 	    }
 #endif	    
-	    env->warm_start->trim_tree = DO_NOT_TRIM;		  	    
-	    env->mip->change_num = 0;
-	    env->mip->var_type_modified = FALSE;
-	    env->mip->new_col_num = 0;
-	    if(env->mip->cru_vars_num){
-	       FREE(env->mip->cru_vars);
-	       env->mip->cru_vars_num = 0;
-	    }
 	 } else{
 	    printf("sym_warm_solve():");
 	    printf("Unable to re-solve this type of modification,for now!\n");
 	    return(FUNCTION_TERMINATED_ABNORMALLY); 
 	 }
-      }      
+      }
    }
 
    /* Uncommented for now! */
