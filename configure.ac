@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[WS],[https://github.com/coin-or/SYMPHONY/issues/new])
+AC_INIT([SYMPHONY],[5.7],[https://github.com/coin-or/SYMPHONY/issues/new])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
