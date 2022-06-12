@@ -42,7 +42,7 @@ int resolve_node(sym_environment *env, bc_node *node)
 {
    node_desc * desc = &node->desc;
    LPdata *lp_data = (LPdata*)calloc(1, sizeof(LPdata));
-   lp_sol *best_sol = &(env->warm_start->best_sol);
+   lp_sol *best_sol = &(env->best_sol);
    branch_desc *bpath;
    branch_obj *bobj;
    bc_node **path, *n;
@@ -462,8 +462,8 @@ int resolve_node(sym_environment *env, bc_node *node)
       for(i = lp_data->n-1; i>=0; i--){
 	 colsol = lp_data->x[i];
 	 if(env->mip->is_int[i]){
-	    if(colsol-floor(colsol) > env->par.lp_par.granularity &&
-	       ceil(colsol)-colsol > env->par.lp_par.granularity){
+	    if(colsol-floor(colsol) > lp_data->lpetol &&
+	       ceil(colsol)-colsol > lp_data->lpetol){
 	       break;
 	    }
 	 }
@@ -486,16 +486,27 @@ int resolve_node(sym_environment *env, bc_node *node)
 	 }
 	 node->sol_size = cnt;
 
-	 if((env->warm_start->has_ub && 
-	     lp_data->objval < env->warm_start->ub)||
-	    !env->warm_start->has_ub){
+	 if((best_sol->has_sol && 
+	     lp_data->objval < best_sol->objval)||
+	    !best_sol->has_sol){
 	    
-	    if(!env->warm_start->has_ub){
-	       env->warm_start->has_ub = TRUE;
-	       best_sol->has_sol = TRUE;
-	    }
+            best_sol->has_sol = TRUE;
+            env->has_ub = TRUE;
 
-	    env->warm_start->ub = best_sol->objval = lp_data->objval;
+            double gran_round = floor(env->par.lp_par.granularity + 0.5);
+            if (env->par.lp_par.granularity > lp_data->lpetol &&
+                fabs(gran_round - env->par.lp_par.granularity) < lp_data->lpetol) {
+               /* we have granularity. symphony now uses granularity to set ub on
+                * lp-solver using granularity. so we round the solution to the
+                * nearest integer so that this tighter ub does not cut off other
+                * good solutions.
+                */
+               best_sol->objval = floor(lp_data->objval + 0.5);
+            }else{
+               best_sol->objval = lp_data->objval;
+            }
+            env->ub = best_sol->objval;
+            env->has_ub = TRUE;
 	    
 	    FREE(best_sol->xind);
 	    FREE(best_sol->xval);
@@ -539,7 +550,7 @@ int resolve_node(sym_environment *env, bc_node *node)
    /* FIXME- for now just copy free_node_desc here. Decide where to carry 
       resolve_node() */
    //   free_node_desc(&desc);
-     if (desc){
+   if (desc){
       node_desc *n = desc;
       FREE(n->cutind.list);
       FREE(n->uind.list);
@@ -1026,7 +1037,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 #else
    
    MIPdesc *mip = env->mip;
-   lp_sol *best_sol = &(env->warm_start->best_sol);
+   lp_sol *best_sol = &(env->best_sol);
 
    
    if(env->mip->var_type_modified == TRUE) {
@@ -1048,16 +1059,16 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 	    for(i = 0; i<root->sol_size; i++){
 	       upper_bound += mip->obj[root->sol_ind[i]] * root->sol[i];
 	    }	    	       
-	    if((env->warm_start->has_ub && 
-		upper_bound<env->warm_start->ub)||
-	       !env->warm_start->has_ub){
+	    if((env->has_ub && 
+		upper_bound<env->ub)||
+	       !env->has_ub){
 	       
-	       if(!env->warm_start->has_ub){
-		  env->warm_start->has_ub = TRUE;
+	       if(!env->has_ub){
+		  env->has_ub = TRUE;
 		  best_sol->has_sol = TRUE;
 	       }
 	       
-	       env->warm_start->ub = upper_bound;
+	       env->ub = upper_bound;
 	       best_sol->objval = upper_bound;
 	       new_solution = true;
 	    }
@@ -1083,11 +1094,11 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 	       
 	       if(!env->has_mc_ub){
 	       env->has_mc_ub = TRUE;
-	       env->warm_start->has_ub = TRUE;
+	       env->has_ub = TRUE;
 	       best_sol->has_sol = TRUE;
 	       }
 	       
-	       env->mc_ub = env->warm_start->ub = best_sol->objval = objval;
+	       env->mc_ub = env->ub = best_sol->objval = objval;
 	       env->obj[0] = obj[0];
 	       env->obj[1] = obj[1];
 	       new_solution = TRUE;
@@ -1142,18 +1153,18 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 	 }
 	 
 	 if(feasible) {
-	    if((env->warm_start->has_ub && 
-		upper_bound<env->warm_start->ub)||
-	    !env->warm_start->has_ub){
+	    if((env->has_ub && 
+		upper_bound<env->ub)||
+	    !env->has_ub){
 	       
-	       if(!env->warm_start->has_ub){
-		  env->warm_start->has_ub = TRUE;
+	       if(!env->has_ub){
+		  env->has_ub = TRUE;
 		  best_sol->has_sol = TRUE;
 	       }
 	       
-	    env->warm_start->ub = upper_bound;
-	    best_sol->objval = upper_bound;
-	    new_solution = true;
+               env->ub = upper_bound;
+               best_sol->objval = upper_bound;
+               new_solution = true;
 	    }
 	 }
       }else if(change_type == COL_BOUNDS_CHANGED){
@@ -1172,16 +1183,16 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 	 }
 	 
 	 if(feasible) {
-	    if((env->warm_start->has_ub && 
-		upper_bound < env->warm_start->ub)||
-	       !env->warm_start->has_ub){
+	    if((env->has_ub && 
+		upper_bound < env->ub)||
+	       !env->has_ub){
 	       
-	       if(!env->warm_start->has_ub){
-		  env->warm_start->has_ub = TRUE;
+	       if(!env->has_ub){
+		  env->has_ub = TRUE;
 		  best_sol->has_sol = TRUE;
 	       }
 	       
-	       env->warm_start->ub = upper_bound;
+	       env->ub = upper_bound;
 	       best_sol->objval = upper_bound;
 	       new_solution = true;
 	    }
