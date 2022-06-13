@@ -586,7 +586,7 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
 		      int *cuts_ind, char *cru_vars, int change_type)
 {
 
-   int i, resolve = 1;
+   int i, resolve = 0;
    char deletable = TRUE;   
 
    if (root){
