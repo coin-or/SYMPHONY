@@ -3897,7 +3897,7 @@ void sym_catch_c(int num)
 
 int find_tree_lb(tm_prob *tm)
 {
-   double lb = -SYM_INFINITY;
+   double lb = SYM_INFINITY;
    bc_node **samephase_cand;
 
 #pragma omp critical (tree_update)
