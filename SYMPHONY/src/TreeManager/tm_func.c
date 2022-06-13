@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHOY MILP Solver Framework.                  */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -3923,7 +3923,7 @@ void sym_catch_c(int num)
 
 int find_tree_lb(tm_prob *tm)
 {
-   double lb = -SYM_INFINITY;
+   double lb = SYM_INFINITY;
    bc_node **samephase_cand;
 
 #pragma omp critical (tree_update)
