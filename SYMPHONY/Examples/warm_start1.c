@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
    sym_solve(env);
 
-   sym_set_int_param(env, "find_first_feasible", true);
+   sym_set_int_param(env, "find_first_feasible", false);
    /* set node selection rule to BEST_FIRST_SEARCH */
    sym_set_int_param(env, "node_selection_rule", 4);
 
