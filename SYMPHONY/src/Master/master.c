@@ -1744,33 +1744,23 @@ int sym_warm_solve(sym_environment *env)
 	return(sym_solve(env));
       }
       
-#if 0
-      //This doesn't seem to be the right thing, although it's been here for
-      //a long time!
       if(env->mip->change_num){
 
 	 env->has_ub = FALSE;
 	 env->ub = 0.0;
 	 env->lb = -MAXDOUBLE;
 	 
-	 //env->warm_start->has_ub = env->best_sol.has_sol = 
-	 //   env->warm_start->best_sol.has_sol = FALSE;
-	 //env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
-	 //env->warm_start->lb = -MAXDOUBLE;
-	 //env->warm_start->best_sol.xlength = 0;
-	 //FREE(env->warm_start->best_sol.xind);
-	 //FREE(env->warm_start->best_sol.xval);
+	 env->warm_start->has_ub = env->best_sol.has_sol = 
+	    env->warm_start->best_sol.has_sol = FALSE;
+	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+	 env->warm_start->lb = -MAXDOUBLE;
+	 env->warm_start->best_sol.xlength = 0;
+	 FREE(env->warm_start->best_sol.xind);
+	 FREE(env->warm_start->best_sol.xval);
       }else {
 	 env->has_ub = env->warm_start->has_ub;
 	 env->ub = env->warm_start->ub;
 	 env->lb = env->warm_start->lb;
-      }
-#endif
-      if (env->warm_start){
-         env->warm_start->has_ub = env->best_sol.has_sol = 
-            env->warm_start->best_sol.has_sol = FALSE;
-         env->warm_start->ub = env->best_sol.objval = env->warm_start->best_sol.objval = 0.0;
-         env->warm_start->lb = -MAXDOUBLE;
       }
 
       //check stored solution for feasibility
