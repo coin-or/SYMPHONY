@@ -1,385 +1,381 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.3.23)  15 JAN 2022 22:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.1.23)  14 JUN 2022 16:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **./images.tex
 (./images.tex
-LaTeX2e <2017-04-15>
-Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
-
+LaTeX2e <2020-02-02> patch level 2
+L3 programming layer <2020-02-14>
 (/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
-Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
+Document Class: book 2019/12/20 v1.4l Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/bk11.clo
-File: bk11.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+File: bk11.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
 )
-\c@part=\count79
-\c@chapter=\count80
-\c@section=\count81
-\c@subsection=\count82
-\c@subsubsection=\count83
-\c@paragraph=\count84
-\c@subparagraph=\count85
-\c@figure=\count86
-\c@table=\count87
-\abovecaptionskip=\skip41
-\belowcaptionskip=\skip42
-\bibindent=\dimen102
+\c@part=\count167
+\c@chapter=\count168
+\c@section=\count169
+\c@subsection=\count170
+\c@subsubsection=\count171
+\c@paragraph=\count172
+\c@subparagraph=\count173
+\c@figure=\count174
+\c@table=\count175
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen134
 ) (/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 ) (/usr/local/share/texmf/tex/latex/html/html.sty (/usr/share/texlive/texmf-dis
 t/tex/latex/hyperref/hyperref.sty
-Package: hyperref 2018/02/06 v6.86b Hypertext links for LaTeX
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
-Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
-Package: hobsub-generic 2016/05/16 v1.14 Bundle oberdiek, subset generic (HO)
-Package: hobsub 2016/05/16 v1.14 Construct package bundles (HO)
-Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
-Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
-Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
-Package ifluatex Info: LuaTeX not detected.
-Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
-Package ifvtex Info: VTeX not detected.
-Package: intcalc 2016/05/16 v1.2 Expandable calculations with integers (HO)
-Package: ifpdf 2017/03/15 v3.2 Provides the ifpdf switch
-Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
-Package etexcmds Info: Could not find \expanded.
-(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
-(etexcmds)             that some package has redefined \expanded.
-(etexcmds)             In the latter case, load this package earlier.
-Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
-Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
-Package: pdftexcmds 2018/01/21 v0.26 Utility functions of pdfTeX for LuaTeX (HO
+Package: hyperref 2020/01/14 v7.00d Hypertext links for LaTeX
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2019/12/15 v1.24 LaTeX kernel commands for general use (HO)
+) (/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2019/11/07 v1.0c TeX engine tests
+) (/usr/share/texlive/texmf-dist/tex/latex/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2019/11/24 v0.31 Utility functions of pdfTeX for LuaTeX (HO
 )
-Package pdftexcmds Info: LuaTeX not detected.
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-Package: pdfescape 2016/05/16 v1.14 Implements pdfTeX's escape features (HO)
-Package: bigintcalc 2016/05/16 v1.4 Expandable calculations on big integers (HO
-)
-Package: bitset 2016/05/16 v1.2 Handle bit-vector datatype (HO)
-Package: uniquecounter 2016/05/16 v1.3 Provide unlimited unique counter (HO)
-)
-Package hobsub Info: Skipping package `hobsub' (already loaded).
-Package: letltxmacro 2016/05/16 v1.5 Let assignment for LaTeX macros (HO)
-Package: hopatch 2016/05/16 v1.3 Wrapper for package hooks (HO)
-Package: xcolor-patch 2016/05/16 xcolor patch
-Package: atveryend 2016/05/16 v1.9 Hooks at the very end of document (HO)
-Package atveryend Info: \enddocument detected (standard20110627).
-Package: atbegshi 2016/06/09 v1.18 At begin shipout hook (HO)
-Package: refcount 2016/05/16 v3.5 Data extraction from label references (HO)
-Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
 ) (/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \KV@toks@=\toks14
-) (/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty
-Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
-) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty
-Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
-) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
-Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+) (/usr/share/texlive/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+) (/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+) (/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+) (/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+) (/usr/share/texlive/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+) (/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+) (/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2019/11/29 v3.13 Key value format for package options (HO)
 )
-\@linkdim=\dimen103
-\Hy@linkcounter=\count88
-\Hy@pagecounter=\count89
+\@linkdim=\dimen135
+\Hy@linkcounter=\count176
+\Hy@pagecounter=\count177
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def
-File: pd1enc.def 2018/02/06 v6.86b Hyperref: PDFDocEncoding definition (HO)
+File: pd1enc.def 2020/01/14 v7.00d Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+) (/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+) (/usr/share/texlive/texmf-dist/tex/generic/etexcmds/etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
 )
-\Hy@SavedSpaceFactor=\count90
-(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg
-File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
-)
-Package hyperref Info: Hyper figures OFF on input line 4509.
-Package hyperref Info: Link nesting OFF on input line 4514.
-Package hyperref Info: Hyper index ON on input line 4517.
-Package hyperref Info: Plain pages OFF on input line 4524.
-Package hyperref Info: Backreferencing OFF on input line 4529.
+\Hy@SavedSpaceFactor=\count178
+\pdfmajorversion=\count179
+Package hyperref Info: Hyper figures OFF on input line 4547.
+Package hyperref Info: Link nesting OFF on input line 4552.
+Package hyperref Info: Hyper index ON on input line 4555.
+Package hyperref Info: Plain pages OFF on input line 4562.
+Package hyperref Info: Backreferencing OFF on input line 4567.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4762.
-\c@Hy@tempcnt=\count91
+Package hyperref Info: Bookmarks ON on input line 4800.
+\c@Hy@tempcnt=\count180
 (/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
-\Urlmuskip=\muskip10
+\Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
-LaTeX Info: Redefining \url on input line 5115.
-\XeTeXLinkMargin=\dimen104
-\Fld@menulength=\count92
-\Field@Width=\dimen105
-\Fld@charsize=\dimen106
-Package hyperref Info: Hyper figures OFF on input line 6369.
-Package hyperref Info: Link nesting OFF on input line 6374.
-Package hyperref Info: Hyper index ON on input line 6377.
-Package hyperref Info: backreferencing OFF on input line 6384.
-Package hyperref Info: Link coloring OFF on input line 6389.
-Package hyperref Info: Link coloring with OCG OFF on input line 6394.
-Package hyperref Info: PDF/A mode OFF on input line 6399.
-LaTeX Info: Redefining \ref on input line 6439.
-LaTeX Info: Redefining \pageref on input line 6443.
-\Hy@abspage=\count93
-\c@Item=\count94
-\c@Hfootnote=\count95
+LaTeX Info: Redefining \url on input line 5159.
+\XeTeXLinkMargin=\dimen136
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count181
+\Field@Width=\dimen137
+\Fld@charsize=\dimen138
+Package hyperref Info: Hyper figures OFF on input line 6430.
+Package hyperref Info: Link nesting OFF on input line 6435.
+Package hyperref Info: Hyper index ON on input line 6438.
+Package hyperref Info: backreferencing OFF on input line 6445.
+Package hyperref Info: Link coloring OFF on input line 6450.
+Package hyperref Info: Link coloring with OCG OFF on input line 6455.
+Package hyperref Info: PDF/A mode OFF on input line 6460.
+LaTeX Info: Redefining \ref on input line 6500.
+LaTeX Info: Redefining \pageref on input line 6504.
+(/usr/share/texlive/texmf-dist/tex/generic/atbegshi/atbegshi.sty
+Package: atbegshi 2019/12/05 v1.19 At begin shipout hook (HO)
+)
+\Hy@abspage=\count182
+\c@Item=\count183
+\c@Hfootnote=\count184
 )
 Package hyperref Info: Driver: hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
-File: hpdftex.def 2018/02/06 v6.86b Hyperref driver for pdfTeX
-\Fld@listcount=\count96
-\c@bookmark@seq@number=\count97
-(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
-Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
-Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
-82.
+File: hpdftex.def 2020/01/14 v7.00d Hyperref driver for pdfTeX
+(/usr/share/texlive/texmf-dist/tex/latex/atveryend/atveryend.sty
+Package: atveryend 2019-12-11 v1.11 Hooks at the very end of document (HO)
+Package atveryend Info: \enddocument detected (standard20110627).
 )
-\Hy@SectionHShift=\skip43
+\Fld@listcount=\count185
+\c@bookmark@seq@number=\count186
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+Package: rerunfilecheck 2019/12/05 v1.9 Rerun checks for auxiliary files (HO)
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+86.
+)
+\Hy@SectionHShift=\skip49
 )
 Package: html 1999/07/19 v1.38 hypertext commands for latex2html (nd, hws, rrm)
 
-\c@lpart=\count98
-\c@lchapter=\count99
-\c@lsection=\count100
-\c@lsubsection=\count101
-\c@lsubsubsection=\count102
-\c@lparagraph=\count103
-\c@lsubparagraph=\count104
-\c@lsubsubparagraph=\count105
+\c@lpart=\count187
+\c@lchapter=\count188
+\c@lsection=\count189
+\c@lsubsection=\count190
+\c@lsubsubsection=\count191
+\c@lparagraph=\count192
+\c@lsubparagraph=\count193
+\c@lsubsubparagraph=\count194
 \ptrfile=\write3
 )
-\headwidth=\skip44
+\headwidth=\skip50
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
-Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+Package: graphicx 2019/11/30 v1.2a Enhanced LaTeX Graphics (DPC,SPQR)
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
-Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+Package: graphics 2019/11/30 v1.4a Standard LaTeX Graphics (DPC,SPQR)
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
 ) (/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: pdftex.def on input line 99.
+Package graphics Info: Driver file: pdftex.def on input line 105.
 (/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen107
-\Gin@req@width=\dimen108
+\Gin@req@height=\dimen139
+\Gin@req@width=\dimen140
 ) (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
-Package: amsmath 2017/09/02 v2.17a AMS math features
-\@mathmargin=\skip45
+Package: amsmath 2020/01/20 v2.17e AMS math features
+\@mathmargin=\skip51
 For additional information on amsmath, use the `?' option.
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2000/06/29 v2.01 AMS text
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks15
-\ex@=\dimen109
+\ex@=\dimen141
 )) (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen110
+\pmbraise@=\dimen142
 ) (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2016/03/08 v2.02 operator names
 )
-\inf@bad=\count106
-LaTeX Info: Redefining \frac on input line 213.
-\uproot@=\count107
-\leftroot@=\count108
-LaTeX Info: Redefining \overline on input line 375.
-\classnum@=\count109
-\DOTSCASE@=\count110
-LaTeX Info: Redefining \ldots on input line 472.
-LaTeX Info: Redefining \dots on input line 475.
-LaTeX Info: Redefining \cdots on input line 596.
-\Mathstrutbox@=\box26
-\strutbox@=\box27
-\big@size=\dimen111
-LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
-\macc@depth=\count111
-\c@MaxMatrixCols=\count112
-\dotsspace@=\muskip11
-\c@parentequation=\count113
-\dspbrk@lvl=\count114
+\inf@bad=\count195
+LaTeX Info: Redefining \frac on input line 227.
+\uproot@=\count196
+\leftroot@=\count197
+LaTeX Info: Redefining \overline on input line 389.
+\classnum@=\count198
+\DOTSCASE@=\count199
+LaTeX Info: Redefining \ldots on input line 486.
+LaTeX Info: Redefining \dots on input line 489.
+LaTeX Info: Redefining \cdots on input line 610.
+\Mathstrutbox@=\box45
+\strutbox@=\box46
+\big@size=\dimen143
+LaTeX Font Info:    Redeclaring font encoding OML on input line 733.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 734.
+\macc@depth=\count266
+\c@MaxMatrixCols=\count267
+\dotsspace@=\muskip17
+\c@parentequation=\count268
+\dspbrk@lvl=\count269
 \tag@help=\toks16
-\row@=\count115
-\column@=\count116
-\maxfields@=\count117
+\row@=\count270
+\column@=\count271
+\maxfields@=\count272
 \andhelp@=\toks17
-\eqnshift@=\dimen112
-\alignsep@=\dimen113
-\tagshift@=\dimen114
-\tagwidth@=\dimen115
-\totwidth@=\dimen116
-\lineht@=\dimen117
+\eqnshift@=\dimen144
+\alignsep@=\dimen145
+\tagshift@=\dimen146
+\tagwidth@=\dimen147
+\totwidth@=\dimen148
+\lineht@=\dimen149
 \@envbody=\toks18
-\multlinegap=\skip46
-\multlinetaggap=\skip47
+\multlinegap=\skip52
+\multlinetaggap=\skip53
 \mathdisplay@stack=\toks19
-LaTeX Info: Redefining \[ on input line 2817.
-LaTeX Info: Redefining \] on input line 2818.
+LaTeX Info: Redefining \[ on input line 2859.
+LaTeX Info: Redefining \] on input line 2860.
 ) (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 )) (/usr/share/texlive/texmf-dist/tex/latex/preprint/fullpage.sty
 Package: fullpage 1999/02/23 1.1 (PWD)
-\FP@margin=\skip48
+\FP@margin=\skip54
 ) (/usr/share/texlive/texmf-dist/tex/latex/easy/easyeqn.sty
 Document Style `easyeqn' v1.94 <2002/03/18>.
 (/usr/share/texlive/texmf-dist/tex/latex/easy/easy.sty
 Document Style `easy' v1.1 <2001/05/31>.
 Package: easy 2001/05/31 v1.1
-\@easy@level=\count118
-\@easy@ncol=\count119
-\@easy@nrow=\count120
-\@easy@cnt=\count121
-\@easy@boxviii=\box28
-\@easy@minxviii=\dimen118
-\@easy@minyviii=\dimen119
-\@easy@maxxviii=\dimen120
-\@easy@maxyviii=\dimen121
-\@easy@boxvii=\box29
-\@easy@minxvii=\dimen122
-\@easy@minyvii=\dimen123
-\@easy@maxxvii=\dimen124
-\@easy@maxyvii=\dimen125
-\@easy@boxvi=\box30
-\@easy@minxvi=\dimen126
-\@easy@minyvi=\dimen127
-\@easy@maxxvi=\dimen128
-\@easy@maxyvi=\dimen129
-\@easy@boxv=\box31
-\@easy@minxv=\dimen130
-\@easy@minyv=\dimen131
-\@easy@maxxv=\dimen132
-\@easy@maxyv=\dimen133
-\@easy@boxiv=\box32
-\@easy@minxiv=\dimen134
-\@easy@minyiv=\dimen135
-\@easy@maxxiv=\dimen136
-\@easy@maxyiv=\dimen137
-\@easy@boxiii=\box33
-\@easy@minxiii=\dimen138
-\@easy@minyiii=\dimen139
-\@easy@maxxiii=\dimen140
-\@easy@maxyiii=\dimen141
-\@easy@boxii=\box34
-\@easy@minxii=\dimen142
-\@easy@minyii=\dimen143
-\@easy@maxxii=\dimen144
-\@easy@maxyii=\dimen145
-\@easy@boxi=\box35
-\@easy@minxi=\dimen146
-\@easy@minyi=\dimen147
-\@easy@maxxi=\dimen148
-\@easy@maxyi=\dimen149
-\@easy@hsizexxx=\dimen150
-\@easy@vsizexxx=\dimen151
-\@easy@hsizexxix=\dimen152
-\@easy@vsizexxix=\dimen153
-\@easy@hsizexxviii=\dimen154
-\@easy@vsizexxviii=\dimen155
-\@easy@hsizexxvii=\dimen156
-\@easy@vsizexxvii=\dimen157
-\@easy@hsizexxvi=\dimen158
-\@easy@vsizexxvi=\dimen159
-\@easy@hsizexxv=\dimen160
-\@easy@vsizexxv=\dimen161
-\@easy@hsizexxiv=\dimen162
-\@easy@vsizexxiv=\dimen163
-\@easy@hsizexxiii=\dimen164
-\@easy@vsizexxiii=\dimen165
-\@easy@hsizexxii=\dimen166
-\@easy@vsizexxii=\dimen167
-\@easy@hsizexxi=\dimen168
-\@easy@vsizexxi=\dimen169
-\@easy@hsizexx=\dimen170
-\@easy@vsizexx=\dimen171
-\@easy@hsizexix=\dimen172
-\@easy@vsizexix=\dimen173
-\@easy@hsizexviii=\dimen174
-\@easy@vsizexviii=\dimen175
-\@easy@hsizexvii=\dimen176
-\@easy@vsizexvii=\dimen177
-\@easy@hsizexvi=\dimen178
-\@easy@vsizexvi=\dimen179
-\@easy@hsizexv=\dimen180
-\@easy@vsizexv=\dimen181
-\@easy@hsizexiv=\dimen182
-\@easy@vsizexiv=\dimen183
-\@easy@hsizexiii=\dimen184
-\@easy@vsizexiii=\dimen185
-\@easy@hsizexii=\dimen186
-\@easy@vsizexii=\dimen187
-\@easy@hsizexi=\dimen188
-\@easy@vsizexi=\dimen189
-\@easy@hsizex=\dimen190
-\@easy@vsizex=\dimen191
-\@easy@hsizeix=\dimen192
-\@easy@vsizeix=\dimen193
-\@easy@hsizeviii=\dimen194
-\@easy@vsizeviii=\dimen195
-\@easy@hsizevii=\dimen196
-\@easy@vsizevii=\dimen197
-\@easy@hsizevi=\dimen198
-\@easy@vsizevi=\dimen199
-\@easy@hsizev=\dimen256
-\@easy@vsizev=\dimen257
-\@easy@hsizeiv=\dimen258
-\@easy@vsizeiv=\dimen259
-\@easy@hsizeiii=\dimen260
-\@easy@vsizeiii=\dimen261
-\@easy@hsizeii=\dimen262
-\@easy@vsizeii=\dimen263
-\@easy@hsizei=\dimen264
-\@easy@vsizei=\dimen265
-\@easy@dash@len=\dimen266
-\@easy@dash@sep=\dimen267
+\@easy@level=\count273
+\@easy@ncol=\count274
+\@easy@nrow=\count275
+\@easy@cnt=\count276
+\@easy@boxviii=\box47
+\@easy@minxviii=\dimen150
+\@easy@minyviii=\dimen151
+\@easy@maxxviii=\dimen152
+\@easy@maxyviii=\dimen153
+\@easy@boxvii=\box48
+\@easy@minxvii=\dimen154
+\@easy@minyvii=\dimen155
+\@easy@maxxvii=\dimen156
+\@easy@maxyvii=\dimen157
+\@easy@boxvi=\box49
+\@easy@minxvi=\dimen158
+\@easy@minyvi=\dimen159
+\@easy@maxxvi=\dimen160
+\@easy@maxyvi=\dimen161
+\@easy@boxv=\box50
+\@easy@minxv=\dimen162
+\@easy@minyv=\dimen163
+\@easy@maxxv=\dimen164
+\@easy@maxyv=\dimen165
+\@easy@boxiv=\box51
+\@easy@minxiv=\dimen166
+\@easy@minyiv=\dimen167
+\@easy@maxxiv=\dimen168
+\@easy@maxyiv=\dimen169
+\@easy@boxiii=\box52
+\@easy@minxiii=\dimen170
+\@easy@minyiii=\dimen171
+\@easy@maxxiii=\dimen172
+\@easy@maxyiii=\dimen173
+\@easy@boxii=\box53
+\@easy@minxii=\dimen174
+\@easy@minyii=\dimen175
+\@easy@maxxii=\dimen176
+\@easy@maxyii=\dimen177
+\@easy@boxi=\box54
+\@easy@minxi=\dimen178
+\@easy@minyi=\dimen179
+\@easy@maxxi=\dimen180
+\@easy@maxyi=\dimen181
+\@easy@hsizexxx=\dimen182
+\@easy@vsizexxx=\dimen183
+\@easy@hsizexxix=\dimen184
+\@easy@vsizexxix=\dimen185
+\@easy@hsizexxviii=\dimen186
+\@easy@vsizexxviii=\dimen187
+\@easy@hsizexxvii=\dimen188
+\@easy@vsizexxvii=\dimen189
+\@easy@hsizexxvi=\dimen190
+\@easy@vsizexxvi=\dimen191
+\@easy@hsizexxv=\dimen192
+\@easy@vsizexxv=\dimen193
+\@easy@hsizexxiv=\dimen194
+\@easy@vsizexxiv=\dimen195
+\@easy@hsizexxiii=\dimen196
+\@easy@vsizexxiii=\dimen197
+\@easy@hsizexxii=\dimen198
+\@easy@vsizexxii=\dimen199
+\@easy@hsizexxi=\dimen256
+\@easy@vsizexxi=\dimen257
+\@easy@hsizexx=\dimen258
+\@easy@vsizexx=\dimen259
+\@easy@hsizexix=\dimen260
+\@easy@vsizexix=\dimen261
+\@easy@hsizexviii=\dimen262
+\@easy@vsizexviii=\dimen263
+\@easy@hsizexvii=\dimen264
+\@easy@vsizexvii=\dimen265
+\@easy@hsizexvi=\dimen266
+\@easy@vsizexvi=\dimen267
+\@easy@hsizexv=\dimen268
+\@easy@vsizexv=\dimen269
+\@easy@hsizexiv=\dimen270
+\@easy@vsizexiv=\dimen271
+\@easy@hsizexiii=\dimen272
+\@easy@vsizexiii=\dimen273
+\@easy@hsizexii=\dimen274
+\@easy@vsizexii=\dimen275
+\@easy@hsizexi=\dimen276
+\@easy@vsizexi=\dimen277
+\@easy@hsizex=\dimen278
+\@easy@vsizex=\dimen279
+\@easy@hsizeix=\dimen280
+\@easy@vsizeix=\dimen281
+\@easy@hsizeviii=\dimen282
+\@easy@vsizeviii=\dimen283
+\@easy@hsizevii=\dimen284
+\@easy@vsizevii=\dimen285
+\@easy@hsizevi=\dimen286
+\@easy@vsizevi=\dimen287
+\@easy@hsizev=\dimen288
+\@easy@vsizev=\dimen289
+\@easy@hsizeiv=\dimen290
+\@easy@vsizeiv=\dimen291
+\@easy@hsizeiii=\dimen292
+\@easy@vsizeiii=\dimen293
+\@easy@hsizeii=\dimen294
+\@easy@vsizeii=\dimen295
+\@easy@hsizei=\dimen296
+\@easy@vsizei=\dimen297
+\@easy@dash@len=\dimen298
+\@easy@dash@sep=\dimen299
 )
 Package: easyeqn 2001/05/31 v1.1
-\@EQ@leftmargin=\dimen268
-\@EQ@col@sep=\dimen269
-\@EQ@EQN@BOX=\box36
+\@EQ@leftmargin=\dimen300
+\@EQ@col@sep=\dimen301
+\@EQ@EQN@BOX=\box55
 ) (/usr/share/texlive/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
-Package: fancyvrb 2008/02/07
-
-Style option: `fancyvrb' v2.7a, with DG/SPQR fixes, and firstline=lastline fix 
-<2008/02/07> (tvz)
-\FV@CodeLineNo=\count122
-\FV@InFile=\read1
-\FV@TabBox=\box37
-\c@FancyVerbLine=\count123
-\FV@StepNumber=\count124
+Package: fancyvrb 2020/01/13 v3.5 verbatim text (tvz,hv)
+\FV@CodeLineNo=\count277
+\FV@InFile=\read2
+\FV@TabBox=\box56
+\c@FancyVerbLine=\count278
+\FV@StepNumber=\count279
 \FV@OutFile=\write4
 ) (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
-\lst@mode=\count125
-\lst@gtempboxa=\box38
+\lst@mode=\count280
+\lst@gtempboxa=\box57
 \lst@token=\toks20
-\lst@length=\count126
-\lst@currlwidth=\dimen270
-\lst@column=\count127
-\lst@pos=\count128
-\lst@lostspace=\dimen271
-\lst@width=\dimen272
-\lst@newlines=\count129
-\lst@lineno=\count130
-\lst@maxwidth=\dimen273
+\lst@length=\count281
+\lst@currlwidth=\dimen302
+\lst@column=\count282
+\lst@pos=\count283
+\lst@lostspace=\dimen303
+\lst@width=\dimen304
+\lst@newlines=\count284
+\lst@lineno=\count285
+\lst@maxwidth=\dimen305
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
-\c@lstnumber=\count131
-\lst@skipnumbers=\count132
-\lst@framebox=\box39
+File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
+\c@lstnumber=\count286
+\lst@skipnumbers=\count287
+\lst@framebox=\box58
 ) (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
-File: listings.cfg 2015/06/04 1.6 listings configuration
+File: listings.cfg 2019/09/10 1.8c listings configuration
 ))
-Package: listings 2015/06/04 1.6 (Carsten Heinz)
+Package: listings 2019/09/10 1.8c (Carsten Heinz)
 (/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
-Package: inputenc 2015/03/17 v1.2c Input encoding file
+Package: inputenc 2018/08/11 v1.3c Input encoding file
 \inpenc@prehook=\toks21
 \inpenc@posthook=\toks22
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def
-File: latin1.def 2015/03/17 v1.2c Input encoding file
+File: latin1.def 2018/08/11 v1.3c Input encoding file
 )) (/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
 (/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
@@ -406,34 +402,40 @@ Package: splitidx 2016/02/18 v1.2c multiple indices for LaTeX
 Writing index file images.idx
 Using splitted index at images.idx
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
-File: lstlang1.sty 2015/06/04 1.6 listings language file
+File: lstlang1.sty 2019/09/10 1.8c listings language file
 )
-\sizebox=\box40
+\sizebox=\box59
 \lthtmlwrite=\write6
 (/usr/share/texmf/tex/latex/preview/preview.sty
 Package: preview 2017/04/24 11.91 (AUCTeX/preview-latex)
 (/usr/share/texlive/texmf-dist/tex/generic/luatex85/luatex85.sty
 Package: luatex85 2016/06/15 v1.4 pdftex aliases for luatex
 ) (/usr/share/texmf/tex/latex/preview/prtightpage.def
-\PreviewBorder=\dimen274
+\PreviewBorder=\dimen306
 )
-\pr@snippet=\count133
-\pr@box=\box41
+\pr@snippet=\count288
+\pr@box=\box60
 \pr@output=\toks23
 )
-\lthtmlPageBox=\box42
-\lthtmlCropMarkHeight=\dimen275
-\lthtmlCropMarkDepth=\dimen276
-(./images.aux)
+\lthtmlPageBox=\box61
+\lthtmlCropMarkHeight=\dimen307
+\lthtmlCropMarkDepth=\dimen308
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
+File: l3backend-pdfmode.def 2020-02-03 L3 backend support: PDF mode
+\l__kernel_color_stack_int=\count289
+\l__pdf_internal_box=\box62
+) (./images.aux)
 \openout1 = `images.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 212.
 LaTeX Font Info:    ... okay on input line 212.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 212.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 212.
 LaTeX Font Info:    ... okay on input line 212.
 LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 212.
 LaTeX Font Info:    ... okay on input line 212.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 212.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 212.
+LaTeX Font Info:    ... okay on input line 212.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 212.
 LaTeX Font Info:    ... okay on input line 212.
 LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 212.
 LaTeX Font Info:    ... okay on input line 212.
@@ -441,14 +443,16 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 212.
 LaTeX Font Info:    ... okay on input line 212.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 212.
 LaTeX Font Info:    ... okay on input line 212.
-\AtBeginShipoutBox=\box43
+\AtBeginShipoutBox=\box63
 Package hyperref Info: Link coloring OFF on input line 212.
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
-Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
-Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
+Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+) (/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count134
+\c@section@level=\count290
 )
 LaTeX Info: Redefining \ref on input line 212.
 LaTeX Info: Redefining \pageref on input line 212.
@@ -459,33 +463,26 @@ LaTeX Info: Redefining \nameref on input line 212.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count135
-\scratchdimen=\dimen277
-\scratchbox=\box44
-\nofMPsegments=\count136
-\nofMParguments=\count137
+\scratchcounter=\count291
+\scratchdimen=\dimen309
+\scratchbox=\box64
+\nofMPsegments=\count292
+\nofMParguments=\count293
 \everyMPshowfont=\toks24
-\MPscratchCnt=\count138
-\MPscratchDim=\dimen278
-\MPnumerator=\count139
-\makeMPintoPDFobject=\count140
+\MPscratchCnt=\count294
+\MPscratchDim=\dimen310
+\MPnumerator=\count295
+\makeMPintoPDFobject=\count296
 \everyMPtoPDFconversion=\toks25
-) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
-Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
-(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
-Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
-)
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
-38.
-Package grfext Info: Graphics extension search list:
-(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
-G,.JBIG2,.JB2,.eps]
-(grfext)             \AppendGraphicsExtensions on input line 456.
+85.
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-\c@lstlisting=\count141
+\c@lstlisting=\count297
 Preview: Fontsize 10.95pt
 Preview: PDFoutput 1
 
@@ -511,11 +508,13 @@ latex2htmlLength oddsidemargin=0.0pt
 
 latex2htmlLength evensidemargin=0.0pt
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 249.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 249
+.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 249.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 249
+.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
@@ -899,13 +898,13 @@ Package rerunfilecheck Info: File `images.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1384.
  ) 
 Here is how much of TeX's memory you used:
- 9243 strings out of 492982
- 130107 string characters out of 6134896
- 284907 words of memory out of 5000000
- 12695 multiletter control sequences out of 15000+600000
- 10067 words of font info for 39 fonts, out of 8000000 for 9000
+ 9631 strings out of 481239
+ 137817 string characters out of 5920377
+ 628304 words of memory out of 5000000
+ 24725 multiletter control sequences out of 15000+600000
+ 538765 words of font info for 49 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 35i,12n,35p,224b,371s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,12n,37p,260b,361s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texli
@@ -917,7 +916,7 @@ blic/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
 msfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
 s/cm/cmtt8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbo
 ls/msbm10.pfb>
-Output written on images.pdf (68 pages, 151908 bytes).
+Output written on images.pdf (68 pages, 151901 bytes).
 PDF statistics:
  269 PDF objects out of 1000 (max. 8388607)
  186 compressed objects within 2 object streams
