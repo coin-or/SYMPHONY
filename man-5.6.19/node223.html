@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_send_feas_sol</TITLE>
+<META NAME="description" CONTENT="user_send_feas_sol">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node224.html">
+<LINK REL="previous" HREF="node222.html">
+<LINK REL="next" HREF="node224.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node224.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node222.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1505"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node224.html">user_process_own_messages</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node222.html">user_display_solution</A>
+ &nbsp; <B>  <A ID="tex2html1506"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007311300000000000000"></A>
+<A ID="user_send_feas_sol"></A>
+<BR>
+user_send_feas_sol
+</H3>
+
+<PRE>
+int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This function is useful for debugging purposes. It passes a known
+feasible solution to the tree manager. The tree manager then tracks
+which current subproblem admits this feasible solution and notifies
+the user when it gets pruned. It is useful for finding out why a known
+optimal solution never gets discovered. Usually, this is due to either
+an invalid cut of an invalid branching. Note that this feature only
+works when branching on binary variables. See Section <A HREF="node113.html#debugging">5.6.3</A>
+for more on how to use this feature.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=246>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *feas_sol_size</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=246>Pointer to size of the feasible
+solution passed by the user.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int **feas_sol</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=246>Pointer to the array of user indices
+containing the feasible solution. This array is simply copied by the tree
+manager and must be freed by the user.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD><TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Solution tracing is not enabled.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Tracing of the given solution is enabled.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>No feasible solution given.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node224.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node222.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1505"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node224.html">user_process_own_messages</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node222.html">user_display_solution</A>
+ &nbsp; <B>  <A ID="tex2html1506"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

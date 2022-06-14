@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Debugging with PVM</TITLE>
+<META NAME="description" CONTENT="Debugging with PVM">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node113.html">
+<LINK REL="previous" HREF="node111.html">
+<LINK REL="next" HREF="node113.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node113.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node111.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html866"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node113.html">Checking the Validity of</A>
+<B> Up:</B> <A
+ HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A
+ HREF="node111.html">The First Rule</A>
+ &nbsp; <B>  <A ID="tex2html867"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00662000000000000000"></A>
+<A ID="debugging-PVM"></A>
+<BR>
+Debugging with PVM
+</H2>
+If you wish to venture into debugging your distributed application, then you
+simply need to set the parameter 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">*_debug</SPAN></FONT>, where * is the name of the
+module you wish to debug, to &ldquo;1&rdquo; in the parameter file. This will tell PVM
+to spawn the particular process or processes in question under a debugger.
+What PVM actually does in this case is to launch the script
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">$PVM_ROOT/lib/debugger</SPAN></FONT>. You will undoubtedly want to modify this
+script to launch your preferred debugger in the manner you deem fit. If you
+have trouble with this, please send e-mail to the list serve (see Section
+<A HREF="node8.html#resources">1.6</A>).
+
+<P>
+It's a little tricky to debug interacting parallel processes. The main
+difficulty is in that the order of operations is difficult to control. Random
+interactions can occur when processes run in parallel due to varying system
+loads, process priorities, etc. Therefore, it may not always be possible to
+duplicate errors. To force runs that you should be able to reproduce, make
+sure the parameter <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> no_cut_timeout</FONT></SPAN> appears in the parameter file or
+start SYMPHONY with the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">-a</SPAN></FONT> option. This will keep the cut generator from
+timing out, a major source of randomness. Furthermore, run with only one
+active node allowed at a time (set <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000">  max_active_nodes</FONT></SPAN> to &ldquo;1&rdquo;). This
+will keep the tree search from becoming random. These two steps should allow
+runs to be reproduced. You still have to be careful, but this should make
+things easier.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node113.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node111.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html866"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node113.html">Checking the Validity of</A>
+<B> Up:</B> <A
+ HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A
+ HREF="node111.html">The First Rule</A>
+ &nbsp; <B>  <A ID="tex2html867"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

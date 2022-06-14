@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_dg_init_window</TITLE>
+<META NAME="description" CONTENT="user_dg_init_window">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node273.html">
+<LINK REL="previous" HREF="node271.html">
+<LINK REL="next" HREF="node273.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node273.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node270.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node271.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1652"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node273.html">user_dg_free_window</A>
+<B> Up:</B> <A
+ HREF="node270.html">Draw graph module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node271.html">user_dg_process_message</A>
+ &nbsp; <B>  <A ID="tex2html1653"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00735200000000000000">
+user_dg_init_window</A>
+</H3>
+
+<PRE>
+void user_dg_init_window(void **user, window *win)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The user must perform whatever initialization is necessary for
+processing later commands. This usually includes setting up the user's
+data structure for receiving and storing display data.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void **user</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">window *win</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>&nbsp;</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. Ignored.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>The user successfully performed initialization.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

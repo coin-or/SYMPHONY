@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Writing the Callbacks</TITLE>
+<META NAME="description" CONTENT="Writing the Callbacks">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node106.html">
+<LINK REL="previous" HREF="node100.html">
+<LINK REL="next" HREF="node106.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node106.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node98.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node104.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html845"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node106.html">Data Structures</A>
+<B> Up:</B> <A
+ HREF="node98.html">Developing Custom Applications</A>
+<B> Previous:</B> <A
+ HREF="node104.html">Using the MSVC++ IDE</A>
+ &nbsp; <B>  <A ID="tex2html846"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00630000000000000000">
+Writing the Callbacks</A>
+</H1>
+
+<P>
+For each module, all callback functions are invoked from so-called
+<SPAN  CLASS="textit">wrapper functions</SPAN> that provide the interface and also performs a
+default action if the user chooses not to override it. Although SYMPHONY is
+written in C, the wrapper functions provide a C++-style interface in which the
+user can either accept the default action or override it. Each wrapper
+function is named 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">*_u()</SPAN></FONT> , where 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">*</SPAN></FONT> is the name of the
+corresponding callback function, and is defined in a file called
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">*_wrapper.c</SPAN></FONT>. The wrapper function first collects the necessary data
+and hands it to the user by calling the user function. Based on the return
+value from the user, the wrapper then performs any necessary post-processing.
+All callback functions have default options, so that SYMPHONY now acts as a
+generic MILP solver out of the box.
+
+<P>
+In Section <A HREF="node209.html#API">6.3</A>, the callback functions are described in
+detail.  The name of every callback function starts with 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">user_</SPAN></FONT>.
+There are three kinds of arguments:
+<DL>
+<DT><STRONG>IN:</STRONG></DT>
+<DD>An argument containing information that the user might need
+to perform the function.
+</DD>
+<DT><STRONG>OUT:</STRONG></DT>
+<DD>A pointer to an argument in which the user should
+return a result (requested data, decision, etc.) of the function. 
+</DD>
+<DT><STRONG>INOUT:</STRONG></DT>
+<DD>An argument which contains information the user might need,
+but also for which the user can change the value.
+</DD>
+</DL>
+The return values for most function are as follows:
+<DL>
+<DT><STRONG>Return values:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">USER_ERROR</SPAN></FONT></TD>
+<TD CLASS="LEFT TOP"  WIDTH=311>Error in the user function. Printing an error message is
+the user's responsibility. Depending on the work the user function was
+supposed to do, the error might be ignored (and some default option used), or
+the process aborts.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">USER_SUCCESS</SPAN></FONT></TD>
+<TD CLASS="LEFT TOP"  WIDTH=311>The user function was implemented and executed correctly.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">USER_DEFAULT</SPAN></FONT></TD>
+<TD CLASS="LEFT TOP"  WIDTH=311>This option means that the user function was not
+implemented and that SYMPHONY should either execute a default subroutine (the
+default is one of the built-in options&mdash;SYMPHONY decides which one to use based on
+initial parameter settings and the execution of the algorithm) or else do
+nothing, if execution of the subroutine is optional.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">built_in_option1 </SPAN></FONT></TD>
+<TD CLASS="LEFT TOP"  WIDTH=311>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">built_in_option2 </SPAN></FONT> ...</TD>
+<TD CLASS="LEFT TOP"  WIDTH=311>The specified built-in option will be used.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Notes:</STRONG></DT>
+<DD>
+
+<BR>
+
+<UL>
+<LI>Sometimes an output is optional. This is always noted in the
+function descriptions.
+
+<P>
+</LI>
+<LI>If an array has to be returned (i.e., the argument is 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">type
+  **array</SPAN></FONT>), then (unless otherwise noted) the user has to allocate space for
+  the array itself and set 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">*array</SPAN></FONT> to be the array allocated. If an
+  output array is optional and the user is not returning any values in that
+  array, then the user <EM>must not</EM> set 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">*array</SPAN></FONT> because this is how
+  SYMPHONY decides which optional arrays are filled up.
+
+<P>
+</LI>
+<LI>Some built-in options are implemented so that the user can invoke them
+directly from the callback function. This might be useful if, for example,
+the user wants to use different built-in options at different stages
+of the algorithm.
+</LI>
+</UL>
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node106.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node98.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node104.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html845"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node106.html">Data Structures</A>
+<B> Up:</B> <A
+ HREF="node98.html">Developing Custom Applications</A>
+<B> Previous:</B> <A
+ HREF="node104.html">Using the MSVC++ IDE</A>
+ &nbsp; <B>  <A ID="tex2html846"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

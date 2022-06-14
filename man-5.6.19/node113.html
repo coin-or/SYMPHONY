@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Checking the Validity of Cuts and Tracing the Optimal Path</TITLE>
+<META NAME="description" CONTENT="Checking the Validity of Cuts and Tracing the Optimal Path">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node114.html">
+<LINK REL="previous" HREF="node112.html">
+<LINK REL="next" HREF="node114.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node114.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node112.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html868"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node114.html">Using the Interactive Graph</A>
+<B> Up:</B> <A
+ HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A
+ HREF="node112.html">Debugging with PVM</A>
+ &nbsp; <B>  <A ID="tex2html869"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00663000000000000000"></A>
+<A ID="debugging"></A>
+<BR>
+Checking the Validity of Cuts and Tracing the Optimal Path
+</H2>
+
+<P>
+Sometimes the only evidence of a bug is the fact that the optimal solution to
+a particular problem is never found. This is usually caused by either (1)
+adding an invalid cut, or (2) performing an invalid branching. There are two
+options available for discovering such errors. The first is for checking the
+validity of added cuts. This checking must, of course, be done by the user,
+but SYMPHONY can facilitate such checking. To do this, the user must fill in the
+function <A HREF="node260.html#user_check_validity_of_cut"><SPAN style="font-family:monospace">user_check_validity_of_cut()</SPAN></A>. THIS function is called every time a cut is
+passed from the cut generator to the LP and can function as an independent
+verifier. To do this, the user must pass (through her own data structures) a
+known feasible solution. Then for each cut passed into the function, the user
+can check whether the cut is satisfied by the feasible solution. If not, then
+there is a problem! Of course, the problem could also be with the checking
+routine. To enable this functionality, the user must configure SYMPHONY with
+the flag 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">&ndash;enable-cut-check</SPAN></FONT> (see Section <A HREF="node13.html#building_from_source">2.2</A>). 
+
+<P>
+Tracing the optimal path can alert the user when the subproblem which admits a
+particular known feasible solution (at least according to the branching
+restrictions that have been imposed so far) is pruned. This could be due to an
+invalid branching. Note that this option currently only works for branching on
+binary variables. To use this facility, the user must fill in the function
+<A HREF="node223.html#user_send_feas_sol"><SPAN style="font-family:monospace">user_send_feas_sol()</SPAN></A>. All that is required is to pass out an array
+of user indices that are in the feasible solution that you want to trace. Each
+time the subproblem which admits this feasible solution is branched on, the
+branch that continues to admit the solution is marked. When one of these
+marked subproblems is pruned, the user is notified. To enable this
+functionality, the user must configure SYMPHONY with the flag
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">&ndash;enable-trace-path</SPAN></FONT> (see Section <A HREF="node13.html#building_from_source">2.2</A>). 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node114.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node112.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html868"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node114.html">Using the Interactive Graph</A>
+<B> Up:</B> <A
+ HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A
+ HREF="node112.html">Debugging with PVM</A>
+ &nbsp; <B>  <A ID="tex2html869"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

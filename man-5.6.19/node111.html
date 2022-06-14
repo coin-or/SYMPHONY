@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>The First Rule</TITLE>
+<META NAME="description" CONTENT="The First Rule">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node112.html">
+<LINK REL="previous" HREF="node110.html">
+<LINK REL="next" HREF="node112.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node112.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node110.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node110.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html864"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node112.html">Debugging with PVM</A>
+<B> Up:</B> <A
+ HREF="node110.html">Debugging Your Application</A>
+<B> Previous:</B> <A
+ HREF="node110.html">Debugging Your Application</A>
+ &nbsp; <B>  <A ID="tex2html865"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00661000000000000000">
+The First Rule</A>
+</H2>
+
+<P>
+SYMPHONY has many built-in options to make debugging easier. The most
+important one, however, is the following rule. <B>It is easier to
+debug the fully sequential version than the fully distributed
+version</B>. Debugging parallel code is not terrible, but it is more
+difficult to understand what is going on when you have to look at the
+interaction of several different modules running as separate
+processes. This means multiple debugging windows which have to be
+closed and restarted each time the application is re-run. For this
+reason, it is highly recommended to develop code that can be compiled
+serially even if you eventually intend to run in a fully distributed
+environment. This does make the coding marginally more complex, but
+believe me, it's worth the effort. The vast majority of your code will
+be the same for either case. Make sure to use the configuration flag to
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">&ndash;enable-debug</SPAN></FONT> while building (see Section <A HREF="node13.html#building_from_source">2.2</A>). 
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

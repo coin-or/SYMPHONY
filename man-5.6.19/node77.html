@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Initial Solve</TITLE>
+<META NAME="description" CONTENT="Initial Solve">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node78.html">
+<LINK REL="previous" HREF="node76.html">
+<LINK REL="next" HREF="node78.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node78.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node76.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node76.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html752"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node78.html">Solve from Warm Start</A>
+<B> Up:</B> <A
+ HREF="node76.html">The Master Module</A>
+<B> Previous:</B> <A
+ HREF="node76.html">The Master Module</A>
+ &nbsp; <B>  <A ID="tex2html753"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00541100000000000000"></A><A ID="initial_solve"></A>
+<BR>
+Initial Solve
+</H3>
+
+<P>
+Calling the initial solve method solves a given MILP from scratch, as
+described above. The first action taken is to create an instance of the tree
+manager module that will control execution of the algorithm. If the algorithm
+is to be executed in parallel on a distributed architecture, the master module
+spawns a separate tree manager process that will autonomously control the
+solution process. The tree manager in turn creates the modules for processing
+the nodes of the search tree, generating cuts, and maintaining cut pools.
+These modules work in concert to execute the solution process. When it makes
+sense, sets of two or more modules, such as a node processing module and a cut
+generation module may be combined to yield a single process in which the
+combined modules work in concert and communicate with each other through
+shared memory instead of across the network. When running as separate process,
+the modules communicate with each other using a standard communications
+protocol. Currently, the only option supported is PVM, but it would be
+relatively easy to add an MPI implementation.
+
+<P>
+The overall flow of the algorithm is similar to other branch and bound
+implementations and is detailed below. A priority queue of candidate
+subproblems available for processing is maintained at all times and the
+candidates are processed in an order determined by the search strategy. The
+algorithm terminates when the queue is empty or when another specified
+condition is satisfied. A new feature in SYMPHONY 5.6.19  is the ability to stop
+the computation based on exceeding a given time limit, exceeding a given limit
+on the number of processed nodes, achieving a target percentage gap between
+the upper and lower bounds, or finding the first feasible solution. After
+halting prematurely, the computation can be restarted after modifying
+parameters or problem data. This enables the implementation of a wide range of
+dynamic and on-line solution algorithms, as we describe next.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node78.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node76.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node76.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html752"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node78.html">Solve from Warm Start</A>
+<B> Up:</B> <A
+ HREF="node76.html">The Master Module</A>
+<B> Previous:</B> <A
+ HREF="node76.html">The Master Module</A>
+ &nbsp; <B>  <A ID="tex2html753"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

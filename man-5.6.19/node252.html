@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_generate_column</TITLE>
+<META NAME="description" CONTENT="user_generate_column">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node253.html">
+<LINK REL="previous" HREF="node251.html">
+<LINK REL="next" HREF="node253.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node253.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node251.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1597"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node253.html">user_generate_cuts_in_lp</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node251.html">user_logical_fixing</A>
+ &nbsp; <B>  <A ID="tex2html1598"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007322200000000000000">
+user_generate_column</A>
+</H3>
+
+<PRE>
+int user_generate_column(void *user, int generate_what, int cutnum, 
+                         cut_data **cuts, int prevind, int nextind, 
+                         int *real_nextind, double *colval, 
+                         int *colind, int *collen, double *obj,
+                         double *lb, double *ub)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This function is called when pricing out the columns that are not
+already fixed and are not explicitly represented in the matrix. Only
+the user knows the explicit description of these columns. When a
+missing variable need to be priced, the user is asked to provide the
+corresponding column. SYMPHONY scans through the known variables in the
+order of their user indices. After testing a variable in the matrix
+(<SPAN style="font-family:monospace">prevind</SPAN>), SYMPHONY asks the user if there are any missing variables
+to be priced before the next variable in the matrix (<SPAN style="font-family:monospace">nextind</SPAN>).
+If there are missing variables before <SPAN style="font-family:monospace">nextind</SPAN>, the user has to
+supply the user index of the real next variable (<SPAN style="font-family:monospace">real_nextind</SPAN>)
+along with the corresponding column. Occasionally SYMPHONY asks the user to
+simply supply the column corresponding to <SPAN style="font-family:monospace">nextind</SPAN>. The <SPAN style="font-family:monospace">generate_what</SPAN> flag is used for making a distinction between the two
+cases: in the former case it is set to <SPAN style="font-family:monospace">GENERATE_REAL_NEXTIND</SPAN>
+and in the latter it is set to <SPAN style="font-family:monospace">GENERATE_NEXTIND</SPAN>.
+
+<P>
+
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int generate_what</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261><SPAN style="font-family:monospace">GENERATE_NEXTIND</SPAN> or <SPAN style="font-family:monospace">GENERATE_REAL_NEXTIND</SPAN> (see description above).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int cutnum</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>The number of added rows in the LP formulation
+(i.e., the total number of rows less the number of base constraints).
+This is the length of the <SPAN style="font-family:monospace">**cuts</SPAN> array.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">cut_data **cuts</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Description of the cuts corresponding to
+the added rows of the current LP formulation. The user is supposed to
+know about the cuts corresponding to the base constraints.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int prevind</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>The last variable processed (<SPAN CLASS="MATH"><IMG STYLE="height: 1.53ex; vertical-align: -0.30ex; " SRC="img56.png"
+ ALT="$-1$"></SPAN> if there was
+none) by SYMPHONY.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int nextind</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>The next variable (<SPAN CLASS="MATH"><IMG STYLE="height: 1.53ex; vertical-align: -0.30ex; " SRC="img56.png"
+ ALT="$-1$"></SPAN> if there are none)
+known to SYMPHONY.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *real_nextind</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Pointer to the user index of the next
+variable (<SPAN CLASS="MATH"><IMG STYLE="height: 1.53ex; vertical-align: -0.30ex; " SRC="img56.png"
+ ALT="$-1$"></SPAN> if there is none).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *colval</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Values of the nonzero entries in the
+column of the next variable. (Sufficient space is already allocated for this
+array.)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *colind</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Row indices of the nonzero entries in the column.
+(Sufficient space is already allocated for this array.)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *collen</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>The length of the <SPAN style="font-family:monospace">colval</SPAN> and <SPAN style="font-family:monospace">colind</SPAN> arrays.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *obj</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Objective coefficient corresponding to the
+next variable.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *lb</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Lower bound of the next variable.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *ub</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=261>Upper bound of the next variable.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. The LP process is aborted.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>User filled out <SPAN style="font-family:monospace">*real_nextind</SPAN> and
+generated its column if needed.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>No column generation is done.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">price_all_vars()</SPAN> and <SPAN style="font-family:monospace">restore_lp_feasibility()</SPAN>.
+
+<P>
+</DD>
+<DT><STRONG>Note:</STRONG></DT>
+<DD>
+
+<P>
+<SPAN style="font-family:monospace">colval</SPAN>, <SPAN style="font-family:monospace">colind</SPAN>, <SPAN style="font-family:monospace">collen</SPAN> and <SPAN style="font-family:monospace">obj</SPAN> do not need to
+be filled out if <SPAN style="font-family:monospace">real_nextind</SPAN> is the same as <SPAN style="font-family:monospace">nextind</SPAN> and <SPAN style="font-family:monospace">generate_what</SPAN> is <SPAN style="font-family:monospace">GENERATE_REAL_NEXTIND</SPAN>.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node253.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node251.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1597"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node253.html">user_generate_cuts_in_lp</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node251.html">user_logical_fixing</A>
+ &nbsp; <B>  <A ID="tex2html1598"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

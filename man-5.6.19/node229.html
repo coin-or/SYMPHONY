@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>MIPdesc</TITLE>
+<META NAME="description" CONTENT="MIPdesc">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node231.html">
+<LINK REL="previous" HREF="node227.html">
+<LINK REL="next" HREF="node230.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node230.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node228.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1548"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node230.html">cut_data</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node228.html">MIPdesc</A>
+ &nbsp; <B>  <A ID="tex2html1549"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00732200000000000000"></A>
+<A ID="MIPdesc"></A>
+<BR>
+MIPdesc
+</H3>
+
+<P>
+One of the few internally defined data structures that the user has to deal
+with frequently is the <SPAN  CLASS="texttt">MIPdesc</SPAN> data structure, which holds the data
+needed to describe a MILP. This data structure is used by SYMPHONY for two
+purposes. First, it is used to store the description of a generic MILP that is
+either read in from an MPS or AMPL file. More importantly, it is the data
+structure the user must use to pass the subproblem descriptions back to
+SYMPHONY at the time a new search tree node is created in the function
+<A HREF="node238.html#user_create_subproblem"><SPAN style="font-family:monospace">user_create_subproblem()</SPAN></A>. The structure has 14 fields (listed
+below) that must be filled out to describe a subproblem (some fields are
+optional). 
+<BR>
+<BR>
+A subproblem is a mixed-integer program defined by a matrix of constraints, an
+objective function, bounds on both the right hand side values of the
+constraints and the variables, an array indicating which variables are
+integer, and (optionally) an array of column names that allows SYMPHONY to
+report the solution back in terms of column names instead of user indices. If
+the subproblem has <SPAN  CLASS="texttt">n</SPAN> variables and <SPAN  CLASS="texttt">m</SPAN> constraints, the
+constraints are given by a constraint coefficient matrix of size <SPAN  CLASS="texttt">m</SPAN>
+
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.15ex; vertical-align: -0.30ex; " SRC="img47.png"
+ ALT="\bgroup\color{brown}$ \times$\egroup"></SPAN></FONT> <SPAN  CLASS="texttt">n</SPAN> (described in the next paragraph). The sense of each
+constraint, the right hand side values and bounds on the right hand side
+(called <EM>range</EM>) are vectors are of size <SPAN  CLASS="texttt">m</SPAN>. The objective
+function coefficients and the lower and upper bounds on the variables are
+vectors of length <SPAN  CLASS="texttt">n</SPAN>. The sense of each constraint can be either 'L'
+(
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.79ex; vertical-align: -0.42ex; " SRC="img48.png"
+ ALT="\bgroup\color{brown}$ \leq$\egroup"></SPAN></FONT>), 'E' (
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 0.64ex; vertical-align: -0.11ex; " SRC="img49.png"
+ ALT="\bgroup\color{brown}$ =$\egroup"></SPAN></FONT>), 'G' (
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.79ex; vertical-align: -0.42ex; " SRC="img50.png"
+ ALT="\bgroup\color{brown}$ \geq$\egroup"></SPAN></FONT>) or 'R' (ranged). For non-ranged rows the
+range value is <SPAN style="font-family:monospace">0</SPAN>, for a ranged row the range value must be non-negative
+and the constraint means that the row activity level has to be between the
+right hand side value and the right hand side increased by the range value. 
+<BR>
+<BR>
+Since the coefficient matrix is very often sparse, only the nonzero entries
+are stored. Each entry of the matrix has a column index, a row index and a
+coefficient value associated with it. A matrix is specified in the form of the
+three arrays <SPAN  CLASS="texttt">matval</SPAN>, <SPAN  CLASS="texttt">matind</SPAN>, and <SPAN  CLASS="texttt">matbeg</SPAN>. The array
+<SPAN  CLASS="texttt">matval</SPAN> contains the values of the nonzero entries of the matrix in
+<SPAN  CLASS="textit">column order</SPAN>; that is, all the entries for the 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 2.11ex; vertical-align: -0.11ex; " SRC="img51.png"
+ ALT="\bgroup\color{brown}$ 0^{th}$\egroup"></SPAN></FONT> column come 
+first, then the entries for the 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.92ex; vertical-align: -0.11ex; " SRC="img52.png"
+ ALT="\bgroup\color{brown}$ 1^{st}$\egroup"></SPAN></FONT> column, etc. The row index
+corresponding to each entry of <SPAN  CLASS="texttt">matval</SPAN> is listed in <SPAN  CLASS="texttt">matind</SPAN>
+(both of them are of length <SPAN  CLASS="texttt">nz</SPAN>, the number of nonzero entries in the
+matrix). Finally,
+<SPAN  CLASS="texttt">matbeg</SPAN> contains the starting positions of each of the columns in 
+<SPAN  CLASS="texttt">matval</SPAN> and <SPAN  CLASS="texttt">matind</SPAN>. Thus, <SPAN  CLASS="texttt">matbeg[i]</SPAN> is the position
+of the first entry of column <SPAN  CLASS="texttt">i</SPAN> in both <SPAN  CLASS="texttt">matval</SPAN> and
+<SPAN  CLASS="texttt">matind</SPAN>). By convention <SPAN  CLASS="texttt">matbeg</SPAN> is allocated to be of length
+<SPAN  CLASS="texttt">n+1</SPAN>, with <SPAN  CLASS="texttt">matbeg[n]</SPAN> containing the position after the very
+last entry in <SPAN  CLASS="texttt">matval</SPAN> and <SPAN  CLASS="texttt">matind</SPAN> (so it is very conveniently
+equal to <SPAN  CLASS="texttt">nz</SPAN>). This representation of a matrix is known as a <EM>column ordered</EM> or <EM>column major</EM> representation. Below are listed the
+fields that must be filled out to describe a subproblem.
+<BR>
+<BR>
+<P>
+<DL>
+<DT><STRONG><SPAN  CLASS="texttt">int n</SPAN> &ndash;</STRONG></DT>
+<DD>The number of columns.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">int m</SPAN> &ndash;</STRONG></DT>
+<DD>The number of rows.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">int nz</SPAN> &ndash;</STRONG></DT>
+<DD>The number of nonzeros.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double obj_offset</SPAN> &ndash;</STRONG></DT>
+<DD>Constant to be added to the objective
+function value when printed.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">char obj_sense</SPAN> &ndash;</STRONG></DT>
+<DD>Objective sense (set to <SPAN  CLASS="texttt">MAXIMIZE</SPAN>
+or <SPAN  CLASS="texttt">MINIMIZE</SPAN>).
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">char *is_int</SPAN> &ndash;</STRONG></DT>
+<DD>Indicates which variables are required to be 
+integer.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">int *matbeg</SPAN> &ndash; </STRONG></DT>
+<DD>The array containing the starting positions
+for each column.  
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">int *matind</SPAN> &ndash;</STRONG></DT>
+<DD>The array containing the indices for each
+column. 
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double *matval</SPAN> &ndash;</STRONG></DT>
+<DD>The array containing the matrix values for
+each column.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double *obj</SPAN> &ndash;</STRONG></DT>
+<DD>The objective function coefficients for the second objective (for multicriteria solve).
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double *obj2</SPAN> &ndash;</STRONG></DT>
+<DD>The objective function coefficients.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double *rhs</SPAN> &ndash;</STRONG></DT>
+<DD>The right hand side values for the
+constraints. 
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double *rngval</SPAN> &ndash;</STRONG></DT>
+<DD>The range values for the constraints
+(optional). 
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">char *sense</SPAN> &ndash;</STRONG></DT>
+<DD>The senses of the constraints. 
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double *lb</SPAN> &ndash;</STRONG></DT>
+<DD>The lower bounds of the variables.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">double *ub</SPAN> &ndash;</STRONG></DT>
+<DD>The upper bounds of the variables.
+</DD>
+<DT><STRONG><SPAN  CLASS="texttt">char **colname</SPAN> &ndash;</STRONG></DT>
+<DD>The column names.
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A ID="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A ID="tex2html1550"
+  HREF="node230.html">cut_data</A>
+</UL>
+<!--End of Table of Child-Links-->
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node230.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node228.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1548"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node230.html">cut_data</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node228.html">MIPdesc</A>
+ &nbsp; <B>  <A ID="tex2html1549"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

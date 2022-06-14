@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_usage</TITLE>
+<META NAME="description" CONTENT="user_usage">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node212.html">
+<LINK REL="previous" HREF="node210.html">
+<LINK REL="next" HREF="node212.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node212.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1481"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node212.html">user_initialize</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+ &nbsp; <B>  <A ID="tex2html1482"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00731100000000000000"></A>
+<A ID="user_usage"></A>
+<BR>
+user_usage
+</H3>
+
+<PRE>
+void user_usage()
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+SYMPHONY's command-line switches are all lower case letters. The user can use
+any upper case letter (except 'H' and as specified below) for command line
+switches to control user-defined parameter settings without the use of a
+parameter file. The function <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> user_usage()</FONT></SPAN> can optionally print out
+usage information for the user-defined command line switches. The command line
+switch <SPAN style="font-family:monospace">-H</SPAN> automatically calls the user's usage subroutine. The switch
+<SPAN style="font-family:monospace">-h</SPAN> prints SYMPHONY's own usage information. In its default configuration, the
+command-line switch <SPAN  CLASS="texttt">-F</SPAN> is used to specify the file in which the
+instance data is contained (either an MPS file or an GMPL/AMPL file). The
+<SPAN  CLASS="texttt">-D</SPAN> switch is used to specify the data file if an GMPL/AMPL file is
+being read in (see the README file). The <SPAN  CLASS="texttt">-L</SPAN> switch is used to specify
+the data file if a file in LP format is being read in
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

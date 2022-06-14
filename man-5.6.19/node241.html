@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_display_lp_solution</TITLE>
+<META NAME="description" CONTENT="user_display_lp_solution">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node242.html">
+<LINK REL="previous" HREF="node240.html">
+<LINK REL="next" HREF="node242.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node242.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node240.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1575"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node242.html">user_shall_we_branch</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node240.html">user_send_feasible_solution</A>
+ &nbsp; <B>  <A ID="tex2html1576"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007321100000000000000">
+user_display_lp_solution</A>
+</H3>
+
+<PRE>
+int user_display_lp_solution(void *user, int which_sol,
+                          int varnum, int *indices, double *values)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Given a solution to an LP relaxation (the indices and values of the nonzero
+variables) the user can (graphically) display it. The <SPAN style="font-family:monospace">which_sol</SPAN>
+argument shows what kind of solution is passed to the function: <SPAN style="font-family:monospace">DISP_FEAS_SOLUTION</SPAN> indicates a solution feasible to the original IP
+problem, <SPAN style="font-family:monospace">DISP_RELAXED_SOLUTION</SPAN> indicates the solution to any LP
+relaxation and <SPAN style="font-family:monospace">DISP_FINAL_RELAXED_SOLUTION</SPAN> indicates the solution to
+an LP relaxation when no cut has been found. There is no post-processing.
+Default options print out user indices and values of nonzero or fractional
+variables on the standard output.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=291>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=291>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int which_sol</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=291>The type of solution passed on to the
+displaying function. Possible values are <SPAN style="font-family:monospace">DISP_FEAS_SOLUTION</SPAN>,
+<SPAN style="font-family:monospace">DISP_RELAXED_SOLUTION</SPAN> and <SPAN style="font-family:monospace">DISP_FINAL_RELAXED_SOLUTION</SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int varnum</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=291>The number of variables in the current
+solution at nonzero level (the length of the <SPAN style="font-family:monospace">indices</SPAN> and <SPAN style="font-family:monospace">values</SPAN> arrays).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *indices</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=291>User indices of variables at
+nonzero level in the current solution.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *values</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=291>Values of the nonzero variables.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>Error. SYMPHONY ignores error message.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>User displayed whatever she wanted to.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>Regulated by the parameter <SPAN style="font-family:monospace">display_solution_default</SPAN>, but set to <SPAN style="font-family:monospace">DISP_NZ_INT</SPAN> unless overridden
+by the user.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">DISP_NOTHING</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>Display nothing.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">DISP_NZ_INT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>Display user indices (as integers) and values of
+nonzero variables.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">DISP_NZ_HEXA</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>Display user indices (as hexadecimals) and
+values of nonzero variables.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">DISP_FRAC_INT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>Display user indices (as integers) and values
+of variables not at their lower or upper bounds.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">DISP_FRAC_HEXA</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=318>Display user indices (as hexadecimals) and
+values of variables not at their lower and upper bounds.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">fathom_branch()</SPAN> with <SPAN style="font-family:monospace">DISP_FEAS_SOLUTION</SPAN> or <SPAN style="font-family:monospace">DISP_RELAXED_SOLUTION</SPAN> after solving an LP
+relaxation and checking its feasibility status. If it was not feasible and no
+cut could be added either then the wrapper is invoked once more, now with <SPAN style="font-family:monospace">DISP_FINAL_RELAXED_SOLUTION</SPAN>. 
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node242.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node240.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1575"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node242.html">user_shall_we_branch</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node240.html">user_send_feasible_solution</A>
+ &nbsp; <B>  <A ID="tex2html1576"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
