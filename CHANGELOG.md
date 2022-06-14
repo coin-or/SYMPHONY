@@ -1,11 +1,19 @@
 ## CHANGELOG
 
+### Release 5.6.19
+  * Fix unicode caracters in documentation
+  * Update documentation
+  * Fix few small bugs (#187)
+  * Fix a few things with autotools
+  * Update license to EPL 2
+  * Change warm-starting example to make it more interesting
+
 ### Release 5.6.18
   * Switch CI to Github Actions
   * Switch to automatically generated README
-  * Update documentation for coinbrew and get latex2html working again	
+  * Update documentation for coinbrew and get latex2html working again
   * Fix reported bugs (See #171, #177, #180)
-	
+
 ### Release 5.6.17
   * Update appveyor
   * Fix several reported bugs (see PRs 10-12, Issue 2)
