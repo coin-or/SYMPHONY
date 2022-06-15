@@ -334,7 +334,7 @@ guides and pointers to other on-line documentation can be found below.
 
 The PDF version of the manual is available here:
 
-https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.17-Manual.pdf
+https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.19-Manual.pdf
 
 An on-line version that is for a slightly earlier release is here:
 
