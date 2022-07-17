@@ -55,7 +55,9 @@ int main(int argc, char **argv)
 #include "sym_master.h"
 #include "sym_messages.h"
 #if defined HAS_READLINE
+#if defined HAVE_PWD_H
 #include <pwd.h>
+#endif
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -134,7 +136,10 @@ char **sym_completion(const char *text, int start, int end);
 void sym_initialize_readline();
 char *command_generator (const char *text, int state);
 char *alloc_str (char *s);
+
+#if defined HAVE_PWD_H
 void sym_read_tilde(char input[]);
+#endif
 
 #endif
 #endif
@@ -236,9 +241,9 @@ int main(int argc, char **argv)
 	   strcpy(args[1], line);
 	 }	 
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) || \
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(HAVE_PWD_H) && (HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                               RL_VERSION_MINOR >= 2) || \
+                                              (RL_VERSION_MAJOR >= 6))
 	 sym_read_tilde(args[1]);	 
 #endif	 	 
 	 if (fopen(args[1], "r") == NULL){
@@ -295,9 +300,9 @@ int main(int argc, char **argv)
 	     strcpy(args[2], line);
 	   }
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) || \
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(HAVE_PWD_H) && (HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                               RL_VERSION_MINOR >= 2) || \
+                                              (RL_VERSION_MAJOR >= 6))
 	   sym_read_tilde(args[2]);	 
 #endif	 	 
 	 
@@ -552,9 +557,9 @@ int main(int argc, char **argv)
 	       strcpy(args[2], line);
 	     }
 
-#if defined(HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
-			       RL_VERSION_MINOR >= 2) ||\
-			      (RL_VERSION_MAJOR >= 6))
+#if defined(HAVE_PWD_H) && (HAS_READLINE) && ((RL_VERSION_MAJOR == 5 && \
+                                               RL_VERSION_MINOR >= 2) || \
+                                              (RL_VERSION_MAJOR >= 6))
 	     sym_read_tilde(args[2]);	 
 #endif	 	 
 
@@ -888,6 +893,7 @@ char *alloc_str(char *s)
 /*===========================================================================*\
 \*===========================================================================*/
 
+#if defined(HAVE_PWD_H)
 void sym_read_tilde(char input[])
 {
    char temp;
@@ -905,6 +911,7 @@ void sym_read_tilde(char input[])
       }	    
    }
 }
+#endif
 
 #endif
 #endif
