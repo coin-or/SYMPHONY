@@ -82,6 +82,8 @@ AC_COIN_CHECK_GNU_READLINE
 AM_CONDITIONAL(COIN_HAS_READLINE,
                [test $coin_has_readline = yes])
 
+AC_CHECK_HEADERS([pwd.h])
+
 #############################################################################
 #                              COIN components                              #
 #############################################################################
