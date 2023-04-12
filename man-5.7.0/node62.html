@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Design of SYMPHONY</TITLE>
+<META NAME="description" CONTENT="Design of SYMPHONY">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node75.html">
+<LINK REL="previous" HREF="node61.html">
+<LINK REL="next" HREF="node63.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node63.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node59.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node61.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html679"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node63.html">An Object-oriented Approach</A>
+<B> Up:</B> <A
+ HREF="node59.html">Technical Details</A>
+<B> Previous:</B> <A
+ HREF="node61.html">Branch and Cut</A>
+ &nbsp; <B>  <A ID="tex2html680"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00530000000000000000"></A>
+<A ID="design"></A>
+<BR>
+Design of SYMPHONY
+</H1>
+
+<P>
+SYMPHONY was designed with two major goals in mind&mdash;portability and
+ease of use. With respect to ease of use, we aimed for a &ldquo;black box&rdquo;
+design, whereby the user would not be required to know anything about
+the implementation of the library, but only about the user interface.
+With respect to portability, we aimed not only for it to be <EM>possible</EM> to use the framework in a wide variety of settings and on a
+wide variety of hardware, but also for it to perform <EM>effectively</EM> in all
+these settings. Our primary measure of effectiveness was
+how well the framework would perform in comparison to a problem-specific
+(or hardware-specific) implementation written &ldquo;from scratch.&rdquo;
+
+<P>
+It is important to point out that achieving such design goals involves
+a number of very difficult tradeoffs. For instance, ease of use is quite
+often at odds with efficiency. In several instances, we had to give up
+some efficiency to make the code easy to work with and to maintain a
+true black box implementation. Maintaining portability across a wide
+variety of hardware, both sequential and parallel, also required some
+difficult choices. For example, solving large-scale problems on
+sequential platforms requires extremely memory-efficient data
+structures in order to maintain the very large search trees that can
+be generated. These storage schemes, however, are highly centralized
+and do not scale well to large numbers of processors. 
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A ID="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A ID="tex2html681"
+  HREF="node63.html">An Object-oriented Approach</A>
+<LI><A ID="tex2html682"
+  HREF="node64.html">Data Structures and Storage</A>
+<UL>
+<LI><A ID="tex2html683"
+  HREF="node65.html">Variables</A>
+<LI><A ID="tex2html684"
+  HREF="node66.html">Constraints</A>
+<LI><A ID="tex2html685"
+  HREF="node67.html">Search Tree</A>
+</UL>
+<BR>
+<LI><A ID="tex2html686"
+  HREF="node68.html">Modular Implementation</A>
+<UL>
+<LI><A ID="tex2html687"
+  HREF="node69.html">The Master Module</A>
+<LI><A ID="tex2html688"
+  HREF="node70.html">The Tree Management Module</A>
+<LI><A ID="tex2html689"
+  HREF="node71.html">The Node Processing Module</A>
+<LI><A ID="tex2html690"
+  HREF="node72.html">The Cut Generation Module</A>
+<LI><A ID="tex2html691"
+  HREF="node73.html">The Cut Management Module</A>
+</UL>
+<BR>
+<LI><A ID="tex2html692"
+  HREF="node74.html">Algorithm Summary</A>
+</UL>
+<!--End of Table of Child-Links-->
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node63.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node59.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node61.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html679"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node63.html">An Object-oriented Approach</A>
+<B> Up:</B> <A
+ HREF="node59.html">Technical Details</A>
+<B> Previous:</B> <A
+ HREF="node61.html">Branch and Cut</A>
+ &nbsp; <B>  <A ID="tex2html680"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

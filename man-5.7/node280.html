@@ -1,0 +1,744 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>LP parameters</TITLE>
+<META NAME="description" CONTENT="LP parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node281.html">
+<LINK REL="previous" HREF="node279.html">
+<LINK REL="next" HREF="node281.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node281.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node275.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node279.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1676"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node281.html">Cut Generator Parameters</A>
+<B> Up:</B> <A
+ HREF="node275.html">Run-time Parameters</A>
+<B> Previous:</B> <A
+ HREF="node279.html">Tree Manager parameters</A>
+ &nbsp; <B>  <A ID="tex2html1677"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00745000000000000000">
+LP parameters</A>
+</H2>
+
+<P>
+<DL>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> LP_verbosity</FONT></SPAN> &ndash; integer (0).</STRONG></DT>
+<DD>Verbosity level of the LP module.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> set_obj_upper_lim</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Whether to stop solving the LP relaxation when it's optimal value is
+provably higher than the global upper bound. There are some advantages
+to continuing the solution process anyway. For instance, this results
+in the highest possible lower bound. On the other hand, if the matrix
+is full, this node will be pruned anyway and the rest of the
+computation is pointless. This option should be set at <SPAN style="font-family:monospace">FALSE</SPAN> for
+column generation since the LP dual values may not be reliable otherwise.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> try_to_recover_from_error</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">TRUE</SPAN>).</STRONG></DT>
+<DD>Indicates what should be done in case the LP solver is unable to solve
+a particular LP relaxation because of numerical problems. It is
+possible to recover from this situation but further results may be
+suspect. On the other hand, the entire solution process can be
+abandoned.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> problem_type</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">ZERO_ONE_PROBLEM</SPAN>{0}).</STRONG></DT>
+<DD>The type of problem being solved. Other values are <SPAN style="font-family:monospace">INTEGER_PROBLEM</SPAN>{1} or <SPAN style="font-family:monospace">MIXED_INTEGER_PROBLEM</SPAN>{2}.
+(Caution: The mixed-integer option is not well tested.)
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> cut_pool_check_frequency</FONT></SPAN> &ndash; integer (10).</STRONG></DT>
+<DD>The number of iterations between sending LP solutions to the cut pool
+to find violated cuts. It is not advisable to check the cut pool too
+frequently as the cut pool module can get bogged down and the LP
+solution generally do not change that drastically from one iteration
+to the next anyway.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> not_fixed_storage_size</FONT></SPAN> &ndash; integer (2048).</STRONG></DT>
+<DD>The <EM>not fixed list</EM> is a partial list of indices of variables not
+in the matrix that have not been fixed by reduced cost. Keeping this
+list allows SYMPHONY to avoid repricing variables (an expensive operation)
+that are not in the matrix because they have already been permanently
+fixed. When this array reaches its maximum size, no more variable
+indices can be stored. It is therefore advisable to keep the maximum
+size of this array as large as possible, given memory limitations.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_non_dual_feas_to_add_min</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_non_dual_feas_to_add_max</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_non_dual_feas_to_add_frac</FONT></SPAN> 
+&ndash; integer, integer, double (20, 200, .05).</STRONG></DT>
+<DD>These three parameters determine the maximum number of
+non-dual-feasible columns that can be added in any one iteration
+after pricing. This maximum is set to the indicated
+fraction of the current number of active columns unless this numbers
+exceeds the given maximum or is less than the given minimum, in which
+case, it is set to the max or min, respectively.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_not_fixable_to_add_min</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_not_fixable_to_add_max</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_not_fixable_to_add_frac</FONT></SPAN> &ndash; integer, integer, double (100,
+500, .1) </STRONG></DT>
+<DD>As above, these three parameters determine the maximum number of new
+columns to be added to the problem because they cannot be priced out.
+These variables are only added when trying to restore infeasibility
+and usually, this does not require many variables anyway.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> mat_col_compress_num, mat_col_compress_ratio</FONT></SPAN> &ndash; integer,
+double (50, .05).</STRONG></DT>
+<DD>Determines when the matrix should be physically compressed. This only
+happens when the number of columns is high enough to make it
+&ldquo;worthwhile.&rdquo; The matrix is physically compressed when the number of
+deleted columns exceeds either an absolute number <EM>and</EM> a specified
+fraction of the current number of active columns.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> mat_row_compress_num, mat_row_compress_ratio</FONT></SPAN> &ndash; integer,
+double (20, .05).</STRONG></DT>
+<DD>Same as above except for rows.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> tailoff_gap_backsteps, tailoff_gap_frac</FONT></SPAN> &ndash; integer, double
+(2, .99).</STRONG></DT>
+<DD>Determines when tailoff is detected in the LP module.
+Tailoff is reported if the average ratio of the current gap to the
+previous iteration's gap over the last <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> tailoff_gap_backsteps</FONT></SPAN>
+iterations wasn't at least <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> tailoff_gap_frac</FONT></SPAN>.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> tailoff_obj_backsteps, tailoff_obj_frac</FONT></SPAN> &ndash; integer, double
+(2, .99).</STRONG></DT>
+<DD>Same as above, only the ratio is taken with respect to the change in
+objective function values instead of the change in the gap.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> ineff_cnt_to_delete</FONT></SPAN> &ndash; integer (0).</STRONG></DT>
+<DD>Determines after how many iterations of being deemed ineffective a
+constraint is removed from the current relaxation.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> eff_cnt_before_cutpool</FONT></SPAN> &ndash; integer (3).</STRONG></DT>
+<DD>Determines after how many iterations of being deemed effective each
+cut will be sent to the global pool.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> ineffective_constraints</FONT></SPAN> &ndash; integer
+(<SPAN style="font-family:monospace">BASIC_SLACKS_ARE_INEFFECTIVE</SPAN>{2}).</STRONG></DT>
+<DD>Determines under what condition a constraint is deemed ineffective in
+the current relaxation. Other possible values are <SPAN style="font-family:monospace">NO_CONSTRAINT_IS_INEFFECTIVE</SPAN>{0},  <SPAN style="font-family:monospace">NONZERO_SLACKS_ARE_INEFFECTIVE</SPAN>{1}, and 
+<BR><SPAN style="font-family:monospace">ZERO_DUAL_VALUES_ARE_INEFFECTIVE</SPAN>{3}.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> base_constraints_always_effective</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">TRUE</SPAN>).</STRONG></DT>
+<DD>Determines whether the base constraints can ever be removed from the
+relaxation. In some case, removing the base constraints from the
+problem can be disastrous depending on the assumptions made by the cut
+generator.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> branch_on_cuts</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>This informs the framework whether the user plans on branching on cuts
+or not. If so, there is additional bookkeeping to be done, such as
+maintaining a pool of slack cuts to be used for branching. Therefore,
+the user should not set this flag unless he actually plans on using
+this feature.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> discard_slack_cuts</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">DISCARD_SLACKS_BEFORE_NEW_ITERATION</SPAN>{0}).</STRONG></DT>
+<DD>Determines when the pool of slack cuts is discarded. The other option
+is <SPAN style="font-family:monospace">DISCARD_SLACKS_WHEN_STARTING_NEW_NODE</SPAN>{1}.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> first_lp_first_cut_time_out</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> first_lp_all_cuts_time_out</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> later_lp_first_cut_time_out</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> later_lp_all_cuts_time_out</FONT></SPAN> &ndash;
+double (0, 0, 5, 1).</STRONG></DT>
+<DD>The next group of parameters determines when the LP should give up
+waiting for cuts from the cut generator and start to solve the
+relaxation in its current form or possibly branch if necessary. There
+are two factors that contribute to determining this timeout. First
+is whether this is the first LP in the search node of whether it is a
+later LP. Second is whether any cuts have been added already in this
+iteration. The four timeout parameters correspond to the four possible
+combinations of these two variables.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> no_cut_timeout</FONT></SPAN> &ndash; </STRONG></DT>
+<DD>This keyword does not have an associated value. If this keyword
+appears on a line by itself or with a value, this tells the framework
+not to time out while waiting for cuts. This is useful for debugging
+since it enables runs with a single LP module to be duplicated.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> all_cut_timeout</FONT></SPAN> &ndash; double (no default).</STRONG></DT>
+<DD>This keyword tells the framework to set all of the above timeout
+parameters to the value indicated.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_cut_num_per_iter</FONT></SPAN> &ndash; integer (20).</STRONG></DT>
+<DD>The maximum number of cuts that can be added to the LP in an
+iteration. The remaining cuts stay in the local pool to be added in
+subsequent iterations, if they are strong enough.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> do_reduced_cost_fixing</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Whether or not to attempt to fix variables by reduced cost. This
+option is highly recommended
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> gap_as_ub_frac, gap_as_last_gap_frac</FONT></SPAN> &ndash; double (.1, .7).</STRONG></DT>
+<DD>Determines when reduced cost fixing should be attempted. It is only
+done when the gap is within the fraction <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> gap_as_ub_frac</FONT></SPAN> of the upper
+bound or when the gap has decreased by the fraction 
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> gap_as_last_gap_frac</FONT></SPAN> since the last time variables were fixed.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> do_logical_fixing</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>Determines whether the user's logical fixing routine should be used.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fixed_to_ub_before_logical_fixing</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fixed_to_ub_frac_before_logical_fixing</FONT></SPAN> &ndash; 
+<B>integer, double (1, .01)</B>.</STRONG></DT>
+<DD>Determines when logical fixing should be attempted. It will be called
+only when a certain absolute number <EM>and</EM> a certain number of variables
+have been fixed to their upper bounds by reduced cost. This is because
+it is typically only after fixing variables to their upper bound that
+other variables can be logically fixed.
+
+<P>
+<A ID="strong_branching"></A></DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_presolve_iter</FONT></SPAN> &ndash; integer (10).</STRONG></DT>
+<DD>Number of simplex iterations to be performed in the pre-solve for
+strong branching.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_cand_num_max</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_cand_num_min</FONT></SPAN>,</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_red_ratio</FONT></SPAN> &ndash;
+<B>integer (10, 5, 1)</B>.</STRONG></DT>
+<DD>These three parameters together determine the number of strong
+branching candidates to be used by default. In the root node,
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_cand_num_max</FONT></SPAN> candidates are used. On each
+succeeding level, this number is reduced by the number 
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_red_ratio</FONT></SPAN> multiplied by the square of the level.
+This continues until the number of candidates is reduced to 
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_cand_num_min</FONT></SPAN> and then that number of candidates
+is used in all lower levels of the tree.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_high_low_weight</FONT></SPAN> &ndash; double (0.8).</STRONG></DT>
+<DD>This parameter is used to calculate the score of each branching candidate. The
+candidate with the highest score is then selected for branching. Let <!-- MATH
+ $z_i^+,
+z_i^-$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.75ex; vertical-align: -0.80ex; " SRC="img61.png"
+ ALT="$z_i^+,
+z_i^-$"></SPAN> be the estimated change in objective function value when we branch on
+the candidate <SPAN CLASS="MATH"><IMG STYLE="height: 1.60ex; vertical-align: -0.11ex; " SRC="img62.png"
+ ALT="$i$"></SPAN>. Then the score of candidate <SPAN CLASS="MATH"><IMG STYLE="height: 1.60ex; vertical-align: -0.11ex; " SRC="img62.png"
+ ALT="$i$"></SPAN> is <!-- MATH
+ $s_i =
+\alpha\times\min\{z_i^+, z_i^-\} + (1-\alpha)\times\max\{z_i^+,z_i^-\}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.75ex; vertical-align: -0.80ex; " SRC="img63.png"
+ ALT="$s_i =
+\alpha\times\min\{z_i^+, z_i^-\} + (1-\alpha)\times\max\{z_i^+,z_i^-\}$"></SPAN>, where
+<SPAN CLASS="MATH"><IMG STYLE="height: 1.09ex; vertical-align: -0.11ex; " SRC="img64.png"
+ ALT="$\alpha$"></SPAN> is the value of <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> strong_branching_high_low_weight</FONT></SPAN>. This
+value should always lie in the interval <SPAN CLASS="MATH"><IMG STYLE="height: 2.36ex; vertical-align: -0.69ex; " SRC="img65.png"
+ ALT="$[0,1]$"></SPAN>.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> limit_strong_branching_time</FONT></SPAN></STRONG></DT>
+<DD>&ndash; boolean (TRUE).]
+
+Whether to heuristically limit the amount of time spent in strong branching.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> use_hot_starts</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">TRUE</SPAN>).</STRONG></DT>
+<DD>Determines if the LP solver is asked to make special arrangements for doing
+dual-simplex iterations when bounds on a variable are changed for strong
+branching. Some LP solvers provide such options so that strong branching can
+be performed much faster than the regular dual-simplex procedure.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> should_use_rel_br</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">TRUE</SPAN>).</STRONG></DT>
+<DD>Determines if reliability braching is used to determine branching candidates
+or not. This parameter is set to <SPAN style="font-family:monospace">FALSE</SPAN> if OPENMP is used. When this
+branching rule is disabled, strong branching is used to select a candidate.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> rel_br_override_default</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">TRUE</SPAN>).</STRONG></DT>
+<DD>If reliability branching is enabled and this paramter is set to <SPAN style="font-family:monospace">TRUE</SPAN> then the
+policy of selecting branching candidates is automatically adjusted on the
+basis of bounds on solution value and the time elapsed. If this parameter is
+set to <SPAN style="font-family:monospace">FALSE</SPAN>, the policy is based on the values of the following three
+parameters.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> rel_br_threshold</FONT></SPAN> &ndash; integer (8).</STRONG></DT>
+<DD>It is assumed that the score obtained by branching on a given variable these many
+times is reliable for estimating the pseudocosts of this variable in the rest
+of the branch-and-bound algorithm. In other words, if reliability branching is
+enabled, strong branching is used on a variable at most
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> rel_br_threshold</FONT></SPAN> many times.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> rel_br_max_solves</FONT></SPAN> &ndash; integer (20).</STRONG></DT>
+<DD>If reliability branching is enabled, this parameter determines the maximum
+number of strong branching LPs that are solved in each node. If some branching
+candidates have reliable estimates, the number of LPs can be less than
+the value of this parameter.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> rel_br_cand_threshold</FONT></SPAN> &ndash; integer (10).</STRONG></DT>
+<DD>If reliability branching is enabled, then strong branching is stopped if the
+last <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> rel_br_cand_threshold</FONT></SPAN> LPs did not give a better improvement in
+the lower bound.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> is_feasible_default</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">TEST_INTEGRALITY</SPAN>{1}).</STRONG></DT>
+<DD>Determines the default test to be used to determine feasibility. This
+parameter is provided so that the user can change the default behavior
+without recompiling. The only other option is <SPAN style="font-family:monospace">TEST_ZERO_ONE</SPAN>{0}.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> send_feasible_solution_default</FONT></SPAN> &ndash; integer 
+(<SPAN style="font-family:monospace">SEND_NONZEROS</SPAN>{0}).</STRONG></DT>
+<DD>Determines the form in which to send the feasible solution. This
+parameter is provided so that the user can change the default behavior
+without recompiling. This is currently the only option.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> send_lp_solution_default</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">SEND_NONZEROS</SPAN>{0}).</STRONG></DT>
+<DD>Determines the default form in which to send the LP solution to the
+cut generator and cut pool. This
+parameter is provided so that the user can change the default behavior
+without recompiling. The other option is <SPAN style="font-family:monospace">SEND_FRACTIONS</SPAN>{1}.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> display_solution_default</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">DISP_NOTHING</SPAN>{0}).</STRONG></DT>
+<DD>Determines how to display the current LP solution if desired.
+See the description of <A HREF="node222.html#user_display_solution"><SPAN  CLASS="texttt">user_display_solution()</SPAN></A> for other
+possible values. This parameter is provided so that
+the user can change the default behavior without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> shall_we_branch_default</FONT></SPAN> &ndash; integer 
+(<SPAN style="font-family:monospace">USER__BRANCH_IF_MUST</SPAN>{2}).</STRONG></DT>
+<DD>Determines the default branching behavior. Other values are <SPAN style="font-family:monospace">USER__DO_NOT_BRANCH</SPAN>{0} (not recommended as a default), <SPAN style="font-family:monospace">USER__DO_BRANCH</SPAN>{1} (also not recommended as a default), and <SPAN style="font-family:monospace">USER__BRANCH_IF_TAILOFF</SPAN>{3}. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> select_candidates_default</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">USER__CLOSE_TO_HALF_AND_EXPENSIVE</SPAN>{10}).</STRONG></DT>
+<DD>Determines the default rule for selecting strong branching candidates.
+Other values are <SPAN style="font-family:monospace">USER__CLOSE_TO_HALF</SPAN>{10} and 
+<SPAN style="font-family:monospace">USER__CLOSE_TO_ONE_AND_CHEAP</SPAN>{12}. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> compare_candidates_default</FONT></SPAN> &ndash; integer 
+(<SPAN style="font-family:monospace">HIGHEST_LOW_OBJ</SPAN>{2}).</STRONG></DT>
+<DD>Determines the default rule for comparing candidates. See the
+description of <A HREF="node244.html#user_compare_candidates"><SPAN  CLASS="texttt">user_compare_candidates()</SPAN></A> for other values. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> select_child_default</FONT></SPAN> &ndash; integer 
+(<SPAN style="font-family:monospace">PREFER_LOWER_OBJ_VALUE</SPAN>{0}).</STRONG></DT>
+<DD>Determines the default rule for selecting the child to be processed
+next. For other possible values, see the description <A HREF="node245.html#user_select_child">
+<SPAN  CLASS="texttt">user_select_child()</SPAN></A>. This
+parameter is provided so that the user can change the default behavior
+without recompiling.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> mc_find_supported_solutions</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">FALSE</SPAN>).</STRONG></DT>
+<DD>By default, <SPAN style="font-family:monospace">sym_mc_solve</SPAN> routine will find all the non-dominated 
+solutions if the problem to be solved is 
+a bicriteria problem. However, if the user plans to find only the supported 
+solutions, then, this parameter has to be set before 
+calling <SPAN style="font-family:monospace">sym_mc_solve</SPAN> routine. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> mc_rho</FONT></SPAN> &ndash; double (<SPAN style="font-family:monospace">0.00001</SPAN>).</STRONG></DT>
+<DD>The value used in augmented Chebyshev norm during the bicriteria 
+solution procedure.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_cuts</FONT></SPAN> &ndash; boolean (<SPAN style="font-family:monospace">TRUE</SPAN>).</STRONG></DT>
+<DD>Whether or not to generate cuts using COIN's cut generation library. 
+Note that, to use CGL cuts, OSI interface has to be used and moreover the 
+corresponding flags have to be set during installation. See the makefile for 
+more details.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_gomory_cuts</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">GENERATE_DEFAULT</SPAN>).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_knapsack_cuts</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">GENERATE_DEFAULT</SPAN>).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_twomir_cuts</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">GENERATE_ONLY_IN_ROOT</SPAN>).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_clique_cuts</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">GENERATE_DEFAULT</SPAN>).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_oddhole_cuts</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">DO_NOT_GENERATE</SPAN>).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_flowcover_cuts</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">GENERATE_DEFAULT</SPAN>).</STRONG></DT>
+<DD> 
+<BR> 
+<BR>
+This set of parameters is for controlling when certain classes of cuts are to
+be generated. It can take on the values enumerated below (see values
+in <SPAN  CLASS="texttt">symphony.h</SPAN>).
+
+<UL>
+<LI>DO_NOT_GENERATE (-1): Do not generate cuts of this class.
+</LI>
+<LI>GENERATE_DEFAULT (0): Use SYMPHONY's automatic tuning for generation of
+this class of cuts.
+</LI>
+<LI>GENERATE_IF_IN_ROOT (1): Generate these cuts in the tree only if at
+least one violated cut is generated in the root node.    
+</LI>
+<LI>GENERATE_ONLY_IN_ROOT (2): Generate these cuts only in the root node.
+</LI>
+<LI>GENERATE_ALWAYS (3): Generate these cuts every time cut generation is
+done. 
+</LI>
+<LI>GENERATE_PERIODICALLY (4): Generate these cuts every <!-- MATH
+ $n^{\textrm th}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.11ex; vertical-align: -0.11ex; " SRC="img66.png"
+ ALT="$n^{\textrm th}$"></SPAN>
+time the cut generator is called, where <SPAN CLASS="MATH"><IMG STYLE="height: 1.09ex; vertical-align: -0.11ex; " SRC="img67.png"
+ ALT="$n$"></SPAN> is set by the parameter
+<SPAN  CLASS="texttt">generate_cgl_xxx_cuts_freq</SPAN>.
+</LI>
+</UL>
+See <kbd><A ID="tex2html33"
+  HREF="https://projects.coin-or.org/Cgl">https://projects.coin-or.org/Cgl</A></kbd> for a description of these
+classes and others that could be added.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_gomory_cuts_freq</FONT></SPAN> &ndash; integer (5).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_knapsack_cuts_freq</FONT></SPAN> &ndash; integer (5).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_twomir_cuts_freq</FONT></SPAN> &ndash; integer (5).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_clique_cuts_freq</FONT></SPAN> &ndash; integer (5).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_oddhole_cuts_freq</FONT></SPAN> &ndash; integer (5).</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> generate_cgl_flowcover_cuts_freq</FONT></SPAN> &ndash; integer (5).</STRONG></DT>
+<DD> 
+<BR> 
+<BR>
+The frequency with which to generate cuts if the
+parameter <SPAN  CLASS="texttt">cgl_generate_xxx_cuts</SPAN> for the
+corresponding class is set to <SPAN  CLASS="texttt">GENERATE_PERIODICALLY</SPAN>.
+
+<P>
+<A ID="fp_enabled"></A></DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_enabled</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">SYM_FEAS_PUMP_DEFAULT</SPAN>{1}).</STRONG></DT>
+<DD>Determines the overall policy of using the feasibility pump heuristic to find
+feasible solutions. <SPAN style="font-family:monospace">SYM_FEAS_PUMP_DEFAULT</SPAN>{1} indicates that the
+decision to use the heuristic is determined on the basis of current values of
+lower bound, upper bound, the time used etc., based on some preset rules. <SPAN style="font-family:monospace">SYM_FEAS_PUMP_REPEATED</SPAN>{2} indicates that the heuristic will be used
+every few iterations until the problem is solved. The frequency can be
+adjusted through the <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_frequency</FONT></SPAN> parameter.  <SPAN style="font-family:monospace">SYM_FEAS_PUMP_TILL_SOL</SPAN>{3} indicates that the heuristic is used only
+until the first feasible solution is found. <SPAN style="font-family:monospace">SYM_FEAS_PUMP_DISABLE</SPAN>{-1} indicates that the heuristic is not used.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_frequency</FONT></SPAN> &ndash; integer (10).</STRONG></DT>
+<DD>Determines the number of LPs that are solved before which the feasibility pump
+heuristic is called again. This parameter is used only if the parameter
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_enabled</FONT></SPAN> is set to <SPAN style="font-family:monospace">SYM_FEAS_PUMP_REPEATED</SPAN>{2}. Otherwise,
+the frequency is determined automatically based on some preset rules. 
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_max_cycles</FONT></SPAN> &ndash; integer (100).</STRONG></DT>
+<DD>Determines the maximum number of LPs that can be solved in a call to the
+feasibility pump heuristic. A higher number might be helpful in finding a
+better feasible solution but may result in more time spent in the heuristic.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_time_limit</FONT></SPAN> &ndash; double (50).</STRONG></DT>
+<DD>If a feasible solution has been found, this parameter determines the time in
+seconds that can be spent on the feasibility pump heuristic. If a solution has
+not been found yet, the parameter <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_max_initial_time</FONT></SPAN> is used.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_max_initial_time</FONT></SPAN> &ndash; double (100).</STRONG></DT>
+<DD>If a feasible solution has not been found, this parameter determines the time in
+seconds that can be spent on the feasibility pump heuristic. If a solution has
+been found, the parameter <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_time_limit</FONT></SPAN> is used.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_min_gap</FONT></SPAN> &ndash; double (0.5).</STRONG></DT>
+<DD>If the relative (%) gap between the lower and the upper bounds falls below the
+value of this parameter, feasibility pump is not called.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_flip_fraction</FONT></SPAN> &ndash; double (0.1).</STRONG></DT>
+<DD>When the feasibility pump gets stuck in a cycle, this fraction of binary
+variables are flipped. The variables are selected randomly. Increasing the
+value of this parameter may result in the pump getting stuck fewer number of
+times, but the time to solve LPs after flipping may increase substantially.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_poor_sol_lim_fac</FONT></SPAN> &ndash; integer (10).</STRONG></DT>
+<DD>Sometimes the feasibility pump keeps generating solutions that have high
+objective function values. When the number of such solutions becomes more than
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> fp_poor_sol_lim_fac</FONT></SPAN> times the number of &ldquo;good&rdquo; solutions, the pump
+is disabled.
+
+<P>
+</DD>
+</DL>
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node281.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node275.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node279.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1676"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node281.html">Cut Generator Parameters</A>
+<B> Up:</B> <A
+ HREF="node275.html">Run-time Parameters</A>
+<B> Previous:</B> <A
+ HREF="node279.html">Tree Manager parameters</A>
+ &nbsp; <B>  <A ID="tex2html1677"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

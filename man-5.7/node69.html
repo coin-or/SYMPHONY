@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>The Master Module</TITLE>
+<META NAME="description" CONTENT="The Master Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node70.html">
+<LINK REL="previous" HREF="node68.html">
+<LINK REL="next" HREF="node70.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node70.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node68.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node68.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html713"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node70.html">The Tree Management Module</A>
+<B> Up:</B> <A
+ HREF="node68.html">Modular Implementation</A>
+<B> Previous:</B> <A
+ HREF="node68.html">Modular Implementation</A>
+ &nbsp; <B>  <A ID="tex2html714"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00533100000000000000"></A>
+<A ID="master-process"></A>
+<BR>
+The Master Module
+</H3>
+
+<P>
+The <EM>master module</EM> includes functions that perform problem initialization
+and I/O. This module is the only persistent module and stores all static
+problem data. The other modules are created only during a solve call and
+destroyed afterward. All calls to the API are processed through the master
+module. These functions of the master module implement the following tasks:
+
+<UL>
+<LI>Initialize the environment.
+</LI>
+<LI>Set and maintain parameter values.
+</LI>
+<LI>Read and store static problem data for instance to be solved.
+</LI>
+<LI>Compute an initial upper bound using heuristics.
+</LI>
+<LI>Perform problem preprocessing.
+</LI>
+<LI>Initialize the solution process, pass problem information to the
+        solver modules and store the results after completion of the solve 
+	call.
+</LI>
+<LI>Track the status of associated processes during parallel
+        solution calls.
+</LI>
+<LI>Act as a clearing house for output during the solution process.
+</LI>
+<LI>Store warm start information between solver calls.
+</LI>
+<LI>Service requests from the user through the API for problem data,
+        problem modification, and parameter modification.
+</LI>
+</UL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

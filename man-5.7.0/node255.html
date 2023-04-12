@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_purge_waiting_rows</TITLE>
+<META NAME="description" CONTENT="user_purge_waiting_rows">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node256.html">
+<LINK REL="previous" HREF="node254.html">
+<LINK REL="next" HREF="node256.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node256.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node254.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1603"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node256.html">user_free_lp</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node254.html">user_print_stat_on_cuts_added</A>
+ &nbsp; <B>  <A ID="tex2html1604"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007322500000000000000">
+user_purge_waiting_rows</A>
+</H3>
+
+<PRE>
+int user_purge_waiting_rows(void *user, int rownum,
+                            waiting_row **rows, char *delete_rows)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The local pool is purged from time to time to control its size. In
+this function the user has the power to decide which cuts to purge
+from this pool if desired. To mark the <SPAN style="font-family:monospace">i<SPAN CLASS="MATH"><IMG STYLE="height: 1.09ex; vertical-align: -0.11ex; " SRC="img57.png"
+ ALT="$^{\tt th}$"></SPAN></SPAN> waiting row
+(an element of the pre-pool) for removal she has to set <SPAN style="font-family:monospace">delete_rows[i]</SPAN> to be <SPAN style="font-family:monospace">TRUE</SPAN> (<SPAN style="font-family:monospace">delete_rows</SPAN> is allocated before the
+function is called and its elements are set to <SPAN style="font-family:monospace">FALSE</SPAN> by
+default).
+<BR>
+<BR>
+Post-processing consists of actually deleting those entries from the waiting
+row list and compressing the list. The default is to discard the least
+violated waiting rows and keep no more than what can be added in the next
+iteration (this is determined by the <SPAN style="font-family:monospace">max_cut_num_per_iter</SPAN>
+parameter).
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int rownum</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>The number of waiting rows.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">waiting_row **rows</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>The array of waiting rows.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">char *delete_rows</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>An array of indicators showing which waiting 
+rows are to be deleted.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>Purge every single waiting row.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>The user marked in <SPAN style="font-family:monospace">delete</SPAN> the rows to be deleted.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>Described above.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+The marked rows are deleted.
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">receive_cuts()</SPAN> after cuts have been added.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node256.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node254.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1603"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node256.html">user_free_lp</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node254.html">user_print_stat_on_cuts_added</A>
+ &nbsp; <B>  <A ID="tex2html1604"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

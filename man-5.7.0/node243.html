@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_select_candidates</TITLE>
+<META NAME="description" CONTENT="user_select_candidates">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node244.html">
+<LINK REL="previous" HREF="node242.html">
+<LINK REL="next" HREF="node244.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node244.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node242.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1579"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node244.html">user_compare_candidates</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node242.html">user_shall_we_branch</A>
+ &nbsp; <B>  <A ID="tex2html1580"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007321300000000000000"></A>
+<A ID="user_select_candidates"></A>
+<BR>
+user_select_candidates
+</H3>
+
+<PRE>
+int user_select_candidates(void *user, double lpetol, int cutnum, 
+                           int slacks_in_matrix_num,
+                           cut_data **slacks_in_matrix,
+                           int slack_cut_num, cut_data **slack_cuts,
+                           int varnum, var_desc **vars, double *x, 
+                           char *status, int *cand_num, 
+                           branch_obj ***candidates, int *action,
+                           int bc_level)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The purpose of this function is to generate branching candidates. Note
+that <SPAN style="font-family:monospace">*action</SPAN> from <SPAN style="font-family:monospace"><A HREF="node242.html#user_shall_we_branch">user_shall_we_branch()</A></SPAN> is passed on to
+this function (but its value can be changed here, see notes at the
+previous function), as well as the candidates in <SPAN style="font-family:monospace">**candidates</SPAN>
+and their number in <SPAN style="font-family:monospace">*cand_num</SPAN> if there were any. 
+<BR>
+<BR>
+Violated cuts found among the slack cuts (not in the matrix) can be
+added to the candidate list. These violated cuts will be added to the
+LP relaxation regardless of the value of <SPAN style="font-family:monospace">*action</SPAN>. 
+<BR>
+<BR>
+The <SPAN style="font-family:monospace">branch_obj</SPAN> structure contains fields similar to the
+<SPAN style="font-family:monospace"><A HREF="node231.html#cut_data">cut_data</A></SPAN> data structure. Branching is
+accomplished by imposing inequalities which divide the current
+subproblem while cutting off the corresponding fractional solution.
+Branching on cuts and variables is treated symmetrically and branching
+on a variable can be thought of as imposing a constraint with a single
+unit entry in the appropriate column. Following is a list of the
+fields of the <SPAN style="font-family:monospace">branch_obj</SPAN> data structure which must be set by
+the user.
+
+<P>
+<DL>
+<DT><STRONG><SPAN style="font-family:monospace">char type</SPAN></STRONG></DT>
+<DD>Can take five values:
+<DL>
+<DT><STRONG><SPAN style="font-family:monospace">CANDIDATE_VARIABLE</SPAN></STRONG></DT>
+<DD>The object is a variable.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">CANDIDATE_CUT_IN_MATRIX</SPAN></STRONG></DT>
+<DD>The object is a cut (it must
+be slack) which is in the current formulation.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">CANDIDATE_CUT_NOT_IN_MATRIX</SPAN></STRONG></DT>
+<DD>The object is a cut (it
+must be slack) which has been deleted from the formulation and is listed among
+the slack cuts.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">VIOLATED_SLACK</SPAN></STRONG></DT>
+<DD>The object is not offered as a candidate for
+branching, but rather it is selected because it was among the slack cuts but
+became violated again.
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">SLACK_TO_BE_DISCARDED</SPAN></STRONG></DT>
+<DD>The object is not selected as a candidate
+for branching rather it is selected because it is a slack cut which should be
+discarded even from the list of slack cuts.
+</DD>
+</DL>
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">int position</SPAN></STRONG></DT>
+<DD><P>
+The position of the object in the appropriate array (which is one of <SPAN style="font-family:monospace">vars</SPAN>, <SPAN style="font-family:monospace">slacks_in_matrix</SPAN>, or <SPAN style="font-family:monospace">slack_cuts</SPAN>.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">waiting_row *row</SPAN></STRONG></DT>
+<DD><P>
+Used only if the type is <SPAN style="font-family:monospace">CANDIDATE_CUT_NOT_IN_MATRIX</SPAN> or <SPAN style="font-family:monospace">VIOLATED_SLACK</SPAN>. In these cases this field holds the row extension
+corresponding to the cut. This structure can be filled out easily
+using a call to <SPAN style="font-family:monospace"><A HREF="node249.html#user_unpack_cuts">user_unpack_cuts()</A></SPAN>.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">int child_num</SPAN></STRONG></DT>
+<DD>
+
+<P>
+The number of children of this branching object.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">char *sense, double *rhs, double *range, int *branch</SPAN></STRONG></DT>
+<DD>
+
+<P>
+The description of the children. These arrays determine the sense,
+rhs, etc. for the cut to be imposed in each of the children. These are
+defined and used exactly as in the <SPAN style="font-family:monospace"><A HREF="node231.html#cut_data">cut_data</A></SPAN>
+data structure. <B>Note:</B> If a limit is defined on the number of
+children by defining the <SPAN style="font-family:monospace">MAX_CHILDREN_NUM</SPAN> macro to be a number
+(it is pre-defined to be 4 as a default), then these arrays will be
+statically defined to be the correct length and don't have to be
+allocated. This option is highly recommended. Otherwise, the user must
+allocate them to be of length <SPAN style="font-family:monospace">child_num</SPAN>.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">double lhs</SPAN></STRONG></DT>
+<DD><P>
+The activity level for the row (for branching cuts). This field is
+purely for the user's convenience. SYMPHONY doesn't use it so it need not
+be filled out.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">double *objval, int *termcode, int *iterd, int *feasible</SPAN></STRONG></DT>
+<DD>
+
+<P>
+The objective values, termination codes, number of iterations and
+feasibility stati of the children after pre-solving them. These are all
+filed out by SYMPHONY during strong branching. The user may access them in
+<SPAN style="font-family:monospace"><A HREF="node244.html#user_compare_candidates">user_compare_candidates()</A></SPAN> 
+(see below).
+
+<P>
+</DD>
+</DL>
+
+<P>
+There are three default options (see below), each chooses a few variables (the
+number is determined by the <A HREF="node280.html#strong_branching">strong branching parameters</A>.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Same as for <A HREF="node242.html#user_shall_we_branch"><SPAN style="font-family:monospace">user_shall_we_branch()</SPAN></A>, except
+that <SPAN style="font-family:monospace">*action</SPAN> must be either <SPAN style="font-family:monospace">USER__DO_BRANCH</SPAN> or <SPAN style="font-family:monospace">USER__DO_NOT_BRANCH</SPAN>, and if branching is asked for, there must be
+a real candidate in the candidate list (not only <SPAN style="font-family:monospace">VIOLATED_SLACK</SPAN>s and <SPAN style="font-family:monospace">SLACK_TO_BE_DISCARDED</SPAN>s). Also, the
+argument <SPAN style="font-family:monospace">bc_level</SPAN> is the level in the tree. This could be used
+in deciding how many strong branching candidates to use.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=211>Error. <SPAN style="font-family:monospace">DEFAULT</SPAN> is used.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=211>User generated branching candidates.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=211>Regulated by the <SPAN style="font-family:monospace">select_candidates_default</SPAN> 
+parameter, but set to <SPAN style="font-family:monospace">USER__CLOSE_TO_HALF</SPAN> unless overridden by the
+user.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER__CLOSE_TO_HALF</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=211>Choose variables with values closest to half.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER__CLOSE_TO_HALF_AND_EXPENSIVE</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=211>Choose variables
+with values close to half and with high objective function coefficients.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER__CLOSE_TO_ONE_AND_CHEAP</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=211>Choose variables with
+values close to one and with low objective function coefficients.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">select_branching_object()</SPAN>.
+
+<P>
+</DD>
+<DT><STRONG>Notes:</STRONG></DT>
+<DD>See the notes at <SPAN style="font-family:monospace"><A HREF="node242.html#user_shall_we_branch">user_shall_we_branch()</A></SPAN>.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node244.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node242.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1579"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node244.html">user_compare_candidates</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node242.html">user_shall_we_branch</A>
+ &nbsp; <B>  <A ID="tex2html1580"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

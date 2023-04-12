@@ -1,0 +1,321 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_shall_we_branch</TITLE>
+<META NAME="description" CONTENT="user_shall_we_branch">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node243.html">
+<LINK REL="previous" HREF="node241.html">
+<LINK REL="next" HREF="node243.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node243.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node241.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1577"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node243.html">user_select_candidates</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node241.html">user_display_lp_solution</A>
+ &nbsp; <B>  <A ID="tex2html1578"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007321200000000000000"></A>
+<A ID="user_shall_we_branch"></A>
+<BR>
+user_shall_we_branch
+</H3>
+
+<PRE>
+int user_shall_we_branch(void *user, double lpetol, int cutnum, 
+                         int slacks_in_matrix_num,
+                         cut_data **slacks_in_matrix,
+                         int slack_cut_num, cut_data **slack_cuts,
+                         int varnum, var_desc **vars, double *x, 
+                         char *status, int *cand_num, 
+                         branch_obj ***candidates, int *action)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+There are two user-written functions invoked from <SPAN style="font-family:monospace">select_candidates_u</SPAN>. The first one
+(<SPAN style="font-family:monospace"><A HREF="#user_shall_we_branch">user_shall_we_branch()</A></SPAN>) decides
+whether to branch at all, the second one (<SPAN style="font-family:monospace"><A HREF="node243.html#user_select_candidates">user_select_candidates()</A></SPAN>) chooses
+the branching objects. The argument lists of the two functions are the
+same, and if branching occurs (see discussion below) then the contents
+of <SPAN style="font-family:monospace">*cand_num</SPAN> and <SPAN style="font-family:monospace">*candidates</SPAN> will not change between the
+calls to the two functions.
+<BR>
+<BR>
+The first of these two functions is invoked in each iteration
+after solving the LP relaxation and (possibly) generating cuts.
+Therefore, by the time it is called, some violated cuts might be known.
+Still, the user might decide to branch anyway. The second function is
+invoked only when branching is decided on.
+<BR>
+<BR>
+Given (1) the number of known violated cuts that can be added to the
+problem when this function is invoked, (2) the constraints that are
+slack in the LP relaxation, (3) the slack cuts not in the matrix that
+could be branched on (more on this later), and (4) the solution to the
+current LP relaxation, the user must decide whether to branch or not.
+Branching can be done either on variables or slack cuts. A pool of
+slack cuts which has been removed from the problem and kept for
+possible branching is passed to the user. If any of these happen to
+actually be violated (it is up to the user to determine this), they
+can be passed back as branching candidate type <SPAN style="font-family:monospace">VIOLATED_SLACK</SPAN>
+and will be added into the current relaxation. In this case, branching
+does not have to occur (the structure of the <SPAN style="font-family:monospace">*candidates</SPAN> array
+is described below in <SPAN style="font-family:monospace"><A HREF="node243.html#user_select_candidates">user_select_candidates()</A></SPAN>). 
+<BR>
+<BR>
+This function has two outputs. The first output is <SPAN style="font-family:monospace">*action</SPAN> which
+can take four values: <SPAN style="font-family:monospace">USER__DO_BRANCH</SPAN> if the user wants to
+branch, <SPAN style="font-family:monospace">USER__DO_NOT_BRANCH</SPAN> if he doesn't want to branch,
+<SPAN style="font-family:monospace">USER__BRANCH_IF_MUST</SPAN> if he wants to branch only if there are
+no known violated cuts, or finally <SPAN style="font-family:monospace">USER__BRANCH_IF_TAILOFF</SPAN> if he
+wants to branch in case tailing off is detected. The second output is the
+number of candidates and their description. In this function the only
+sensible &ldquo;candidates&rdquo; are <SPAN style="font-family:monospace">VIOLATED_SLACK</SPAN>s. 
+<BR>
+<BR>
+There is no post processing, but in case branching is
+selected, the <SPAN style="font-family:monospace">col_gen_before_branch()</SPAN> function is invoked
+before the branching would take place. If that function finds dual
+infeasible variables then (instead of branching) they are added to the
+LP relaxation and the problem is resolved. (Note that the behavior of
+the <SPAN style="font-family:monospace">col_gen_before_branch()</SPAN> is governed by the <SPAN style="font-family:monospace">colgen_strat[]</SPAN> TM parameters.)
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double lpetol</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>The <SPAN CLASS="MATH"><IMG STYLE="height: 1.09ex; vertical-align: -0.11ex; " SRC="img55.png"
+ ALT="$\epsilon$"></SPAN> tolerance of the LP solver.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int cutnum</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>The number of violated cuts (known before invoking
+this function) that could be added to the problem (instead of branching).</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int slacks_in_matrix_num</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>Number of slack constraints in the
+matrix.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">cut_data **slacks_in_matrix</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>The description of the cuts
+corresponding to these constraints (see Section <A HREF="node231.html#cut_data">6.3.2.1</A>).</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int slack_cut_num</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>The number of slack cuts not in the
+matrix.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">cut_data **slack_cuts</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>Array of pointers to these cuts
+(see Section <A HREF="node231.html#cut_data">6.3.2.1</A>).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int varnum</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>The number of variables in the current lp
+relaxation (the length of the following three arrays).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">var_desc **vars</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>Description of the variables in the
+relaxation.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *x</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>The corresponding solution values (in the optimal
+solution to the relaxation).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">char *status</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>The stati of the variables. 
+There are five possible status values: 
+<SPAN style="font-family:monospace">NOT_FIXED</SPAN>, <SPAN style="font-family:monospace">TEMP_FIXED_TO_UB</SPAN>, <SPAN style="font-family:monospace">PERM_FIXED_TO_UB</SPAN>, <SPAN style="font-family:monospace">TEMP_FIXED_TO_LB</SPAN> and <SPAN style="font-family:monospace">PERM_FIXED_TO_LB</SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *cand_num</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>Pointer to the number of candidates
+returned (the length of <SPAN style="font-family:monospace">*candidates</SPAN>).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">candidate ***candidates</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>Pointer to the array of
+candidates generated (see description below).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *action</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=206>What to do. Must be one of the four above described
+values unless the return code is <SPAN style="font-family:monospace">USER_DEFAULT</SPAN>.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=341>Error. <SPAN style="font-family:monospace">DEFAULT</SPAN> is used.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=341>The user filled out <SPAN style="font-family:monospace">*action</SPAN> (and possibly <SPAN style="font-family:monospace">*cand_num</SPAN> and <SPAN style="font-family:monospace">*candidates</SPAN>).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=341>Action taken is controlled by the parameter <SPAN style="font-family:monospace">shall_we_branch_default</SPAN>, which is initially
+<SPAN style="font-family:monospace">USER__BRANCH_IF_MUST</SPAN> unless overridden by the user.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Notes:</STRONG></DT>
+<DD>
+
+<UL>
+<LI>The user has to allocate the pointer array for the
+	candidates and place the pointer for the array into <SPAN style="font-family:monospace">	***candidates</SPAN> (if candidates are returned).
+
+<P>
+</LI>
+<LI>Candidates of type <SPAN style="font-family:monospace">VIOLATED_SLACK</SPAN> are always
+	added to the LP relaxation regardless of what <SPAN style="font-family:monospace">action</SPAN> is
+	chosen and whether branching will be carried out or not.
+
+<P>
+</LI>
+<LI>Also note that the user can change his mind in 
+	<SPAN style="font-family:monospace"><A HREF="node243.html#user_select_candidates">user_select_candidates()</A></SPAN> and not branch after all, even if
+	she chose to branch in this function. A possible scenario:
+	<SPAN style="font-family:monospace">cut_num</SPAN> is zero when this function is invoked and the
+	user asks for <SPAN style="font-family:monospace">USER__BRANCH_IF_MUST</SPAN> without checking
+	the slack constraints and slack cuts. Afterward no columns
+	are generated (no dual infeasible variables found) and thus
+	SYMPHONY decides branching is called for and invokes 
+	<SPAN style="font-family:monospace"><A HREF="node243.html#user_select_candidates">user_select_candidates()</A></SPAN>. 
+	However, in that function the
+	user checks the slack cuts, finds that some are violated,
+	cancels the branching request and adds the violated cuts to
+	the relaxation instead.
+</LI>
+</UL>
+
+<P>
+</DD>
+<DT><STRONG><B>Warning:</STRONG></DT>
+<DD></B>
+<P>
+<B>The cuts the user unpacks and wants to be added to the
+problem (either because they are of type <SPAN style="font-family:monospace">VIOLATED_SLACK</SPAN> or type
+<SPAN style="font-family:monospace">CANDIDATE_CUT_NOT_IN_MATRIX</SPAN>) will be deleted from the list
+of slack cuts after this routine returns. Therefore the same
+warning applies here as in the function <SPAN style="font-family:monospace"><A HREF="node249.html#user_unpack_cuts">user_unpack_cuts()</A></SPAN>.
+</B>
+<P>
+<B>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">select_branching_object()</SPAN>.
+</B>
+<P>
+<B>
+</DD>
+</DL></B>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node243.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node241.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1577"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node243.html">user_select_candidates</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node241.html">user_display_lp_solution</A>
+ &nbsp; <B>  <A ID="tex2html1578"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

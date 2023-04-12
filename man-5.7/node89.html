@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>The Two-Phase Algorithm</TITLE>
+<META NAME="description" CONTENT="The Two-Phase Algorithm">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node88.html">
+<LINK REL="next" HREF="node90.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node90.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node86.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node88.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html784"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node90.html">The Cut Generation Module</A>
+<B> Up:</B> <A
+ HREF="node86.html">The Tree Management Module</A>
+<B> Previous:</B> <A
+ HREF="node88.html">Search Chains and Diving</A>
+ &nbsp; <B>  <A ID="tex2html785"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00543300000000000000"></A>
+<A ID="two-phase"></A>
+<BR>
+The Two-Phase Algorithm
+</H3>
+
+<P>
+If no heuristic subroutine is available for generating feasible
+solutions quickly, then a unique two-phase algorithm can also be
+invoked. In the two-phase method, the algorithm is first run to
+completion on a specified set of core variables. Any node that would
+have been pruned in the first phase is instead sent to a pool of
+candidates for the second phase. If the set of core variables is
+small, but well-chosen, this first phase should be finished quickly
+and should result in a near-optimal solution. In addition, the first
+phase will produce a list of useful cuts. Using the upper bound and
+the list of cuts from the first phase, the root node is <EM>repriced</EM>&mdash;that is, it is reprocessed with the full set of variables
+and cuts. The hope is that most or all of the variables not included
+in the first phase will be priced out of the problem in the new root
+node. Any variable thus priced out can be eliminated from the problem
+globally. If we are successful at pricing out all of the inactive
+variables, we have shown that the solution from the first phase was,
+in fact, optimal. If not, we must go back and price out the (reduced)
+set of extra variables in each leaf of the search tree produced during
+the first phase. We then continue processing any node in which we fail
+to price out all the variables.
+
+<P>
+In order to avoid pricing variables in every leaf of the tree, we can
+<EM>trim the tree</EM> before the start of the second phase. Trimming the
+tree consists of eliminating the children of any node for which
+each child has lower bound above the current upper
+bound. We then reprocess the parent node itself. This is typically
+more efficient, since there is a high probability that, given the new
+upper bound and cuts, we will be able to prune the parent node and
+avoid the task of processing each child individually.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node90.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node86.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node88.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html784"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node90.html">The Cut Generation Module</A>
+<B> Up:</B> <A
+ HREF="node86.html">The Tree Management Module</A>
+<B> Previous:</B> <A
+ HREF="node88.html">Search Chains and Diving</A>
+ &nbsp; <B>  <A ID="tex2html785"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

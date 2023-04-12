@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_receive_lp_data</TITLE>
+<META NAME="description" CONTENT="user_receive_lp_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node238.html">
+<LINK REL="previous" HREF="node236.html">
+<LINK REL="next" HREF="node238.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node238.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node236.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1567"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node238.html">user_create_subproblem</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node236.html">Function Descriptions</A>
+ &nbsp; <B>  <A ID="tex2html1568"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00732700000000000000"></A> 
+<A ID="user_receive_lp_data"></A>
+<BR>
+user_receive_lp_data
+</H3>
+
+<PRE>
+int user_receive_lp_data (void **user)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+This function only has to be filled out for parallel execution and only if
+either the TM or LP modules are configured as separate processes. Otherwise,
+data will have been copied into appropriate locations in the master function
+<A HREF="node219.html#user_send_lp_data"><SPAN style="font-family:monospace">user_send_lp_data()</SPAN></A>. The two cases can be handled by means of <SPAN style="font-family:monospace">#ifdef</SPAN> statements. See comments in the source code stubs for more details. 
+<BR>
+<BR>
+Here, the user must receive all problem-specific information sent from
+the master, set up necessary data structures, etc. Note that the data must be
+received in exactly the same order as it was sent in <A HREF="node219.html#user_send_lp_data"><SPAN style="font-family:monospace">user_send_lp_data()</SPAN></A>. See Section <A HREF="node108.html#communication">5.5.1</A> for more notes on
+receiving data.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void **user</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=251>Pointer to the user-defined LP data
+structure.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. SYMPHONY aborts this LP module.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>User received the data successfully.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>User did not send any data.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">lp_initialize()</SPAN> at process start.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node238.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node236.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1567"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node238.html">user_create_subproblem</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node236.html">Function Descriptions</A>
+ &nbsp; <B>  <A ID="tex2html1568"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

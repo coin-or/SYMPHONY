@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Callable Library C API</TITLE>
+<META NAME="description" CONTENT="Callable Library C API">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node208.html">
+<LINK REL="previous" HREF="node117.html">
+<LINK REL="next" HREF="node119.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node119.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node117.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node117.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1044"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node119.html">Primary Interface Functions</A>
+<B> Up:</B> <A
+ HREF="node117.html">Reference</A>
+<B> Previous:</B> <A
+ HREF="node117.html">Reference</A>
+ &nbsp; <B>  <A ID="tex2html1045"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00710000000000000000"></A>
+<A ID="callable-library"></A>
+<BR>
+Callable Library C API
+</H1>
+
+<P>
+<A ID="C_Interface"></A>
+<P>
+This chapter specifies the interface for using SYMPHONY's callable
+library. These function calls can be used to build custom applications that
+call SYMPHONY as a subroutine, as described in Section
+<A HREF="node46.html#callable_library">3.3</A>. All callable library function begin with the
+prefix 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">sym_</SPAN></FONT>. To call these function from an application, include the
+header file 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">symphony.h</SPAN></FONT> and then link with the SYMPHONY library as
+described <A HREF="node9.html#getting_started">here</A>. In general, if an
+array is requested, such as the array of lower bounds on the variables, for
+instance, the user is responsible for allocating an array of appropriate size
+and passing it to SYMPHONY. SYMPHONY will then fill up the array.
+
+<P>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A ID="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A ID="tex2html1046"
+  HREF="node119.html">Primary Interface Functions</A>
+<UL>
+<LI><A ID="tex2html1047"
+  HREF="node120.html">sym_open_environment</A>
+<LI><A ID="tex2html1048"
+  HREF="node121.html">sym_create_copy_environment</A>
+<LI><A ID="tex2html1049"
+  HREF="node122.html">sym_parse_command_line</A>
+<LI><A ID="tex2html1050"
+  HREF="node123.html">sym_find_initial_bounds</A>
+<LI><A ID="tex2html1051"
+  HREF="node124.html">sym_load_problem</A>
+<LI><A ID="tex2html1052"
+  HREF="node125.html">sym_explicit_load_problem</A>
+<LI><A ID="tex2html1053"
+  HREF="node126.html">sym_read_mps</A>
+<LI><A ID="tex2html1054"
+  HREF="node127.html">sym_read_gmpl</A>
+<LI><A ID="tex2html1055"
+  HREF="node128.html">sym_solve</A>
+<LI><A ID="tex2html1056"
+  HREF="node129.html">sym_warm_solve</A>
+<LI><A ID="tex2html1057"
+  HREF="node130.html">sym_mc_solve</A>
+<LI><A ID="tex2html1058"
+  HREF="node131.html">sym_create_permanent_cut_pools</A>
+<LI><A ID="tex2html1059"
+  HREF="node132.html">sym_set_user_data</A>
+<LI><A ID="tex2html1060"
+  HREF="node133.html">sym_get_user_data</A>
+<LI><A ID="tex2html1061"
+  HREF="node134.html">sym_close_environment</A>
+</UL>
+<BR>
+<LI><A ID="tex2html1062"
+  HREF="node135.html">Parameter Query and Modification</A>
+<UL>
+<LI><A ID="tex2html1063"
+  HREF="node136.html">sym_set_defaults</A>
+<LI><A ID="tex2html1064"
+  HREF="node137.html">sym_set_int_param</A>
+<LI><A ID="tex2html1065"
+  HREF="node138.html">sym_set_dbl_param</A>
+<LI><A ID="tex2html1066"
+  HREF="node139.html">sym_set_str_param</A>
+<LI><A ID="tex2html1067"
+  HREF="node140.html">sym_get_int_param</A>
+<LI><A ID="tex2html1068"
+  HREF="node141.html">sym_get_dbl_param</A>
+<LI><A ID="tex2html1069"
+  HREF="node142.html">sym_get_str_param</A>
+</UL>
+<BR>
+<LI><A ID="tex2html1070"
+  HREF="node143.html">Solver Status Query Functions</A>
+<UL>
+<LI><A ID="tex2html1071"
+  HREF="node144.html">sym_get_status</A>
+<LI><A ID="tex2html1072"
+  HREF="node145.html">sym_is_proven_optimal</A>
+<LI><A ID="tex2html1073"
+  HREF="node146.html">sym_is_proven_primal_infeasible</A>
+<LI><A ID="tex2html1074"
+  HREF="node147.html">sym_is_iteration_limit_reached</A>
+<LI><A ID="tex2html1075"
+  HREF="node148.html">sym_is_time_limit_reached</A>
+<LI><A ID="tex2html1076"
+  HREF="node149.html">sym_is_target_gap_achieved</A>
+<LI><A ID="tex2html1077"
+  HREF="node150.html">sym_is_abandoned</A>
+</UL>
+<BR>
+<LI><A ID="tex2html1078"
+  HREF="node151.html">Data Query Functions</A>
+<UL>
+<LI><A ID="tex2html1079"
+  HREF="node152.html">sym_create_copy_mip_desc</A>
+<LI><A ID="tex2html1080"
+  HREF="node153.html">sym_get_num_cols</A>
+<LI><A ID="tex2html1081"
+  HREF="node154.html">sym_get_num_rows</A>
+<LI><A ID="tex2html1082"
+  HREF="node155.html">sym_get_num_elements</A>
+<LI><A ID="tex2html1083"
+  HREF="node156.html">sym_get_col_lower</A>
+<LI><A ID="tex2html1084"
+  HREF="node157.html">sym_get_col_upper</A>
+<LI><A ID="tex2html1085"
+  HREF="node158.html">sym_get_row_sense</A>
+<LI><A ID="tex2html1086"
+  HREF="node159.html">sym_get_rhs</A>
+<LI><A ID="tex2html1087"
+  HREF="node160.html">sym_get_row_range</A>
+<LI><A ID="tex2html1088"
+  HREF="node161.html">sym_get_row_lower</A>
+<LI><A ID="tex2html1089"
+  HREF="node162.html">sym_get_row_upper</A>
+<LI><A ID="tex2html1090"
+  HREF="node163.html">sym_get_matrix</A>
+<LI><A ID="tex2html1091"
+  HREF="node164.html">sym_get_obj_coeff</A>
+<LI><A ID="tex2html1092"
+  HREF="node165.html">sym_get_obj2_coeff</A>
+<LI><A ID="tex2html1093"
+  HREF="node166.html">sym_get_obj_sense</A>
+<LI><A ID="tex2html1094"
+  HREF="node167.html">sym_is_continuous</A>
+<LI><A ID="tex2html1095"
+  HREF="node168.html">sym_is_binary</A>
+<LI><A ID="tex2html1096"
+  HREF="node169.html">sym_is_integer</A>
+<LI><A ID="tex2html1097"
+  HREF="node170.html">sym_get_infinity</A>
+<LI><A ID="tex2html1098"
+  HREF="node171.html">sym_get_col_solution</A>
+<LI><A ID="tex2html1099"
+  HREF="node172.html">sym_get_sp_size</A>
+<LI><A ID="tex2html1100"
+  HREF="node173.html">sym_get_sp_solution</A>
+<LI><A ID="tex2html1101"
+  HREF="node174.html">sym_get_row_activity</A>
+<LI><A ID="tex2html1102"
+  HREF="node175.html">sym_get_obj_val</A>
+<LI><A ID="tex2html1103"
+  HREF="node176.html">sym_get_primal_bound</A>
+<LI><A ID="tex2html1104"
+  HREF="node177.html">sym_get_iteration_count</A>
+</UL>
+<BR>
+<LI><A ID="tex2html1105"
+  HREF="node178.html">Data Modification Functions</A>
+<UL>
+<LI><A ID="tex2html1106"
+  HREF="node179.html">sym_set_obj_coeff</A>
+<LI><A ID="tex2html1107"
+  HREF="node180.html">sym_set_obj2_coeff</A>
+<LI><A ID="tex2html1108"
+  HREF="node181.html">sym_set_col_lower</A>
+<LI><A ID="tex2html1109"
+  HREF="node182.html">sym_set_col_upper</A>
+<LI><A ID="tex2html1110"
+  HREF="node183.html">sym_set_row_lower</A>
+<LI><A ID="tex2html1111"
+  HREF="node184.html">sym_set_row_upper</A>
+<LI><A ID="tex2html1112"
+  HREF="node185.html">sym_set_row_type</A>
+<LI><A ID="tex2html1113"
+  HREF="node186.html">sym_set_obj_sense</A>
+<LI><A ID="tex2html1114"
+  HREF="node187.html">sym_set_col_solution</A>
+<LI><A ID="tex2html1115"
+  HREF="node188.html">sym_set_primal_bound</A>
+<LI><A ID="tex2html1116"
+  HREF="node189.html">sym_set_continuous</A>
+<LI><A ID="tex2html1117"
+  HREF="node190.html">sym_set_integer</A>
+<LI><A ID="tex2html1118"
+  HREF="node191.html">sym_set_col_names</A>
+<LI><A ID="tex2html1119"
+  HREF="node192.html">sym_add_col</A>
+<LI><A ID="tex2html1120"
+  HREF="node193.html">sym_add_row</A>
+<LI><A ID="tex2html1121"
+  HREF="node194.html">sym_delete_cols</A>
+<LI><A ID="tex2html1122"
+  HREF="node195.html">sym_delete_rows</A>
+</UL>
+<BR>
+<LI><A ID="tex2html1123"
+  HREF="node196.html">Warm Starting Functions</A>
+<UL>
+<LI><A ID="tex2html1124"
+  HREF="node197.html">sym_write_warm_start_desc</A>
+<LI><A ID="tex2html1125"
+  HREF="node198.html">sym_read_warm_start</A>
+<LI><A ID="tex2html1126"
+  HREF="node199.html">sym_delete_warm_start</A>
+<LI><A ID="tex2html1127"
+  HREF="node200.html">sym_get_warm_start</A>
+<LI><A ID="tex2html1128"
+  HREF="node201.html">sym_set_warm_start</A>
+<LI><A ID="tex2html1129"
+  HREF="node202.html">sym_create_copy_warm_start</A>
+</UL>
+<BR>
+<LI><A ID="tex2html1130"
+  HREF="node203.html">Sensitivity Analysis Functions</A>
+<UL>
+<LI><A ID="tex2html1131"
+  HREF="node204.html">sym_get_lb_for_new_rhs</A>
+<LI><A ID="tex2html1132"
+  HREF="node205.html">sym_get_ub_for_new_rhs</A>
+<LI><A ID="tex2html1133"
+  HREF="node206.html">sym_get_lb_for_new_obj</A>
+<LI><A ID="tex2html1134"
+  HREF="node207.html">sym_get_ub_for_new_obj</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+
+</BODY>
+</HTML>

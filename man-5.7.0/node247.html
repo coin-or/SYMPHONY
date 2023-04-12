@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_add_to_desc</TITLE>
+<META NAME="description" CONTENT="user_add_to_desc">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node248.html">
+<LINK REL="previous" HREF="node246.html">
+<LINK REL="next" HREF="node248.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node248.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node246.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1587"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node248.html">user_same_cuts</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node246.html">user_print_branch_stat</A>
+ &nbsp; <B>  <A ID="tex2html1588"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007321700000000000000">
+user_add_to_desc</A>
+</H3>
+
+<PRE>
+int user_add_to_desc(void *user, int *desc_size, char **desc)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Before a node description is sent to the TM, the user can provide a
+pointer to a data structure that will be appended to the description
+for later use by the user in reconstruction of the node. This
+information must be placed into <SPAN style="font-family:monospace">*desc</SPAN>. Its size should be
+returned in <SPAN style="font-family:monospace">*desc_size</SPAN>.
+<BR>
+<BR>
+There is only one default option: the description to be added is considered to
+be of zero length, i.e., there is no additional description.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *desc_size</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>The size of the additional information, the
+length of <SPAN style="font-family:monospace">*desc</SPAN> in bytes.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">char **desc</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=276>Pointer to the additional information (space must be
+allocated by the user).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. <SPAN style="font-family:monospace">DEFAULT</SPAN> is used.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>User filled out <SPAN style="font-family:monospace">*desc_size</SPAN> and <SPAN style="font-family:monospace">*desc</SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>No description is appended.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">create_explicit_node_desc()</SPAN> before a
+node is sent to the tree manager.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node248.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node246.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1587"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node248.html">user_same_cuts</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node246.html">user_print_branch_stat</A>
+ &nbsp; <B>  <A ID="tex2html1588"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

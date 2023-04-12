@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>The Tree Management Module</TITLE>
+<META NAME="description" CONTENT="The Tree Management Module">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node71.html">
+<LINK REL="previous" HREF="node69.html">
+<LINK REL="next" HREF="node71.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node71.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node68.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node69.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html715"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node71.html">The Node Processing Module</A>
+<B> Up:</B> <A
+ HREF="node68.html">Modular Implementation</A>
+<B> Previous:</B> <A
+ HREF="node69.html">The Master Module</A>
+ &nbsp; <B>  <A ID="tex2html716"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00533200000000000000">
+The Tree Management Module</A>
+</H3>
+
+<P>
+The <SPAN  CLASS="textit">tree manager</SPAN> controls the overall execution of the algorithm. It
+tracks the status of its worker modules, as well as that of the search
+tree, and distributes the subproblems to be processed to the node processing
+module(s). Functions performed by the tree management module are:
+
+<UL>
+<LI>Receive data for the root node and place it on the list 
+        of candidates for processing.
+</LI>
+<LI>Receive data for subproblems to be held for later
+        processing.
+</LI>
+<LI>Handle requests from linear programming modules to
+        release a subproblem for processing.
+</LI>
+<LI>Receive branching object information, set up data structures
+        for the children, and add them to the list of candidate subproblems.
+</LI>
+<LI>Keep track of the global upper bound and notify all node
+        processing modules when it changes.
+</LI>
+<LI>Write current state information out to disk periodically
+        to allow a restart in the event of a system crash.
+</LI>
+<LI>Keep track of run data and send it to the master
+        program at termination.
+</LI>
+</UL> 
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

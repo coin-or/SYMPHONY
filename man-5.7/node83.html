@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>The LP Engine</TITLE>
+<META NAME="description" CONTENT="The LP Engine">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node84.html">
+<LINK REL="previous" HREF="node82.html">
+<LINK REL="next" HREF="node84.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node84.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node82.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node82.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html769"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node84.html">Managing the LP Relaxation</A>
+<B> Up:</B> <A
+ HREF="node82.html">The Node Processing Module</A>
+<B> Previous:</B> <A
+ HREF="node82.html">The Node Processing Module</A>
+ &nbsp; <B>  <A ID="tex2html770"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00542100000000000000">
+The LP Engine</A>
+</H3>
+
+<P>
+SYMPHONY requires the use of a third-party callable library (referred
+to as the <EM>LP engine</EM> or <EM>LP library</EM>) to solve the LP
+relaxations once they are formulated. As with the user functions,
+SYMPHONY communicates with the LP engine through an API that converts
+SYMPHONY's internal data structures into those of the LP engine.
+Currently, the framework will only work with advanced, simplex-based
+LP engines, such as CPLEX [<A
+ HREF="node284.html#cplex">9</A>], since the LP engine must be
+able to accept an advanced basis, and provide a variety of data to the
+framework during the solution process. The internal data structures
+used for maintaining the LP relaxations are similar to those of CPLEX
+and matrices are stored in the standard column-ordered format.
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

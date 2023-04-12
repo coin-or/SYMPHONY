@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_generate_cuts_in_lp</TITLE>
+<META NAME="description" CONTENT="user_generate_cuts_in_lp">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node254.html">
+<LINK REL="previous" HREF="node252.html">
+<LINK REL="next" HREF="node254.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node254.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node252.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1599"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node254.html">user_print_stat_on_cuts_added</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node252.html">user_generate_column</A>
+ &nbsp; <B>  <A ID="tex2html1600"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION007322300000000000000"></A>
+<A ID="user_generate_cuts_in_lp"></A>
+<BR>
+user_generate_cuts_in_lp
+</H3>
+
+<PRE>
+int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
+                             var_desc **vars, double *x, int *new_row_num,
+                             cut_data ***cuts)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The user might decide to generate cuts directly within the LP module instead
+of using the cut generator. This can be accomplished either through a call to
+this function or simply by configuring SYMPHONY such that the cut generator is
+called directly from the LP solver. One example of when this might be done is
+when generating Gomory cuts or something else that requires knowledge of the
+current LP tableau. The user must return the list of generated cuts by
+allocating an array of <SPAN  CLASS="texttt">cut_data</SPAN> structures and setting
+<SPAN  CLASS="texttt">*cuts</SPAN> to point to this array. Post-processing consists of
+checking if any of the new cuts are already in the local pool (or dominated by
+a cut in the local pool).
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">LPdata *lp_data</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>A pointer to SYMPHONY's internal data structure for
+storing the LP relaxation and related data.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int varnum</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>The number of variables currently in the LP
+relaxation. (The length of the <SPAN style="font-family:monospace">*vars</SPAN> and <SPAN style="font-family:monospace">x</SPAN> arrays.)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">var_desc **vars</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>The variables currently in the LP relaxation.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *x</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>Values of the above variables.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *new_row_num</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>The number of cuts generated.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">cut_data ***cuts</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=226>The cuts and the corresponding rows.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>Error. Interpreted as if no cuts were generated.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>Cuts were generated.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>No cuts were generated. By default, SYMPHONY uses the
+CGL to generate generic cuts, according to parameter settings.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">GENERATE_CGL_CUTS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>Generate generic CGL cuts, according to parameter
+settings.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">DO_NOT_GENERATE_CGL_CUTS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>No additional cuts are generated.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+SYMPHONY checks if any of the newly generated cuts are already in the
+local pool. 
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">receive_cuts()</SPAN> before the cuts from the CG
+module are received. Since the user will probably use this function
+to generate tableau-dependent cuts, it is highly unlikely that any of
+the new cuts would already be in the pool. Therefore the user will
+probably return <SPAN style="font-family:monospace">USER_AND_PP</SPAN> to force SYMPHONY to skip post-processing.
+
+<P>
+</DD>
+<DT><STRONG>Notes:</STRONG></DT>
+<DD>
+<BR>
+<P>
+
+<BR>
+<UL>
+<LI>Just like in <SPAN style="font-family:monospace"><A HREF="node249.html#user_unpack_cuts">user_unpack_cuts()</A></SPAN>, 
+the user has to allocate space for the rows.
+</LI>
+<LI>Unless the <SPAN style="font-family:monospace">name</SPAN> field of a cut is explicitly set to 
+<SPAN style="font-family:monospace">CUT__SEND_TO_CP</SPAN>, SYMPHONY will assume that the cut is locally
+valid only and set that field to <SPAN style="font-family:monospace">CUT__DO_NOT_SEND_TO_CP</SPAN>.
+</LI>
+</UL>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node254.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node252.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1599"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node254.html">user_print_stat_on_cuts_added</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node252.html">user_generate_column</A>
+ &nbsp; <B>  <A ID="tex2html1600"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

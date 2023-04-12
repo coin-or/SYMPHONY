@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_receive_cp_data</TITLE>
+<META NAME="description" CONTENT="user_receive_cp_data">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node265.html">
+<LINK REL="previous" HREF="node263.html">
+<LINK REL="next" HREF="node265.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node265.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node263.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node263.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1632"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node265.html">user_receive_lp_solution_cp</A>
+<B> Up:</B> <A
+ HREF="node263.html">Cut pool module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node263.html">Cut pool module callbacks</A>
+ &nbsp; <B>  <A ID="tex2html1633"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00734100000000000000"></A>
+<A ID="user_receive_cp_data"></A>
+<BR>
+user_receive_cp_data
+</H3>
+
+<PRE>
+int user_receive_cp_data(void **user)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+The user has to receive here all problem-specific information sent
+from <A HREF="node221.html#user_send_cp_data"><SPAN style="font-family:monospace">user_send_cp_data()</SPAN></A> function in the master module.
+The user has to allocate space for all the data structures, including
+<SPAN style="font-family:monospace">user</SPAN> itself. Note that this function is only called if the
+either the Tree Manager, LP, or CP are running as a separate process
+(i.e.&nbsp;either <SPAN style="font-family:monospace">COMPILE_IN_TM</SPAN>, <SPAN style="font-family:monospace">COMPILE_IN_LP</SPAN>, or <SPAN style="font-family:monospace">COMPILE_IN_CP</SPAN> are set to <SPAN style="font-family:monospace">FALSE</SPAN> in the <SPAN style="font-family:monospace">make</SPAN> file).
+Otherwise, this is done in <SPAN style="font-family:monospace"><A HREF="node221.html#user_send_cp_data">user_send_cp_data()</A></SPAN>. See the
+description of that function for more details.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void **user</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=281>Pointer to the user-defined data structure.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. Cut pool module exits.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>The user received data successfully.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>The user did not send any data to be received.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">cp_initialize</SPAN> at module start-up.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

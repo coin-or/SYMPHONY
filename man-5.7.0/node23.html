@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Building on OS X.</TITLE>
+<META NAME="description" CONTENT="Building on OS X.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node22.html">
+<LINK REL="next" HREF="node24.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node24.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node22.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html505"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node24.html">Advanced Configuration Options</A>
+<B> Up:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+<B> Previous:</B> <A
+ HREF="node22.html">Building on Windows.</A>
+ &nbsp; <B>  <A ID="tex2html506"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H4><A ID="SECTION00322130000000000000">
+Building on OS X.</A>
+</H4>
+
+<P>
+OS X is a Unix-based OS and ships with many of the basic components needed to
+build COIN-OR, but it's missing some things. For examples, the latest versions
+of OS X come with the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">clang</SPAN></FONT> compiler but no Fortran compiler. You may also
+be missing the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">wget</SPAN></FONT> utility and 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">subversion</SPAN></FONT> and 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">git</SPAN></FONT> clients (needed for
+obtaining source code). The easiest way to get these missing utilitites is to
+install Homebrew (see http://brew.sh). After installation, open a terminal and
+do
+
+<P>
+
+<PRE>
+brew install gcc wget svn git
+</PRE>
+
+<P>
+To obtain the source code, the first step is to get the installer that will then
+fetch the source for SYMPHONY and all its dependencies. *You do not need to
+clone SYMPHONY first, just do the following!* Open a terminal and execute
+
+<P>
+
+<PRE>
+git clone https://www.github.com/coin-or/coinbrew
+</PRE>
+
+<P>
+Next, to check out source code for and build all the necessary projects
+(including dependencies), execute the script in the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT>
+subdirectory. To execute the script, do
+
+<P>
+
+<PRE>
+cd COIN-OR-OptimizationSuite
+chmod u+x coi.install.sh
+./coin.install.sh
+</PRE>
+
+<P>
+(Note: The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">chmod</SPAN></FONT> command is only needed if the execute permission is not
+automatically set by git on cloning). Once you run the script,
+you will be prompted interactively to select a project to fetch and build. the
+rest should happen automagically. Alternatively, the following command-line
+incantation will execute the procedure non-interactively.
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER
+</PRE>
+
+<P>
+With this setup, 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">clang</SPAN></FONT> will be used for compiling C++ by default. If
+you want to use the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">gcc</SPAN></FONT> compiler provided by Homebrew, then replace the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">build</SPAN></FONT> command above with
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER CC=gcc-* CXX=g++-*
+</PRE>
+where 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">*</SPAN></FONT> is the version number of 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">gcc</SPAN></FONT>. 
+The install script invokes a separate 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">configure</SPAN></FONT> script that is
+auto-generated using the GNU autotools. This script takes a wide range of
+additional options and these options can be specified on the commnd-line when
+running 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT>. For example, to build with debugging symbols,
+do
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
+</PRE>
+
+<P>
+To get help with additional options available in running the script, do
+
+<P>
+
+<PRE>
+./coinbrew --help
+</PRE>
+
+<P>
+If you wish to install in a different directory, such as 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">/usr/local</SPAN></FONT>, then run
+the command
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER --prefix=/path/to/install/dir
+</PRE>
+
+<P>
+After installation, you will also need to add 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">/path/to/install/dir/bin</SPAN></FONT> to your
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">PATH</SPAN></FONT> variable in your 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">.bashrc</SPAN></FONT> and also add 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">/path/to/install/dir/lib</SPAN></FONT>
+to your 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">DYLD_LIBRARY_PATH</SPAN></FONT> if you want to link to COIN libraries. 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node24.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node22.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html505"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node24.html">Advanced Configuration Options</A>
+<B> Up:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+<B> Previous:</B> <A
+ HREF="node22.html">Building on Windows.</A>
+ &nbsp; <B>  <A ID="tex2html506"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

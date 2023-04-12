@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_check_cut</TITLE>
+<META NAME="description" CONTENT="user_check_cut">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node268.html">
+<LINK REL="previous" HREF="node266.html">
+<LINK REL="next" HREF="node268.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node268.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node263.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node266.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1638"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node268.html">user_finished_checking_cuts</A>
+<B> Up:</B> <A
+ HREF="node263.html">Cut pool module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node266.html">user_prepare_to_check_cuts</A>
+ &nbsp; <B>  <A ID="tex2html1639"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00734400000000000000"></A>
+<A ID="user_check_cuts"></A>
+<BR>
+user_check_cut
+</H3>
+
+<PRE>
+int user_check_cut(void *user, double lpetol, int varnum, 
+                   int *indices, double *values, cut_data *cut,
+                   int *is_violated, double *quality)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Description:</STRONG></DT>
+<DD>
+
+<P>
+The user has to determine whether a given cut is violated by the given
+LP solution (see Section <A HREF="node226.html#user-written-lp">6.3.2</A> for a description of
+the <SPAN style="font-family:monospace"><A HREF="node231.html#cut_data">cut_data data</A></SPAN> data structure). Also,
+the user can assign a number to the cut called the <EM>quality</EM>. This
+number is used in deciding which cuts to check and purge. See the
+section on <A HREF="node282.html#cut_pool_params">Cut Pool Parameters</A> for more
+information.
+
+<P>
+</DD>
+<DT><STRONG>Arguments:</STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">INOUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>The user defined part of p.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double lpetol</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>The <SPAN CLASS="MATH"><IMG STYLE="height: 1.09ex; vertical-align: -0.11ex; " SRC="img55.png"
+ ALT="$\epsilon$"></SPAN> tolerance in the LP module.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int varnum</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>Same as the previous function.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *indices</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>Same as the previous function.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *values</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>Same as the previous function.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">cut_data *cut</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>Pointer to the cut to be tested.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *is_violated</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>TRUE/FALSE based on whether the cut is violated
+or not.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *quality</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=256>a number representing the relative
+strength of the cut.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Cut is not sent to the LP, regardless of the value of
+<SPAN style="font-family:monospace">*is_violated</SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>The user function exited properly.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Same as error.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Invoked from:</STRONG></DT>
+<DD>Whenever a cut needs to be checked.
+
+<P>
+</DD>
+<DT><STRONG>Note:</STRONG></DT>
+<DD>
+
+<P>
+The same note applies to <SPAN style="font-family:monospace">number</SPAN>, <SPAN style="font-family:monospace">indices</SPAN> and <SPAN style="font-family:monospace">values</SPAN> as in
+the previous function.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node268.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node263.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node266.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1638"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node268.html">user_finished_checking_cuts</A>
+<B> Up:</B> <A
+ HREF="node263.html">Cut pool module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node266.html">user_prepare_to_check_cuts</A>
+ &nbsp; <B>  <A ID="tex2html1639"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

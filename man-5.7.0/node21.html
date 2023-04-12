@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Building on Linux.</TITLE>
+<META NAME="description" CONTENT="Building on Linux.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node22.html">
+<LINK REL="previous" HREF="node20.html">
+<LINK REL="next" HREF="node22.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node22.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html501"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node22.html">Building on Windows.</A>
+<B> Up:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+<B> Previous:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+ &nbsp; <B>  <A ID="tex2html502"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H4><A ID="SECTION00322110000000000000">
+Building on Linux.</A>
+</H4>
+
+<P>
+Most Linux distributions come with all the required tools installed, but to be
+sure, check that you have
+
+<UL>
+<LI>pkg-config, wget, gcc, g++, make, git, tar
+</LI>
+<LI>BLAS and LAPACK
+</LI>
+<LI>Optional additions
+    
+<UL>
+<LI>Metis
+</LI>
+<LI>Suitesparse
+</LI>
+<LI>libamd
+</LI>
+<LI>Cholmod
+</LI>
+<LI>Nauty
+    
+</LI>
+</UL>
+</LI>
+</UL>
+
+<P>
+To obtain the source code, the first step is to get the installer that will
+then fetch the source for SYMPHONY and all its dependencies. *You do not need
+to clone SYMPHONY first, just do the following!* Open a terminal and execute
+
+<P>
+
+<PRE>
+git clone https://www.github.com/coin-or/coinbrew
+</PRE>
+
+<P>
+Next, to check out source code for and build all the necessary projects
+(including dependencies), use the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT> script.
+
+<P>
+
+<PRE>
+cd coinbrew
+chmod u+x coinbrew
+./coinbrew
+</PRE>
+
+<P>
+(Note: The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">chmod</SPAN></FONT> command is only needed if the execute permission is not
+automatically set by git on cloning). Once you run the script,
+you will be prompted interactively to select a project to fetch and build. The
+rest should happen automagically. Alternatively, the following command-line
+incantation will execute the procedure non-interactively.
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER
+</PRE>
+
+<P>
+The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT> script invokes a separate 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">configure</SPAN></FONT> script that is
+auto-generated using the GNU autotools. This script takes a wide range of
+additional options and these options can be specified on the commnd-line when
+running 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT>. For example, to build with debugging symbols,
+do
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
+</PRE>
+
+<P>
+To get help with additional options available in running the script, do
+
+<P>
+
+<PRE>
+./coinbrew --help
+</PRE>
+
+<P>
+The above procedures will build all required dependencies and SYMPHONY itself.
+Afterwards, the binaries will be installed in the directory
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">dist/bin</SPAN></FONT> 
+and the libraries in the directory 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">dist/lib</SPAN></FONT>. If you wish to install in
+a different directory, such as 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">/usr/local</SPAN></FONT>, then run the command
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER --prefix=/path/to/install/dir
+</PRE>
+
+<P>
+After installation, you will also need to add 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">/path/to/install/dir/bin</SPAN></FONT> to your
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">PATH</SPAN></FONT> variable in your 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">.bashrc</SPAN></FONT> and also add 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">/path/to/install/dir/lib</SPAN></FONT>
+to your 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">LD_LIBRARY_PATH</SPAN></FONT> if you want to link to COIN libraries. 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node22.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html501"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node22.html">Building on Windows.</A>
+<B> Up:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+<B> Previous:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+ &nbsp; <B>  <A ID="tex2html502"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

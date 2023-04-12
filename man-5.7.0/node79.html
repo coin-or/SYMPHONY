@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Modifying Parameters.</TITLE>
+<META NAME="description" CONTENT="Modifying Parameters.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node80.html">
+<LINK REL="previous" HREF="node78.html">
+<LINK REL="next" HREF="node80.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node80.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node78.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node78.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html758"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node80.html">Modifying Problem Data.</A>
+<B> Up:</B> <A
+ HREF="node78.html">Solve from Warm Start</A>
+<B> Previous:</B> <A
+ HREF="node78.html">Solve from Warm Start</A>
+ &nbsp; <B>  <A ID="tex2html759"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H4><A ID="SECTION00541210000000000000">
+Modifying Parameters.</A>
+</H4>
+
+<P>
+The most straightforward use of the warm start class is to restart the solver
+after modifying problem parameters. To start the computation from a given warm
+start when the problem data has not been modified, the tree manager simply
+traverses the tree and adds those nodes marked as candidates for processing to
+the node queue. Once the queue has been reformed, the algorithm is then able
+to pick up exactly where it left off. Code for using the resolve command was
+shown in Figure <A HREF="node55.html#dynamic">3.2</A>. The situation is more challenging if the user
+modifies problem data in between calls to the solver. We address this
+situation next.
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

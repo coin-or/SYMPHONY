@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_create_subproblem</TITLE>
+<META NAME="description" CONTENT="user_create_subproblem">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node239.html">
+<LINK REL="previous" HREF="node237.html">
+<LINK REL="next" HREF="node239.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node239.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node237.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1569"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node239.html">user_is_feasible</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node237.html">user_receive_lp_data</A>
+ &nbsp; <B>  <A ID="tex2html1570"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00732800000000000000"></A>
+<A ID="user_create_subproblem"></A>
+<BR>
+user_create_subproblem
+</H3>
+
+<PRE>
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
+                           int *maxn, int *maxm, int *maxnz)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+Based on the instance data contained in the user data structure and the list
+of base and extra variables that are active in the current subproblem, the
+user has to create the subproblem for the search node. The matrix describing
+the subproblem must contain those variables whose user indices are listed in
+the array <SPAN  CLASS="texttt">indices</SPAN> (in the same order) and the base constraints. The
+extra (dynamically generated) constraints are added automatically by SYMPHONY
+after the initial subproblem description is created. 
+<BR>
+<BR>
+In this function, the user is required to construct a description of the
+subproblem in column-ordered format and pass it back to SYMPHONY by filling
+out the <SPAN  CLASS="texttt">MIPdesc</SPAN> data structure, described <A HREF="node229.html#MIPdesc">here</A>. The user is not responsible for allocating extra memory to allow
+for the addition of dynamically generated cuts and variables. The arrays
+allocated in <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> user_create_subproblem()</FONT></SPAN> are owned by SYMPHONY after
+allocation and are freed as soon as the relaxation is loaded into the
+solver. However, if the user has an idea as to the maximum number of variables
+and constraints that are likely to be generated during processing of the
+subproblem, this information can be passed to SYMPHONY in the variables
+<SPAN  CLASS="texttt">*maxn</SPAN>, <SPAN  CLASS="texttt">*maxm</SPAN>, and <SPAN  CLASS="texttt">*maxnz</SPAN>. These numbers are only
+estimates that SYMPHONY can use to perform memory allocation. They do not have
+to be exact numbers. In fact, these estimates need not be provided at all. The
+<SPAN  CLASS="texttt">obj_sense</SPAN> and <SPAN  CLASS="texttt">obj_offset</SPAN> fields are set globally in the
+function <A HREF="node217.html#user_initialize_root_node"><SPAN style="font-family:monospace">user_initialize_root_node()</SPAN></A>. Setting them here will have no
+effect.
+<BR>
+<BR>
+Note that, the user should return &ldquo;USER_DEFAULT&rdquo; if an MPS or GMPL/AMPL 
+file was read in to describe the original MILP. SYMPHONY will allocate the 
+corresponding arrays and specify the constraint matrix automatically in this 
+case.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=258>Pointer to the user-defined LP data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="LEFT TOP"  WIDTH=258>&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *indices</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=258>The list of the active variables (base and extra).</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">MIPdesc *mip</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=258>Pointer to the MIPdesc data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *maxn</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=258>Estimated maximum number of variables.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *maxm</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=258>Estimated maximum number of constraints.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">int *maxnz</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=258>Estimated maximum number of nonzeros.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>Error. The LP module is aborted.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>User created the constraint matrix with the base
+constraints.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=331>This return code is used when the default routines for
+reading in an MPS or AMPL file were used and the user wants to let SYMPHONY
+set up the subproblem automatically. This return will cause an error if the
+default I/O routines were not used.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>Post-processing:</STRONG></DT>
+<DD>
+
+<P>
+The extra constraints are added to the matrix by calling the 
+<SPAN style="font-family:monospace"><A HREF="node249.html#user_unpack_cuts">user_unpack_cuts()</A></SPAN> subroutine and 
+then adding the corresponding rows to the matrix. This is easier for
+the user to implement, but less efficient than adding the cuts at the
+time the original matrix was being constructed.
+
+<P>
+</DD>
+<DT><STRONG>Wrapper invoked from:</STRONG></DT>
+<DD><SPAN style="font-family:monospace">process_chain()</SPAN> which is
+invoked when setting up a the initial search node in a chain.
+
+<P>
+</DD>
+</DL>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node239.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node237.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1569"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node239.html">user_is_feasible</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node237.html">user_receive_lp_data</A>
+ &nbsp; <B>  <A ID="tex2html1570"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

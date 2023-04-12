@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Data Structures and Storage</TITLE>
+<META NAME="description" CONTENT="Data Structures and Storage">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node68.html">
+<LINK REL="previous" HREF="node63.html">
+<LINK REL="next" HREF="node65.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node65.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node62.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node63.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html695"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node65.html">Variables</A>
+<B> Up:</B> <A
+ HREF="node62.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A
+ HREF="node63.html">An Object-oriented Approach</A>
+ &nbsp; <B>  <A ID="tex2html696"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00532000000000000000"></A>
+<A ID="data-structures"></A>
+<BR>
+Data Structures and Storage
+</H2>
+
+<P>
+Both the memory required to store the search tree and the time
+required to process a node are largely dependent on the number of
+objects (cuts and variables) that are active in each subproblem.
+Keeping this active set as small as possible is one of the keys to
+efficiently implementing BCP. For this reason, we chose data
+structures that enhance our ability to efficiently move objects in and
+out of the active set. Allowing sets of cuts and variables to move in
+and out of the linear programs simultaneously is one of the most
+significant challenges of BCP. We do this by maintaining an abstract
+<EM>representation</EM> of each global object that contains information
+about how to add it to a particular LP relaxation. 
+
+<P>
+In the literature on linear and integer programming, the terms <EM>cut</EM> and <EM>row</EM> are typically used interchangeably. Similarly, <EM>variable</EM> and <EM>column</EM> are often used with similar meanings. In
+many situations, this is appropriate and does not cause confusion.
+However, in object-oriented BCP frameworks, such as SYMPHONY or ABACUS
+[<A
+ HREF="node284.html#abacus1">21</A>], a <EM>cut</EM> and a <EM>row</EM> are <EM>fundamentally
+different objects</EM>. A <EM>cut</EM> (also referred to as a <EM>constraint</EM>) is a user-defined representation of an abstract object
+which can only be realized as a row in an LP matrix <EM>with respect
+to a particular set of active variables</EM>. Similarly, a <EM>variable</EM>
+is a representation which can only be realized as a column of an LP
+matrix with respect to a <EM>particular set of cuts</EM>. This
+distinction between the <EM>representation</EM> and the <EM>realization</EM>
+of objects is a crucial design element and is what allows us to
+effectively address some of the challenges inherent in BCP. In the
+remainder of this section, we further discuss this distinction
+and its implications.
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A ID="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A ID="tex2html697"
+  HREF="node65.html">Variables</A>
+<LI><A ID="tex2html698"
+  HREF="node66.html">Constraints</A>
+<LI><A ID="tex2html699"
+  HREF="node67.html">Search Tree</A>
+</UL>
+<!--End of Table of Child-Links-->
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node65.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node62.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node63.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html695"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node65.html">Variables</A>
+<B> Up:</B> <A
+ HREF="node62.html">Design of SYMPHONY</A>
+<B> Previous:</B> <A
+ HREF="node63.html">An Object-oriented Approach</A>
+ &nbsp; <B>  <A ID="tex2html696"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

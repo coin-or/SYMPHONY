@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_start_heurs</TITLE>
+<META NAME="description" CONTENT="user_start_heurs">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node217.html">
+<LINK REL="previous" HREF="node215.html">
+<LINK REL="next" HREF="node217.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node217.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node215.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1491"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node217.html">user_initialize_root_node</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node215.html">user_init_draw_graph</A>
+ &nbsp; <B>  <A ID="tex2html1492"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00731600000000000000"></A>
+<A ID="user_start_heurs"></A>
+<BR>
+user_start_heurs
+</H3>
+
+<PRE>
+int user_start_heurs(void *user, double *ub, double *ub_estimate)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The user invokes heuristics and generates the initial global upper
+bound and also perhaps an upper bound estimate. This is the last place 
+where the user can do things before the
+branch and cut algorithm starts. She might do some preprocessing,
+in addition to generating the upper bound.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *ub</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Pointer to the global upper bound. Initially,
+the upper bound is set to either <SPAN style="font-family:monospace">-MAXDOUBLE</SPAN> or the bound read in
+from the parameter file, and should be changed by the user only if
+a better valid upper bound is found.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">double *ub_estimate</SPAN></TD>
+<TD CLASS="LEFT">OUT</TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Pointer to an estimate of the global
+upper bound. This is useful if the <SPAN style="font-family:monospace">BEST_ESTIMATE</SPAN> diving
+strategy is used (see the treemanager parameter
+<A HREF="node279.html#diving_strategy"><SPAN style="font-family:monospace">diving_strategy</SPAN></A>)</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. This error is probably not fatal.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>User executed function successfully.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>No action (someday, there may be a
+default MIP heuristic here).</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node217.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node215.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1491"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node217.html">user_initialize_root_node</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node215.html">user_init_draw_graph</A>
+ &nbsp; <B>  <A ID="tex2html1492"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

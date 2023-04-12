@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Building with the MSVC++ compiler in MSys2</TITLE>
+<META NAME="description" CONTENT="Building with the MSVC++ compiler in MSys2">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node35.html">
+<LINK REL="next" HREF="node37.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node37.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node33.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node35.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html543"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node37.html">Using SYMPHONY</A>
+<B> Up:</B> <A
+ HREF="node33.html">Building SYMPHONY Applications</A>
+<B> Previous:</B> <A
+ HREF="node35.html">Building in a Windows</A>
+ &nbsp; <B>  <A ID="tex2html544"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H4><A ID="SECTION00323430000000000000">
+Building with the MSVC++ compiler in MSys2</A>
+</H4>
+
+<P>
+It is possible to build applications using an automated build of SYMPHONY
+with the MSVC++ compiler 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">cl</SPAN></FONT> using the GNU autotools in the MSys2
+environment. To do so, follow the instuctions for building in Unix-like
+environments (see Section <A HREF="node19.html#getting_started_unix">2.2.2</A>), except when
+configuring, use the command
+
+<P>
+
+<PRE>
+ ./coinbrew fetch build SYMPHONY@\VER --enable-msvc
+</PRE>
+
+<P>
+Afterwards, you can build the individual applications using the &ldquo;make&rdquo;
+command, as usual in a Unix-like environment except that thecompiler used will
+be 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">cl</SPAN></FONT>.
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

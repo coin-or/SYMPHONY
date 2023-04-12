@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Installation in Unix-like environments</TITLE>
+<META NAME="description" CONTENT="Installation in Unix-like environments">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node12.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html442"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node12.html">Installation for Use With</A>
+<B> Up:</B> <A
+ HREF="node10.html">Installing the Binary Distribution</A>
+<B> Previous:</B> <A
+ HREF="node10.html">Installing the Binary Distribution</A>
+ &nbsp; <B>  <A ID="tex2html443"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00311000000000000000"></A>
+<A ID="building-unix"></A>
+<BR>
+Installation in Unix-like environments
+</H2>
+
+<P>
+The installation consists of unpacking the distribution into an appropriate
+installation directory, such as 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">/usr/local/symphony</SPAN></FONT>.
+Unpack the distribution with
+
+<PRE>
+ tar xzvf SYMPHONY-releases.\VER-XXX.tgz
+</PRE>
+where 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">XXX</SPAN></FONT> indicates the platform and the version of compiler used to
+build the distribution. Switch into the root directory of the unpacked
+distribution. 
+
+<P>
+Test the executable by going to the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">bin</SPAN></FONT> directory and typing 
+
+<PRE>
+ ./symphony
+</PRE>
+This will start up the solver in interactive mode. Type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">help</SPAN></FONT>
+or 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">?</SPAN></FONT> to see a list of available commands or see Chapter
+<A HREF="node37.html#API-overview">3</A> for instructions on using the interactive solver.
+
+<P>
+To test the callable library, the distribution
+includes sample files in 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">examples</SPAN></FONT> directory:  
+<BR>
+<BR>
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">milp.c</SPAN></FONT>: This sample code is an implementation of a basic MILP
+solver using SYMPHONY's C callable functions with user defined input (see
+Section <A HREF="node46.html#callable_library">3.3</A>). To test the code, go to the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">examples</SPAN></FONT> directory and type 
+
+<PRE>
+ make milp 
+ milp
+</PRE>
+You may need to customize some paths in the Makefile and to set the
+environment variable 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">LD_LIBRARY_PATH</SPAN></FONT>. 
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">milpOsi.c</SPAN></FONT>: This sample code is an implementation of a basic MILP 
+solver using SYMPHONY's C++ callable functions (through OsiSym interface)
+with user defined input (see Section <A HREF="node56.html#OSI">3.3.2</A>). To test the code, 
+go to 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">examples</SPAN></FONT> directory and type, 
+
+<PRE>
+ make milpOsi
+ milpOsi
+</PRE>
+
+<P>
+If everything is working properly, the libraries, executables and header files
+can be installed in appropriate system directories if desired. This must be
+done by hand. This step will be done automatically if building from source
+using the automatic scripts provided (see below). It is important to note,
+though, that 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node10.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html442"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node12.html">Installation for Use With</A>
+<B> Up:</B> <A
+ HREF="node10.html">Installing the Binary Distribution</A>
+<B> Previous:</B> <A
+ HREF="node10.html">Installing the Binary Distribution</A>
+ &nbsp; <B>  <A ID="tex2html443"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
