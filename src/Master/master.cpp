@@ -1734,6 +1734,7 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
    /* first check for the updates! */
    char *cru_vars = NULL; 
    double etol = 1e-04;
+   env->par.warm_start = 1;
    if(env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY){
 
       return(sym_solve(env));
