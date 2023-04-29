@@ -2584,7 +2584,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 
-   si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
+   //si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
     
    si->initialSolve();
    

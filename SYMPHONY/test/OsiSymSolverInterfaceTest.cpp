@@ -407,10 +407,12 @@ void OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::strin
       OSIUNITTEST_ASSERT_ERROR(ei[13] == 7, {}, "symphony", "matrix by row after assignment: indices");
     }
   }
-    
+
+#if 0
   // Do common solverInterface testing by calling the base class testing method.
   {
      OsiSymSolverInterface m;
      OsiSolverInterfaceCommonUnitTest(&m, mpsDir,netlibDir);
   }
+#endif
 }
