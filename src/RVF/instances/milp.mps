@@ -1,0 +1,17 @@
+NAME	simple_milp
+ROWS
+ N 	 OBJROW
+ E	 R0 
+COLUMNS
+ X0	 OBJROW 	0.5	 R0 	1	
+ X1	 OBJROW 	0.0	 R0 	-1.5	
+ X2	 OBJROW 	2.0	 R0 	1	
+ X3	 OBJROW 	1.0	 R0     -1	
+RHS
+ RHS	 R0 	 0
+BOUNDS
+ UI BOUND	X0	 1e+30	
+ UI BOUND	X1	 1e+30	
+ UP BOUND	X2	 1e+30
+ UP BOUND	X3	 1e+30	
+ENDATA
