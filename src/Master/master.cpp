@@ -1817,7 +1817,7 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 	 change_type = env->mip->change_type[i];
 	 if(change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED || 
 	    change_type == OBJ_COEFF_CHANGED || change_type == COLS_ADDED){
-#if 0
+
 	    if(change_type == OBJ_COEFF_CHANGED){
 	       if(env->par.lp_par.do_reduced_cost_fixing && !env->par.multi_criteria){		 
 		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
@@ -1848,7 +1848,7 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 		  return(FUNCTION_TERMINATED_ABNORMALLY);
 	       } 
 	    }
-#endif
+
 	    if(!env->mip->cru_vars_num){
 	       analyzed = env->warm_start->stat.analyzed;
 	       depth = env->warm_start->stat.max_depth;
