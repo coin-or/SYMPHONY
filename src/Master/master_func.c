@@ -35,6 +35,16 @@
 //#include "sym_lp.h"
 #include "sym_tm.h"
 
+/*------------------------------------------------------------------------*\
+* feb223 : TESTING
+\*----------------------------------------------------------------------- */
+// Maybe look at bc_node *rootnode in warm_start_desc
+int get_duals(warm_start_desc *ws, double *duals) {
+	bc_node *root = ws->rootnode;
+	duals = root->duals;
+	return 0;
+}
+
 /*===========================================================================*/
 /*===========================================================================*/
 
@@ -2956,6 +2966,7 @@ char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
    sol->objval = 0;
    /* step 1. check for bounds and integrality */   
    for (i = env->mip->n - 1; i >= 0; i--){
+	  sol->objval += tmp_sol[i]*obj[i];
       if (tmp_sol[i] < env->mip->lb[i] - lpetol || 
 	  tmp_sol[i] > env->mip->ub[i] + lpetol)
 	 break;
@@ -2967,7 +2978,6 @@ char check_solution(sym_environment *env, lp_sol *sol, double *colsol)
 	  ceil(tmp_sol[i])-tmp_sol[i] > lpetol){
 	 break;  
       }
-      sol->objval += tmp_sol[i]*obj[i];
    }
 
    feasible = i < 0 ? true : false;
