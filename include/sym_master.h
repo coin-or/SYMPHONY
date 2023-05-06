@@ -119,15 +119,6 @@ int process_own_messages_u PROTO((sym_environment *env, int msgtag));
 /*=================== Master helper functions (master_func.c) ===============*/
 /*===========================================================================*/
 
-/*------------------------------------------------------------------------*\
-* feb223 : TESTING
-\*----------------------------------------------------------------------- */
-
-int get_duals PROTO((warm_start_desc *ws, double *duals));
-
-/*===========================================================================*/
-/*===========================================================================*/
-
 int resolve_node PROTO((sym_environment *env, bc_node * node));
 int update_tree_bound PROTO((sym_environment *env, bc_node *root, int *cut_num, 
 			      int *cut_ind, char *cru_vars, int change_type));
