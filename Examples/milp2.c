@@ -32,7 +32,7 @@
 
 #include "symphony.h"
 #include <iostream>
-#include <malloc.h>
+#include <stdlib.h>
 
 int main(int argc, char* argv[]){
 
