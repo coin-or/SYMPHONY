@@ -884,7 +884,7 @@ AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/VRP/sample.vrp])
 
 # Here put the location and name of the configuration header file
-AC_CONFIG_HEADER([include/config.h include/config_sym.h include/config_osisym.h])
+AC_CONFIG_HEADERS([include/config.h include/config_sym.h include/config_osisym.h])
 
 AC_COIN_FINALIZE_FLAGS([SymphonyLib OsiSymphonyLib SymUnitTest])
 

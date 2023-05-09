@@ -36,7 +36,7 @@ EXAMPLES += milpOsi milpOsi2
 endif
 
 # Directory with Application files
-SYMEXDIR = @SYMSRCDIR@/../Examples
+SYMEXDIR = @srcdir@/../Examples
 
 # Additional compiler flags
 ADDINCFLAGS =
@@ -75,16 +75,16 @@ ifeq ($(USE_OSI_INTERFACE),TRUE)
   ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
     INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags osi-sym`
   else
-    INCL = @SYMPHONYLIB_CFLAGS_INSTALLED@
+    INCL = @SYMPHONYLIB_CFLAGS@
   endif
 
   ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
     LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs osi-sym`
   else
     ifeq ($(COIN_CXX_IS_CL), TRUE)
-      LIBS = -link -libpath:`$(CYGPATH_W) @abs_lib_dir@` libOsiSym.lib libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@
+      LIBS = -link -libpath:`$(CYGPATH_W) @abs_lib_dir@` libOsiSym.lib libSym.lib @SYMPHONYLIB_LFLAGS@
     else
-      LIBS = -L@abs_lib_dir@ -lOsiSym -lSym @SYMPHONYLIB_LIBS_INSTALLED@
+      LIBS = -L@abs_lib_dir@ -lOsiSym -lSym @SYMPHONYLIB_LFLAGS@
     endif
   endif
 
@@ -94,16 +94,16 @@ else
   ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
     INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony`
   else
-    INCL = @SYMPHONYLIB_CFLAGS_INSTALLED@
+    INCL = @SYMPHONYLIB_CFLAGS@
   endif
 
   ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
     LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony`
   else
     ifeq ($(COIN_CXX_IS_CL), TRUE)
-      LIBS = -link -libpath:`$(CYGPATH_W) @abs_lib_dir@` libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@
+      LIBS = -link -libpath:`$(CYGPATH_W) @abs_lib_dir@` libSym.lib @SYMPHONYLIB_LFLAGS@
     else
-      LIBS = -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@
+      LIBS = -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LFLAGS@
     endif
   endif
 endif
