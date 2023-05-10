@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Branch and Bound</TITLE>
+<META NAME="description" CONTENT="Branch and Bound">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node61.html">
+<LINK REL="previous" HREF="node59.html">
+<LINK REL="next" HREF="node61.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node59.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html675"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node61.html">Branch and Cut</A>
+<B> Up:</B> <A
+ HREF="node59.html">Technical Details</A>
+<B> Previous:</B> <A
+ HREF="node59.html">Technical Details</A>
+ &nbsp; <B>  <A ID="tex2html676"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00510000000000000000">
+Branch and Bound</A>
+</H1>
+
+<P>
+<EM>Branch and bound</EM> is the broad class of algorithms from which
+branch, cut, and price is descended. A branch and bound algorithm uses
+a divide and conquer strategy to partition the solution space into
+<EM>subproblems</EM> and then optimizes individually over each
+subproblem. For instance, let 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.72ex; vertical-align: -0.11ex; " SRC="img10.png"
+ ALT="\bgroup\color{brown}$ S$\egroup"></SPAN></FONT> be the set of solutions to a given
+problem, and let 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $c \in {\bf R}^S$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.20ex; " SRC="img11.png"
+ ALT="\bgroup\color{brown}$ c \in {\bf R}^S$\egroup"></SPAN></FONT> be a vector of costs associated
+with members of S. Suppose we wish to determine a least cost member of
+S and we are given 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\hat{s} \in S$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 1.79ex; vertical-align: -0.20ex; " SRC="img12.png"
+ ALT="\bgroup\color{brown}$ \hat{s} \in S$\egroup"></SPAN></FONT>, a &ldquo;good&rdquo; solution determined
+heuristically. Using branch and bound, we initially examine the entire
+solution space 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.72ex; vertical-align: -0.11ex; " SRC="img10.png"
+ ALT="\bgroup\color{brown}$ S$\egroup"></SPAN></FONT>. In the <EM>processing</EM> or <EM>bounding</EM> phase,
+we relax the problem. In so doing, we admit solutions that are not in
+the feasible set 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.72ex; vertical-align: -0.11ex; " SRC="img10.png"
+ ALT="\bgroup\color{brown}$ S$\egroup"></SPAN></FONT>. Solving this relaxation yields a lower bound on
+the value of an optimal solution. If the solution to this relaxation
+is a member of 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.72ex; vertical-align: -0.11ex; " SRC="img10.png"
+ ALT="\bgroup\color{brown}$ S$\egroup"></SPAN></FONT> or has cost equal to 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.66ex; vertical-align: -0.11ex; " SRC="img13.png"
+ ALT="\bgroup\color{brown}$ \hat{s}$\egroup"></SPAN></FONT>, then we are
+done&mdash;either the new solution or 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.66ex; vertical-align: -0.11ex; " SRC="img13.png"
+ ALT="\bgroup\color{brown}$ \hat{s}$\egroup"></SPAN></FONT>, respectively, is optimal.
+Otherwise, we identify 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.09ex; vertical-align: -0.11ex; " SRC="img14.png"
+ ALT="\bgroup\color{brown}$ n$\egroup"></SPAN></FONT> subsets of 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.72ex; vertical-align: -0.11ex; " SRC="img10.png"
+ ALT="\bgroup\color{brown}$ S$\egroup"></SPAN></FONT>, 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $S_1, \ldots, S_n$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.11ex; vertical-align: -0.56ex; " SRC="img15.png"
+ ALT="\bgroup\color{brown}$ S_1, \ldots, S_n$\egroup"></SPAN></FONT>, such
+that 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\cup_{i = 1}^n S_i = S$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.36ex; vertical-align: -0.76ex; " SRC="img16.png"
+ ALT="\bgroup\color{brown}$ \cup_{i = 1}^n S_i = S$\egroup"></SPAN></FONT>. Each of these subsets is called a <EM>subproblem</EM>; 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $S_1, \ldots, S_n$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.11ex; vertical-align: -0.56ex; " SRC="img15.png"
+ ALT="\bgroup\color{brown}$ S_1, \ldots, S_n$\egroup"></SPAN></FONT> are sometimes called the <EM>children</EM> of 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.72ex; vertical-align: -0.11ex; " SRC="img10.png"
+ ALT="\bgroup\color{brown}$ S$\egroup"></SPAN></FONT>. We add the children of 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.72ex; vertical-align: -0.11ex; " SRC="img10.png"
+ ALT="\bgroup\color{brown}$ S$\egroup"></SPAN></FONT> to the list of <EM>candidate subproblems</EM> (those which need processing). This is called
+<EM>branching</EM>.
+
+<P>
+To continue the algorithm, we select one of the candidate subproblems
+and process it. There are four possible results. If we find a feasible
+solution better than 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.66ex; vertical-align: -0.11ex; " SRC="img13.png"
+ ALT="\bgroup\color{brown}$ \hat{s}$\egroup"></SPAN></FONT>, then we replace 
+<FONT COLOR="#a52a2a"><SPAN CLASS="MATH"><IMG STYLE="height: 1.66ex; vertical-align: -0.11ex; " SRC="img13.png"
+ ALT="\bgroup\color{brown}$ \hat{s}$\egroup"></SPAN></FONT> with the new
+solution and continue. We may also find that the subproblem has no
+solutions, in which case we discard, or <EM>prune</EM> it. Otherwise, we
+compare the lower bound to our global upper bound. If it is greater
+than or equal to our current upper bound, then we may again prune the
+subproblem. Finally, if we cannot prune the subproblem, we are forced
+to branch and add the children of this subproblem to the list of
+active candidates. We continue in this way until the list of active
+subproblems is empty, at which point our current best solution is the
+optimal one.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node61.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node59.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node59.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html675"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node61.html">Branch and Cut</A>
+<B> Up:</B> <A
+ HREF="node59.html">Technical Details</A>
+<B> Previous:</B> <A
+ HREF="node59.html">Technical Details</A>
+ &nbsp; <B>  <A ID="tex2html676"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>waiting_row</TITLE>
+<META NAME="description" CONTENT="waiting_row">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node235.html">
+<LINK REL="previous" HREF="node231.html">
+<LINK REL="next" HREF="node234.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node234.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node226.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node232.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1558"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node234.html">var_desc</A>
+<B> Up:</B> <A
+ HREF="node226.html">LP module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node232.html">waiting_row</A>
+ &nbsp; <B>  <A ID="tex2html1559"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00732400000000000000"></A>
+<A ID="waiting_row"></A>
+<BR>
+waiting_row
+</H3>
+
+<P>
+A closely related data structure is the <SPAN style="font-family:monospace">waiting_row</SPAN>,
+essentially the &ldquo;unpacked&rdquo; form of a cut. There are six fields.
+
+<P>
+<DL>
+<DT><STRONG><SPAN style="font-family:monospace">source_pid</SPAN> &ndash;</STRONG></DT>
+<DD>Used internally by SYMPHONY.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">cut_data *cut</SPAN> &ndash;</STRONG></DT>
+<DD>Pointer to the cut from which the row was generated.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">int nzcnt, *matind, *matval</SPAN> &ndash;</STRONG></DT>
+<DD>Fields describing the row. <SPAN style="font-family:monospace">nzcnt</SPAN> is the number of nonzeros in
+the row, i.e., the length of the <SPAN style="font-family:monospace">matind</SPAN> and <SPAN style="font-family:monospace">matval</SPAN> arrays,
+which are the variable indices (wrt. the current LP relaxation) and
+nonzero coefficients in the row.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">double violation</SPAN> &ndash;</STRONG></DT>
+<DD>If the constraint corresponding to the cut is violated, this value
+contains the degree of violation (the absolute value of the difference
+between the row activity level (i.e., lhs) and the right hand
+side). This value does not have to be set by the user.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A ID="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A ID="tex2html1560"
+  HREF="node234.html">var_desc</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+
+</BODY>
+</HTML>

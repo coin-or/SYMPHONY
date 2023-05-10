@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Display Menu</TITLE>
+<META NAME="description" CONTENT="Display Menu">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node44.html">
+<LINK REL="previous" HREF="node42.html">
+<LINK REL="next" HREF="node44.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node44.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node38.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node42.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html584"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node44.html">Sub Menu Browsing</A>
+<B> Up:</B> <A
+ HREF="node38.html">Using SYMPHONY Interactively</A>
+<B> Previous:</B> <A
+ HREF="node42.html">Set Menu</A>
+ &nbsp; <B>  <A ID="tex2html585"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00415000000000000000">
+Display Menu</A>
+</H2>
+
+<P>
+The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Display</SPAN></FONT> submenu is used to print out results and statistics of the
+solution process after a 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">solve</SPAN></FONT> call. To enter this submenu and see
+available options, type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">display</SPAN></FONT> and then 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">help</SPAN></FONT> or 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">?</SPAN></FONT>:
+
+<PRE>
+ SYMPHONY: display
+ Please type 'help'/'?' to see the display options!
+ SYMPHONY\Display: help
+
+ List of display options:
+
+ solution     : display the column values
+ obj          : display the objective value
+ stats        : display the statistics
+ parameter    : display the value of a parameter
+
+ back         : leave this menu
+ quit/exit    : leave the optimizer
+
+ SYMPHONY\Display:
+</PRE>
+Clearly, in order to display column solutions and the optimal solution value, 
+you need to type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">solution</SPAN></FONT> and then 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">obj</SPAN></FONT>:
+
+<PRE>
+ SYMPHONY\Display: solution
+ Optimal Solution found!
+ +++++++++++++++++++++++++++++++++++++++++++++++
+ Nonzero column names and values in the solution
+ +++++++++++++++++++++++++++++++++++++++++++++++
+ COL00002      3.000
+ COL00006      1.000
+
+ SYMPHONY\Display: obj
+ Objective Value: -40.000000
+ SYMPHONY\Display:
+</PRE>
+You can also display the values of SYMPHONY's run-time parameters (see Section
+<A HREF="node275.html#params">6.4</A>) by moving into 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">parameters</SPAN></FONT> submenu: 
+
+<PRE>
+ SYMPHONY\Display: parameter
+ Please type 'help'/'?' to see the list of available parameters!
+ SYMPHONY\Display\Parameter:
+</PRE>
+For instance, in order to display the verbosity level, type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">verbosity</SPAN></FONT>:
+
+<PRE>
+ SYMPHONY\Display\Parameter: verbosity 
+ The value of verbosity: 3
+ SYMPHONY\Display\Parameter:
+</PRE>
+As in Set submenu, typing 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">help</SPAN></FONT> or 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">?</SPAN></FONT> will display only a subset of 
+available run-time parameters. However, you are allowed to display the value of
+any of the parameters given in Section <A HREF="node275.html#params">6.4</A>. 
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

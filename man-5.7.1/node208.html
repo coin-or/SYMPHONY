@@ -1,0 +1,321 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Callable Library C++ API</TITLE>
+<META NAME="description" CONTENT="Callable Library C++ API">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node209.html">
+<LINK REL="previous" HREF="node118.html">
+<LINK REL="next" HREF="node209.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node209.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node117.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node207.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1395"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node209.html">User Callback API</A>
+<B> Up:</B> <A
+ HREF="node117.html">Reference</A>
+<B> Previous:</B> <A
+ HREF="node207.html">sym_get_ub_for_new_obj</A>
+ &nbsp; <B>  <A ID="tex2html1396"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00720000000000000000"></A>
+<A ID="C++_Interface"></A>
+<BR>
+Callable Library C++ API
+</H1>
+
+<P>
+SYMPHONY's C++ interface is derived from COIN-OR's Open Solver Interface
+(OSI). The OSI methods are implemented simply as wrapped calls to the SYMPHONY
+C callable library just described. For instance, when an instance of the OSI
+interface class is constructed, a call is made to
+<SPAN  CLASS="texttt">sym_open_environment()</SPAN> and a pointer to the environment is stored
+in the class and when the OSI object is destroyed,
+<SPAN  CLASS="texttt">sym_close_environment</SPAN> is called to destroy the environment object. 
+Most subsequent calls within the class can then be made without
+any arguments. To fully support SYMPHONY's capabilities, we have 
+extended the OSI interface to include some other methods not in the base 
+class. For example, we added calls equivalent to our 
+<SPAN  CLASS="texttt">sym_parse_command_line()</SPAN> and <SPAN  CLASS="texttt">sym_find_initial_bounds()</SPAN>.
+Additionally, SYMPHONY has a warm start class derived from the CoinWarmStart 
+base class to support the new functionalities of the MILP warm starting such 
+as <SPAN  CLASS="texttt">sym_get_warm_start</SPAN> and <SPAN  CLASS="texttt">sym_set_warm_start</SPAN>. They are 
+also implemented as wrapped calls to the C interface library. 
+
+<P>
+In order to have the whole list of the methods and information 
+regarding their usage, see the OSI SYMPHONY interface and SYMPHONY warm start
+header files (<SPAN  CLASS="texttt">OsiSymSolverInterface.hpp</SPAN> and 
+<SPAN  CLASS="texttt">SymWarmStart.hpp</SPAN>). Here, we will give the table of the C library 
+equivalent calls of the C++ interface routines with brief descriptions:
+
+<P>
+
+<P>
+<!-- MATH
+ $\resizebox{15cm}{12cm}{
+\begin{tabular}{|l||l||l|} \hline
+{\bf C++ Interface} & {\bf C Interface} & {\bf Description}\\\hline \hline
+OsiSymSolverInterface & sym\_open\_environment &
+create a new environment.\\\hline \hline
+loadProblem & sym\_load\_problem &
+load the problem read trough an MPS or GMPL file\\\hline \hline
+branchAndBound & sym\_solve/sym\_warm\_solve &
+solve the MILP problem from scratch or \\
+& & from a warm start if loaded. \\\hline \hline
+resolve & sym\_warm\_solve &
+re-solve the MILP problem after some modifications.\\\hline \hline
+initialSolve & sym\_solve &
+solve the MILP problem from scratch.\\\hline \hline
+multiCriteriaBranchAndBound & sym\_mc\_solve &
+solve the multi criteria problem.\\\hline \hline
+setInitialData & sym\_set\_defaults &
+set the parameters to their defaults.\\\hline \hline
+parseCommandLine & sym\_parse\_command\_line &
+read the command line arguments.\\\hline \hline
+findInitialBounds & sym\_find\_initial\_bounds &
+find the initial bounds via the user defined heuristics.\\\hline \hline
+createPermanentCutPools & sym\_create\_permanent\_cut\_pools &
+save the global cuts. \\\hline \hline
+loadProblem & sym\_explicit\_load\_problem &
+load the problem through a set of arrays. \\\hline \hline
+getWarmStart & sym\_get\_warm\_start &
+get the warm start description.\\\hline \hline
+setWarmStart & sym\_set\_warm\_start &
+set the warm start description. \\\hline
+getLbForNewRhs & sym\_get\_lb\_for\_new\_rhs &
+find a lower bound to the new rhs problem\\
+&&using the post solution info.\\\hline \hline
+getUbForNewRhs & sym\_get\_lb\_for\_new\_rhs &
+find an upper bound to the new rhs problem.\\
+&&using the post solution info.\\\hline \hline
+getLbForNewObj & sym\_get\_lb\_for\_new\_rhs &
+find a lower bound to the new obj problem.\\
+&&using the post solution info.\\\hline \hline
+getUbForNewObj & sym\_get\_lb\_for\_new\_rhs &
+find an upper bound to the new obj problem.\\
+&&using the post solution info.\\\hline \hline
+reset & sym\_close\_environment &
+return the allocated memory.\\\hline \hline
+setIntParam & sym\_set\_int\_param &
+set the integer type OSI parameter.\\\hline \hline
+setSymParam(int) & sym\_set\_int\_param &
+set the integer type SYMPHONY parameter.\\\hline \hline
+setDblParam & sym\_set\_dbl\_param &
+set the double type OSI parameter.\\\hline \hline
+setSymParam(double) & sym\_set\_dbl\_param &
+set the double type SYMPHONY parameter.\\\hline \hline
+setStrParam & sym\_set\_str\_param &
+set the string type OSI parameter.\\\hline \hline
+setSymParam(string) & sym\_set\_str\_param &
+set the string type SYMPHONY parameter.\\\hline \hline
+getIntParam & sym\_get\_int\_param &
+get the value of the integer type OSI parameter. \\\hline \hline
+getSymParam(int \&) & sym\_get\_int\_param &
+get the value of the integer type SYMPHONY parameter. \\\hline \hline
+getDblParam & sym\_get\_dbl\_param &
+get the value of the double type OSI parameter. \\\hline \hline
+getSymParam(double \&) & sym\_get\_dbl\_param &
+get the value of the double type SYMPHONY parameter. \\\hline \hline
+getStrParam & sym\_get\_str\_param &
+get the value of the string type OSI parameter. \\\hline \hline
+getSymParam(string \&) & sym\_get\_str\_param &
+get the value of the string type SYMPHONY parameter. \\\hline \hline
+isProvenOptimal & sym\_is\_proven\_optimal &
+query the problem status. \\\hline \hline
+isProvenPrimalInfeasible & sym\_is\_proven\_primal\_infeasible &
+query the problem status. \\\hline \hline
+isPrimalObjectiveLimitReached & sym\_is\_target\_gap\_achieved &
+query the problem status. \\\hline \hline
+isIterationLimitReached & sym\_is\_iteration\_limit\_reached &
+query the problem status. \\\hline \hline
+isTimeLimitReached & sym\_is\_time\_limit\_reached &
+query the problem status. \\\hline \hline
+isTargetGapReached & sym\_is\_target\_gap\_achieved &
+query the problem status. \\\hline \hline
+getNumCols & sym\_get\_num\_cols &
+get the number of columns. \\\hline \hline
+getNumRows & sym\_get\_num\_rows &
+get the number of rows. \\\hline \hline
+getNumElements & sym\_get\_num\_elements &
+get the number of nonzero elements. \\\hline \hline
+getColLower & sym\_get\_col\_lower &
+get the column lower bounds. \\\hline \hline
+getColUpper & sym\_get\_col\_upper &
+get the column upper bounds. \\\hline \hline
+getRowSense & sym\_get\_row\_sense &
+get the row senses. \\\hline \hline
+getRightHandSide & sym\_get\_rhs &
+get the rhs values. \\\hline \hline
+getRowRange & sym\_get\_row\_range &
+get the row range values. \\\hline \hline
+getRowLower & sym\_get\_row\_lower &
+get the row lower bounds. \\\hline \hline
+getRowUpper & sym\_get\_row\_upper &
+get the row upper bounds. \\\hline \hline
+getObjCoefficients & sym\_get\_obj\_coeff &
+get the objective function vector. \\\hline
+\end{tabular}
+}$
+ -->
+<IMG STYLE=""
+ SRC="img45.png"
+ ALT="\resizebox{15cm}{12cm}{
+\begin{tabular}{\vert l\vert\vert l\vert\vert l\vert} \h...
+...m\_get\_obj\_coeff &amp;
+get the objective function vector. \\ \hline
+\end{tabular}}">
+
+<P>
+
+<P>
+<!-- MATH
+ $\resizebox{15cm}{10.5cm}{
+\begin{tabular}{|l||l||l|} \hline
+{\bf C++ Interface} & {\bf C Interface} & {\bf Description}\\\hline \hline
+getObjSense & sym\_get\_obj\_sense &
+get the objective sense. \\\hline \hline
+isContinuous & sym\_is\_continuous &
+query the variable type.\\\hline \hline
+isBinary & sym\_is\_binary &
+query the variable type.\\\hline \hline
+isInteger & sym\_is\_integer &
+query the variable type.\\\hline \hline
+isIntegerNonBinary & - &
+query the variable type.\\\hline \hline
+isFreeBinary & sym\_is\_binary &
+query the variable type.\\\hline \hline
+getMatrixByRow & - &
+get the constraint matrix by row oriented. \\\hline \hline
+getMatrixByCol & - &
+get the constraint matrix by column oriented. \\\hline \hline
+getInfinity & - &
+get the infinity definition of SYMPHONY. \\\hline \hline
+getColSolution & sym\_get\_col\_solution &
+get the current best column solution. \\\hline \hline
+getRowActivity & sym\_get\_row\_activity &
+get the current row activity. \\\hline \hline
+getObjValue & sym\_get\_obj\_val &
+get the current best objective value. \\\hline \hline
+getPrimalBound & sym\_get\_primal\_bound &
+get the primal upper bound. \\\hline \hline
+getIterationCount & sym\_get\_iteration\_count &
+get the number of the analyzed tree nodes. \\\hline \hline
+setObjCoeff & sym\_set\_obj\_coeff &
+set the objective function vector. \\\hline \hline
+setObj2Coeff & sym\_set\_obj2\_coeff &
+set the second objective function vector. \\\hline \hline
+setColLower & sym\_set\_col\_lower &
+set the column lower bounds. \\\hline \hline
+setColUpper & sym\_set\_col\_upper &
+set the column upper bounds. \\\hline \hline
+setRowLower & sym\_set\_row\_lower &
+set the row lower bounds. \\\hline \hline
+setRowUpper & sym\_set\_row\_upper &
+set the row upper bounds. \\\hline \hline
+setRowType & sym\_set\_row\_type &
+set the row characteristics. \\\hline \hline
+setObjSense & sym\_set\_obj\_sense &
+set the objective sense. \\\hline \hline
+setColSolution & sym\_set\_col\_solution &
+set the current solution. \\\hline \hline
+setContinuous & sym\_set\_continuous &
+set the variable type. \\\hline \hline
+setInteger & sym\_set\_integer &
+set the variable type. \\\hline \hline
+setColName & sym\_set\_col\_names &
+set the column names. \\\hline \hline
+addCol & sym\_add\_col &
+add columns to the constraint matrix. \\\hline \hline
+addRow & sym\_add\_row &
+add rows to the constraint matrix. \\\hline \hline
+deleteCols & sym\_delete\_cols &
+delete some columns from the constraint matrix. \\\hline \hline
+deleteRows & sym\_delete\_rows &
+delete some rows from the constraint matrix. \\\hline \hline
+writeMps & - &
+write the current problem in MPS format. \\\hline \hline
+applyRowCut & - &
+add some row cuts. \\\hline \hline
+applyColCut & - &
+add some column cuts. \\\hline \hline
+SymWarmStart(warm\_start\_desc *) & sym\_create\_copy\_warm\_start &
+create a SYMPHONY warm start by copying the given one. \\\hline \hline
+SymWarmStart(char *) & sym\_read\_warm\_start &
+create a SYMPHONY warm start reading from file. \\\hline \hline
+getCopyOfWarmStartDesc & sym\_create\_copy\_warm\_start &
+get the copy of the warm start structure. \\\hline \hline
+writeToFile & sym\_write\_warm\_start\_desc &
+write the loaded warm start to a file. \\\hline
+\end{tabular}
+}$
+ -->
+<IMG STYLE=""
+ SRC="img46.png"
+ ALT="\resizebox{15cm}{10.5cm}{
+\begin{tabular}{\vert l\vert\vert l\vert\vert l\vert} ...
+...m\_start\_desc &amp;
+write the loaded warm start to a file. \\ \hline
+\end{tabular}}">
+
+<P>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node209.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node117.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node207.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1395"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node209.html">User Callback API</A>
+<B> Up:</B> <A
+ HREF="node117.html">Reference</A>
+<B> Previous:</B> <A
+ HREF="node207.html">sym_get_ub_for_new_obj</A>
+ &nbsp; <B>  <A ID="tex2html1396"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
