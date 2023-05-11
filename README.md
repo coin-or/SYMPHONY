@@ -5,7 +5,7 @@
 Projects such as this one are maintained by a small group of volunteers under
 the auspices of the non-profit [COIN-OR Foundation](https://www.coin-or.org)
 and we need your help! Please consider [sponsoring our
-activities](https://github.com/sponsors/coin-or).
+activities](https://github.com/sponsors/coin-or) or [volunteering](mailto:volunteer@coin-or.org) to help!
 
 [![Latest Release](https://img.shields.io/github/v/release/coin-or/SYMPHONY?sort=semver)](https://github.com/coin-or/SYMPHONY/releases)
 
@@ -329,11 +329,11 @@ guides and pointers to other on-line documentation can be found below.
 
 The PDF version of the manual is available here:
 
-https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.6.19-Manual.pdf
+https://coin-or.github.io/SYMPHONY/doc/SYMPHONY-5.7.1-Manual.pdf
 
 An on-line version that is for a slightly earlier release is here:
 
-http://coin-or.github.io/SYMPHONY/man-5.6/
+http://coin-or.github.io/SYMPHONY/man-5.7/
 
 ## Project Links
 
