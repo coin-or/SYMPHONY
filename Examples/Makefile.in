@@ -21,7 +21,7 @@
 CYGPATH_W = @CYGPATH_W@
 
 EXAMPLES = milp milp2 bicriteria sensitivity \
-	warm_start1 warm_start2 warm_start3
+	warm_start1 warm_start2 warm_start3 rhs_obj_changes
 
 ##############################################################################
 # If you wish to use SYMPHONY through the SYMPHONY OSI interface, 
