@@ -2715,6 +2715,8 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
+      // YX: reset term if Clp; Clp may return ITLIM at timeout
+      term = LP_TIME_LIMIT;
       /* If max iterations and had switched to primal, bound is no good */
       if (si->getModelPtr()->secondaryStatus() == 10){
 	 term = LP_ABANDONED;
