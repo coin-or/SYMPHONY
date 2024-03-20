@@ -2599,6 +2599,12 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
+      // YX: reset term if needed; Clp may return ITLIM at timeout
+      int itlim_chk = -1;
+      retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
+      if (si->getIterationCount() < itlim_chk){
+         term = LP_TIME_LIMIT;
+      }
       /* If max iterations and had switched to primal, bound is no good */
       if (si->getModelPtr()->secondaryStatus() == 10){
 	 term = LP_ABANDONED;
@@ -2716,6 +2722,12 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
+      // YX: reset term if needed; Clp may return ITLIM at timeout
+      int itlim_chk = -1;
+      retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
+      if (si->getIterationCount() < itlim_chk){
+         term = LP_TIME_LIMIT;
+      } 
       /* If max iterations and had switched to primal, bound is no good */
       if (si->getModelPtr()->secondaryStatus() == 10){
 	 term = LP_ABANDONED;
@@ -2820,9 +2832,17 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
       term = LP_D_OBJLIM;
    else if (si->isProvenOptimal())
       term = LP_OPTIMAL;
-   else if (si->isIterationLimitReached())
+   else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
-   else if (si->isAbandoned())
+#ifdef __OSI_CLP__
+      // YX: reset term if needed; Clp may return ITLIM at timeout
+      int itlim_chk = -1;
+      retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
+      if (si->getIterationCount() < itlim_chk){
+         term = LP_TIME_LIMIT;
+      }
+#endif
+   }else if (si->isAbandoned())
       term = LP_ABANDONED;
    
    /* if(term == D_UNBOUNDED){
