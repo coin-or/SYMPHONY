@@ -1,0 +1,313 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Building on Windows.</TITLE>
+<META NAME="description" CONTENT="Building on Windows.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node23.html">
+<LINK REL="previous" HREF="node21.html">
+<LINK REL="next" HREF="node23.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node23.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node21.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html503"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node23.html">Building on OS X.</A>
+<B> Up:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+<B> Previous:</B> <A
+ HREF="node21.html">Building on Linux.</A>
+ &nbsp; <B>  <A ID="tex2html504"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H4><A ID="SECTION00322120000000000000">
+Building on Windows.</A>
+</H4>
+
+<P>
+By far, the easiest way to build on Windows is with the GNU autotools and the
+GCC compilers. The first step is to install either
+
+<UL>
+<LI>Msys2 (<kbd><A ID="tex2html15"
+  HREF="https://msys2.github.io/">https://msys2.github.io/</A></kbd>)
+</LI>
+<LI>Windows Subsystem for Linux (<kbd><A ID="tex2html16"
+  HREF="https://docs.microsoft.com/en-us/windows/wsl/install-win10">https://docs.microsoft.com/en-us/windows/wsl/install-win10</A></kbd>)
+</LI>
+</UL>
+If you don't want to fool around with
+WSL (which is a great option if you already know your way around Unix), it is
+recommended to use MSys2, since it provides a minimal toolset that is easy to
+install. To get MSys2, download the installer from
+<kbd><A ID="tex2html17"
+  HREF="https://msys2.github.io/">https://msys2.github.io/</A></kbd>.
+
+<P>
+Following the above steps, you should have the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">bash</SPAN></FONT> command
+(with Msys2, be sure to run 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">msys2_shell.bat</SPAN></FONT> 
+or manually add 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">msys64
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>usr 
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>bin</SPAN></FONT>, 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">msys64
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>mingw32
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>bin</SPAN></FONT>,
+and 
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">msys64
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>mingw64
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>bin</SPAN></FONT> to your Windows path).   
+
+<P>
+Once you have bash installed and in your 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">PATH</SPAN></FONT>, open a Windows terminal and
+type 
+
+<P>
+
+<PRE>
+bash
+pacman -S make wget tar patch dos2unix diffutils git svn pkg-config zip unzip
+</PRE>
+
+<P>
+To obtain the source code, the first step is to get the installer that will then
+fetch the source for SYMPHONY and all its dependencies. *You do not need to
+clone SYMPHONY first, just do the following!* Open a terminal and execute
+
+<P>
+
+<PRE>
+git clone https://www.github.com/coin-or/coinbrew
+</PRE>
+
+<P>
+Next, to check out source code for and build all the necessary projects
+(including dependencies), execute the script in the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT>
+subdirectory. To execute the script, do
+
+<P>
+
+<PRE>
+cd coinbrew
+chmod u+x coinbrew
+./coinbrew
+</PRE>
+
+<P>
+(Note: The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">chmod</SPAN></FONT> command is only needed if the execute permission is not
+automatically set by git on cloning). Once you run the script,
+you will be prompted interactively to select a project to fetch and build. the
+rest should happen automagically. Alternatively, the following command-line
+incantation will execute the procedure non-interactively.
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER
+</PRE>
+The 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT> script invokes a separate 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">configure</SPAN></FONT> script that is
+auto-generated using the GNU autotools. This script takes a wide range of
+additional options and these options can be specified on the commnd-line when
+running 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT>. For example, to build with debugging symbols,
+do
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER --enable-debug
+</PRE>
+
+<P>
+To get help with additional options available in running the script, do
+
+<P>
+
+<PRE>
+./coinbrew --help
+</PRE>
+
+<P>
+To use the resulting binaries and/or libraries, you will need to add the
+full path of the directory 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">build
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>bin</SPAN></FONT> to your Windows executable
+search 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">PATH</SPAN></FONT>, or, alternatively, copy the conents of the build directory to 
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">C:
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>Program Files (x86)
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>SYMPHONY</SPAN></FONT> and add the directory 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">C:
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>
+  Program Files (x86)
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>SYMPHONY
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>bin</SPAN></FONT> 
+to your Windows executable search 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">PATH</SPAN></FONT>. You may also consider adding
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">C:
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>Program Files (x86)
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>SYMPHONY
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>lib</SPAN></FONT> to the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">LIB</SPAN></FONT> path and 
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">C:
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>Program Files (x86)
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>SYMPHONY
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>include</SPAN></FONT> to the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">INCLUDE</SPAN></FONT> path. 
+
+<P>
+It is possible to use almost the exact same commands to build with the Visual
+Studio compilers. Before doing any of the above commands in the Windows
+terminal, first run the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">vcvarsall.bat</SPAN></FONT> script for your version of Visual
+Studio. Then follow all the steps above, but add 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">&ndash;enable-msvc</SPAN></FONT> to the
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">coinbrew</SPAN></FONT> command.
+
+<P>
+
+<PRE>
+./coinbrew fetch build SYMPHONY@\VER --enable-msvc
+</PRE>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node23.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node20.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node21.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html503"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node23.html">Building on OS X.</A>
+<B> Up:</B> <A
+ HREF="node20.html">Building the Standard Configuration</A>
+<B> Previous:</B> <A
+ HREF="node21.html">Building on Linux.</A>
+ &nbsp; <B>  <A ID="tex2html504"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

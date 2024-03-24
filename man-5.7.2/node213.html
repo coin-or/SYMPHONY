@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>user_readparams</TITLE>
+<META NAME="description" CONTENT="user_readparams">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node214.html">
+<LINK REL="previous" HREF="node212.html">
+<LINK REL="next" HREF="node214.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node214.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node212.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1485"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node214.html">user_io</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node212.html">user_initialize</A>
+ &nbsp; <B>  <A ID="tex2html1486"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00731300000000000000"></A>
+<A ID="user_readparams"></A>
+<BR>
+user_readparams
+</H3>
+
+<PRE>
+int user_readparams(void *user, char *filename, int argc, char **argv)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>
+<FONT COLOR="#00ffff">Description:</FONT></STRONG></DT>
+<DD>
+
+<P>
+The user can optionally read in parameter settings from the file named 
+<SPAN  CLASS="texttt">filename</SPAN>, specified on the command line using the <SPAN  CLASS="texttt">-f</SPAN> switch. 
+The parameter file <SPAN  CLASS="texttt">filename</SPAN> can contain both SYMPHONY's built-in
+parameters and user-defined parameters. If desired, the user can open this
+file for reading, scan the file for lines that contain user parameter settings
+and then read the parameter settings. A shell for doing this is set up in the
+in the file <SPAN  CLASS="texttt">SYMPHONY-5.0/USER/user_master.c</SPAN>. Also, see the file
+<SPAN  CLASS="texttt">Master/master_io.c</SPAN> to see how SYMPHONY does this. 
+<BR>
+<BR>
+The user can also parse the command line arguments for user
+settings. A shell for doing this is also set up in the file
+<SPAN  CLASS="texttt">SYMPHONY-5.0/USER/user_master.c</SPAN>. Upper case letters are reserved for
+user-defined command line switches. The switch <SPAN style="font-family:monospace">-H</SPAN> is reserved for help
+and calls the user's usage subroutine (see <A HREF="node211.html#user_usage"><SPAN  CLASS="texttt">user_usage</SPAN></A>). If the user returns 
+`<SPAN  CLASS="texttt">USER_DEFAULT</SPAN>', then SYMPHONY will look for the command-line switches 
+<SPAN  CLASS="texttt">-F</SPAN> to specify the file name for reading in the model from either an 
+MPS or a GMPL/AMPL file or <SPAN  CLASS="texttt">-L</SPAN> to specify the file name for reading in
+the model from an LP format file. The <SPAN  CLASS="texttt">-D</SPAN> command-line switch is used
+to specify an additional data file for GMPL/AMPL models. If the <SPAN  CLASS="texttt">-D</SPAN>
+option is not present, SYMPHONY assumes the file is an MPS file.
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#a52a2a">Arguments:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">void *user</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=281>Pointer to the user-defined data structure.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">char *filename</SPAN></TD>
+<TD CLASS="LEFT">IN</TD>
+<TD CLASS="LEFT TOP"  WIDTH=281>The name of the parameter file.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+<DT><STRONG>
+<FONT COLOR="#00ff00">Return values:</FONT></STRONG></DT>
+<DD>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_ERROR</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>Error. SYMPHONY stops.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_SUCCESS</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>User
+parameters were read successfully.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><SPAN style="font-family:monospace">USER_DEFAULT</SPAN></TD>
+<TD CLASS="LEFT TOP"  WIDTH=301>SYMPHONY will read
+in the problem instance from either an MPS, LP, or GMPL/AMPL file. The
+command-line switches <SPAN  CLASS="texttt">-F</SPAN>, <SPAN  CLASS="texttt">-L</SPAN>, and <SPAN  CLASS="texttt">-D</SPAN> (as
+appropriate) will be used to specify the model file.</TD>
+</TR>
+</TABLE>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node214.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node210.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node212.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1485"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node214.html">user_io</A>
+<B> Up:</B> <A
+ HREF="node210.html">Master module callbacks</A>
+<B> Previous:</B> <A
+ HREF="node212.html">user_initialize</A>
+ &nbsp; <B>  <A ID="tex2html1486"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

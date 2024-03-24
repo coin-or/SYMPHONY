@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Managing the Search Tree</TITLE>
+<META NAME="description" CONTENT="Managing the Search Tree">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node88.html">
+<LINK REL="previous" HREF="node86.html">
+<LINK REL="next" HREF="node88.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node88.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node86.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node86.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html780"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node88.html">Search Chains and Diving</A>
+<B> Up:</B> <A
+ HREF="node86.html">The Tree Management Module</A>
+<B> Previous:</B> <A
+ HREF="node86.html">The Tree Management Module</A>
+ &nbsp; <B>  <A ID="tex2html781"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00543100000000000000">
+Managing the Search Tree</A>
+</H3>
+
+<P>
+The tree manager's primary job is to control the execution of the
+algorithm by deciding which candidate node should be chosen as the
+next to be processed. This is done using either one of several
+built-in rules or a user-defined rule. Usually, the goal of the search
+strategy is to minimize overall running time, but it is sometimes
+also important to find good feasible solutions early in the search
+process. In general, there are two ways to decrease running
+time&mdash;either by decreasing the size of the search tree or by
+decreasing the time needed to process each search tree node.
+
+<P>
+To minimize the size of the search tree, the strategy is to select
+consistently that candidate node with the smallest associated lower bound.
+In theory, this strategy, sometimes called <EM>best-first</EM>, will lead
+the smallest possible search tree. However, we need to consider the
+time required to process each search tree node as well. This is affected
+by both the quality of the current upper bound and by such factors as
+communication overhead and node set-up costs. When considering these
+additional factors, it is sometimes be more effective to deviate from the
+best-first search order. We discuss the importance of such strategies
+below.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node88.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node86.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node86.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html780"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node88.html">Search Chains and Diving</A>
+<B> Up:</B> <A
+ HREF="node86.html">The Tree Management Module</A>
+<B> Previous:</B> <A
+ HREF="node86.html">The Tree Management Module</A>
+ &nbsp; <B>  <A ID="tex2html781"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

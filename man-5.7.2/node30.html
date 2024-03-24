@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Building with the MSVC++ Graphical Interface</TITLE>
+<META NAME="description" CONTENT="Building with the MSVC++ Graphical Interface">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node31.html">
+<LINK REL="previous" HREF="node29.html">
+<LINK REL="next" HREF="node31.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node31.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node29.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node29.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html528"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node31.html">Building in a Windows</A>
+<B> Up:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+ &nbsp; <B>  <A ID="tex2html529"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A ID="SECTION00323100000000000000"></A>
+<A ID="using_msvc"></A>
+<BR>
+Building with the MSVC++ Graphical Interface
+</H3>
+
+<P>
+These instructions are for MSVC++ Version 8. Instructions for other versions
+should be similar.
+
+<P>
+
+<UL>
+<LI>Go to 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">MSVisualStudio
+<FONT COLOR="#a52a2a"><!-- MATH
+ $\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.30ex; vertical-align: -0.69ex; " SRC="img1.png"
+ ALT="\bgroup\color{brown}$ \backslash$\egroup"></SPAN></FONT>v10</SPAN></FONT> directory and open the solution file
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">symphony.sln</SPAN></FONT>. 
+
+<P>
+</LI>
+<LI>Note that there are a number of additional preprocessor definitions that
+control the functionality of SYMPHONY. These definitions are described in
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">sym.mak</SPAN></FONT>, a Unix-style makefile included in the distribution. To 
+enable the functionality associated with a particular definition, simply add 
+it to the list of definitions of 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">libSymphony</SPAN></FONT> project together with 
+the required libraries and paths. For instance, if you 
+want to enable GMPL reader option, you need to
+
+<UL>
+<LI>add the directory of the header files of GLPK to the include 
+files path
+</LI>
+<LI>add 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">USE_GLPMPL</SPAN></FONT> to the defines
+</LI>
+<LI>add the GLPK library to the solution
+</LI>
+</UL>
+</LI>
+<LI>Make sure that the project 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">symphony</SPAN></FONT> is set as the startup project
+by choosing 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Set as Startup Project</SPAN></FONT> from the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Project</SPAN></FONT> menu after
+selecting the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">symphony</SPAN></FONT> project in the Solution Explorer. Choose
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Build Solution</SPAN></FONT> from the Build menu. This should successfully build
+the SYMPHONY library and the corresponding executable.
+
+<P>
+</LI>
+<LI>To test the executable, go to the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Debug</SPAN></FONT> tab and choose
+
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">Start Without Debugging</SPAN></FONT>. This should open a Window in which the
+interactive solver will appear. Type 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">help</SPAN></FONT> or 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">?</SPAN></FONT> to see a list of
+available commands or see Chapter <A HREF="node37.html#API-overview">3</A> for instructions on using
+the interactive solver.
+
+<P>
+</LI>
+</UL>
+
+<P>
+Note that there is some functionality missing from the Windows version. Most
+prominently, the timing functions do not work. In addition, the Windows
+version will only run in sequential mode for a variety of reasons. However, it
+should be relatively easy to get it running in parallel if you can get PVM
+working under Windows. 
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node31.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node29.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node29.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html528"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node31.html">Building in a Windows</A>
+<B> Up:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+<B> Previous:</B> <A
+ HREF="node29.html">Building Using Microsoft Visual</A>
+ &nbsp; <B>  <A ID="tex2html529"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

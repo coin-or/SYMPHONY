@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Cut Pool Parameters</TITLE>
+<META NAME="description" CONTENT="Cut Pool Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node283.html">
+<LINK REL="previous" HREF="node281.html">
+<LINK REL="next" HREF="node283.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node283.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node275.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node281.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1680"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node283.html">C++ Interface/OSI Parameters</A>
+<B> Up:</B> <A
+ HREF="node275.html">Run-time Parameters</A>
+<B> Previous:</B> <A
+ HREF="node281.html">Cut Generator Parameters</A>
+ &nbsp; <B>  <A ID="tex2html1681"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00747000000000000000"></A>
+<A ID="cut_pool_params"></A>
+<BR>
+Cut Pool Parameters
+</H2>
+<DL>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> CP_verbosity</FONT></SPAN> &ndash; integer (0).</STRONG></DT>
+<DD>Verbosity of the cut pool module.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> cp_logging</FONT></SPAN> &ndash; boolean (0).</STRONG></DT>
+<DD>Determines whether the logging option is enabled. In this case, the
+entire contents of the cut pool are written out periodically to disk
+(at the same interval as the tree manager log files are written). If
+this option is set, then the line following must start with the
+keyword <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> cp_log_file_name</FONT></SPAN> and include the appropriate
+file name as the value.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> cp_warm_start</FONT></SPAN> &ndash; boolean (0).</STRONG></DT>
+<DD>Used to allow the cut pool to make a warm start by reading in a
+previously written log file. If
+this option is set, then the line following must start with the
+keyword <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> cp_warm_start_file_name</FONT></SPAN> and include the appropriate
+file name as the value.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> block_size</FONT></SPAN> &ndash; integer (5000).</STRONG></DT>
+<DD>Indicates the size of the blocks to allocate when more space is needed
+in the cut list.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_size</FONT></SPAN> &ndash; integer (2000000).</STRONG></DT>
+<DD>Indicates the maximum size of the cut pool in bytes. This is the total
+memory taken up by the cut list, including all data structures and the
+array of pointers itself.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> max_number_of_cuts</FONT></SPAN> &ndash; integer (10000).</STRONG></DT>
+<DD>Indicates the maximum number of cuts allowed to be stored. When this
+max is reached, cuts are forcibly purged, starting with duplicates
+and then those indicated by the parameter <A HREF="#delete_which"><SPAN  CLASS="texttt">delete_which</SPAN></A> (see below), until the list is below the allowable size.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> min_to_delete</FONT></SPAN> &ndash; integer (1000).</STRONG></DT>
+<DD>Indicates the number of cuts required to be deleted when the pool reaches
+it's maximum size.
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> touches_until_deletion</FONT></SPAN> &ndash; integer (10).</STRONG></DT>
+<DD>When using the number of touches a cut has as a measure of its
+quality, this parameter indicates the number of touches a cut can have
+before being deleted from the pool. The number of touches is the
+number of times in a row that a cut has been checked without being
+found to be violated. It is a measure of a cut's relevance or
+effectiveness.
+
+<P>
+<A ID="delete_which"></A></DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> delete_which</FONT></SPAN> &ndash; integer 
+(<SPAN style="font-family:monospace">DELETE_BY_TOUCHES</SPAN>{2}).</STRONG></DT>
+<DD>Indicates which cuts to delete when
+purging the pool. <SPAN style="font-family:monospace">DELETE_BY_TOUCHES</SPAN> indicates that cuts whose
+number of touches is above the threshold (see <SPAN style="font-family:monospace">touches_until_deletion</SPAN> above) should be purged if the pool gets too
+large. <SPAN style="font-family:monospace">DELETE_BY_QUALITY</SPAN>{1} indicates that a user-defined
+measure of quality should be used (see the function <A HREF="node267.html#user_check_cuts"><SPAN style="font-family:monospace">user_check_cuts()</SPAN></A>).
+
+<P>
+</DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> check_which</FONT></SPAN> &ndash; integer (<SPAN style="font-family:monospace">CHECK_ALL_CUTS</SPAN>{0}).</STRONG></DT>
+<DD>Indicates which cuts should be checked for violation. The choices are
+to check all cuts (<SPAN style="font-family:monospace">CHECK_ALL_CUTS</SPAN>{0}); only those that have
+number of touches below the threshold (<SPAN style="font-family:monospace">CHECK_TOUCHES</SPAN>{2}); only
+those that were generated at a level higher in the tree than the
+current one (<SPAN style="font-family:monospace">CHECK_LEVEL</SPAN>{1}); or both (<SPAN style="font-family:monospace">CHECK_LEVEL_AND_TOUCHES</SPAN>{3}). Note that with <SPAN style="font-family:monospace">CHECK_ALL_CUTS</SPAN> set, SYMPHONY will still only check the first
+<A HREF="#cuts_to_check"><SPAN  CLASS="texttt">cuts_to_check</SPAN></A> cuts in the list ordered
+by quality (see the function <A HREF="node267.html#user_check_cuts"><SPAN  CLASS="texttt">user_check_cut</SPAN></A>).
+
+<P>
+<A ID="cuts_to_check"></A></DD>
+<DT><STRONG><SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> cuts_to_check</FONT></SPAN> &ndash; integer (1000).</STRONG></DT>
+<DD>Indicates how many cuts in the pool to actually check. The list is
+ordered by quality and the first <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> cuts_to_check</FONT></SPAN> cuts are
+checked for violation.
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node283.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node275.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node281.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1680"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node283.html">C++ Interface/OSI Parameters</A>
+<B> Up:</B> <A
+ HREF="node275.html">Run-time Parameters</A>
+<B> Previous:</B> <A
+ HREF="node281.html">Cut Generator Parameters</A>
+ &nbsp; <B>  <A ID="tex2html1681"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

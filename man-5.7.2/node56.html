@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>The C++ API</TITLE>
+<META NAME="description" CONTENT="The C++ API">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node57.html">
+<LINK REL="previous" HREF="node47.html">
+<LINK REL="next" HREF="node57.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node57.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node46.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node55.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html629"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node57.html">Linking to the Callable</A>
+<B> Up:</B> <A
+ HREF="node46.html">Using the Callable Library</A>
+<B> Previous:</B> <A
+ HREF="node55.html">sym_close_environment()</A>
+ &nbsp; <B>  <A ID="tex2html630"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00432000000000000000"></A><A ID="OSI"></A>
+<BR>
+The C++ API
+</H2>
+
+<P>
+The Open Solver Interface (OSI) is a C++ class that provides a standard API
+for accessing a variety of solvers for mathematical programs. It is provided
+as part of the COIN-OR repository [<A
+ HREF="node284.html#coin-or">24</A>], along with a collection of
+solver-specific derived classes that translate OSI call into calls to the
+underlying libraries of the solvers. A code implemented using calls to the
+methods in the OSI base class can easily be linked with any solver for which
+there is an OSI interface. This allows development of solver-independent codes
+and eliminates many portability issues. The current incarnation of OSI
+supports only solvers for linear and mixed-integer linear programs, although a
+new version supporting a wider variety of solvers is currently under
+development.
+
+<P>
+We have implemented an OSI interface for SYMPHONY 5.7.2 that allows any solver
+built with SYMPHONY to be accessed through the OSI, including customized
+solvers and those configured to run on parallel architectures. To ease code
+maintenance, for each method in the OSI base class, there is a corresponding
+method in the callable library. The OSI methods are implemented simply as
+wrapped calls to the SYMPHONY callable library. When an instance of the OSI
+interface class is constructed, a call is made to
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> sym_open_environment()</FONT></SPAN> and a pointer to the environment is stored
+in the class. Most subsequent calls within the class can then be made without
+any arguments. When the OSI object is destroyed,
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> sym_close_environment</FONT></SPAN> is called and the environment is destroyed.
+
+<P>
+To fully support SYMPHONY's capabilities, we have extended the OSI interface to
+include some methods not in the base class. For example, we added calls
+equivalent to our <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> sym_parse_command_line()</FONT></SPAN> and
+<SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> sym_find_initial_bounds()</FONT></SPAN>. Figure <A HREF="#OSI_main">3.5</A> shows the
+program of Figure <A HREF="node55.html#default_main">3.1</A> implemented using the OSI interface.
+
+<DIV class="CENTER"><A ID="OSI_main"></A><A ID="5011"></A>
+<TABLE>
+<CAPTION class="BOTTOM"><STRONG>Figure 3.5:</STRONG>
+Implementation of a generic MILP solver with the SYMPHONY
+OSI interface.</CAPTION>
+<TR><TD><IMG STYLE="height: 35.15ex; " SRC="img9.png"
+ ALT="\begin{figure}{\color{brown}
+\begin{Verbatim}[frame=lines]
+int main(int argc, ch...
+... argv);
+si.loadProblem();
+si.branchAndBound();
+}\end{Verbatim}
+}\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+Note that the code would be exactly the same for accessing any customized
+SYMPHONY solver, sequential or parallel.
+
+<P>
+Although we are using the OSI to access a MILP solver, the current version of
+the OSI is geared primarily toward support of solvers for linear programming
+(LP) problems. This is because LP solvers employing some version of the
+simplex algorithm support much richer functionality and a wider range of
+interface functions, due to their support of warm starting from previously
+saved checkpoints. This functionality is difficult to provide for MILP
+solvers.  In SYMPHONY 5.7.2, we have implemented for MILPs some of the same
+functionality that has long been available for LP solvers. As such, our OSI
+interface supports warm starting and sensitivity analysis. The implementations
+of this functionality is straightforward at the moment, but will be improved
+in future versions.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node57.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node46.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node55.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html629"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node57.html">Linking to the Callable</A>
+<B> Up:</B> <A
+ HREF="node46.html">Using the Callable Library</A>
+<B> Previous:</B> <A
+ HREF="node55.html">sym_close_environment()</A>
+ &nbsp; <B>  <A ID="tex2html630"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

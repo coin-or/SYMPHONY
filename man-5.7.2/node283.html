@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>C++ Interface/OSI Parameters</TITLE>
+<META NAME="description" CONTENT="C++ Interface/OSI Parameters">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="previous" HREF="node282.html">
+<LINK REL="next" HREF="node284.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node284.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node275.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node282.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html1682"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node284.html">References</A>
+<B> Up:</B> <A
+ HREF="node275.html">Run-time Parameters</A>
+<B> Previous:</B> <A
+ HREF="node282.html">Cut Pool Parameters</A>
+ &nbsp; <B>  <A ID="tex2html1683"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A ID="SECTION00748000000000000000"></A>
+<A ID="OSI_Parameters"></A>
+<BR>
+C++ Interface/OSI Parameters
+</H2>
+
+<P>
+As the implementation of the whole interface, there exists a matching 
+C interface parameter to each of the C++ Interface/OSI parameter and 
+the parameter setting functions are designed to set the 
+corresponding C interface parameter. Thus, we will just give a table of the 
+parameter names, their C interface complements and the values they can be set 
+to, rather than their detailed descriptions. For each parameter, the user 
+can see the C interface complement for further explanation. 
+<BR>
+<P>
+<!-- MATH
+ $\resizebox{16cm}{7cm}{
+\begin{tabular}{|l||l||l|} \hline
+{\bf C++ Interface} & {\bf C Interface} & {\bf Value}\\\hline \hline
+OsiSymVerbosity & verbosity & -user defined- \\
+\hline \hline
+OsiSymWarmStart & warm\_start & -boolean- \\
+\hline \hline
+OsiSymNodeLimit &  & \\
+OsiMaxNumIteration & node\_limit & -user defined-\\
+OsiMaxNumIterationHotStart & & \\
+\hline \hline
+OsiSymFindFirstFeasible & find\_first\_feasible & -boolean- \\
+\hline \hline
+OsiSymSearchStrategy & node\_selection\_rule & LOWEST\_LP\_FIRST \\
+& & HIGHEST\_LP\_FIRST \\
+& & BREADTH\_FIRST\_SEARCH \\
+& & DEPTH\_FIRST\_SEARCH \\
+\hline \hline
+OsiSymUsePermanentCutPools & use\_permanent\_cut\_pools & -boolean- \\
+\hline \hline
+OsiSymGenerateCglGomoryCuts & generate\_cgl\_gomory\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglKnapsackCuts & generate\_cgl\_knapsack\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglOddHoleCuts & generate\_cgl\_oddhole\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglProbingCuts & generate\_cgl\_probing\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglCliqueCuts & generate\_cgl\_clique\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglFlowAndCoverCuts & generate\_cgl\_flow\_and\_cover\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglRoundingCuts & generate\_cgl\_rounding\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglLiftAndProjectCuts & generate\_cgl\_lift\_and\_project\_cuts & -boolean- \\
+\hline \hline
+OsiSymKeepWarmStart & keep\_warm\_start & -boolean- \\
+\hline \hline
+OsiSymTrimWarmTree & trim\_warm\_tree * -boolean- \\
+\hline \hline
+OsiSymDoReducedCostFixing & do\_reduced\_cost\_fixing & -boolean- \\
+\hline \hline
+OsiSymMCFindSupportedSolutions &
+mc\_find\_supported\_solutions & -boolean- \\
+\hline \hline
+OsiSymSensitivityAnalysis & sensitivity\_analysis & -boolean- \\
+\hline \hline
+OsiSymRandomSeed & random\_seed & -user defined-\\
+\hline \hline
+OsiSymDivingStrategy & diving\_strategy & BEST\_ESTIMATE \\
+& & COMP\_BEST\_K \\
+& & COMP\_BEST\_K\_GAP \\
+\hline \hline
+OsiSymDivingK & diving\_k & -user defined- \\
+\hline \hline
+OsiSymDivingThreshold & diving\_threshold & -user defined- \\
+\hline \hline
+OsiSymGranularity & granularity & -user defined- \\
+\hline \hline
+OsiSymTimeLimit & time\_limit & -user defined- \\
+\hline \hline
+OsiSymGapLimit & gap\_limit & -user defined- \\
+\hline \hline
+OsiObjOffset & - & -user defined- \\
+\hline \hline
+OsiProbName & problem\_name & -user defined- \\
+\hline
+\end{tabular}
+}$
+ -->
+<IMG STYLE=""
+ SRC="img68.png"
+ ALT="\resizebox{16cm}{7cm}{
+\begin{tabular}{\vert l\vert\vert l\vert\vert l\vert} \hl...
+...ne \hline
+OsiProbName &amp; problem\_name &amp; -user defined- \\
+\hline
+\end{tabular}}"> 
+<BR>
+<P>
+However, as it is seen, only some of the C interface parameters have their 
+matches. If the other parameters are required to be modified, the user 
+can always set them directly by their C interface names, 
+using the overlapping functions: <SPAN style="font-family:monospace">setSymParam(string, int), 
+setSymParam(string, double) and setSymParam(string,string)</SPAN>. For instance, 
+the <SPAN style="font-family:monospace">
+<FONT COLOR="#ff0000"> verbosity</FONT></SPAN> parameter can be set, let's say, to 2 either by 
+setSymParam(OsiSymVerbosity, 2) or by setSymParam(&ldquo;verbosity&rdquo;, 2). 
+Note that, this flexibility is also supported for parameter querying 
+functions. 
+
+<P>
+
+<P>
+
+<BR><HR>
+
+</BODY>
+</HTML>

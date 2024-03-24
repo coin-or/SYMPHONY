@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2020.2 (Released July 1, 2020) -->
+<HTML lang="en">
+<HEAD>
+<TITLE>Shared-memory architectures.</TITLE>
+<META NAME="description" CONTENT="Shared-memory architectures.">
+<META NAME="keywords" CONTENT="man">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2020.2">
+
+<LINK REL="STYLESHEET" HREF="man.css">
+
+<LINK REL="next" HREF="node27.html">
+<LINK REL="previous" HREF="node25.html">
+<LINK REL="next" HREF="node27.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node27.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node25.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html513"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node27.html">Distributed-memory architectures</A>
+<B> Up:</B> <A
+ HREF="node25.html">Building for parallel architectures</A>
+<B> Previous:</B> <A
+ HREF="node25.html">Building for parallel architectures</A>
+ &nbsp; <B>  <A ID="tex2html514"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H4><A ID="SECTION00322310000000000000">
+Shared-memory architectures.</A>
+</H4>
+
+<P>
+To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
+compiler. Version 5.7.2  builds with OpenMP support enabled automatically when
+the compiler provides it. This should be the case for all recent versions of
+gcc and recent Microsoft compilers. Clang on OS X does not support OpenMP,
+though it is possible to build a version that does yourself. You can manually
+enable or disable OpenMP support with configure options by doing, e.g.,
+
+<PRE>
+ ./coinbrew fetch build SYMPHONY@\VER --enable-openmp
+</PRE> 
+In the Microsoft Visual Studio, enable OpenMP
+support in the properties for the SYMPHONY projects (it doesn't need to be
+enabled for the dependent projects). In a future version, this will also be
+made the default.
+
+<P>
+After configuring, follow the earlier instructions for building and testing.
+To invoke SYMPHONY from the command-line with multiple threads, specify the
+number of <SPAN  CLASS="textit">additional</SPAN> worker threads with the 
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">-p</SPAN></FONT> option, i.e., 
+invoking SYMPHONY with
+
+<PRE>
+ bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
+</PRE>
+will utilize two worker threads to process subproblems in parallel. 
+When more than 1 thread is used, the first thread is the &ldquo;master&rdquo;
+thread and only prints out periodic status messages, as well as doing some
+bookkeeping work. Therefore, it is recommended to always use at least one
+worker thread (
+<FONT COLOR="#a52a2a"><SPAN  CLASS="texttt">-p 1</SPAN></FONT>). Starting in version 5.6.0, the number of
+threads used is automatically set equal to the number of available cores if no
+option is specified. For a fully sequential run with just one thread, invoke
+SYMPHONY with
+
+<PRE>
+ bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
+</PRE>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A
+ HREF="node27.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node25.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A> 
+<A ID="tex2html513"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A
+ HREF="node27.html">Distributed-memory architectures</A>
+<B> Up:</B> <A
+ HREF="node25.html">Building for parallel architectures</A>
+<B> Previous:</B> <A
+ HREF="node25.html">Building for parallel architectures</A>
+ &nbsp; <B>  <A ID="tex2html514"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>
