@@ -1,5 +1,18 @@
 ## CHANGELOG
 
+### Release 5.7.2
+  * Patch for a bug in Clp that results in termination due to timeout as being falsely reported as termination due to iteration count.
+
+### Release 5.7.1
+  * Fix #195 (failures in unit test versus 5.6)
+  * Merge #196  (fixing checks for parameter settings when warm starting)	
+	
+### Release 5.7.0
+  * Merge the previous WS branch to master
+  * Wide-ranging changes to allow for warm starting, sensitivity analysis, exporting of dual functions, and related.
+  * Fixes a number of small bugs.
+  * Adds the important ability to change not only right-hand side, but also variable bounds.
+	
 ### Release 5.6.19
   * Fix unicode caracters in documentation
   * Update documentation
