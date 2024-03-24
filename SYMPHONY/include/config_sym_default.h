@@ -5,15 +5,15 @@
 /***************************************************************************/
 
 /* Version number of project */
-#define SYMPHONY_VERSION         "trunk"
+#define SYMPHONY_VERSION "5.7.2"
 
 /* Major Version number of project */
-#define SYMPHONY_VERSION_MAJOR   9999
+#define SYMPHONY_VERSION_MAJOR 5
 
 /* Minor Version number of project */
-#define SYMPHONY_VERSION_MINOR   9999
+#define SYMPHONY_VERSION_MINOR 7
 
 /* Release Version number of project */
-#define SYMPHONY_VERSION_RELEASE 9999
+#define SYMPHONY_VERSION_RELEASE 2
 
 
