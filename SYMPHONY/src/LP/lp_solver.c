@@ -2339,11 +2339,22 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->messageHandler()->setLogLevel(0);
 #ifdef __OSI_CLP__
    lp_data->si->setupForRepeatedUse();
-   //lp_data->si->setupForRepeatedUse(3,0);
-   //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
-   //lp_data->si->getModelPtr()->setSparseFactorization(true);
-   //lp_data->si->getModelPtr()->setSpecialOptions(524288);
-   //lp_data->si->getModelPtr()->setSpecialOptions(4);   
+   // feb223
+   int options = lp_data->si->getModelPtr()->specialOptions();
+   int moreOptions = lp_data->si->getModelPtr()->moreSpecialOptions();
+   
+   options |= 32           // CLP creates ray while doing dual simplex
+            // + 2048         // CLP does not cruch the problem
+                              // maybe not needed if we recompute dj's on fixed vars ???
+            + 0x08000000;  // CLP computes accurate duals on LP_D_ITLIM
+   moreOptions |= 8192;    // CLP uses dual simplex if it has suggested to do so
+   lp_data->si->getModelPtr()->setSpecialOptions(options);
+   lp_data->si->getModelPtr()->setMoreSpecialOptions(moreOptions);
+   // lp_data->si->setupForRepeatedUse(3,0);
+   // lp_data->si->getModelPtr()->setFactorizationFrequency(200);
+   // lp_data->si->getModelPtr()->setSparseFactorization(true);
+   // lp_data->si->getModelPtr()->setSpecialOptions(524288);
+   // lp_data->si->getModelPtr()->setSpecialOptions(4);
    lp_data->si->getModelPtr()->setPerturbation(50);
    //set cleanup param if unscaled primal is infeasible
    lp_data->si->setCleanupScaling(1);
