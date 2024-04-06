@@ -229,6 +229,9 @@ typedef struct LPDATA{
    cgl_params  cgl;
 
    int        *frac_var_cnt;
+   // feb223
+   int        *cstat; /* to be used in branching to save the basis */
+   int        *rstat;
 
 }LPdata;
 
