@@ -25,7 +25,7 @@ jobs:
         include:
           - os: macos-13
             build_static: false
-            flags: CC=clang OSX=13
+            flags: CC=clang CXX=clang++ OSX=13
             download_requirements: brew install metis bash
           - os: macos-13
             build_static: false
