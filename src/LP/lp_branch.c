@@ -250,8 +250,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    st_time     = used_time(&total_time);
    total_iters = 0;
 
-   int *cstat = lp_data->tmp.i1;
-   int *rstat = lp_data->tmp.i2;
+   
+   int *cstat = lp_data->cstat; //lp_data->tmp.i1;
+   int *rstat = lp_data->rstat; //lp_data->tmp.i2;
 
    get_basis(lp_data, cstat, rstat);
       
