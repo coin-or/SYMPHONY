@@ -2624,10 +2624,14 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
+      double timelimit;
+      ClpDblParam key = ClpMaxWallSeconds;   
+      lp_data->si->getModelPtr()->getDblParam(key, timelimit);
       // YX: reset term if needed; Clp may return ITLIM at timeout
       int itlim_chk = -1;
       retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
-      if (si->getIterationCount() < itlim_chk){
+      // feb223: but check that a time limit has been actually set
+      if (timelimit > 0 && (si->getIterationCount() < itlim_chk)){
          term = LP_TIME_LIMIT;
       }
       /* If max iterations and had switched to primal, bound is no good */
@@ -2747,12 +2751,16 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
+      double timelimit;
+      ClpDblParam key = ClpMaxWallSeconds;   
+      lp_data->si->getModelPtr()->getDblParam(key, timelimit);
       // YX: reset term if needed; Clp may return ITLIM at timeout
       int itlim_chk = -1;
       retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
-      if (si->getIterationCount() < itlim_chk){
+      // feb223: but check that a time limit has been actually set
+      if (timelimit > 0 && (si->getIterationCount() < itlim_chk)){
          term = LP_TIME_LIMIT;
-      } 
+      }
       /* If max iterations and had switched to primal, bound is no good */
       if (si->getModelPtr()->secondaryStatus() == 10){
 	 term = LP_ABANDONED;
@@ -2860,10 +2868,14 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
    else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
+      double timelimit;
+      ClpDblParam key = ClpMaxWallSeconds;   
+      lp_data->si->getModelPtr()->getDblParam(key, timelimit);
       // YX: reset term if needed; Clp may return ITLIM at timeout
       int itlim_chk = -1;
       retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
-      if (si->getIterationCount() < itlim_chk){
+      // feb223: but check that a time limit has been actually set
+      if (timelimit > 0 && (si->getIterationCount() < itlim_chk)){
          term = LP_TIME_LIMIT;
       }
 #endif
