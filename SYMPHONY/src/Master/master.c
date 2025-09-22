@@ -896,7 +896,15 @@ int sym_solve(sym_environment *env)
       best_sol->has_sol = FALSE;
    }
 
+   /* Mark the MIPDesc as not modified anymore */
    env->mip->is_modified = FALSE;
+   env->mip->change_num = 0;
+   env->mip->var_type_modified = FALSE;
+   env->mip->new_col_num = 0;
+   if(env->mip->cru_vars_num){
+      FREE(env->mip->cru_vars);
+      env->mip->cru_vars_num = 0;
+   }
    
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
@@ -1452,13 +1460,6 @@ int sym_solve(sym_environment *env)
    }
    env->par.tm_par.warm_start = FALSE;
    env->warm_start->trim_tree = DO_NOT_TRIM;		  	    
-   env->mip->change_num = 0;
-   env->mip->var_type_modified = FALSE;
-   env->mip->new_col_num = 0;
-   if(env->mip->cru_vars_num){
-      FREE(env->mip->cru_vars);
-      env->mip->cru_vars_num = 0;
-   }
 
 #ifdef COMPILE_IN_LP
    int thread_num;
