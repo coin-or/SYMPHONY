@@ -1741,71 +1741,93 @@ int sym_warm_solve(sym_environment *env)
    }else{
       
       if (env->warm_start){
-	 env->par.tm_par.warm_start = TRUE;
+	      env->par.tm_par.warm_start = TRUE;
       } else {
-	return(sym_solve(env));
+	      return(sym_solve(env));
       }
       
       if(env->mip->change_num){
-
-	 env->has_ub = FALSE;
-	 env->ub = 0.0;
-	 env->lb = -MAXDOUBLE;
-	 
-	 env->warm_start->has_ub = env->best_sol.has_sol = 
-	    env->warm_start->best_sol.has_sol = FALSE;
-	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
-	 env->warm_start->lb = -MAXDOUBLE;
-	 env->warm_start->best_sol.xlength = 0;
-	 FREE(env->warm_start->best_sol.xind);
-	 FREE(env->warm_start->best_sol.xval);
-      }else {
-	 env->has_ub = env->warm_start->has_ub;
-	 env->ub = env->warm_start->ub;
-	 env->lb = env->warm_start->lb;
+         env->has_ub = env->has_ub_estimate =
+            env->best_sol.has_sol = FALSE;
+         env->ub = env->warm_start->ub = 0.0;
+         env->lb = env->warm_start->lb = -MAXDOUBLE;
+      } else {
+         env->has_ub = env->warm_start->has_ub;
+         env->ub = env->warm_start->ub;
+         env->lb = env->warm_start->lb;
       }
 
       //check stored solution for feasibility
-      if (env->sp && env->par.prep_par.level <= 2){
-	 double min = SYM_INFINITY;
-	 lp_sol sol;
-	 int min_ind = -1;
-	 for (i = 0; i < env->sp->num_solutions; i++){
-	    sol.xlength = env->sp->solutions[i]->xlength;
-	    sol.xind = env->sp->solutions[i]->xind;
-	    sol.xval = env->sp->solutions[i]->xval;
-	    if (check_solution(env, &sol) > 0){
-	       if ((env->sp->solutions[i]->objval = sol.objval) < min){
-		  min = env->sp->solutions[i]->objval;
-		  min_ind = i;
-	       }
-	    }
-	    if (min < SYM_INFINITY){
-	       double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-	       for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
-		  assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
-		  tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
-		     env->sp->solutions[min_ind]->xval[j];
-	       }
-	       sym_set_col_solution(env, tmp_sol);
-	       FREE(tmp_sol);
-               env->warm_start->has_ub = env->best_sol.has_sol = 
-                  env->warm_start->best_sol.has_sol = TRUE;
-               env->warm_start->ub = env->warm_start->best_sol.objval = min;
-	    }
-	 }
-      }else{
+      if (env->sp) {
+         env->warm_start->has_ub = 
+            env->warm_start->best_sol.has_sol = FALSE;
+         env->warm_start->best_sol.objval = 0.0;
+         env->warm_start->best_sol.xlength = 0;
+         FREE(env->warm_start->best_sol.xind);
+         FREE(env->warm_start->best_sol.xval);
+
+         /* Solution in sp are in the original space */
+         double min = SYM_INFINITY;
+         lp_sol sol;
+         int min_ind = -1;
+         /* Find the best feasible solution in the pool */
+         for (i = 0; i < env->sp->num_solutions; i++){
+            sol.xlength = env->sp->solutions[i]->xlength;
+            sol.xind = env->sp->solutions[i]->xind;
+            sol.xval = env->sp->solutions[i]->xval;
+            if (check_solution(env, &sol) > 0){
+               if ((env->sp->solutions[i]->objval = sol.objval) < min){
+                  min = env->sp->solutions[i]->objval;
+                  min_ind = i;
+               }
+            }
+         }
+         /* Set the best feasible solution as primal bound */
+         if (min < SYM_INFINITY){
+            double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+            for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
+               assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
+               tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
+                  env->sp->solutions[min_ind]->xval[j];
+            }
+            sym_set_col_solution(env, tmp_sol);
+            FREE(tmp_sol);
+            env->warm_start->has_ub = env->best_sol.has_sol = 
+               env->warm_start->best_sol.has_sol = TRUE;
+            env->warm_start->ub = env->warm_start->best_sol.objval = min;
+         }
+      } else {
+         /* Otherwise, check the env->warm_start->best_sol */
          if (check_solution(env, &env->warm_start->best_sol) <= 0){
+            env->warm_start->has_ub = 
+               env->warm_start->best_sol.has_sol = FALSE;
+            env->warm_start->best_sol.objval = 0.0;
+            env->warm_start->best_sol.xlength = 0;
             FREE(env->warm_start->best_sol.xind);
             FREE(env->warm_start->best_sol.xval);
-            env->warm_start->best_sol.has_sol = FALSE;
-         }else{
-	    FREE(env->best_sol.xind);
-	    FREE(env->best_sol.xval);
-	    env->best_sol = env->warm_start->best_sol;
-	    memset(&(env->warm_start->best_sol), 0, sizeof(lp_sol));
-	 }
-      }
+         } else {
+	         /* env->warm_start->best_sol is feasible */
+            int xlen = env->warm_start->best_sol.xlength;
+            env->has_ub = env->has_ub_estimate = 
+               env->warm_start->has_ub = 
+               env->warm_start->best_sol.has_sol = TRUE;
+            env->ub = env->ub_estimate = 
+               env->warm_start->ub =
+               env->warm_start->best_sol.objval;
+            FREE(env->best_sol.xind);
+            FREE(env->best_sol.xval);
+            memcpy(&env->best_sol, &env->warm_start->best_sol, sizeof(lp_sol));
+            if (xlen){
+               env->best_sol.xind = (int *) malloc(xlen * ISIZE);
+               memcpy(env->best_sol.xind,
+                     env->warm_start->best_sol.xind,
+                     xlen * ISIZE);
+               env->best_sol.xval = (double *) malloc(xlen * DSIZE);
+                memcpy(env->best_sol.xval,
+                     env->warm_start->best_sol.xval,
+                     xlen * DSIZE);
+	         }
+         }
 
       if(env->par.multi_criteria){
 	 env->has_ub = env->has_mc_ub;
