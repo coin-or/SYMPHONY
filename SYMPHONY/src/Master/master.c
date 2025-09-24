@@ -1828,7 +1828,8 @@ int sym_warm_solve(sym_environment *env)
                      xlen * DSIZE);
 	         }
          }
-
+      }
+      
       if(env->par.multi_criteria){
 	 env->has_ub = env->has_mc_ub;
 	 env->ub = env->mc_ub;
