@@ -1416,7 +1416,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 {
    int user_res;
    LPdata *lp_data = p->lp_data;
-   double *x = lp_data->x;
+   double *x = NULL;
    double lpetol = lp_data->lpetol;
 
    int number = 0;
@@ -1424,6 +1424,17 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    double tmpd, *xval = lp_data->tmp.d; /* n */
 
    if (p->par.verbosity < 0) return;
+
+   switch (which_sol){
+      case DISP_FEAS_SOLUTION:
+         x = lp_data->heur_solution;
+         break;
+      case DISP_RELAXED_SOLUTION:
+      case DISP_FINAL_RELAXED_SOLUTION:
+      default:
+         x = lp_data->x;
+         break;
+   }
    
    number = collect_nonzeros(p, x, xind, xval);
 
