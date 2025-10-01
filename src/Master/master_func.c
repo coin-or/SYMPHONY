@@ -584,10 +584,16 @@ int resolve_node(sym_environment *env, bc_node *node)
 /*===========================================================================*/
 
 int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
-		      int *cuts_ind, char *cru_vars, int change_type)
+                      int *cuts_ind, char *cru_vars, int change_type){
+  update_tree_bound(env, root, cut_num, cuts_ind, cru_vars, change_type, false);
+}
+
+int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
+		      int *cuts_ind, char *cru_vars, int change_type, bool solve_again)
 {
 
-   int i, resolve = 0;
+   int i = 0;
+   int resolve = (solve_again) ? 1 : 0;
    char deletable = TRUE;   
 
    if (root){
@@ -654,7 +660,7 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
 		  update_branching_decisions(env, root, change_type);
 	       }
 	       for(i = 0; i<root->bobj.child_num; i++){
-		  if(!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type)){
+		  if(!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type, resolve)){
 		     deletable = FALSE;
 		  }
 	       }	    
