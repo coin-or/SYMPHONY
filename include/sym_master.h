@@ -124,6 +124,7 @@ int update_tree_bound PROTO((sym_environment *env, bc_node *root, int *cut_num,
 			      int *cut_ind, char *cru_vars, int change_type));
 int update_tree_bound PROTO((sym_environment *env, bc_node *root, int *cut_num,
             int *cuts_ind, char *cru_vars, int change_type, bool solve_again));
+double find_ws_lb PROTO((bc_node *root));
 void register_cuts PROTO((bc_node *root, int *cut_num,  int *cuts_ind));
 void update_node_desc PROTO((sym_environment *env, bc_node *root, 
 			     int change_type));

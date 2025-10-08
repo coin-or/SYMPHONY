@@ -720,6 +720,44 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
 /*===========================================================================*/
 /*===========================================================================*/
 
+// find the minimum lower bound in the warm start tree amongst feasible nodes
+double find_ws_lb(bc_node *root){
+
+  // default return to infinity - returned if node is null or infeasible
+  double lb = MAXDOUBLE;
+
+  // if the node is feasible, get its lb
+  if (root && root->feasibility_status != INFEASIBLE_PRUNED) {
+
+    // check if it has feasible children
+    bool feasible_child = false;
+    for (int i = 0; i < root->bobj.child_num; i++) {
+      if (root->children[i]->feasibility_status != INFEASIBLE_PRUNED) {
+        feasible_child = true;
+        break;
+      }
+    }
+
+    // if so, this node's lb is the min of its children's lbs
+    if (feasible_child){
+      lb = find_ws_lb(root->children[0]);
+      for (int i = 1; i < root->bobj.child_num; i++) {
+        double clb = find_ws_lb(root->children[i]);
+        if (clb < lb) {
+          lb = clb;
+        }
+      }
+    } else {
+      // otherwise, return this node's lb
+      lb = root->lower_bound;
+    }
+  }
+  return lb;
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 
 void register_cuts(bc_node *root, int *cut_num,  int *cuts_ind){
 

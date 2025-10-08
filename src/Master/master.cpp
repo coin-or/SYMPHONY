@@ -1917,8 +1917,10 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 	       env->warm_start->stat.created =
 	       env->warm_start->stat.tree_size = 1; //for root node */	   
 
+      double prev_lb = find_ws_lb(env->warm_start->rootnode);
 	    update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind,
                               cru_vars, change_type, true);
+      double warm_start_lb = find_ws_lb(env->warm_start->rootnode);
 
 	    /* FIXME!!!! feasible solutions are getting lost in a sequence of warm-solve---
 	       for a temporary fix, increase ub a litte... */
