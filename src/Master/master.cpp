@@ -1919,7 +1919,6 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 
 	    update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind,
                               cru_vars, change_type, true);
-      find_tree_lb(env->tm);
 
 	    /* FIXME!!!! feasible solutions are getting lost in a sequence of warm-solve---
 	       for a temporary fix, increase ub a litte... */

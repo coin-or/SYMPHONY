@@ -599,7 +599,8 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
    if (root){
 
       check_trim_tree(env, root, cut_num, cuts_ind, change_type);
-      
+
+      // todo
       if (root->node_status == NODE_STATUS__PRUNED || 
 	  root->node_status == NODE_STATUS__TIME_LIMIT || 
 	  root->node_status == NODE_STATUS__ITERATION_LIMIT || 
