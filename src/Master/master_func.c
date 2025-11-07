@@ -441,7 +441,10 @@ int resolve_node(sym_environment *env, bc_node *node)
    FREE(lp_data->slacks);
    
    return_value = dual_simplex(lp_data, &iterd);
-   
+   env->warm_start->lp_stat.lp_iter_num += iterd;
+   env->warm_start->lp_stat.lp_calls ++;
+   env->warm_start->lp_stat.lp_node_calls ++;
+
    if(return_value == LP_D_UNBOUNDED || return_value == LP_ABANDONED || 
       return_value == LP_D_INFEASIBLE){
       node->feasibility_status = INFEASIBLE_PRUNED;
@@ -589,132 +592,131 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
 }
 
 int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num,
-		      int *cuts_ind, char *cru_vars, int change_type, bool solve_again)
-{
+                      int *cuts_ind, char *cru_vars, int change_type, bool solve_again) {
 
-   int i = 0;
-   int resolve = (solve_again) ? 1 : 0;
-   char deletable = TRUE;   
+  int i = 0;
+  int resolve = (solve_again) ? 1 : 0;
+  char deletable = TRUE;
 
-   if (root){
+  if (root) {
 
-      check_trim_tree(env, root, cut_num, cuts_ind, change_type);
+    check_trim_tree(env, root, cut_num, cuts_ind, change_type);
 
-      // todo
-      if (root->node_status == NODE_STATUS__PRUNED || 
-	  root->node_status == NODE_STATUS__TIME_LIMIT || 
-	  root->node_status == NODE_STATUS__ITERATION_LIMIT || 
-	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION || 
-	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || 
-	    change_type == COL_BOUNDS_CHANGED ||  change_type == COLS_ADDED){
-	   if (root->feasibility_status == FEASIBLE_PRUNED ||
-	       root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
-	       root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-	      
-	      check_better_solution(env, root, FALSE, change_type);
-	   }
-	   
-	   if (root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION && 
-	       root->bobj.child_num > 0){
-	      for(i = 0; i<root->bobj.child_num; i++){
-		 if(!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type)){
-		    deletable = FALSE;
-		 }
-	      }
-	      if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
-		 update_branching_decisions(env, root, change_type);
-	      }	      
+    // todo
+    if (root->node_status == NODE_STATUS__PRUNED ||
+        root->node_status == NODE_STATUS__TIME_LIMIT ||
+        root->node_status == NODE_STATUS__ITERATION_LIMIT ||
+        root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+        root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION) {
+      if (change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED ||
+          change_type == COL_BOUNDS_CHANGED || change_type == COLS_ADDED) {
+        if (root->feasibility_status == FEASIBLE_PRUNED ||
+            root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+            root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION) {
 
-	   } else{
-	      if(root->node_status == NODE_STATUS__WSPRUNED) 
-		 root->node_status = NODE_STATUS__PRUNED;		 
-	      else 
-		 root->node_status = NODE_STATUS__WARM_STARTED; 
-	      if(resolve == 0){
-		 root->lower_bound = -MAXDOUBLE;
-	      }else{
-		 resolve_node(env, root);		 
-	      }
-	   }
-	   if (resolve == 0){
-	      root->feasibility_status = 0; // or? ROOT_NODE;
-	   }
-	 }
-      } else{
-	 if(root->bobj.child_num > 0){
-	    if (env->mip->var_type_modified){
-	       if(!env->mip->is_int[root->children[0]->bobj.name]){ 
-		  for(i = 0; i<root->bobj.child_num; i++){
-		     ws_free_subtree(env, root->children[i], change_type, TRUE, TRUE);
-		  }
-		  root->bobj.child_num = 0;
-		  root->node_status = NODE_STATUS__WARM_STARTED;
-		  if(resolve == 0){
-		     root->lower_bound = -MAXDOUBLE;
-		  }else{
-		     resolve_node(env, root);
-		  }		  
-	       } 
-	    } else {		              
-	       if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
-		  update_branching_decisions(env, root, change_type);
-	       }
-	       for(i = 0; i<root->bobj.child_num; i++){
-		  if(!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type, resolve)){
-		     deletable = FALSE;
-		  }
-	       }	    
-	    }
-	 }else{ 
-	    if(root->node_status == NODE_STATUS__WSPRUNED) 
-	       root->node_status = NODE_STATUS__PRUNED;
-	    else 
-	       root->node_status = NODE_STATUS__WARM_STARTED;
-	    if(resolve == 0){
-	       root->lower_bound = -MAXDOUBLE;
-	    }else{
-	       resolve_node(env, root);
-	    }
-	 }
+          check_better_solution(env, root, FALSE, change_type);
+        }
+
+        if (root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION &&
+            root->bobj.child_num > 0) {
+          for (i = 0; i < root->bobj.child_num; i++) {
+            if (!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type)) {
+              deletable = FALSE;
+            }
+          }
+          if (change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0) {
+            update_branching_decisions(env, root, change_type);
+          }
+
+        } else {
+          if (root->node_status == NODE_STATUS__WSPRUNED)
+            root->node_status = NODE_STATUS__PRUNED;
+          else
+            root->node_status = NODE_STATUS__WARM_STARTED;
+          if (resolve == 0) {
+            root->lower_bound = -MAXDOUBLE;
+          } else {
+            resolve_node(env, root);
+          }
+        }
+        if (resolve == 0) {
+          root->feasibility_status = 0; // or? ROOT_NODE;
+        }
       }
+    } else {
+      if (root->bobj.child_num > 0) {
+        if (env->mip->var_type_modified) {
+          if (!env->mip->is_int[root->children[0]->bobj.name]) {
+            for (i = 0; i < root->bobj.child_num; i++) {
+              ws_free_subtree(env, root->children[i], change_type, TRUE, TRUE);
+            }
+            root->bobj.child_num = 0;
+            root->node_status = NODE_STATUS__WARM_STARTED;
+            if (resolve == 0) {
+              root->lower_bound = -MAXDOUBLE;
+            } else {
+              resolve_node(env, root);
+            }
+          }
+        } else {
+          if (change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0) {
+            update_branching_decisions(env, root, change_type);
+          }
+          for (i = 0; i < root->bobj.child_num; i++) {
+            if (!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type, resolve)) {
+              deletable = FALSE;
+            }
+          }
+        }
+      } else {
+        if (root->node_status == NODE_STATUS__WSPRUNED)
+          root->node_status = NODE_STATUS__PRUNED;
+        else
+          root->node_status = NODE_STATUS__WARM_STARTED;
+        if (resolve == 0) {
+          root->lower_bound = -MAXDOUBLE;
+        } else {
+          resolve_node(env, root);
+        }
+      }
+    }
 
-      /* should be before resolve!!!*/
-      if(change_type == COLS_ADDED){
-	 update_node_desc(env, root, change_type);
+    /* should be before resolve!!!*/
+    if (change_type == COLS_ADDED) {
+      update_node_desc(env, root, change_type);
+    }
+
+    if (env->warm_start->trim_tree == ON_CRU_VARS) {
+      if (deletable && root->bobj.child_num) {
+        for (i = 0; i < root->bobj.child_num; i++) {
+          ws_free_subtree(env, root->children[i], change_type, FALSE, TRUE);
+        }
+        root->node_status = NODE_STATUS__WARM_STARTED;
+        if (resolve == 0) {
+          root->lower_bound = -MAXDOUBLE;
+        } else {
+          resolve_node(env, root);
+        }
+        root->bobj.child_num = 0;
+        if (root->bc_level) {
+          if (cru_vars[root->parent->bobj.name]) {
+            deletable = FALSE;
+          }
+        }
       }
-      
-      if(env->warm_start->trim_tree == ON_CRU_VARS){
-	 if(deletable && root->bobj.child_num){
-	    for(i = 0; i<root->bobj.child_num; i++){
-	       ws_free_subtree(env, root->children[i], change_type, FALSE, TRUE);
-	    }
-	    root->node_status = NODE_STATUS__WARM_STARTED; 
-	    if(resolve == 0){
-	       root->lower_bound = -MAXDOUBLE;
-	    }else{
-	       resolve_node(env, root);
-	    }
-	    root->bobj.child_num = 0;
-	    if(root->bc_level){
-	       if(cru_vars[root->parent->bobj.name]){
-		  deletable = FALSE;
-	       }
-	    }
-	 }
-	 if(!deletable && root->bobj.child_num){
-	    for(i = 0; i<root->bobj.child_num; i++){
-	       register_cuts(root->children[i], cut_num, cuts_ind);
-	    }
-	 }
-	 if(root->bc_level){
-	    if(cru_vars[root->parent->bobj.name]){
-	       deletable = FALSE;
-	    }
-	 }
+      if (!deletable && root->bobj.child_num) {
+        for (i = 0; i < root->bobj.child_num; i++) {
+          register_cuts(root->children[i], cut_num, cuts_ind);
+        }
       }
-   }
-   return deletable;
+      if (root->bc_level) {
+        if (cru_vars[root->parent->bobj.name]) {
+          deletable = FALSE;
+        }
+      }
+    }
+  }
+  return deletable;
 }
 
 /*===========================================================================*/

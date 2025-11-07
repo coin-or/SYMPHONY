@@ -1204,6 +1204,7 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
       tm->cut_num = env->warm_start->cut_num;
       tm->allocated_cut_num = env->warm_start->allocated_cut_num;
       tm->stat = env->warm_start->stat;
+      tm->lp_stat = env->warm_start->lp_stat;
       tm->comp_times = env->warm_start->comp_times;
       tm->lb = env->warm_start->lb;
 #if 0
@@ -1455,6 +1456,8 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    env->warm_start->cut_num = env->tm->cut_num;
    env->warm_start->allocated_cut_num = env->tm->allocated_cut_num;
    env->warm_start->stat = tm->stat;
+   env->warm_start->lp_stat = tm->lp_stat;
+   env->warm_start->comp_times = tm->comp_times;
    env->warm_start->phase = tm->phase;
    env->warm_start->lb = tm->lb;
    if ((env->warm_start->has_ub = tm->has_ub)!=0){
@@ -1725,278 +1728,278 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 
 /*===========================================================================*/
 /*===========================================================================*/
-SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
-{
+SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env) {
 
-   int i, change_type;
-   int node_limit, analyzed, depth, index, rated, level, level_rated;
-   cut_data **upd_cuts;
-   int loc, ws_cnum, cut_num = 0, *cut_ind = NULL, *tmp_ind = NULL;
-   /* first check for the updates! */
-   char *cru_vars = NULL; 
-   double etol = 1e-04;
+  int i, change_type;
+  int node_limit, analyzed, depth, index, rated, level, level_rated;
+  cut_data **upd_cuts;
+  int loc, ws_cnum, cut_num = 0, *cut_ind = NULL, *tmp_ind = NULL;
+  /* first check for the updates! */
+  char *cru_vars = NULL;
+  double etol = 1e-04;
 
-   if(env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY){
+  if (env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY) {
 
-      return(sym_solve(env));
-      
-   }else{
-      
-      if (env->warm_start){
-         env->par.tm_par.warm_start = TRUE;
+    return (sym_solve(env));
+
+  } else {
+
+    if (env->warm_start) {
+      env->par.tm_par.warm_start = TRUE;
+    } else {
+      return (sym_solve(env));
+    }
+
+    if (env->mip->change_num) {
+      env->has_ub = env->has_ub_estimate =
+      env->best_sol.has_sol = FALSE;
+      env->ub = env->warm_start->ub = 0.0;
+      env->lb = env->warm_start->lb = -MAXDOUBLE;
+    } else {
+      env->has_ub = env->warm_start->has_ub;
+      env->ub = env->warm_start->ub;
+      env->lb = env->warm_start->lb;
+    }
+
+    //check stored solution for feasibility
+    if (env->sp) {
+      env->warm_start->has_ub =
+      env->warm_start->best_sol.has_sol = FALSE;
+      env->warm_start->best_sol.objval = 0.0;
+      env->warm_start->best_sol.xlength = 0;
+      FREE(env->warm_start->best_sol.xind);
+      FREE(env->warm_start->best_sol.xval);
+
+      /* Solution in sp are in the original space */
+      double min = SYM_INFINITY;
+      lp_sol sol;
+      int min_ind = -1;
+      /* Find the best feasible solution in the pool */
+      for (i = 0; i < env->sp->num_solutions; i++) {
+        sol.xlength = env->sp->solutions[i]->xlength;
+        sol.xind = env->sp->solutions[i]->xind;
+        sol.xval = env->sp->solutions[i]->xval;
+        if (check_solution(env, &sol) > 0) {
+          if ((env->sp->solutions[i]->objval = sol.objval) < min) {
+            min = env->sp->solutions[i]->objval;
+            min_ind = i;
+          }
+        }
+      }
+      /* Set the best feasible solution as primal bound */
+      if (min < SYM_INFINITY) {
+        double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+        for (int j = 0; j < env->sp->solutions[min_ind]->xlength; j++) {
+          assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
+          tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
+              env->sp->solutions[min_ind]->xval[j];
+        }
+        sym_set_col_solution(env, tmp_sol);
+        FREE(tmp_sol);
+        env->warm_start->has_ub = env->best_sol.has_sol =
+        env->warm_start->best_sol.has_sol = TRUE;
+        env->warm_start->ub = env->warm_start->best_sol.objval = min;
+      }
+    } else {
+      /* Otherwise, check the env->warm_start->best_sol */
+      if (check_solution(env, &env->warm_start->best_sol) <= 0) {
+        env->warm_start->has_ub =
+        env->warm_start->best_sol.has_sol = FALSE;
+        env->warm_start->best_sol.objval = 0.0;
+        env->warm_start->best_sol.xlength = 0;
+        FREE(env->warm_start->best_sol.xind);
+        FREE(env->warm_start->best_sol.xval);
       } else {
-         return(sym_solve(env));
+        /* env->warm_start->best_sol is feasible */
+        int xlen = env->warm_start->best_sol.xlength;
+        env->has_ub = env->has_ub_estimate =
+        env->warm_start->has_ub =
+        env->warm_start->best_sol.has_sol = TRUE;
+        env->ub = env->ub_estimate =
+        env->warm_start->ub =
+            env->warm_start->best_sol.objval;
+        FREE(env->best_sol.xind);
+        FREE(env->best_sol.xval);
+        memcpy(&env->best_sol, &env->warm_start->best_sol, sizeof(lp_sol));
+        if (xlen) {
+          env->best_sol.xind = (int *) malloc(xlen * ISIZE);
+          memcpy(env->best_sol.xind,
+                 env->warm_start->best_sol.xind,
+                 xlen * ISIZE);
+          env->best_sol.xval = (double *) malloc(xlen * DSIZE);
+          memcpy(env->best_sol.xval,
+                 env->warm_start->best_sol.xval,
+                 xlen * DSIZE);
+        }
       }
-      
-      if(env->mip->change_num){
-         env->has_ub = env->has_ub_estimate =
-            env->best_sol.has_sol = FALSE;
-         env->ub = env->warm_start->ub = 0.0;
-         env->lb = env->warm_start->lb = -MAXDOUBLE;
+    }
+
+    if (env->par.multi_criteria) {
+      env->has_ub = env->has_mc_ub;
+      env->ub = env->mc_ub;
+    }
+
+    for (i = 0; i < env->mip->change_num; i++) {
+      change_type = env->mip->change_type[i];
+      if (change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED ||
+          change_type == OBJ_COEFF_CHANGED || change_type == COLS_ADDED) {
+
+        if (change_type == OBJ_COEFF_CHANGED) {
+          if (env->par.lp_par.do_reduced_cost_fixing && !env->par.multi_criteria) {
+            printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
+            printf("obj coeff change when reduced cost fixing is on,");
+            printf("for now!\n");
+            return (FUNCTION_TERMINATED_ABNORMALLY);
+          }
+        } else if (change_type == COL_BOUNDS_CHANGED) {
+          int prob_type;
+          if (env->prep_mip) {
+            prob_type = env->prep_mip->mip_inf->prob_type;
+          } else {
+            prob_type = env->mip->mip_inf->prob_type;
+          }
+          if (env->par.lp_par.cgl.generate_cgl_cuts &&
+              prob_type != BINARY_TYPE &&
+              prob_type != BIN_CONT_TYPE &&
+              prob_type != BIN_INT_TYPE) {
+            printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
+            printf("column bound changes when cuts exist unless the\n");
+            printf("problem is binary\n");
+            return (FUNCTION_TERMINATED_ABNORMALLY);
+          }
+        } else if (change_type == RHS_CHANGED) {
+          if (env->par.lp_par.cgl.generate_cgl_cuts) {
+            printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
+            printf("RHS changes when cuts exist\n");
+            return (FUNCTION_TERMINATED_ABNORMALLY);
+          }
+        }
+
+        if (!env->mip->cru_vars_num) {
+          analyzed = env->warm_start->stat.analyzed;
+          depth = env->warm_start->stat.max_depth;
+          rated = (int) (env->par.tm_par.warm_start_node_ratio * analyzed);
+          level_rated = (int) (env->par.tm_par.warm_start_node_level_ratio * depth);
+          node_limit = env->par.tm_par.warm_start_node_limit;
+          level = env->par.tm_par.warm_start_node_level;
+          index = node_limit <= rated ? node_limit : rated;
+          level = level <= level_rated ? level : level_rated;
+
+          if ((level > 0 && level < depth) || index > 0) {
+            if (level > 0 && level < depth) {
+              env->warm_start->trim_tree = TRIM_LEVEL;
+              env->warm_start->trim_tree_level = level;
+              //cut_ws_tree_level(env, env->warm_start->rootnode, level,
+              //	    &(env->warm_start->stat), change_type);
+              env->warm_start->stat.max_depth = level;
+            } else {
+              if (index < analyzed) {
+                if (!index) index = 1;
+                env->warm_start->trim_tree = TRIM_INDEX;
+                env->warm_start->trim_tree_index = index;
+                //   cut_ws_tree_index(env, env->warm_start->rootnode, index,
+                //	       &(env->warm_start->stat), change_type);
+              }
+            }
+          }
+        } else {
+          env->warm_start->trim_tree = ON_CRU_VARS;
+          cru_vars = (char *) calloc(CSIZE, env->mip->n);
+          for (i = 0; i < env->mip->cru_vars_num; i++) {
+            cru_vars[env->mip->cru_vars[i]] = TRUE;
+          }
+        }
+
+        ws_cnum = env->warm_start->cut_num;
+        if (env->warm_start->trim_tree && ws_cnum) {
+          cut_ind = (int *) malloc(ISIZE * ws_cnum);
+          memset(cut_ind, -1, ISIZE * ws_cnum);
+        }
+        env->warm_start->stat.analyzed =
+        env->warm_start->stat.created =
+        env->warm_start->stat.tree_size = 1; //for root node */
+
+        double t = 0.0;
+        used_time(&t);
+        update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind,
+                          cru_vars, change_type, true);
+        env->warm_start->comp_times.lp = used_time(&t);
+
+        /* FIXME!!!! feasible solutions are getting lost in a sequence of warm-solve---
+           for a temporary fix, increase ub a litte... */
+        if (env->warm_start->has_ub) {
+          env->warm_start->ub += etol;
+        }
+
+        if (cut_num > 0) {
+          upd_cuts = (cut_data **) malloc(sizeof(cut_data *) * env->warm_start->allocated_cut_num);
+          tmp_ind = (int *) malloc(ISIZE * ws_cnum);
+          for (i = 0; i < ws_cnum; i++) {
+            tmp_ind[i] = i;
+          }
+          qsort_ii(cut_ind, tmp_ind, ws_cnum);
+
+          for (i = 0; i < cut_num; i++) {
+            loc = tmp_ind[ws_cnum - cut_num + i];
+            upd_cuts[i] = env->warm_start->cuts[loc];
+            upd_cuts[i]->name = i;
+            env->warm_start->cuts[loc] = 0;
+          }
+          for (i = env->warm_start->cut_num - 1; i >= 0; i--) {
+            if (env->warm_start->cuts[i]) {
+              FREE(env->warm_start->cuts[i]->coef);
+            }
+            FREE(env->warm_start->cuts[i]);
+          }
+          FREE(env->warm_start->cuts);
+          env->warm_start->cuts = upd_cuts;
+          env->warm_start->cut_num = cut_num;
+        } else {
+          if (env->warm_start->trim_tree && env->warm_start->cut_num) {
+            for (i = env->warm_start->cut_num - 1; i >= 0; i--) {
+              if (env->warm_start->cuts[i]) {
+                FREE(env->warm_start->cuts[i]->coef);
+              }
+              FREE(env->warm_start->cuts[i]);
+            }
+            //	  FREE(env->warm_start->cuts);
+            //env->warm_start->cuts = 0;
+            env->warm_start->cut_num = 0;
+          }
+        }
+
+#ifdef USE_SYM_APPLICATION
+        cut_data * cut;
+        if(change_type == COLS_ADDED || change_type == RHS_CHANGED){
+           for(i = 0; i < env->warm_start->cut_num; i++){
+        cut = env->warm_start->cuts[i];
+        user_ws_update_cuts(env->user, &(cut->size), &(cut->coef),
+                &(cut->rhs), &(cut->sense), cut->type,
+                env->mip->new_col_num,
+                change_type);
+           }
+        }
+#endif
       } else {
-         env->has_ub = env->warm_start->has_ub;
-         env->ub = env->warm_start->ub;
-         env->lb = env->warm_start->lb;
+        printf("sym_warm_solve():");
+        printf("Unable to re-solve this type of modification,for now!\n");
+        return (FUNCTION_TERMINATED_ABNORMALLY);
       }
+    }
+  }
 
-      //check stored solution for feasibility
-      if (env->sp) {
-         env->warm_start->has_ub = 
-            env->warm_start->best_sol.has_sol = FALSE;
-         env->warm_start->best_sol.objval = 0.0;
-         env->warm_start->best_sol.xlength = 0;
-         FREE(env->warm_start->best_sol.xind);
-         FREE(env->warm_start->best_sol.xval);
-
-         /* Solution in sp are in the original space */
-         double min = SYM_INFINITY;
-         lp_sol sol;
-         int min_ind = -1;
-         /* Find the best feasible solution in the pool */
-         for (i = 0; i < env->sp->num_solutions; i++){
-            sol.xlength = env->sp->solutions[i]->xlength;
-            sol.xind = env->sp->solutions[i]->xind;
-            sol.xval = env->sp->solutions[i]->xval;
-            if (check_solution(env, &sol) > 0){
-               if ((env->sp->solutions[i]->objval = sol.objval) < min){
-                  min = env->sp->solutions[i]->objval;
-                  min_ind = i;
-               }
-            }
-         }
-         /* Set the best feasible solution as primal bound */
-         if (min < SYM_INFINITY){
-            double *tmp_sol = (double *) calloc(env->mip->n, DSIZE);
-            for (int j=0; j < env->sp->solutions[min_ind]->xlength; j++){
-               assert(env->sp->solutions[min_ind]->xind[j] < env->mip->n);
-               tmp_sol[env->sp->solutions[min_ind]->xind[j]] =
-                  env->sp->solutions[min_ind]->xval[j];
-            }
-            sym_set_col_solution(env, tmp_sol);
-            FREE(tmp_sol);
-            env->warm_start->has_ub = env->best_sol.has_sol = 
-               env->warm_start->best_sol.has_sol = TRUE;
-            env->warm_start->ub = env->warm_start->best_sol.objval = min;
-         }
-      } else {
-         /* Otherwise, check the env->warm_start->best_sol */
-         if (check_solution(env, &env->warm_start->best_sol) <= 0){
-            env->warm_start->has_ub = 
-               env->warm_start->best_sol.has_sol = FALSE;
-            env->warm_start->best_sol.objval = 0.0;
-            env->warm_start->best_sol.xlength = 0;
-            FREE(env->warm_start->best_sol.xind);
-            FREE(env->warm_start->best_sol.xval);
-         } else { 
-            /* env->warm_start->best_sol is feasible */
-            int xlen = env->warm_start->best_sol.xlength;
-            env->has_ub = env->has_ub_estimate = 
-               env->warm_start->has_ub = 
-               env->warm_start->best_sol.has_sol = TRUE;
-            env->ub = env->ub_estimate = 
-               env->warm_start->ub =
-               env->warm_start->best_sol.objval;
-            FREE(env->best_sol.xind);
-            FREE(env->best_sol.xval);
-            memcpy(&env->best_sol, &env->warm_start->best_sol, sizeof(lp_sol));
-            if (xlen){
-               env->best_sol.xind = (int *) malloc(xlen * ISIZE);
-               memcpy(env->best_sol.xind,
-                     env->warm_start->best_sol.xind,
-                     xlen * ISIZE);
-               env->best_sol.xval = (double *) malloc(xlen * DSIZE);
-               memcpy(env->best_sol.xval,
-                     env->warm_start->best_sol.xval,
-                     xlen * DSIZE);
-            }
-         }
-      }
-
-      if(env->par.multi_criteria){
-	 env->has_ub = env->has_mc_ub;
-	 env->ub = env->mc_ub;
-      }
-      
-      for(i = 0; i < env->mip->change_num; i++){
-	 change_type = env->mip->change_type[i];
-	 if(change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED || 
-	    change_type == OBJ_COEFF_CHANGED || change_type == COLS_ADDED){
-
-	    if(change_type == OBJ_COEFF_CHANGED){
-	       if(env->par.lp_par.do_reduced_cost_fixing && !env->par.multi_criteria){		 
-		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
-		  printf("obj coeff change when reduced cost fixing is on,"); 
-		  printf("for now!\n"); 
-		  return(FUNCTION_TERMINATED_ABNORMALLY);   
-	       }
-	    } else if (change_type == COL_BOUNDS_CHANGED){
-	       int prob_type;
-	       if (env->prep_mip){
-		  prob_type = env->prep_mip->mip_inf->prob_type;
-	       }else{
-		  prob_type = env->mip->mip_inf->prob_type;
-	       }
-	       if(env->par.lp_par.cgl.generate_cgl_cuts &&
-		  prob_type != BINARY_TYPE &&
-		  prob_type != BIN_CONT_TYPE &&
-		  prob_type != BIN_INT_TYPE){
-		  printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
-		  printf("column bound changes when cuts exist unless the\n");
-		  printf("problem is binary\n");
-		  return(FUNCTION_TERMINATED_ABNORMALLY);
-	       } 
-	    } else if (change_type == RHS_CHANGED){
-	       if(env->par.lp_par.cgl.generate_cgl_cuts){ 
-		  printf("sym_warm_solve(): SYMPHONY can not resolve for\n");
-		  printf("RHS changes when cuts exist\n");
-		  return(FUNCTION_TERMINATED_ABNORMALLY);
-	       } 
-	    }
-
-	    if(!env->mip->cru_vars_num){
-	       analyzed = env->warm_start->stat.analyzed;
-	       depth = env->warm_start->stat.max_depth;
-	       rated = (int)(env->par.tm_par.warm_start_node_ratio * analyzed);
-	       level_rated = (int)(env->par.tm_par.warm_start_node_level_ratio * depth); 
-	       node_limit = env->par.tm_par.warm_start_node_limit;      
-	       level = env->par.tm_par.warm_start_node_level;
-	       index = node_limit <= rated ? node_limit : rated ;
-	       level = level <= level_rated ? level : level_rated;
-	       
-	       if ((level > 0 && level < depth) || index > 0) {
-		  if ( level > 0 && level < depth) {
-		     env->warm_start->trim_tree = TRIM_LEVEL;		  
-		     env->warm_start->trim_tree_level = level;
-		     //cut_ws_tree_level(env, env->warm_start->rootnode, level, 
-		     //	    &(env->warm_start->stat), change_type);	 
-		     env->warm_start->stat.max_depth = level;
-		  } else {
-		     if (index < analyzed) {
-			if (!index) index = 1; 
-			env->warm_start->trim_tree = TRIM_INDEX;		  
-			env->warm_start->trim_tree_index = index;
-			//   cut_ws_tree_index(env, env->warm_start->rootnode, index,
-			//	       &(env->warm_start->stat), change_type);
-		     }
-		  }	    
-	       }	       
-	    }else{
-	       env->warm_start->trim_tree = ON_CRU_VARS;
-	       cru_vars = (char *)calloc(CSIZE,env->mip->n);
-	       for(i = 0; i < env->mip->cru_vars_num; i++){
-		  cru_vars[env->mip->cru_vars[i]] = TRUE;
-	       }	       
-	    }
-	    
-	    ws_cnum = env->warm_start->cut_num; 
-	    if(env->warm_start->trim_tree && ws_cnum){
-	       cut_ind = (int *)malloc(ISIZE*ws_cnum);
-	       memset(cut_ind, -1, ISIZE*ws_cnum);
-	    }
-	    env->warm_start->stat.analyzed = 
-	       env->warm_start->stat.created =
-	       env->warm_start->stat.tree_size = 1; //for root node */	   
-
-      double prev_lb = find_ws_lb(env->warm_start->rootnode);
-	    update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind,
-                              cru_vars, change_type, true);
-      double warm_start_lb = find_ws_lb(env->warm_start->rootnode);
-
-	    /* FIXME!!!! feasible solutions are getting lost in a sequence of warm-solve---
-	       for a temporary fix, increase ub a litte... */
-	    if(env->warm_start->has_ub){
-	       env->warm_start->ub += etol;
-	    }
-	    
-	    if (cut_num > 0){
-	       upd_cuts = (cut_data **)malloc(sizeof(cut_data *)*env->warm_start->allocated_cut_num);
-	       tmp_ind = (int *)malloc(ISIZE*ws_cnum);
-	       for(i = 0; i < ws_cnum; i++){
-		  tmp_ind[i] = i;
-	       }
-	       qsort_ii(cut_ind, tmp_ind, ws_cnum);
-	       
-	       for(i = 0; i < cut_num; i++){
-		  loc = tmp_ind[ws_cnum - cut_num + i];
-		  upd_cuts[i] = env->warm_start->cuts[loc];
-		  upd_cuts[i]->name = i;
-		  env->warm_start->cuts[loc] = 0;
-	       }
-	       for (i = env->warm_start->cut_num - 1; i >= 0; i--){
-		  if (env->warm_start->cuts[i]){
-		     FREE(env->warm_start->cuts[i]->coef);
-		  }
-		  FREE(env->warm_start->cuts[i]);
-	       }
-	       FREE(env->warm_start->cuts);
-	       env->warm_start->cuts = upd_cuts; 
-	       env->warm_start->cut_num = cut_num;
-	    } else{
-	       if(env->warm_start->trim_tree && env->warm_start->cut_num){	    
-		  for (i = env->warm_start->cut_num - 1; i >= 0; i--){
-		     if (env->warm_start->cuts[i]){
-			FREE(env->warm_start->cuts[i]->coef);
-		     }
-		     FREE(env->warm_start->cuts[i]);
-		  }
-		  //	  FREE(env->warm_start->cuts);
-		  //env->warm_start->cuts = 0; 
-		  env->warm_start->cut_num = 0;		  
-	       }
-	    }
-
-#ifdef USE_SYM_APPLICATION 
-	    cut_data * cut;
-	    if(change_type == COLS_ADDED || change_type == RHS_CHANGED){
-	       for(i = 0; i < env->warm_start->cut_num; i++){
-		  cut = env->warm_start->cuts[i];
-		  user_ws_update_cuts(env->user, &(cut->size), &(cut->coef), 
-				      &(cut->rhs), &(cut->sense), cut->type, 
-				      env->mip->new_col_num,  
-				      change_type);
-	       }
-	    }
-#endif	    
-	 } else{
-	    printf("sym_warm_solve():");
-	    printf("Unable to re-solve this type of modification,for now!\n");
-	    return(FUNCTION_TERMINATED_ABNORMALLY); 
-	 }
-      }
-   }
-
-   /* Uncommented for now! */
-#if 0 
-   if (env->par.trim_warm_tree) {
-      trim_warm_tree(env, env->warm_start->rootnode);
-   }
+  /* Uncommented for now! */
+#if 0
+  if (env->par.trim_warm_tree) {
+     trim_warm_tree(env, env->warm_start->rootnode);
+  }
 #endif
 
-   FREE(cru_vars);
-   FREE(cut_ind);
-   FREE(tmp_ind);
-   
-   return(sym_solve(env));
+  FREE(cru_vars);
+  FREE(cut_ind);
+  FREE(tmp_ind);
+
+  return (sym_solve(env));
 }
 
 /*===========================================================================*/
