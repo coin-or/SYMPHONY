@@ -919,6 +919,7 @@ typedef struct WARM_START_DESC{
    char           trim_tree;
    int            trim_tree_level;
    int            trim_tree_index;
+   int            force_resolve_tree;
 }warm_start_desc;
 
 /*===========================================================================*/

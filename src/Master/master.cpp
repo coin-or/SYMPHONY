@@ -1922,7 +1922,7 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env) {
         double t = 0.0;
         used_time(&t);
         update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind,
-                          cru_vars, change_type, true);
+                          cru_vars, change_type, env->warm_start->force_resolve_tree);
         env->warm_start->comp_times.lp = used_time(&t);
 
         /* FIXME!!!! feasible solutions are getting lost in a sequence of warm-solve---
