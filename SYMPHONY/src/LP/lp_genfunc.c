@@ -513,6 +513,9 @@ OPENMP_ATOMIC_UPDATE
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
       feas_status = is_feasible_u(p, FALSE, FALSE);
+      if (feas_status == ERROR__NUMERICAL_INSTABILITY){
+	 return(ERROR__NUMERICAL_INSTABILITY);
+      }
       if (feas_status == IP_FEASIBLE ||
 	  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
 	cuts = -1;
@@ -892,7 +895,7 @@ int repricing(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
    node_times *comp_times = &p->comp_times;
-   int iterd, termcode;
+   int iterd, termcode, feas_status;
    int num_errors = 0;
    our_col_set *new_cols = NULL;
    int dual_feas, new_vars, cuts, no_more_cuts_count;
@@ -975,7 +978,11 @@ int repricing(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p, FALSE, FALSE) == IP_FEASIBLE){
+      feas_status = is_feasible_u(p, FALSE, FALSE);
+      if (feas_status == ERROR__NUMERICAL_INSTABILITY){
+	 return(ERROR__NUMERICAL_INSTABILITY);
+      }
+      if (feas_status == IP_FEASIBLE){
 	 if (p->par.verbosity > 2){
 	    printf ("Now displaying the feasible solution ...\n");
 	    display_lp_solution_u(p, DISP_FEAS_SOLUTION);

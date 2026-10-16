@@ -814,8 +814,10 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    double lpetol = lp_data->lpetol;
    //double lpetol100 = lpetol*100, lpetol1 = 1 - lpetol100;
    double lpetol100 = lpetol, lpetol1 = 1 - lpetol100;
+   /* how far an integer variable may be outside its current bounds */
+   double bndtol = lpetol*100;
    int *indices;
-   double *values, valuesi, *heur_solution = NULL, *col_sol = NULL, 
+   double *values, valuesi, fracx, *heur_solution = NULL, *col_sol = NULL,
           new_obj_val;
    int cnt, i, termcode;
    var_desc **vars = lp_data->vars;
@@ -893,9 +895,25 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 if (!vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 valuesi = x[i];
-	 if (valuesi-floor(valuesi) > lpetol100 &&
-	     ceil(valuesi)-valuesi > lpetol100 &&
-             valuesi>vars[i]->lb-lpetol && valuesi<vars[i]->ub+lpetol){
+	 /* The LP solver only enforces bounds up to its primal tolerance, so
+	  * a value can be slightly outside the current bounds (e.g., after a
+	  * column cut fixes a variable). Up to bndtol, treat it as at the
+	  * bound; further out, the LP solution is wrong. */
+	 if (valuesi < vars[i]->new_lb - bndtol ||
+	     valuesi > vars[i]->new_ub + bndtol){
+	    printf("####### Error: integer variable %i has LP value %.10g, "
+		   "outside its bounds [%g, %g] by more than %g.\n",
+		   vars[i]->userind, valuesi, vars[i]->new_lb,
+		   vars[i]->new_ub, bndtol);
+	    return(ERROR__NUMERICAL_INSTABILITY);
+	 }
+	 /* Use the same test as branch_close_to_half(), which only takes
+	  * variables strictly inside their current bounds. Calling any other
+	  * variable fractional here would make the node iterate forever
+	  * without branching. */
+	 fracx = valuesi - floor(valuesi);
+	 if (fracx > lpetol100 && fracx < lpetol1 &&
+	     valuesi > vars[i]->new_lb && valuesi < vars[i]->new_ub){
 	    break;
 	 }
       }
