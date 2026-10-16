@@ -1,6 +1,7 @@
 ---
 name: Linux build and test
 on:
+  workflow_dispatch:
   push:
     branches:
       - 'master'
@@ -18,31 +19,32 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
+        os: [ubuntu-22.04, ubuntu-24.04]
         build_static: [true, false]
-        download_requirements: [sudo apt install -y -qq gfortran liblapack-dev libmetis-dev libnauty2-dev]
+        download_requirements: [sudo apt install -y -qq gfortran liblapack-dev libmetis-dev libnauty-dev]
         include:
-          - os: macos-10.15
+          - os: macos-26-intel
             build_static: false
-            flags: CC=clang CXX=clang++ OSX=10.15
+            flags: CC=clang CXX=clang++
             download_requirements: brew install metis bash
-          - os: macos-10.15
+          - os: macos-26
             build_static: false
-            flags: CC=gcc-9 CXX=g++-9 OSX=10.15
+            flags: CC=gcc-15 CXX=g++-15 ADD_CXXFLAGS=-Wl,-ld_classic
             download_requirements: brew install metis bash
-          - os: macos-10.15
+          - os: macos-15
             build_static: false
-            flags: CC=gcc-10 CXX=g++-10 OSX=10.15
+            flags: CC=clang CXX=clang++
             download_requirements: brew install metis bash
+
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           path: ${{ github.event.repository.name }}
       - name: Install required packages from package manager
         run: ${{ matrix.download_requirements }}
       - name: Checkout coinbrew
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           repository: coin-or/coinbrew
           path: coinbrew
@@ -52,7 +54,7 @@ jobs:
           ADD_ARGS=()
           ADD_ARGS+=( --skip='ThirdParty/Metis ThirdParty/Mumps ThirdParty/Blas ThirdParty/Lapack' )
           ADD_BUILD_ARGS=()
-          ADD_BUILD_ARGS+=( --tests main --enable-relocatable --disable-mysql )
+          ADD_BUILD_ARGS+=( --tests main --enable-relocatable )
           ADD_BUILD_ARGS+=( --verbosity 2 )
           [[ ${{ matrix.build_static }} == "true" ]] && \
           ADD_BUILD_ARGS+=( --disable-shared )
@@ -69,11 +71,11 @@ jobs:
           cp ${{ github.event.repository.name }}/LICENSE dist/
           tar -czvf release.tar.gz -C dist .
       - name: Checkout package name generation script
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           repository: coin-or-tools/platform-analysis-tools
           path: tools
-          ref: 0.0.1
+          ref: 0.0.2
       - name: Retrieve platform info
         run: |
           python3 -m venv venv
@@ -83,10 +85,9 @@ jobs:
           platform_str=`python3 tools/hsf_get_platform.py -b $buildtype`
           echo "platform_string=${platform_str}" >> $GITHUB_ENV
       - name: Upload Artifact
-        if: ${{ github.event_name == 'pull_request'}}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v6
         with:
-          name: ${{ github.event.repository.name }}-${{ github.head_ref }}-${{ env.platform_string }}.tar.gz
+          name: ${{ github.event.repository.name }}-${{ env.platform_string }}.tar.gz
           path: release.tar.gz
           if-no-files-found: error
       - name: Upload package to release
