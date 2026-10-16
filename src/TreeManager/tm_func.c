@@ -592,8 +592,13 @@ OPENMP_ATOMIC_WRITE
 	   }
 	}
 	if (ii == tm->par.max_active_nodes){
+	   /* If processing the last node ended in an error (the TM_ERROR__*
+	    * codes are negative), keep that code. TM_FINISHED would report
+	    * the solve as optimal. */
+	   if (tm->termcode >= 0 && tm->termcode != SOMETHING_DIED){
 OPENMP_ATOMIC_WRITE
-	   tm->termcode = TM_FINISHED;
+	      tm->termcode = TM_FINISHED;
+	   }
 	}else{
 	   if (now - then2 > timeout2){
 	      if(tm->par.verbosity >=0 ){
