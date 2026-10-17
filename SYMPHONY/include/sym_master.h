@@ -51,6 +51,10 @@ typedef struct SYM_ENVIRONMENT{
    double           ub_estimate;
    double           lb;   
    double           obj_offset;
+   char             granularity_auto; /* TRUE if the granularity was detected
+                                         from the objective in sym_solve() and
+                                         not set by the user, so it has to be
+                                         detected again in the next solve */
 
    MIPdesc         *mip; /*For holding the description when read in from MPS
 			   - also the working copy */
