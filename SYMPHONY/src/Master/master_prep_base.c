@@ -2316,6 +2316,14 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc)
    } 
    
    if (row_lb_improved || row_ub_improved){
+      /* round the new bound of an integer variable, as in
+         prep_improve_variable() and prep_integerize_bounds() */
+      if (mip->is_int[col_ind] ||
+          mip->mip_inf->cols[col_ind].var_type == 'Z'){
+         new_bound = prep_rnd_integral(new_bound, etol,
+                                       fix_type == IMPROVE_UB ?
+                                       RND_FLOOR : RND_CEIL);
+      }
       //ub[col_ind] = old_ub;
       //lb[col_ind] = old_lb;
       
