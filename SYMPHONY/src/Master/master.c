@@ -1078,11 +1078,13 @@ int sym_solve(sym_environment *env)
    /* 
     * set granularity. 
     * TODO: move this to preprocessor when it becomes available
-    * TODO: put a new flag that checks if user wants to override this
+    * The granularity is detected again in every solve, unless it was set by
+    * the user, as the objective may have changed since the last solve.
     * TODO: find if granularity could be 0.1 or 0.2 or ... instead of just
     *       1.0, 2.0, ...
     */
-   if (env->mip && env->mip->obj && env->par.tm_par.granularity<=1e-7) {
+   if (env->mip && env->mip->obj &&
+       (env->par.tm_par.granularity<=1e-7 || env->granularity_auto)) {
       for (int i=0;i<env->mip->n;i++) {
          double coeff = env->mip->obj[i];
          if (fabs(coeff)> 1e-7) {
@@ -1105,6 +1107,7 @@ int sym_solve(sym_environment *env)
        */
       env->par.tm_par.granularity = env->par.lp_par.granularity = 
          fabs((double)granularity - 1e-7); //Anahita
+      env->granularity_auto = TRUE;
    }
    PRINT(env->par.verbosity, 0, ("granularity set at %f\n",
             env->par.tm_par.granularity));
@@ -2079,6 +2082,7 @@ int sym_mc_solve(sym_environment *env)
    }
    env->par.tm_par.granularity = env->par.lp_par.granularity =
       -MAX(env->par.lp_par.mc_rho, compare_sol_tol);
+   env->granularity_auto = FALSE;
    
    if (env->par.mc_binary_search_tolerance > 0){
       binary_search = TRUE;
