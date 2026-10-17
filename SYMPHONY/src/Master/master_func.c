@@ -1891,6 +1891,7 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "granularity") == 0){
       READ_DBL_PAR(tm_par->granularity);
       lp_par->granularity = tm_par->granularity;
+      env->granularity_auto = FALSE;
       return(0);
    }
    
@@ -2126,6 +2127,7 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "TM_granularity") == 0){
       READ_DBL_PAR(tm_par->granularity);
       lp_par->granularity = tm_par->granularity;
+      env->granularity_auto = FALSE;
       return(0);
    }
    else if (strcmp(key, "lp_executable_name") == 0 ||
@@ -2418,6 +2420,7 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "LP_granularity") == 0){
       READ_DBL_PAR(lp_par->granularity);
       tm_par->granularity = lp_par->granularity;
+      env->granularity_auto = FALSE;
       return(0);
    }
    else if (strcmp(key, "debug_lp") == 0 ||
