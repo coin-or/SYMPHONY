@@ -242,14 +242,14 @@ callable library in this way, see the Examples/ subdirectory.
 ## DEVELOPING CUSTOM APPLICATIONS
 
 To customize SYMPHONY by implementing the custom callback functions, simply
-modify the files in the SYMPHONY/Applications/USER/ subdirectory, as described
+modify the files in the Applications/USER/ subdirectory, as described
 in the user's manual and follow the compilation procedures in the file
-SYMPHONY/Applications/USER/README. There are a number of sample applications
+Applications/USER/README. There are a number of sample applications
 available as examples of how to do this kind of development with SYMPHONY.
 These include solvers for the matching problem, the set partitioning problem
 (simple and advanced versions), the vehicle routing and traveling salesman
-problems, and the mixed postman problem. These applications are distributed as
-separate packages and can be downloaded from http://www.branchandcut.org.
+problems, and the mixed postman problem. These applications are in the
+Applications/ subdirectory.
 There is a white paper that guides the user through the development of the
 matching solver.
 
@@ -321,7 +321,7 @@ that fixes the problem.
 ## ADDITIONAL DOCUMENTATION
 
 If you have downloaded a source distribution, LaTex source for the full
-documentation is available in the SYMPHONY/Doc/ subdirectory. Quick start
+documentation is available in the Doc/ subdirectory. Quick start
 guides and pointers to other on-line documentation can be found below.
 
 The PDF version of the manual is available here:
