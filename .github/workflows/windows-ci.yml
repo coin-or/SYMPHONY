@@ -70,11 +70,12 @@ jobs:
       # Windows-style paths (D:/...), with which libtool sets up a broken PATH
       # for running the tests. gcc-fortran is installed because some configure
       # scripts look for a Fortran compiler, and the runner's does not work
-      # with MSYS2's gcc.
+      # with MSYS2's gcc. libgomp has been a separate package since MSYS2 split
+      # its gcc package; without it, linking SYMPHONY's OpenMP code fails.
       - name: Install requirements
         if: ${{ matrix.arch != 'msvc' }}
         run: |
-          pacman -S --noconfirm --needed ${MINGW_PACKAGE_PREFIX}-gcc ${MINGW_PACKAGE_PREFIX}-gcc-fortran pkgconf ${MINGW_PACKAGE_PREFIX}-lapack ${MINGW_PACKAGE_PREFIX}-winpthreads ${MINGW_PACKAGE_PREFIX}-readline ${MINGW_PACKAGE_PREFIX}-suitesparse ${MINGW_PACKAGE_PREFIX}-metis
+          pacman -S --noconfirm --needed ${MINGW_PACKAGE_PREFIX}-gcc ${MINGW_PACKAGE_PREFIX}-libgomp ${MINGW_PACKAGE_PREFIX}-gcc-fortran pkgconf ${MINGW_PACKAGE_PREFIX}-lapack ${MINGW_PACKAGE_PREFIX}-winpthreads ${MINGW_PACKAGE_PREFIX}-readline ${MINGW_PACKAGE_PREFIX}-suitesparse ${MINGW_PACKAGE_PREFIX}-metis
         shell: msys2 {0}
       - name: Build project
         run: |
