@@ -18,6 +18,13 @@ popd > /dev/null
 
 create_variables $SCRIPT_DIR/config.yml
 
+# Binary packages of this project that make_build_info lists (see
+# make_binary_packages in coinbrew's scripts/generate_readme)
+Package_Repology="coin-or-symphony"
+Package_Debian="coinor-symphony coinor-libsymphony-dev"
+Package_FreeBSD="math/symphony"
+Package_Homebrew="symphony"
+
 make_header
 
 echo "SYMPHONY is an open-source generic MILP solver, callable library, and

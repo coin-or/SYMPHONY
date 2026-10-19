@@ -57,7 +57,7 @@ available [here](https://coin-or.github.io/user_introduction.html).
 
 There is a Docker image that provides SYMPHONY, as well as other projects
 in the [COIN-OR Optimization
-Suite](https://github.com/coin-or/COIN-OR-OptimizationSuite) [here](https://hub.docker.com/repository/docker/coinor/coin-or-optimization-suite)
+Suite](https://github.com/coin-or/COIN-OR-OptimizationSuite) [here](https://hub.docker.com/r/coinor/coin-or-optimization-suite).
 
 ### Binaries
 
@@ -67,43 +67,35 @@ releases in Github
 are archived as part of SYMPHONY
 [here](https://www.coin-or.org/download/binary/SYMPHONY).
 
- * *Linux* (see https://repology.org/project/coin-or-symphony/versions for a complete listing): 
-   * arch:
+ * *Linux* (see https://repology.org/project/coin-or-symphony/versions for a complete listing):
+   * Debian and Ubuntu:
      ```
-     $ sudo pacman -S  coin-or-symphony
+     sudo apt install coinor-symphony coinor-libsymphony-dev
      ```
-   * Debian/Ubuntu:
-     ```
-     $ sudo apt-get install  coinor-symphony coinor-libsymphony-dev
-     ```
-   * Fedora/Redhat/CentOS:
-     ```
-     $ sudo yum install  coin-or-SYMPHONY coin-or-SYMPHONY-devel
-     ```
-   * freebsd:
-     ```
-     $ sudo pkg install math/symphony
-     ```
-   * linuxbrew:
-     ```
-     $ brew install symphony
-     ```
+ * *FreeBSD*:
+   ```
+   sudo pkg install math/symphony
+   ```
+ * *macOS and Linux*: With [Homebrew](https://brew.sh), from the
+   [COIN-OR tap](https://github.com/coin-or-tools/homebrew-coinor), do
+   ```
+   brew update
+   brew tap coin-or-tools/coinor
+   brew trust coin-or-tools/coinor
+   brew install coin-or-tools/coinor/symphony
+   ```
+   Since version 6.0, Homebrew loads formulas from taps other than its own
+   only if you trust them. `brew trust coin-or-tools/coinor` trusts all
+   formulas of the COIN-OR tap. This is needed because installing a formula by
+   its full name trusts only that formula, not the other formulas of the tap
+   that it depends on. `brew update` makes sure that your Homebrew is recent
+   enough to have the `brew trust` command.
  * *Windows*: The easiest way to get SYMPHONY on Windows is to download an archive as described above.
- * *Mac OS X*: The easiest way to get SYMPHONY on Mac OS X is through [Homebrew](https://brew.sh).
-     ```
-     $ brew tap coin-or-tools/coinor
-     $ brew install coin-or-tools/coinor/symphony
-     ```
-
-* *conda* (cross-platform, no Windows for now):
-     ```
-     $ conda install coin-or-symphony
-     ```
 
 Due to license incompatibilities, pre-compiled binaries lack some 
 functionality. If binaries are not available for your platform for the latest 
 version and you would like to request them to be built and posted, feel free 
-to let us know on the mailing list. 
+to open a discussion on Github. 
 
 ### Source
 
@@ -121,7 +113,7 @@ SYMPHONY has a number of dependencies, which are detailed in
 automatically downloaded when obtaining the source with `coinbrew`. For some
 of the remaining third-party dependencies, automatic download scripts and
 build wrappers are provided (and will also be automatically run for required
-and recommended dependencies), while other libraries that are aeasy to obtain
+and recommended dependencies), while other libraries that are easy to obtain
 must be installed using an appropriate package manager (or may come with your
 OS by default). 
 
@@ -146,7 +138,7 @@ The `coinbrew` script will fetch the additional projects specified in the Depend
 
  * Download the source code, e.g., by cloning the git repo https://github.com/coin-or/SYMPHONY
  * Download and install the source code for the dependencies listed in [config.yml](.coin-or/config.yml)
- * Build the code as follows (make sure to set PKG_CONFIG_PTH to install directory for dependencies).
+ * Build the code as follows (make sure to set `PKG_CONFIG_PATH` to the `lib/pkgconfig` directory of the installation of the dependencies).
 
 ```
 ./configure -C
