@@ -909,6 +909,7 @@ typedef struct WARM_START_DESC{
    int            allocated_cut_num;
    cut_data     **cuts;
    problem_stat   stat;
+   lp_stat_desc   lp_stat;
    node_times     comp_times;
    int            phase;
    double         lb;
@@ -918,6 +919,7 @@ typedef struct WARM_START_DESC{
    char           trim_tree;
    int            trim_tree_level;
    int            trim_tree_index;
+   int            force_resolve_tree;
 }warm_start_desc;
 
 /*===========================================================================*/
