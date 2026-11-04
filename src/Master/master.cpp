@@ -880,7 +880,8 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    env->par.lp_par.should_use_rel_br = FALSE;
 #else
    if (env->par.lp_par.should_use_rel_br == -1){
-      if (env->par.tm_par.max_active_nodes > 2){
+      /* reliability branching cannot be combined with user cut candidates */
+      if (env->par.tm_par.max_active_nodes > 2 || env->par.lp_par.branch_on_cuts){
 	 env->par.lp_par.should_use_rel_br = FALSE;
       }else{
 	 env->par.lp_par.should_use_rel_br = TRUE;
