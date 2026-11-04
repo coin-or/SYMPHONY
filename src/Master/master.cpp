@@ -914,14 +914,14 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
    termcode = sym_presolve(env);
 
    //Gomory cuts are globally valid for binary problems
-   int prob_type;
-   if (env->prep_mip){
+   int prob_type = -1; /* unknown: user applications have no MIPinfo */
+   if (env->prep_mip && env->prep_mip->mip_inf){
       prob_type = env->prep_mip->mip_inf->prob_type;
-   }else{
+   }else if (env->mip && env->mip->mip_inf){
       prob_type = env->mip->mip_inf->prob_type;
    }
-   if (prob_type == BINARY_TYPE || prob_type != BIN_CONT_TYPE ||
-      prob_type == BIN_INT_TYPE){
+   if (prob_type != -1 && (prob_type == BINARY_TYPE ||
+       prob_type != BIN_CONT_TYPE || prob_type == BIN_INT_TYPE)){
       env->par.lp_par.cgl.gomory_globally_valid = TRUE;
    }
    
@@ -1853,10 +1853,10 @@ SYMPHONYLIB_EXPORT int sym_warm_solve(sym_environment *env)
 		  return(FUNCTION_TERMINATED_ABNORMALLY);   
 	       }
 	    } else if (change_type == COL_BOUNDS_CHANGED){
-	       int prob_type;
-	       if (env->prep_mip){
+	       int prob_type = -1; /* unknown: user applications have no MIPinfo */
+	       if (env->prep_mip && env->prep_mip->mip_inf){
 		  prob_type = env->prep_mip->mip_inf->prob_type;
-	       }else{
+	       }else if (env->mip && env->mip->mip_inf){
 		  prob_type = env->mip->mip_inf->prob_type;
 	       }
 	       if(env->par.lp_par.cgl.generate_cgl_cuts &&
