@@ -3298,6 +3298,11 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 	 rhs = row_cut.rhs();
 	 sense = row_cut.sense();
 	 range = row_cut.range();
+	 if (sense == 'R'){
+	    /* OSI: rhs - range <= ax <= rhs. Store it in SYMPHONY's
+	       convention: rhs + range <= ax <= rhs with range < 0. */
+	    range = -range;
+	 }
       }else{
 	 ind = rc_ind[i - accepted_cnt];
 	 num_elements = p->mip->mip_inf->c_beg[ind + 1] -
