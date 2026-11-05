@@ -2575,9 +2575,25 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
 
 /*===========================================================================*/
 
+/* SYMPHONY stores a ranged row ('R') as rhs <= ax <= rhs + range if
+ * range >= 0, and as rhs + range <= ax <= rhs otherwise (the convention of
+ * cut_data and branch_obj throughout). OSI expects rhs to be the upper bound
+ * and range = upper - lower >= 0. */
+static void sym_range_to_osi(double *rhs, double *range)
+{
+   if (*range >= 0){
+      *rhs += *range;
+   }else{
+      *range = -*range;
+   }
+}
+
 void change_row(LPdata *lp_data, int row_ind,
 		char sense, double rhs, double range)
 {
+   if (sense == 'R'){
+      sym_range_to_osi(&rhs, &range);
+   }
    lp_data->si->setRowType(row_ind, sense, rhs, range);
 }
 
@@ -3313,6 +3329,7 @@ void change_range(LPdata *lp_data, int rowind, double value)
 
    double rhs = lp_data->si->getRightHandSide()[rowind]; 
 
+   sym_range_to_osi(&rhs, &value);
    lp_data->si->setRowType(rowind,'R', rhs, value);
 }
 
@@ -3669,6 +3686,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
       rhs[i] = cut->rhs;  
       if ((sense[i] = cut->sense) == 'R'){
 	 range[i] = cut->range;
+	 sym_range_to_osi(rhs + i, range + i);
       }
    }
 
