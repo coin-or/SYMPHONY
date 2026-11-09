@@ -879,9 +879,18 @@ SYMPHONYLIB_EXPORT int sym_solve(sym_environment *env)
 #ifdef __PVM__
    env->par.lp_par.should_use_rel_br = FALSE;
 #else
-   if (env->par.lp_par.should_use_rel_br == -1){
-      /* reliability branching cannot be combined with user cut candidates */
-      if (env->par.tm_par.max_active_nodes > 2 || env->par.lp_par.branch_on_cuts){
+   if (env->par.lp_par.branch_on_cuts){
+      /* Reliability branching cannot be combined with user cut candidates:
+       * in that mode branch_close_to_half() returns a single placeholder
+       * candidate, which select_candidates_u() cannot merge with them. */
+      if (env->par.lp_par.should_use_rel_br == TRUE &&
+	  env->par.verbosity >= 0){
+	 printf("Warning: reliability branching can not be used with ");
+	 printf("branch_on_cuts. Turning it off.\n");
+      }
+      env->par.lp_par.should_use_rel_br = FALSE;
+   }else if (env->par.lp_par.should_use_rel_br == -1){
+      if (env->par.tm_par.max_active_nodes > 2){
 	 env->par.lp_par.should_use_rel_br = FALSE;
       }else{
 	 env->par.lp_par.should_use_rel_br = TRUE;
