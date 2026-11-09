@@ -401,9 +401,11 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
       rmatbeg[i+1] = rmatbeg[i] + wrow->nzcnt;
    }
    add_rows(lp_data, add_row_num, nzcnt, rhs, sense, rmatbeg, rmatind,rmatval);
+   /* add_rows() has already increased lp_data->m by add_row_num */
    for (i = add_row_num - 1; i >= 0; i--){
       if (sense[i] == 'R')
-	 change_range(lp_data, lp_data->m+i, wrows[i]->cut->range);
+	 change_range(lp_data, lp_data->m - add_row_num + i,
+		      wrows[i]->cut->range);
    }
 }
 
