@@ -1774,7 +1774,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     * and append the variable candidates to it afterwards. Note that the
     * reliability branching variant of branch_close_to_half() returns a
     * single placeholder candidate, so it cannot be combined with user
-    * cut candidates; sym_solve() therefore turns it off by default when
+    * cut candidates; sym_solve() therefore turns it off whenever
     * branch_on_cuts is set. */
    if (p->par.branch_on_cuts && *cand_num > 0 && *candidates){
       user_cands = *candidates;
