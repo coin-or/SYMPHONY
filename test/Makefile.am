@@ -51,6 +51,28 @@ if XPRESS_LP_SOLVER
   AM_CPPFLAGS += -D__OSI_XPRESS__
 endif
 
+# The LP interface tests use SYMPHONY's internal data structures, whose
+# layout depends on these defines, so use the same ones as the library
+# (see src/Makefile.am)
+
+AM_CPPFLAGS += $(SYMDEFS)
+
+if SENSITIVITY_ANALYSIS
+  AM_CPPFLAGS += -DSENSITIVITY_ANALYSIS
+endif
+
+if PSEUDO_COSTS
+  AM_CPPFLAGS += -DPSEUDO_COSTS
+endif
+
+if COMPILE_FRAC_BRANCHING
+  AM_CPPFLAGS += -DCOMPILE_FRAC_BRANCHING
+endif
+
+if TRACE_PATH
+  AM_CPPFLAGS += -DTRACE_PATH
+endif
+
 ########################################################################
 #                            Additional Definitions                    #
 ########################################################################
