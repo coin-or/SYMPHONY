@@ -496,7 +496,11 @@ int create_subproblem_u(lp_prob *p)
       row = rows + i;
       cut = row->cut;
       cut->rhs = rhs[i];
-      cut->range = rngval[i];
+      /* The LP was loaded with the OSI convention for ranged rows,
+       * rhs - rngval <= ax <= rhs. Store the row in SYMPHONY's convention
+       * (rhs + range <= ax <= rhs when range < 0), as for cuts, since
+       * change_row() and constrain_row_set() translate from it. */
+      cut->range = (sense[i] == 'R') ? -rngval[i] : rngval[i];
       cut->branch = (((cut->sense = sense[i]) != 'E') ?
 		     ALLOWED_TO_BRANCH_ON : DO_NOT_BRANCH_ON_THIS_ROW);
       cut->size = 0;
