@@ -744,10 +744,13 @@ int fathom(lp_prob *p, int primal_feasible, int time_limit_reached)
    int termcode = p->lp_data->termcode;
 
 #ifdef COMPILE_IN_LP
-   if(p->branch_dir == 'L' && p->branch_var >= 0){
-      p->br_inf_down[p->branch_var]++;
-   }else{
-      p->br_inf_up[p->branch_var]++;   
+   /* branch_var is -1 when no variable was branched on to reach this node */
+   if (p->branch_var >= 0){
+      if (p->branch_dir == 'L'){
+	 p->br_inf_down[p->branch_var]++;
+      }else{
+	 p->br_inf_up[p->branch_var]++;
+      }
    }
 #endif
    
