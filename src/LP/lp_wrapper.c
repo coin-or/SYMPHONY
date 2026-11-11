@@ -496,7 +496,11 @@ int create_subproblem_u(lp_prob *p)
       row = rows + i;
       cut = row->cut;
       cut->rhs = rhs[i];
-      cut->range = rngval[i];
+      /* The LP was loaded with the OSI convention for ranged rows,
+       * rhs - rngval <= ax <= rhs. Store the row in SYMPHONY's convention
+       * (rhs + range <= ax <= rhs when range < 0), as for cuts, since
+       * change_row() and constrain_row_set() translate from it. */
+      cut->range = (sense[i] == 'R') ? -rngval[i] : rngval[i];
       cut->branch = (((cut->sense = sense[i]) != 'E') ?
 		     ALLOWED_TO_BRANCH_ON : DO_NOT_BRANCH_ON_THIS_ROW);
       cut->size = 0;
@@ -1579,6 +1583,8 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    int *candidate_rows;
    branch_obj *can;
    cut_data **slacks_in_matrix = NULL; /* just to keep gcc quiet */
+   branch_obj **user_cands = NULL;
+   int user_cand_num = 0;
 
    /* If the user might need to generate rows, we better have the
     * columns COLIND_ORDERED */
@@ -1761,6 +1767,21 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    i = (int) (p->par.strong_branching_cand_num_max -
 	      p->par.strong_branching_red_ratio * p->bc_level);
    i = MAX(i, p->par.strong_branching_cand_num_min);
+
+   /* The user may have selected cut candidates and asked for a built-in
+    * rule to add the variable candidates (e.g., VRP with branch_on_cuts).
+    * The built-in rules (re)fill *candidates, so set the user's list aside
+    * and append the variable candidates to it afterwards. Note that the
+    * reliability branching variant of branch_close_to_half() returns a
+    * single placeholder candidate, so it cannot be combined with user
+    * cut candidates; sym_solve() therefore turns it off whenever
+    * branch_on_cuts is set. */
+   if (p->par.branch_on_cuts && *cand_num > 0 && *candidates){
+      user_cands = *candidates;
+      user_cand_num = *cand_num;
+      *candidates = NULL;
+      *cand_num = 0;
+   }
    
    switch(user_res){
     case USER__CLOSE_TO_HALF:
@@ -1776,6 +1797,20 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     default:
       /* Unexpected return value. Do something!! */
       break;
+   }
+
+   if (user_cand_num){
+      branch_obj **all_cands = (branch_obj **)
+	 malloc((user_cand_num + *cand_num) * sizeof(branch_obj *));
+      memcpy(all_cands, user_cands, user_cand_num * sizeof(branch_obj *));
+      if (*cand_num > 0){
+	 memcpy(all_cands + user_cand_num, *candidates,
+		*cand_num * sizeof(branch_obj *));
+      }
+      FREE(*candidates);
+      FREE(user_cands);
+      *candidates = all_cands;
+      *cand_num += user_cand_num;
    }
 
    if (! *cand_num){

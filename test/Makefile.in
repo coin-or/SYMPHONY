@@ -116,9 +116,13 @@ host_triplet = @host@
 @GLPK_LP_SOLVER_TRUE@am__append_4 = -D__OSI_GLPK__
 @SOPLEX_LP_SOLVER_TRUE@am__append_5 = -D__OSI_SOPLEX__
 @XPRESS_LP_SOLVER_TRUE@am__append_6 = -D__OSI_XPRESS__
+@SENSITIVITY_ANALYSIS_TRUE@am__append_7 = -DSENSITIVITY_ANALYSIS
+@PSEUDO_COSTS_TRUE@am__append_8 = -DPSEUDO_COSTS
+@COMPILE_FRAC_BRANCHING_TRUE@am__append_9 = -DCOMPILE_FRAC_BRANCHING
+@TRACE_PATH_TRUE@am__append_10 = -DTRACE_PATH
 noinst_PROGRAMS = unitTest$(EXEEXT)
-@COIN_HAS_NETLIB_TRUE@am__append_7 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
-@COIN_HAS_SAMPLE_TRUE@am__append_8 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
+@COIN_HAS_NETLIB_TRUE@am__append_11 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
+@COIN_HAS_SAMPLE_TRUE@am__append_12 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -370,7 +374,9 @@ AM_CPPFLAGS = $(SYM_OPENMP_FLAGS) $(SYMUNITTEST_CFLAGS) \
 	$(top_srcdir)/include` -I`$(CYGPATH_W) \
 	$(top_builddir)/include` -I`$(CYGPATH_W) \
 	$(top_srcdir)/src/OsiSym` $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5) $(am__append_6)
+	$(am__append_4) $(am__append_5) $(am__append_6) $(SYMDEFS) \
+	$(am__append_7) $(am__append_8) $(am__append_9) \
+	$(am__append_10)
 unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
@@ -381,7 +387,7 @@ unitTest_LDADD = ../src/libSym.la ../src/OsiSym/libOsiSym.la \
 
 @COIN_HAS_MIPLIB3_FALSE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
 @COIN_HAS_MIPLIB3_TRUE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`
-unittestflags = $(am__append_7) $(am__append_8)
+unittestflags = $(am__append_11) $(am__append_12)
 testFILES = air03 air04 air05 bell3a blend2 cap6000 dcmulti dsbmip \
      egout enigma fiber fixnet6 flugpl gen gesa2 gesa2_o \
      gesa3 gesa3_o gt2 khb05250 l152lav lseu misc03 misc06 \
