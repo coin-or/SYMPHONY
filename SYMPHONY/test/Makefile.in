@@ -59,13 +59,21 @@ host_triplet = @host@
 @GLPK_LP_SOLVER_TRUE@am__append_3 = -D__OSI_GLPK__
 @SOPLEX_LP_SOLVER_TRUE@am__append_4 = -D__OSI_SOPLEX__
 @XPRESS_LP_SOLVER_TRUE@am__append_5 = -D__OSI_XPRESS__
-@SYM_PARALLEL_TRUE@am__append_6 = -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-@SYM_PARALLEL_TRUE@am__append_7 = -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+
+# The LP interface tests use SYMPHONY's internal data structures, whose
+# layout depends on these defines, so use the same ones as the library
+# (see src/Makefile.am)
+@SENSITIVITY_ANALYSIS_TRUE@am__append_6 = -DSENSITIVITY_ANALYSIS
+@PSEUDO_COSTS_TRUE@am__append_7 = -DPSEUDO_COSTS
+@COMPILE_FRAC_BRANCHING_TRUE@am__append_8 = -DCOMPILE_FRAC_BRANCHING
+@TRACE_PATH_TRUE@am__append_9 = -DTRACE_PATH
+@SYM_PARALLEL_TRUE@am__append_10 = -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+@SYM_PARALLEL_TRUE@am__append_11 = -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
 @SYM_PARALLEL_TRUE@	-lgpvm3 -lpvm3
 
-@SYM_PARALLEL_TRUE@am__append_8 = ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
-@SYM_PARALLEL_FALSE@am__append_9 = $(SYMLIB)
-@COIN_CXX_IS_CL_TRUE@am__append_10 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
+@SYM_PARALLEL_TRUE@am__append_12 = ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
+@SYM_PARALLEL_FALSE@am__append_13 = $(SYMLIB)
+@COIN_CXX_IS_CL_TRUE@am__append_14 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
 @COIN_CXX_IS_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
 @COIN_CXX_IS_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
 @COIN_CXX_IS_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
@@ -75,14 +83,14 @@ host_triplet = @host@
 @COIN_CXX_IS_CL_TRUE@	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
 @COIN_CXX_IS_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@COIN_CXX_IS_CL_TRUE@am__append_11 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
+@COIN_CXX_IS_CL_TRUE@am__append_15 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
 @COIN_CXX_IS_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
 @COIN_CXX_IS_CL_TRUE@	OsiSymSolverInterfaceTest.$(OBJEXT) unitTestSym.$(OBJEXT)
 
-@COIN_CXX_IS_CL_FALSE@am__append_12 = $(CXXLINK)
+@COIN_CXX_IS_CL_FALSE@am__append_16 = $(CXXLINK)
 noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
-@COIN_HAS_NETLIB_TRUE@am__append_13 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
-@COIN_HAS_SAMPLE_TRUE@am__append_14 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
+@COIN_HAS_NETLIB_TRUE@am__append_17 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
+@COIN_HAS_SAMPLE_TRUE@am__append_18 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -491,11 +499,13 @@ AUTOMAKE_OPTIONS = foreign
 # Add include files
 AM_CPPFLAGS = $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS) \
 	-DCOIN_HAS_SYMPHONY $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5)
+	$(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_7) $(am__append_8) \
+	$(am__append_9)
 SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)
-SYMPCPPFLAGS = $(AM_CPPFLAGS) $(SYMPDEFS) $(am__append_6)
+SYMPCPPFLAGS = $(AM_CPPFLAGS) $(SYMPDEFS) $(am__append_10)
 APPLCPPFLAGS = 
-SYMPALLLDADD = $(ALLLDADD) $(am__append_7)
+SYMPALLLDADD = $(ALLLDADD) $(am__append_11)
 LDADD = $(OSITESTS_LIBS) $(SYMPHONYLIB_LIBS)
 DEPENDENCIES = $(OSITESTS_DEPENDENCIES) $(SYMPHONYLIB_DEPENDENCIES)
 
@@ -504,13 +514,13 @@ DEPENDENCIES = $(OSITESTS_DEPENDENCIES) $(SYMPHONYLIB_DEPENDENCIES)
 ########################################################################
 ALLLDADD = $(LDADD)
 SYMLIB = ../src/libSym.la ../src/OsiSym/libOsiSym.la
-SYMPLIB = $(am__append_8) $(am__append_9)
+SYMPLIB = $(am__append_12) $(am__append_13)
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
 		   -I`$(CYGPATH_W) $(top_builddir)/include` \
 		   -I`$(CYGPATH_W) $(top_srcdir)/src/OsiSym`
 
-TestLDADD = $(LDADD) $(am__append_11)
-TestLINK = $(am__append_10) $(am__append_12)
+TestLDADD = $(LDADD) $(am__append_15)
+TestLINK = $(am__append_14) $(am__append_16)
 unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
@@ -528,7 +538,7 @@ punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD) $(OSIUNITTEST_LIBS)
 punitTest_DEPENDENCIES = $(SYMPLIB) $(DEPENDENCIES)
 @COIN_HAS_MIPLIB3_FALSE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
 @COIN_HAS_MIPLIB3_TRUE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`
-unittestflags = $(am__append_13) $(am__append_14)
+unittestflags = $(am__append_17) $(am__append_18)
 testFILES = air03 air04 air05 bell3a blend2 cap6000 dcmulti dsbmip \
      egout enigma fiber fixnet6 flugpl gen gesa2 gesa2_o \
      gesa3 gesa3_o gt2 khb05250 l152lav lseu misc03 misc06 \

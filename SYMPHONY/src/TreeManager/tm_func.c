@@ -967,13 +967,17 @@ int start_node(tm_prob *tm, int thread_num)
 	     best_node->node_status = NODE_STATUS__PRUNED;
 	     best_node->feasibility_status = OVER_UB_PRUNED;
 
-	     if(best_node->parent){
+	     /* Only variable branching is counted, by column position as in
+		the LP (bobj.name is negative for base variables) */
+	     if(tm->br_inf_down != NULL && tm->br_inf_up != NULL &&
+                best_node->parent &&
+		best_node->parent->bobj.type == BRANCHING_VARIABLE){
 	       for(int i = 0; i < best_node->parent->bobj.child_num; i++){
 		 if(best_node->parent->children[i] == best_node){
 		   if(best_node->parent->bobj.sense[i] == 'L'){
-		     tm->br_inf_down[best_node->parent->bobj.name]++;
+		     tm->br_inf_down[best_node->parent->bobj.position]++;
 		   }else{
-		     tm->br_inf_up[best_node->parent->bobj.name]++;		     
+		     tm->br_inf_up[best_node->parent->bobj.position]++;
 		   }
 		 }
 	       }
@@ -2169,10 +2173,11 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	    if (node->parent && node->parent->bobj.type == BRANCHING_VARIABLE){
 	       for (j = 0; j < node->parent->bobj.child_num; j++){
 		  if (node->parent->children[j] == node){
-		     var_index = (node->parent->bobj.name < 0 ?
-			/* base variable : extra variable */
-				  (-node->parent->bobj.name-1) :
-				  (node->parent->bobj.name + tm->bvarnum));
+		     /* The LP indexes these counters by the column position
+			of the branching variable (see update_pcost()).
+			Extra variables have no fixed index derivable from
+			bobj.name, and name + bvarnum can run past the end. */
+		     var_index = node->parent->bobj.position;
 		     if (node->parent->bobj.sense[j] == 'L'){
 			tm->br_inf_down[var_index]++;
 		     }else{

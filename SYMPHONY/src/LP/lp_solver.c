@@ -56,6 +56,10 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->dj);
    FREE(lp_data->dualsol);
    FREE(lp_data->slacks);
+   // feb223
+   FREE(lp_data->cstat);
+   FREE(lp_data->rstat);
+
    FREE(lp_data->random_hash);
    FREE(lp_data->hashes);
    FREE(lp_data->accepted_ind);
@@ -192,11 +196,15 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
 	 FREE(lp_data->slacks);
 	 lp_data->slacks  = (double *) malloc(lp_data->maxm * DSIZE);
+	 FREE(lp_data->rstat);
+	 lp_data->rstat = (int *)malloc((lp_data->maxm) * ISIZE);
      }else{
          lp_data->dualsol = (double *) realloc((char *)lp_data->dualsol,
                                                lp_data->maxm * DSIZE);
 	 lp_data->slacks  = (double *) realloc((void *)lp_data->slacks,
 					       lp_data->maxm * DSIZE);
+	 lp_data->rstat = (int *)realloc((void *)lp_data->rstat,
+					  (lp_data->maxm) * ISIZE);
       }
       /* rows is realloc'd in either case just to keep the base constr */
       lp_data->rows = (row_data *) realloc((char *)lp_data->rows,
@@ -218,7 +226,10 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          FREE(lp_data->heur_solution);
          lp_data->heur_solution = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->col_solution);
-         lp_data->col_solution = (double *) malloc(lp_data->maxn * DSIZE);
+         lp_data->col_solution = (double *)malloc(lp_data->maxn * DSIZE);
+         // feb223
+         FREE(lp_data->cstat);
+         lp_data->cstat = (int *)malloc((lp_data->maxn) * ISIZE);
 #ifdef __CPLEX__
 	 FREE(lp_data->lb);
 	 lp_data->lb = (double *) malloc(lp_data->maxn * DSIZE);
@@ -238,6 +249,9 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                lp_data->heur_solution, lp_data->maxn * DSIZE);
          lp_data->col_solution = (double *) realloc((char *)
                lp_data->col_solution, lp_data->maxn * DSIZE);
+         // feb223
+         lp_data->cstat = (int *)realloc((void *)lp_data->cstat,
+                                    (lp_data->maxn) * ISIZE);
 #ifdef __CPLEX__
 	 lp_data->lb = (double *) realloc((char *)lp_data->lb,
 					  lp_data->maxn * DSIZE);
@@ -2329,11 +2343,22 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->messageHandler()->setLogLevel(0);
 #ifdef __OSI_CLP__
    lp_data->si->setupForRepeatedUse();
-   //lp_data->si->setupForRepeatedUse(3,0);
-   //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
-   //lp_data->si->getModelPtr()->setSparseFactorization(true);
-   //lp_data->si->getModelPtr()->setSpecialOptions(524288);
-   //lp_data->si->getModelPtr()->setSpecialOptions(4);   
+   // feb223
+   int options = lp_data->si->getModelPtr()->specialOptions();
+   int moreOptions = lp_data->si->getModelPtr()->moreSpecialOptions();
+   
+   options |= 32           // CLP creates ray while doing dual simplex
+            // + 2048         // CLP does not cruch the problem
+                              // maybe not needed if we recompute dj's on fixed vars ???
+            + 0x08000000;  // CLP computes accurate duals on LP_D_ITLIM
+   moreOptions |= 8192;    // CLP uses dual simplex if it has suggested to do so
+   lp_data->si->getModelPtr()->setSpecialOptions(options);
+   lp_data->si->getModelPtr()->setMoreSpecialOptions(moreOptions);
+   // lp_data->si->setupForRepeatedUse(3,0);
+   // lp_data->si->getModelPtr()->setFactorizationFrequency(200);
+   // lp_data->si->getModelPtr()->setSparseFactorization(true);
+   // lp_data->si->getModelPtr()->setSpecialOptions(524288);
+   // lp_data->si->getModelPtr()->setSpecialOptions(4);
    lp_data->si->getModelPtr()->setPerturbation(50);
    //set cleanup param if unscaled primal is infeasible
    lp_data->si->setCleanupScaling(1);
@@ -2540,9 +2565,25 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
 
 /*===========================================================================*/
 
+/* SYMPHONY stores a ranged row ('R') as rhs <= ax <= rhs + range if
+ * range >= 0, and as rhs + range <= ax <= rhs otherwise (the convention of
+ * cut_data and branch_obj throughout). OSI expects rhs to be the upper bound
+ * and range = upper - lower >= 0. */
+static void sym_range_to_osi(double *rhs, double *range)
+{
+   if (*range >= 0){
+      *rhs += *range;
+   }else{
+      *range = -*range;
+   }
+}
+
 void change_row(LPdata *lp_data, int row_ind,
 		char sense, double rhs, double range)
 {
+   if (sense == 'R'){
+      sym_range_to_osi(&rhs, &range);
+   }
    lp_data->si->setRowType(row_ind, sense, rhs, range);
 }
 
@@ -3158,6 +3199,7 @@ void change_range(LPdata *lp_data, int rowind, double value)
 
    double rhs = lp_data->si->getRightHandSide()[rowind]; 
 
+   sym_range_to_osi(&rhs, &value);
    lp_data->si->setRowType(rowind,'R', rhs, value);
 }
 
@@ -3514,6 +3556,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
       rhs[i] = cut->rhs;  
       if ((sense[i] = cut->sense) == 'R'){
 	 range[i] = cut->range;
+	 sym_range_to_osi(rhs + i, range + i);
       }
    }
 
