@@ -877,7 +877,17 @@ int sym_solve(sym_environment *env)
 #ifdef __PVM__
    env->par.lp_par.should_use_rel_br = FALSE;
 #else
-   if (env->par.lp_par.should_use_rel_br == -1){
+   if (env->par.lp_par.branch_on_cuts){
+      /* Reliability branching cannot be combined with user cut candidates:
+       * in that mode branch_close_to_half() returns a single placeholder
+       * candidate, which select_candidates_u() cannot merge with them. */
+      if (env->par.lp_par.should_use_rel_br == TRUE &&
+	  env->par.verbosity >= 0){
+	 printf("Warning: reliability branching can not be used with ");
+	 printf("branch_on_cuts. Turning it off.\n");
+      }
+      env->par.lp_par.should_use_rel_br = FALSE;
+   }else if (env->par.lp_par.should_use_rel_br == -1){
       if (env->par.tm_par.max_active_nodes > 2){
 	 env->par.lp_par.should_use_rel_br = FALSE;
       }else{
@@ -912,14 +922,14 @@ int sym_solve(sym_environment *env)
    termcode = sym_presolve(env);
 
    //Gomory cuts are globally valid for binary problems
-   int prob_type;
-   if (env->prep_mip){
+   int prob_type = -1; /* unknown: user applications have no MIPinfo */
+   if (env->prep_mip && env->prep_mip->mip_inf){
       prob_type = env->prep_mip->mip_inf->prob_type;
-   }else{
+   }else if (env->mip && env->mip->mip_inf){
       prob_type = env->mip->mip_inf->prob_type;
    }
-   if (prob_type == BINARY_TYPE || prob_type != BIN_CONT_TYPE ||
-      prob_type == BIN_INT_TYPE){
+   if (prob_type != -1 && (prob_type == BINARY_TYPE ||
+       prob_type != BIN_CONT_TYPE || prob_type == BIN_INT_TYPE)){
       env->par.lp_par.cgl.gomory_globally_valid = TRUE;
    }
    
@@ -1851,10 +1861,10 @@ int sym_warm_solve(sym_environment *env)
 		  return(FUNCTION_TERMINATED_ABNORMALLY);   
 	       }
 	    } else if (change_type == COL_BOUNDS_CHANGED){
-	       int prob_type;
-	       if (env->prep_mip){
+	       int prob_type = -1; /* unknown: user applications have no MIPinfo */
+	       if (env->prep_mip && env->prep_mip->mip_inf){
 		  prob_type = env->prep_mip->mip_inf->prob_type;
-	       }else{
+	       }else if (env->mip && env->mip->mip_inf){
 		  prob_type = env->mip->mip_inf->prob_type;
 	       }
 	       if(env->par.lp_par.cgl.generate_cgl_cuts &&
