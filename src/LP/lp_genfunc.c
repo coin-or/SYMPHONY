@@ -2163,8 +2163,48 @@ int update_cut_parameters(lp_prob *p)
 	    data_par->generate_cgl_twomir_cuts_freq = 
 	       par->generate_cgl_twomir_cuts_freq = 50;
 	 } else{
-	    data_par->generate_cgl_twomir_cuts_freq = 
+	    data_par->generate_cgl_twomir_cuts_freq =
 	       par->generate_cgl_twomir_cuts_freq = 100;
+	 }
+#ifdef SYM_COMPILE_IN_LP
+      }
+#endif
+   }
+
+   /* mir cuts (same rules as twomir) */
+   if (data_par->generate_cgl_mir_cuts == GENERATE_IF_IN_ROOT &&
+       lp_stat.mir_cuts_root<1) {
+      data_par->generate_cgl_mir_cuts_freq = -1;
+   }
+   if (data_par->generate_cgl_mir_cuts == GENERATE_DEFAULT) {
+#ifdef SYM_COMPILE_IN_LP
+      if(data_par->use_chain_strategy){
+	 if(p->bc_level > 0 && p->tm->lp_stat.mir_calls +
+	    p->lp_stat.mir_calls > 50 &&
+	    p->tm->lp_stat.mir_cuts + p->lp_stat.mir_cuts < 10){
+	    data_par->generate_cgl_mir_cuts = DO_NOT_GENERATE;
+	 }else{
+	    if((data_par->chain_status == CGL_CHAIN_CONTINUE ||
+		data_par->chain_status == CGL_CHAIN_CHECK) &&
+	       lp_stat.mir_cuts_root >= 1){
+	       data_par->generate_cgl_mir_cuts_freq = 1;
+	    }else if(data_par->chain_status == CGL_CHAIN_STOP){
+	       data_par->generate_cgl_mir_cuts = DO_NOT_GENERATE;
+	    }else{
+	       data_par->generate_cgl_mir_cuts_freq = -1;
+	    }
+	 }
+      }else{
+#endif
+	 if (lp_stat.mir_cuts_root<1) {
+	    data_par->generate_cgl_mir_cuts_freq =
+	       par->generate_cgl_mir_cuts_freq = 1000;
+	 } else if(p->bc_level < 20){
+	    data_par->generate_cgl_mir_cuts_freq =
+	       par->generate_cgl_mir_cuts_freq = 50;
+	 } else{
+	    data_par->generate_cgl_mir_cuts_freq =
+	       par->generate_cgl_mir_cuts_freq = 100;
 	 }
 #ifdef SYM_COMPILE_IN_LP
       }
@@ -2862,6 +2902,36 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          p->lp_stat.oddhole_calls++;
          break;
       }
+    case CGL_MIR_GENERATOR:
+      {
+         int param = p->lp_data->cgl.generate_cgl_mir_cuts;
+         int freq  = p->lp_data->cgl.generate_cgl_mir_cuts_freq;
+	 int max_bc_level = p->par.cgl.mir_max_depth;
+         if (param < 0) {
+            *should_generate = FALSE;
+            break;
+         } else if (param == GENERATE_DEFAULT &&
+		    (bc_level > max_bc_level ||
+		     freq < 1 || bc_index % freq != 0  ||
+		     data_par->chain_status == CGL_CHAIN_PAUSE)){
+            *should_generate = FALSE;
+            break;
+         } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
+            *should_generate = FALSE;
+            break;
+         } else if (param == GENERATE_IF_IN_ROOT && (freq < 1 ||
+                  bc_index % freq != 0)) {
+            *should_generate = FALSE;
+            break;
+         } else if (param == GENERATE_PERIODICALLY && (freq < 1 ||
+                  bc_index % freq != 0)) {
+            *should_generate = FALSE;
+            break;
+         }
+         *should_generate = TRUE;
+         p->lp_stat.mir_calls++;
+         break;
+      }
    }
 #endif
    return 0;
@@ -2980,6 +3050,25 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
 	cut_time     = used_time(&total_time);
 	p->comp_times.oddhole_cuts += cut_time;
 	break;
+      }
+    case CGL_MIR_GENERATOR:
+      {
+	 if (p->lp_data->cgl.generate_cgl_mir_cuts < 0) {
+	    break; /* off (the default): don't even construct it */
+	 }
+	 /* Cbc's settings (CbcSolverCutSetup.cpp): no aggregation, multiply
+	  * rows by -1, and preprocessing on */
+	 CglMixedIntegerRounding2 *mir = new CglMixedIntegerRounding2(1, true, 1);
+	 mir->setDoPreproc(1);
+	 should_use_cgl_generator(p, &should_generate, i, (void *)mir);
+	 if (should_generate == TRUE) {
+	    mir->generateCuts(*(p->lp_data->si), cutlist);
+	    *was_tried = TRUE;
+	 }
+	 delete mir;
+	 cut_time     = used_time(&total_time);
+	 p->comp_times.mir_cuts += cut_time;
+	 break;
       }
    }
    *cutlist_p = cutlist;
@@ -3438,6 +3527,12 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       p->lp_stat.oddhole_cuts += num_row_cuts;
       if (p->bc_level<1) {
          p->lp_stat.oddhole_cuts_root += num_row_cuts;
+      }
+      break;
+    case (CGL_MIR_GENERATOR):
+      p->lp_stat.mir_cuts += num_row_cuts;
+      if (p->bc_level<1) {
+         p->lp_stat.mir_cuts_root += num_row_cuts;
       }
       break;
    }

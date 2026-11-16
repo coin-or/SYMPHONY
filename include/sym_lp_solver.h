@@ -61,6 +61,7 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "CglLiftAndProject.hpp"
 #include "CglSimpleRounding.hpp"
 #include "CglMixedIntegerRounding.hpp"
+#include "CglMixedIntegerRounding2.hpp"
 #include "CglClique.hpp"
 #include "CglGomory.hpp"
 #include "CglOddHole.hpp"

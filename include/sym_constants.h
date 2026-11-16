@@ -193,7 +193,7 @@
 #define CGL_FLOWCOVER_GENERATOR     5
 #define CGL_ODDHOLE_GENERATOR       6
 #define CGL_MIR_GENERATOR           7
-#define CGL_NUM_GENERATORS          7
+#define CGL_NUM_GENERATORS          8
 
 
 /* --------------- the status of cut generation on the chain ----------------*/
