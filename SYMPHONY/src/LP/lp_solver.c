@@ -2901,9 +2901,18 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 }
 
 /*===========================================================================*/
+/* Returns 0 if hot starts can be used and 1 if they can't. OsiClp sets the
+ * problem status to infeasible when it can't set up a hot start, for example
+ * when the reduced copy of the LP it builds doesn't solve to optimality. Every
+ * solveFromHotStart() after that reports the LP infeasible without iterating,
+ * so the caller has to solve the strong-branching LPs without hot starts. */
 int mark_hotstart(LPdata *lp_data)
 {
    lp_data->si->markHotStart();
+   if (!lp_data->si->isProvenOptimal()){
+      lp_data->si->unmarkHotStart();
+      return (1);
+   }
    return (0);
 }
 
