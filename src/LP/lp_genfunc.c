@@ -1601,6 +1601,7 @@ void lp_close(lp_prob *p)
    p->tm->comp_times.pricing          += p->comp_times.pricing;
    p->tm->comp_times.strong_branching += p->comp_times.strong_branching;
    p->tm->comp_times.fp               += p->comp_times.fp;
+   p->tm->comp_times.fj               += p->comp_times.fj;
    p->tm->comp_times.rh               += p->comp_times.rh;
    p->tm->comp_times.sh               += p->comp_times.sh;
    p->tm->comp_times.ls               += p->comp_times.ls;
@@ -1696,6 +1697,8 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.fp_num_sols             += p->lp_stat.fp_num_sols;
    p->tm->lp_stat.fp_num_iter             += p->lp_stat.fp_num_iter;
    p->tm->lp_stat.fp_last_call_ind         = p->lp_stat.fp_last_call_ind;
+   p->tm->lp_stat.fj_calls                += p->lp_stat.fj_calls;
+   p->tm->lp_stat.fj_num_sols             += p->lp_stat.fj_num_sols;
 
    p->tm->lp_stat.rh_calls                += p->lp_stat.rh_calls;
    p->tm->lp_stat.rh_num_sols             += p->lp_stat.rh_num_sols;

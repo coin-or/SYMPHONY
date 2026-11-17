@@ -18,6 +18,9 @@
 #include <math.h>
 #include <string.h>
 
+/* Before SYMPHONY's headers, so that none of their macros reach it */
+#include "feasibilityjump.hh"
+
 #include "sym_qsort.h"
 #include "sym_lp.h"
 #include "sym_constants.h"
@@ -5168,3 +5171,236 @@ double get_dgap(double obj_ub, double obj_lb, double obj_offset, char obj_sense)
 }
 #endif
 
+/*===========================================================================*/
+/*===========================================================================*\
+ * Feasibility jump (B. Luteberget and G. Sartor, "Feasibility Jump: an
+ * LP-free Lagrangian MIP heuristic", Mathematical Programming Computation 15,
+ * 2023), through the reference implementation in feasibilityjump.hh, set up
+ * as in Cbc's CbcHeuristicFeasibilityJump: a weighted local search on the
+ * base constraints and the current bounds, started from the rounded LP
+ * solution. It stops at its first feasible solution, when its effort budget
+ * or stall limit runs out (fj_effort_mult and fj_stall_mult times the number
+ * of nonzeros), or at the time limit.
+ *
+ * If the problem has continuous variables, they are then re-optimized with
+ * the integer variables fixed, as Cbc does when it accepts a solution. The
+ * result is checked against the bounds and the base constraints before it is
+ * returned, since nothing downstream checks a heuristic solution.
+ *
+ * Returns TRUE and the solution in better_solution (LP column order) and its
+ * objective value (without the offset) in solution_value if it finds one.
+\*===========================================================================*/
+
+static char fj_check_solution(lp_prob *p, const double *x, double tol)
+{
+   LPdata *lp_data = p->lp_data;
+   OsiXSolverInterface *si = lp_data->si;
+   const int n = lp_data->n, m = p->base.cutnum;
+   const double *lb = si->getColLower(), *ub = si->getColUpper();
+   const CoinPackedMatrix *rmat = si->getMatrixByRow();
+   const double *rmatval = rmat->getElements();
+   const int *rmatind = rmat->getIndices();
+   const CoinBigIndex *rmatbeg = rmat->getVectorStarts();
+   const int *rmatlen = rmat->getVectorLengths();
+   const char *sense = si->getRowSense();
+   const double *rhs = si->getRightHandSide();
+   const double *range = si->getRowRange();
+   int i, j;
+
+   for (j = 0; j < n; j++){
+      if (x[j] < lb[j] - tol || x[j] > ub[j] + tol){
+	 return FALSE;
+      }
+      if (lp_data->vars[j]->is_int && fabs(x[j] - floor(x[j] + 0.5)) > 1e-9){
+	 return FALSE;
+      }
+   }
+   for (i = 0; i < m; i++){
+      double act = 0.0, rtol = tol + 1e-9*fabs(rhs[i]);
+      for (CoinBigIndex k = rmatbeg[i]; k < rmatbeg[i] + rmatlen[i]; k++){
+	 act += rmatval[k]*x[rmatind[k]];
+      }
+      switch (sense[i]){
+       case 'E':
+	 if (fabs(act - rhs[i]) > rtol) return FALSE;
+	 break;
+       case 'L':
+	 if (act > rhs[i] + rtol) return FALSE;
+	 break;
+       case 'G':
+	 if (act < rhs[i] - rtol) return FALSE;
+	 break;
+       case 'R':
+	 if (act > rhs[i] + rtol || act < rhs[i] - range[i] - rtol)
+	    return FALSE;
+	 break;
+       default:
+	 break;
+      }
+   }
+   return TRUE;
+}
+
+/*===========================================================================*/
+
+int feasibility_jump(lp_prob *p, double *solution_value,
+		     double *better_solution)
+{
+   LPdata *lp_data = p->lp_data;
+   OsiXSolverInterface *si = lp_data->si;
+   var_desc **vars = lp_data->vars;
+   const int n = lp_data->n, m = p->base.cutnum;
+   const double tol = 1e-6;   /* Cbc's default for FJ */
+   double total_time = 0, timeleft = -1.0, start = wall_clock(NULL);
+   int i, j, found = FALSE, has_continuous = FALSE;
+
+   used_time(&total_time);
+   p->lp_stat.fj_calls++;
+
+#ifdef SYM_COMPILE_IN_LP
+   if (p->tm->par.time_limit >= 0.0 &&
+       (timeleft = p->tm->par.time_limit - start + p->tm->start_time) <= 0.0){
+      p->comp_times.fj += used_time(&total_time);
+      return FALSE;
+   }
+#endif
+   /* All the variables must be in the LP (no column generation) */
+   if (n != p->mip->n || m <= 0 || m > lp_data->m){
+      p->comp_times.fj += used_time(&total_time);
+      return FALSE;
+   }
+
+   const double *lb = si->getColLower(), *ub = si->getColUpper();
+   const double *obj = si->getObjCoefficients();
+   const double *x = lp_data->x;
+   const CoinPackedMatrix *rmat = si->getMatrixByRow();
+   const double *rmatval = rmat->getElements();
+   const int *rmatind = rmat->getIndices();
+   const CoinBigIndex *rmatbeg = rmat->getVectorStarts();
+   const int *rmatlen = rmat->getVectorLengths();
+   const char *sense = si->getRowSense();
+   const double *rhs = si->getRightHandSide();
+   const double *range = si->getRowRange();
+
+   FeasibilityJumpSolver fj(0, 0, 1.0, tol, tol);
+   std::vector<double> init(n);
+   for (j = 0; j < n; j++){
+      if (vars[j]->is_int){
+	 fj.addVar(VarType::Integer, lb[j], ub[j], obj[j]);
+	 init[j] = floor(x[j] + 0.5);
+      }else{
+	 fj.addVar(VarType::Continuous, lb[j], ub[j], obj[j]);
+	 init[j] = x[j];
+	 has_continuous = TRUE;
+      }
+      init[j] = MAX(lb[j], MIN(ub[j], init[j]));
+   }
+   int64_t nnz = 0;
+   for (i = 0; i < m; i++){
+      int len = rmatlen[i];
+      int *ind = const_cast<int *>(rmatind + rmatbeg[i]);
+      double *val = const_cast<double *>(rmatval + rmatbeg[i]);
+      nnz += len;
+      switch (sense[i]){
+       case 'E':
+	 fj.addConstraint(RowType::Equal, rhs[i], len, ind, val, 0);
+	 break;
+       case 'L':
+	 fj.addConstraint(RowType::Lte, rhs[i], len, ind, val, 0);
+	 break;
+       case 'G':
+	 fj.addConstraint(RowType::Gte, rhs[i], len, ind, val, 0);
+	 break;
+       case 'R':
+	 fj.addConstraint(RowType::Lte, rhs[i], len, ind, val, 0);
+	 fj.addConstraint(RowType::Gte, rhs[i] - range[i], len, ind, val, 0);
+	 break;
+       default:
+	 break;
+      }
+   }
+
+   const int64_t max_effort = nnz*(int64_t)p->par.fj_effort_mult;
+   const int64_t stall_limit = nnz*(int64_t)p->par.fj_stall_mult;
+   std::vector<double> sol;
+   int64_t effort = 0;
+   fj.solve(init.data(), [&](FJStatus status) -> CallbackControlFlow {
+      effort = status.totalEffort;
+      if (status.solution != nullptr){
+	 sol.assign(status.solution, status.solution + status.numVars);
+	 return CallbackControlFlow::Terminate;
+      }
+      if (timeleft >= 0.0 && wall_clock(NULL) - start >= timeleft){
+	 return CallbackControlFlow::Terminate;
+      }
+      if (status.totalEffort >= max_effort){
+	 return CallbackControlFlow::Terminate;
+      }
+      if (stall_limit > 0 && status.effortSinceLastImprovement > stall_limit){
+	 return CallbackControlFlow::Terminate;
+      }
+      return CallbackControlFlow::Continue;
+   });
+
+   if (!sol.empty()){
+      for (j = 0; j < n; j++){
+	 if (vars[j]->is_int){
+	    sol[j] = floor(sol[j] + 0.5);
+	 }
+      }
+      std::vector<double> polished;
+      if (has_continuous){
+	 /* Re-optimize the continuous variables with the integer ones fixed,
+	  * on a copy of the LP without the cuts */
+	 OsiSolverInterface *lp = si->clone();
+	 int nrows = lp->getNumRows();
+	 if (nrows > m){
+	    std::vector<int> del(nrows - m);
+	    for (i = m; i < nrows; i++){
+	       del[i - m] = i;
+	    }
+	    lp->deleteRows(nrows - m, del.data());
+	 }
+	 for (j = 0; j < n; j++){
+	    if (vars[j]->is_int){
+	       lp->setColBounds(j, sol[j], sol[j]);
+	    }
+	 }
+	 lp->messageHandler()->setLogLevel(0);
+	 lp->resolve();
+	 if (lp->isProvenOptimal()){
+	    polished.assign(lp->getColSolution(), lp->getColSolution() + n);
+	    for (j = 0; j < n; j++){
+	       if (vars[j]->is_int){
+		  polished[j] = sol[j];
+	       }
+	    }
+	 }
+	 delete lp;
+      }
+      if (!polished.empty() && fj_check_solution(p, polished.data(), tol)){
+	 sol = polished;
+	 found = TRUE;
+      }else if (fj_check_solution(p, sol.data(), tol)){
+	 found = TRUE;
+      }
+   }
+
+   if (found){
+      double objval = 0.0;
+      for (j = 0; j < n; j++){
+	 objval += obj[j]*sol[j];
+      }
+      memcpy(better_solution, sol.data(), DSIZE*n);
+      *solution_value = objval;
+      p->lp_stat.fj_num_sols++;
+   }
+   PRINT(p->par.verbosity, 1,
+	 ("Feasibility jump: %s after %.2f s, effort %lld of %lld\n",
+	  found ? "found a solution" :
+	  (sol.empty() ? "no solution" : "solution failed the check"),
+	  wall_clock(NULL) - start, (long long)effort, (long long)max_effort));
+
+   p->comp_times.fj += used_time(&total_time);
+   return found;
+}

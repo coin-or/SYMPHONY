@@ -88,6 +88,10 @@ int fp_add_obj_row(LPdata *new_lp_data, int n, const double *obj, double rhs);
 int fp_can_sos_var_fix(lp_prob *p, FPdata *fp_data, int ind, int *filled_row_count);
 int fp_fix_sos_var(lp_prob *p, FPdata *fp_data, int ind);
 
+/* feasibility jump */
+int feasibility_jump PROTO((lp_prob *p, double *solution_value,
+			    double *better_solution));
+
 /* rounding */
 int round_solution PROTO((lp_prob *p, LPdata *lp_data, double *solution_value, 
 			  double *betterSolution, double t_lb));
