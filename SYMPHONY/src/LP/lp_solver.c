@@ -2343,6 +2343,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 || defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
 || defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
 
+#ifdef __OSI_CLP__
+#include "CoinTime.hpp"
+#endif
+
 static bool retval = false;
 
 void open_lp_solver(LPdata *lp_data)
@@ -2641,14 +2645,15 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
-      double timelimit;
-      ClpDblParam key = ClpMaxWallSeconds;   
-      lp_data->si->getModelPtr()->getDblParam(key, timelimit);
-      // YX: reset term if needed; Clp may return ITLIM at timeout
-      int itlim_chk = -1;
-      retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
-      // feb223: but check that a time limit has been actually set
-      if (timelimit > 0 && (si->getIterationCount() < itlim_chk)){
+      /* Clp reports the time limit as the iteration limit. Its wall-clock
+         limit is a deadline (set_timelim() passes the time left, and Clp
+         adds the current time), so check the clock as Clp does. Comparing
+         the iteration count with OsiMaxNumIteration doesn't work: a hot
+         start stops at OsiMaxNumIterationHotStart, and Clp can stop early
+         for other reasons. */
+      double deadline = -1.0;
+      si->getModelPtr()->getDblParam(ClpMaxWallSeconds, deadline);
+      if (deadline >= 0.0 && CoinWallclockTime() >= deadline){
          term = LP_TIME_LIMIT;
       }
       /* If max iterations and had switched to primal, bound is no good */
@@ -2790,14 +2795,15 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
-      double timelimit;
-      ClpDblParam key = ClpMaxWallSeconds;   
-      lp_data->si->getModelPtr()->getDblParam(key, timelimit);
-      // YX: reset term if needed; Clp may return ITLIM at timeout
-      int itlim_chk = -1;
-      retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
-      // feb223: but check that a time limit has been actually set
-      if (timelimit > 0 && (si->getIterationCount() < itlim_chk)){
+      /* Clp reports the time limit as the iteration limit. Its wall-clock
+         limit is a deadline (set_timelim() passes the time left, and Clp
+         adds the current time), so check the clock as Clp does. Comparing
+         the iteration count with OsiMaxNumIteration doesn't work: a hot
+         start stops at OsiMaxNumIterationHotStart, and Clp can stop early
+         for other reasons. */
+      double deadline = -1.0;
+      si->getModelPtr()->getDblParam(ClpMaxWallSeconds, deadline);
+      if (deadline >= 0.0 && CoinWallclockTime() >= deadline){
          term = LP_TIME_LIMIT;
       }
       /* If max iterations and had switched to primal, bound is no good */
@@ -2907,14 +2913,15 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
    else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
 #ifdef __OSI_CLP__
-      double timelimit;
-      ClpDblParam key = ClpMaxWallSeconds;   
-      lp_data->si->getModelPtr()->getDblParam(key, timelimit);
-      // YX: reset term if needed; Clp may return ITLIM at timeout
-      int itlim_chk = -1;
-      retval = si->getIntParam(OsiMaxNumIteration, itlim_chk);
-      // feb223: but check that a time limit has been actually set
-      if (timelimit > 0 && (si->getIterationCount() < itlim_chk)){
+      /* Clp reports the time limit as the iteration limit. Its wall-clock
+         limit is a deadline (set_timelim() passes the time left, and Clp
+         adds the current time), so check the clock as Clp does. Comparing
+         the iteration count with OsiMaxNumIteration doesn't work: a hot
+         start stops at OsiMaxNumIterationHotStart, and Clp can stop early
+         for other reasons. */
+      double deadline = -1.0;
+      si->getModelPtr()->getDblParam(ClpMaxWallSeconds, deadline);
+      if (deadline >= 0.0 && CoinWallclockTime() >= deadline){
          term = LP_TIME_LIMIT;
       }
 #endif
