@@ -1438,27 +1438,27 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 {
    int user_res;
    LPdata *lp_data = p->lp_data;
-   double *x = NULL;
    double lpetol = lp_data->lpetol;
 
    int number = 0;
-   int i, *xind = lp_data->tmp.i1; /* n */
-   double tmpd, *xval = lp_data->tmp.d; /* n */
+   int i, *xind;
+   double tmpd, *xval;
 
    if (p->par.verbosity < 0) return;
 
-   switch (which_sol){
-      case DISP_FEAS_SOLUTION:
-         x = lp_data->heur_solution;
-         break;
-      case DISP_RELAXED_SOLUTION:
-      case DISP_FINAL_RELAXED_SOLUTION:
-      default:
-         x = lp_data->x;
-         break;
+   if (which_sol == DISP_FEAS_SOLUTION){
+      /* Show the solution that was stored, whether it came from the LP or
+       * from a heuristic. Don't collect it again into lp_data->tmp: the
+       * caller, is_feasible_u(), still needs its copy there. */
+      if (!p->best_sol.has_sol) return;
+      number = p->best_sol.xlength;
+      xind = p->best_sol.xind;
+      xval = p->best_sol.xval;
+   }else{
+      xind = lp_data->tmp.i1; /* n */
+      xval = lp_data->tmp.d; /* n */
+      number = collect_nonzeros(p, lp_data->x, xind, xval);
    }
-   
-   number = collect_nonzeros(p, x, xind, xval);
 
    /* Invoke user written function. */
 #ifdef USE_SYM_APPLICATION
@@ -1860,6 +1860,8 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
 	 //}
 	 break;
        case LP_D_ITLIM:
+       case LP_TIME_LIMIT:
+	 /* The LP stopped early, so its value is only an estimate. */
 	 can->objval[i] = MAX(can->objval[i], oldobjval);
 	 break;
        case LP_D_INFEASIBLE:
@@ -2032,8 +2034,11 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
       action[i] = RETURN_THIS_CHILD;
       if (p->lp_data->nf_status == NF_CHECK_NOTHING){
 	 /*see which one is infeasible!*/
+	 /* An LP that stopped at the iteration or time limit says nothing
+	    about feasibility, so keep the child unless its bound prunes it. */
 	 if (can->termcode[i] == LP_OPTIMAL || 
-	     can->termcode[i] == LP_D_ITLIM){
+	     can->termcode[i] == LP_D_ITLIM ||
+	     can->termcode[i] == LP_TIME_LIMIT){
 	    if (p->has_ub &&
 		can->objval[i] > p->ub - p->par.granularity){
 	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
