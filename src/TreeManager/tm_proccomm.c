@@ -621,9 +621,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    char node_type, repricing;
    node_desc *desc = &n->desc;
    node_desc *newdesc;
-#ifdef DO_TESTS
    double old_lower_bound  = n->lower_bound;
-#endif
 
    tm->stat.analyzed++;
 
@@ -724,6 +722,11 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
       n->node_status = (node_type == TIME_LIMIT ?
 			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
+      /* The LP was interrupted, so the value it sent is not a bound on the
+	 node. Keep the bound the node already had. */
+      if (!repricing){
+	 n->lower_bound = old_lower_bound;
+      }
       insert_new_node(tm, n);
       if (!repricing)
 	 return;
