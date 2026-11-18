@@ -2727,7 +2727,29 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    //si->getModelPtr()->setSubstitution(3);
 #endif
    si->resolve();
-   
+
+#ifdef __OSI_CLP__
+   /* Clp can give up in primal with flagged variables and still report the
+    * LP optimal (secondary status 5). The solution can then be far from
+    * feasible: on rocII-5-11 a node LP that is infeasible came back "optimal"
+    * with 376 columns outside their bounds, one binary at 2.91. Solve such
+    * an LP again from an all-slack basis, and give up on it if that doesn't
+    * help either. */
+   char clp_gave_up = FALSE;
+   if (si->isProvenOptimal() && si->getModelPtr()->secondaryStatus() == 5){
+      si->getModelPtr()->allSlackBasis(true);
+      si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
+      si->initialSolve();
+      clp_gave_up = (si->isProvenOptimal() &&
+		     si->getModelPtr()->secondaryStatus() == 5);
+   }
+#endif
+
+#ifdef __OSI_CLP__
+   if (clp_gave_up){
+      term = LP_ABANDONED;
+   }else
+#endif
    if (si->isProvenDualInfeasible()){
       term = LP_D_INFEASIBLE;
    }else if (si->isProvenPrimalInfeasible()){
@@ -2901,9 +2923,18 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 }
 
 /*===========================================================================*/
+/* Returns 0 if hot starts can be used and 1 if they can't. OsiClp sets the
+ * problem status to infeasible when it can't set up a hot start, for example
+ * when the reduced copy of the LP it builds doesn't solve to optimality. Every
+ * solveFromHotStart() after that reports the LP infeasible without iterating,
+ * so the caller has to solve the strong-branching LPs without hot starts. */
 int mark_hotstart(LPdata *lp_data)
 {
    lp_data->si->markHotStart();
+   if (!lp_data->si->isProvenOptimal()){
+      lp_data->si->unmarkHotStart();
+      return (1);
+   }
    return (0);
 }
 

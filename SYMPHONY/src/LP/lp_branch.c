@@ -716,8 +716,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	  should_use_hot_starts = FALSE;
 	}
 	
-	if (should_use_hot_starts) {
-	  mark_hotstart(lp_data);
+	if (should_use_hot_starts && mark_hotstart(lp_data)) {
+	  should_use_hot_starts = FALSE;
 	}
       }
 
@@ -1474,7 +1474,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             unmark_hotstart(lp_data);
             set_itlim_hotstart(lp_data, -1);
          }else{
-	    load_basis(lp_data, rstat, cstat);
+	    load_basis(lp_data, cstat, rstat);
 	 }
          set_itlim(lp_data, -1); //both limits should be set for hotstarts
 	 if (both_children_inf){
@@ -1505,8 +1505,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       }
 
       /* Set the iteration limit */
-      if (should_use_hot_starts) {
-	 mark_hotstart(lp_data);
+      if (should_use_hot_starts && mark_hotstart(lp_data)) {
+	 should_use_hot_starts = FALSE;
       }
       
       if (p->par.max_presolve_iter > 0) {
@@ -2530,8 +2530,9 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
 {
    int status = 0;
    LPdata *lp_data = p->lp_data;
-   int *cstat = lp_data->tmp.i1;
-   int *rstat = lp_data->tmp.i2;
+   /* the basis that select_branching_object() saved before strong branching */
+   int *cstat = lp_data->cstat;
+   int *rstat = lp_data->rstat;
 
    // TODO: LP_ABANDONED
    /* change the lb and ub */
