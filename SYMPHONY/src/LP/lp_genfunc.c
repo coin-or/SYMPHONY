@@ -3543,7 +3543,12 @@ int update_pcost(lp_prob *p)
    int *br_rel_down = p->br_rel_down;
    int *br_rel_up = p->br_rel_up;
    double objval = p->lp_data->objval;
-   double oldobjval = p->tm->active_nodes[p->proc_index]->lower_bound;
+   /* The change is measured from the parent's LP value, which is the
+    * parent's lower bound: fathom_branch() sets the active node's bound
+    * after each LP solve. The current node's own bound can't be used: by
+    * the time this is called, fathom_branch() has already set it to objval,
+    * which would make every update zero. */
+   double oldobjval = parent->lower_bound;
    double oldx =  parent->bobj.value;
    double *x;
 
