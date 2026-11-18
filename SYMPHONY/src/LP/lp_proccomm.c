@@ -601,10 +601,16 @@ void send_node_desc(lp_prob *p, int node_type)
    n->intcpt = lp_data->intcpt;
 #endif
 
-   n->lower_bound = p->objval; /*lp_data->objval gets over-written
-				 in branching */
-      
 #ifdef COMPILE_IN_LP
+   /* If the node was interrupted by the time or iteration limit, p->objval
+      is not a bound: it is the value of an LP that was stopped early or, if
+      no LP was solved at this node, of the previous node. n->lower_bound
+      already holds a valid bound (the one the node inherited, raised to the
+      LP value each time the LP was solved to optimality here), so keep it. */
+   if (node_type != TIME_LIMIT && node_type != ITERATION_LIMIT){
+      n->lower_bound = p->objval; /*lp_data->objval gets over-written
+				    in branching */
+   }
    int *indices;
    double *values;
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
@@ -692,7 +698,6 @@ void send_node_desc(lp_prob *p, int node_type)
    if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
       n->node_status = (node_type == TIME_LIMIT ?
 			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
-      n->lower_bound = p->objval;
       insert_new_node(tm, n);
       if (!repricing)
 	 return;
