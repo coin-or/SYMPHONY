@@ -1773,6 +1773,8 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
 	 can->objval[i] = MAXDOUBLE / 2;
 	 break;
        case LP_D_ITLIM:
+       case LP_TIME_LIMIT:
+	 /* The LP stopped early, so its value is only an estimate. */
 	 can->objval[i] = MAX(can->objval[i], oldobjval);
 	 break;
        case LP_D_INFEASIBLE:
@@ -1944,8 +1946,11 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
       action[i] = RETURN_THIS_CHILD;
       if (p->lp_data->nf_status == NF_CHECK_NOTHING){
 	 /*see which one is infeasible!*/
+	 /* An LP that stopped at the iteration or time limit says nothing
+	    about feasibility, so keep the child unless its bound prunes it. */
 	 if (can->termcode[i] == LP_OPTIMAL || 
-	     can->termcode[i] == LP_D_ITLIM){
+	     can->termcode[i] == LP_D_ITLIM ||
+	     can->termcode[i] == LP_TIME_LIMIT){
 	    if (p->has_ub &&
 		can->objval[i] > p->ub - p->par.granularity){
 	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
