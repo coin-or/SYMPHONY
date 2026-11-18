@@ -2496,6 +2496,17 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 }
 
 /*===========================================================================*/
+/*===========================================================================*/
+/* The length limit on cuts: max_cut_length, or at the root the larger of
+ * that and max_cut_length_root, if set. */
+static int cut_length_limit(lp_prob *p)
+{
+   if (p->bc_level < 1 && p->par.max_cut_length_root > 0){
+      return(MAX(p->par.max_cut_length, p->par.max_cut_length_root));
+   }
+   return(p->par.max_cut_length);
+}
+
 int should_use_cgl_generator(lp_prob *p, int *should_generate, 
       int which_generator, void *generator)
 {
@@ -2753,8 +2764,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 	    always applies its root limit. Set it to the length limit
 	    check_and_add_cgl_cuts() will apply, so that Gomory doesn't build
 	    cuts only for them to be thrown away. */
-	 gomory->setLimit(max_cut_length);
-	 gomory->setLimitAtRoot(max_cut_length);
+	 gomory->setLimit(cut_length_limit(p));
+	 gomory->setLimitAtRoot(cut_length_limit(p));
 	 //if(p->bc_index < 1) {
 	 //  gomory->setAway(100*p->lp_data->lpetol);
 	 //}
@@ -2990,13 +3001,78 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
 
 /*===========================================================================*/
 #ifdef USE_CGL_CUTS
+/*===========================================================================*\
+ * Cbc's test of a cut's coefficients (ADJUST_CUTS in CbcCutGenerator.cpp),
+ * used when cut_coef_test is 1. Ranged and equality cuts are left alone.
+ * A coefficient below small (1e-5 at the root, 1e-4 in the tree) on a
+ * column whose bounds are less than 100 apart only relaxes the rhs, by
+ * what dropping the term could change; elsewhere it rejects the cut. The
+ * other coefficients may span at most a factor of 1e9. The rhs doesn't
+ * count. Returns the (possibly relaxed) rhs in *rhs_out, or FALSE to
+ * reject.
+\*===========================================================================*/
+static int cbc_cut_coef_ok(const OsiRowCut *cut, const double *x,
+			   const double *lb, const double *ub, double small,
+			   double *rhs_out)
+{
+   double rlo = cut->lb(), rup = cut->ub(), rhs, orig, sum = 0.0;
+   double largest = 0.0, smallest = 1.0e30;
+   int upper, k, kept = 0;
+   const int n = cut->row().getNumElements();
+   const int *ind = cut->row().getIndices();
+   const double *el = cut->row().getElements();
+
+   if (rup < 1.0e20){
+      if (rlo > -1.0e20){
+	 *rhs_out = cut->rhs();
+	 return(TRUE);
+      }
+      upper = TRUE;
+      rhs = rup;
+   }else{
+      upper = FALSE;
+      rhs = rlo;
+   }
+   orig = rhs;
+   for (k = 0; k < n; k++){
+      sum += el[k] * x[ind[k]];
+   }
+   for (k = 0; k < n; k++){
+      double v = fabs(el[k]);
+      int j = ind[k];
+      if (v < small){
+	 if (ub[j] - lb[j] >= 100.0){
+	    return(FALSE);
+	 }
+	 if (upper){
+	    rhs += (el[k] > 0.0) ? -v * lb[j] : v * ub[j];
+	    if (sum < rhs + small) return(FALSE);
+	 }else{
+	    rhs += (el[k] > 0.0) ? -v * ub[j] : v * lb[j];
+	    if (sum > rhs - small) return(FALSE);
+	 }
+      }else{
+	 largest = MAX(largest, v);
+	 smallest = MIN(smallest, v);
+	 kept++;
+      }
+   }
+   if (!kept || largest > 1.0e9 * smallest){
+      return(FALSE);
+   }
+   /* As Cbc does: relax by the amount, whichever way it moved */
+   *rhs_out = upper ? orig + fabs(rhs - orig) : orig - fabs(rhs - orig);
+   return(TRUE);
+}
+
+/*===========================================================================*/
 int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts, 
 			   int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool) 
 {
    int i, k, num_row_cuts, *accepted_ind = NULL, num_elements,
       *indices, discard_cut, num_poor_quality = 0, num_unviolated = 0,
       num_duplicate = 0, *matind; 
-   int    max_elements = p->par.max_cut_length, 
+   int    max_elements = cut_length_limit(p), 
       verbosity = p->par.verbosity;
    LPdata       *lp_data = p->lp_data;
    int          *tmp_matind = lp_data->tmp.i1;
@@ -3125,7 +3201,28 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       bool bad_small_coeff_cond = min_coeff > 0 && min_coeff < etol1000;
       bool bad_coeff_ratio_cond = max_coeff > 0 && coeff_ratio < etol1000;
 
-      if (num_elements>0) {
+      if (num_elements>0 && p->par.cut_coef_test == 1) {
+	 double new_rhs = rhs;
+	 if (!cbc_cut_coef_ok(cutlist->rowCutPtr(i), x,
+			      lp_data->si->getColLower(),
+			      lp_data->si->getColUpper(),
+			      p->bc_level < 1 ? 1.0e-5 : 1.0e-4, &new_rhs)) {
+            PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
+	    num_poor_quality++;
+	    continue;
+	 }
+	 if (new_rhs != rhs) {
+	    OsiRowCut *cut = cutlist->rowCutPtr(i);
+	    if (row_cut.sense() == 'L') {
+	       cut->setUb(new_rhs);
+	       violation -= new_rhs - rhs;
+	    } else {
+	       cut->setLb(new_rhs);
+	       violation += new_rhs - rhs;
+	    }
+	    rhs = new_rhs;
+	 }
+      } else if (num_elements>0) {
          if ( (bad_coeff_ratio_cond)||
       	      (bad_small_coeff_cond) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));

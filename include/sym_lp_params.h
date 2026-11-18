@@ -182,6 +182,12 @@ typedef struct LP_PARAMS{
    int               max_cut_num_per_iter_root;
    int               min_root_cut_rounds;
    int               max_cut_length;
+   int               max_cut_length_root; /* if > 0, the length limit at the
+                                             root is the larger of this and
+                                             max_cut_length (default 1000) */
+   int               cut_coef_test;       /* how to test a cut's coefficients:
+                                             0: SYMPHONY's test, 1: Cbc's
+                                             (default) */
    int               tried_long_cuts;
 
    int               best_violation_length[CGL_NUM_GENERATORS];

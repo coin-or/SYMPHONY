@@ -839,6 +839,32 @@ The maximum number of cuts that can be added to the LP in an
 iteration. The remaining cuts stay in the local pool to be added in
 subsequent iterations, if they are strong enough.
 
+\item[\ptt{max\_cut\_length} -- integer (100).]
+\mysindex{p}{\LPP!max\_cut\_length}
+The maximum number of nonzero coefficients in a cut from the Cut Generation
+Library. Longer cuts are discarded.
+
+\item[\ptt{max\_cut\_length\_root} -- integer (1000).]
+\mysindex{p}{\LPP!max\_cut\_length\_root}
+If positive, the length limit in the root node is the larger of this and
+\ptt{max\_cut\_length}. The Gomory cut generator is given the same limit.
+
+\item[\ptt{cut\_coef\_test} -- integer (1).]
+\mysindex{p}{\LPP!cut\_coef\_test}
+How the coefficients of a cut from the Cut Generation Library are tested
+before the cut is added.
+\begin{itemize}
+\item 0: SYMPHONY's original test. A cut is discarded if its smallest
+coefficient or the ratio of its smallest to its largest coefficient is below
+1000 times the LP's primal tolerance.
+\item 1: Cbc's test. A coefficient below $10^{-5}$ in the root node
+($10^{-4}$ elsewhere) on a variable whose bounds are less than 100 apart is
+removed, and the right-hand side is relaxed by what it could contribute. Any
+other such coefficient discards the cut, as does a ratio of more than
+$10^9$ between the remaining coefficients. Ranged and equality cuts are not
+tested.
+\end{itemize}
+
 \item[\ptt{do\_reduced\_cost\_fixing} -- boolean ({\tt FALSE}).]
 \mysindex{p}{\LPP!do\_reduced\_cost\_fixing}
 Whether or not to attempt to fix variables by reduced cost. This

@@ -382,6 +382,8 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->min_root_cut_rounds = 100;
    lp_par->tried_long_cuts = FALSE;
    lp_par->max_cut_length = 100;
+   lp_par->max_cut_length_root = 1000;
+   lp_par->cut_coef_test = 1;
    lp_par->do_reduced_cost_fixing = TRUE;
    lp_par->gap_as_ub_frac = .1;
    lp_par->gap_as_last_gap_frac = .7;
@@ -5814,6 +5816,14 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
       *value = lp_par->max_cut_length;
       return(0);
    }
+   else if (strcmp(key, "max_cut_length_root") == 0) {
+      *value = lp_par->max_cut_length_root;
+      return(0);
+   }
+   else if (strcmp(key, "cut_coef_test") == 0) {
+      *value = lp_par->cut_coef_test;
+      return(0);
+   }
    
    /* variable fixing params */
    else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
@@ -7833,6 +7843,16 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    else if (strcmp(key, "max_cut_length") == 0 ||
 	    strcmp(key, "LP_max_cut_length") == 0){
       READ_INT_PAR(lp_par->max_cut_length);
+      return(0);
+   }
+   else if (strcmp(key, "max_cut_length_root") == 0 ||
+	    strcmp(key, "LP_max_cut_length_root") == 0){
+      READ_INT_PAR(lp_par->max_cut_length_root);
+      return(0);
+   }
+   else if (strcmp(key, "cut_coef_test") == 0 ||
+	    strcmp(key, "LP_cut_coef_test") == 0){
+      READ_INT_PAR(lp_par->cut_coef_test);
       return(0);
    }
 
