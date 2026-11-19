@@ -2722,7 +2722,12 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             *should_generate = FALSE;
             break;
          }
+	 /* SYMPHONY calls generateCuts() without a CglTreeInfo, so Gomory
+	    always applies its root limit. Set it to the length limit
+	    check_and_add_cgl_cuts() will apply, so that Gomory doesn't build
+	    cuts only for them to be thrown away. */
 	 gomory->setLimit(max_cut_length);
+	 gomory->setLimitAtRoot(max_cut_length);
 	 //if(p->bc_index < 1) {
 	 //  gomory->setAway(100*p->lp_data->lpetol);
 	 //}
@@ -3142,21 +3147,19 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    qsort_di(hashes, accepted_ind, accepted_cnt);
    int l_ind, r_ind, c_ind;
    int move_ratio = num_row_cuts + 100; 
-   for(l_ind = 0; l_ind < accepted_cnt;){
-      c_ind = accepted_ind[l_ind]; 
-      accepted_ind[l_ind] += move_ratio; 
-      for(r_ind = l_ind + 1; r_ind < accepted_cnt; r_ind++){
-	 if(fabs(hashes[l_ind] - hashes[r_ind]) < lpetol){
-            PRINT(verbosity,5,("cut #%i is same as cut #%i\n", c_ind, accepted_ind[r_ind]));
-            num_duplicate++;
-            //is_deleted[i] = TRUE;
-	    r_ind++;
-	 }else{
-	    l_ind = r_ind; 
-	    break;
-	 }
+   /* Keep the first cut of each run of equal hashes. (This used to skip
+      the cut after each duplicate, dropping it whether or not it was a
+      duplicate.) */
+   for(l_ind = 0, r_ind = -1; l_ind < accepted_cnt; l_ind++){
+      if (r_ind >= 0 && fabs(hashes[l_ind] - hashes[r_ind]) < lpetol){
+	 PRINT(verbosity,5,("cut #%i is same as cut #%i\n",
+			    accepted_ind[l_ind],
+			    accepted_ind[r_ind] - move_ratio));
+	 num_duplicate++;
+	 continue;
       }
-      if(r_ind >= accepted_cnt) break; 
+      accepted_ind[l_ind] += move_ratio;
+      r_ind = l_ind;
    }
 
    r_ind = accepted_cnt;
