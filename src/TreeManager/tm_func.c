@@ -419,7 +419,7 @@ int solve(tm_prob *tm)
 #pragma omp master
 	    if(tm->par.node_selection_rule == DEPTH_FIRST_THEN_BEST_FIRST &&
 	       tm->has_ub){
-	      tm->par.node_selection_rule = LOWEST_LP_FIRST;
+	      change_node_selection_rule(tm, LOWEST_LP_FIRST);
 	    }
 
 	    if (i != NEW_NODE__STARTED)
@@ -1219,6 +1219,45 @@ OPENMP_ATOMIC_WRITE
    
 } /* End critical Region */
 
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Changes the node selection rule and reorders the list of candidate nodes
+ * for it. The list is a heap under the rule it was built with, and
+ * del_best_node(), insert_new_node() and find_tree_lb() all assume it is a
+ * heap under the current rule. find_tree_lb() takes the first node's bound
+ * as the tree's lower bound under LOWEST_LP_FIRST, so a list still ordered
+ * by depth gives a bound that can be above the optimal value.
+\*===========================================================================*/
+
+void change_node_selection_rule(tm_prob *tm, int rule)
+{
+#pragma omp critical (tree_update)
+{
+   bc_node **list = tm->samephase_cand;
+   int size = tm->samephase_candnum;
+   bc_node *temp;
+   int i, pos, ch;
+
+   tm->par.node_selection_rule = rule;
+
+   /* Rebuild the heap bottom up, sifting each internal node down */
+   for (i = size/2; i >= 1; i--){
+      temp = list[i];
+      pos = i;
+      while ((ch = 2*pos) <= size){
+	 if (ch < size && node_compar(tm, rule, list[ch], list[ch+1]))
+	    ch++;
+	 if (!node_compar(tm, rule, temp, list[ch]))
+	    break;
+	 list[pos] = list[ch];
+	 pos = ch;
+      }
+      list[pos] = temp;
+   }
+} /* End critical region */
 }
 
 /*===========================================================================*/
