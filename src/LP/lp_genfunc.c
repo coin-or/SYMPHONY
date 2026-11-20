@@ -2536,6 +2536,19 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             *should_generate = FALSE;
             break;
          } 
+	 /* At the root, stop probing after probing_root_idle calls in a row
+	  * that gave no cuts and no bound changes, once probing has taken at
+	  * least probing_root_idle_time seconds and more than the LP. Without
+	  * the time condition, the rule would also stop probing on instances
+	  * where it is cheap and useful in the tree. */
+	 if (bc_level < 1 && p->par.cgl.probing_root_idle > 0 &&
+	     data_par->probing_root_idle_count >=
+	     p->par.cgl.probing_root_idle &&
+	     p->comp_times.probing_cuts >=
+	     MAX(p->par.cgl.probing_root_idle_time, p->comp_times.lp)) {
+	    *should_generate = FALSE;
+	    break;
+	 }
 
 
 #ifdef SYM_COMPILE_IN_LP
@@ -2649,6 +2662,32 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 #ifdef SYM_COMPILE_IN_LP
 	 }
 #endif
+	 /* Limits based on Cbc's (CbcSolverCutSetup.cpp): at the root, probe
+	  * at most 50 variables, look at 10 and skip rows longer than 300; in
+	  * the tree, 10, 10 and 200; one pass. These are the values Cbc sets
+	  * first; by default it then raises the variables to probe to 123 and
+	  * the variables to look at in the root to 20. SYMPHONY calls
+	  * CglProbing without a CglTreeInfo, so CglProbing always uses its root
+	  * settings, and in the tree they are set to the tree values. */
+	 if (p->par.cgl.probing_limits == 1) {
+	    probing->setMaxPass(1);
+	    probing->setMaxPassRoot(1);
+	    probing->setMaxProbe(10);
+	    probing->setMaxLook(10);
+	    probing->setMaxElements(200);
+	    if (bc_level < 1) {
+	       probing->setMaxProbeRoot(50);
+	       probing->setMaxLookRoot(10);
+	       probing->setMaxElementsRoot(300);
+	    } else {
+	       probing->setMaxProbeRoot(10);
+	       probing->setMaxLookRoot(10);
+	       probing->setMaxElementsRoot(200);
+	    }
+	 }
+	 if (p->par.cgl.probing_max_seconds > 0) {
+	    probing->setMaxSeconds(p->par.cgl.probing_max_seconds);
+	 }
          *should_generate = TRUE;
          p->lp_stat.probing_calls++;
          break;
@@ -2887,8 +2926,24 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
 	  CglProbing *probing = new CglProbing;
 	  should_use_cgl_generator(p, &should_generate, i, (void *)probing);
          if (should_generate == TRUE) {
+	    int row_cuts = cutlist.sizeRowCuts();
+	    int col_cuts = cutlist.sizeColCuts();
             probing->generateCuts(*(p->lp_data->si), cutlist);
             *was_tried = TRUE;
+	    /* Count the calls in a row at the root that give nothing, for
+	     * probing_root_idle */
+	    if (p->bc_level < 1) {
+	       int bounds = 0;
+	       for (int k = col_cuts; k < cutlist.sizeColCuts(); k++) {
+		  bounds += cutlist.colCut(k).lbs().getNumElements() +
+		     cutlist.colCut(k).ubs().getNumElements();
+	       }
+	       if (cutlist.sizeRowCuts() > row_cuts || bounds > 0) {
+		  p->lp_data->cgl.probing_root_idle_count = 0;
+	       } else {
+		  p->lp_data->cgl.probing_root_idle_count++;
+	       }
+	    }
          }
          delete probing;
          cut_time     = used_time(&total_time);

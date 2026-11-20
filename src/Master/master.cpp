@@ -407,6 +407,11 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
 
    lp_par->cgl.probing_is_expensive = FALSE;
    lp_par->cgl.probing_root_max_look = 100;
+   lp_par->cgl.probing_limits = 1;
+   lp_par->cgl.probing_root_idle = 2;
+   lp_par->cgl.probing_root_idle_time = 1.0;
+   lp_par->cgl.probing_root_idle_count = 0;
+   lp_par->cgl.probing_max_seconds = 0.0;
 
    lp_par->cgl.gomory_max_depth = 200;
    lp_par->cgl.probing_max_depth = 40;
@@ -5921,6 +5926,16 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
       *value = lp_par->cgl.generate_cgl_probing_cuts_freq;
       return(0);
    }
+   else if (strcmp(key, "probing_limits") == 0 ||
+	    strcmp(key, "LP_probing_limits") == 0){
+      *value = lp_par->cgl.probing_limits;
+      return(0);
+   }
+   else if (strcmp(key, "probing_root_idle") == 0 ||
+	    strcmp(key, "LP_probing_root_idle") == 0){
+      *value = lp_par->cgl.probing_root_idle;
+      return(0);
+   }
    else if (strcmp(key, "generate_cgl_clique_cuts_freq") == 0 ||
             strcmp(key, "LP_generate_cgl_clique_cuts_freq") == 0){
      *value = lp_par->cgl.generate_cgl_clique_cuts_freq;
@@ -6408,6 +6423,16 @@ SYMPHONYLIB_EXPORT int sym_get_dbl_param(sym_environment *env, const char *key,
    else if (strcmp(key, "mc_rho") == 0 ||
 	    strcmp(key, "LP_mc_rho") == 0 ){
       *value = lp_par->mc_rho;
+      return(0);
+   }
+   else if (strcmp(key, "probing_root_idle_time") == 0 ||
+	    strcmp(key, "LP_probing_root_idle_time") == 0){
+      *value = lp_par->cgl.probing_root_idle_time;
+      return(0);
+   }
+   else if (strcmp(key, "probing_max_seconds") == 0 ||
+	    strcmp(key, "LP_probing_max_seconds") == 0){
+      *value = lp_par->cgl.probing_max_seconds;
       return(0);
    }
    else if (strcmp(key, "fp_time_limit") == 0) {
@@ -8045,6 +8070,30 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    else if (strcmp(key, "probing_max_depth") == 0 ||
 	    strcmp(key, "LP_probing_max_depth") == 0){
       READ_INT_PAR(lp_par->cgl.probing_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "probing_limits") == 0 ||
+	    strcmp(key, "LP_probing_limits") == 0){
+      READ_INT_PAR(lp_par->cgl.probing_limits);
+      return(0);
+   }
+
+   else if (strcmp(key, "probing_root_idle") == 0 ||
+	    strcmp(key, "LP_probing_root_idle") == 0){
+      READ_INT_PAR(lp_par->cgl.probing_root_idle);
+      return(0);
+   }
+
+   else if (strcmp(key, "probing_root_idle_time") == 0 ||
+	    strcmp(key, "LP_probing_root_idle_time") == 0){
+      READ_DBL_PAR(lp_par->cgl.probing_root_idle_time);
+      return(0);
+   }
+
+   else if (strcmp(key, "probing_max_seconds") == 0 ||
+	    strcmp(key, "LP_probing_max_seconds") == 0){
+      READ_DBL_PAR(lp_par->cgl.probing_max_seconds);
       return(0);
    }
 

@@ -75,6 +75,20 @@ typedef struct CGL_PARAMS{
 
    int               probing_is_expensive;
    int               probing_root_max_look;
+   int               probing_limits;      /* CglProbing's limits: 0 as set
+					     above, 1 based on Cbc's
+					     (default) */
+   int               probing_root_idle;   /* stop probing at the root after
+					     this many calls in a row with no
+					     cuts and no bound changes (default
+					     2); -1: never */
+   double            probing_root_idle_time; /* ... but only once probing at
+					     the root has taken at least this
+					     many seconds and more than the LP
+					     (default 1) */
+   int               probing_root_idle_count; /* calls in a row with nothing */
+   double            probing_max_seconds; /* CglProbing's time limit for each
+					     call; 0: none (default) */
 
    int               gomory_max_depth;
    int               probing_max_depth;

@@ -1082,6 +1082,32 @@ The frequency with which to generate cuts if the
 parameter \texttt{cgl\_generate\_xxx\_cuts} for the
 corresponding class is set to \texttt{GENERATE\_PERIODICALLY}.
 
+\item[\ptt{probing\_limits} -- integer (1).]
+\mysindex{p}{\LPP!probing\_limits}
+The limits on probing (\texttt{CglProbing}). With 0, SYMPHONY's own rules set
+them. With 1, limits based on Cbc's are used: in the root node, probe at most
+50 variables, look at 10, and skip rows with more than 300 nonzeros; in the
+tree, 10, 10 and 200; one pass each time. (Cbc's defaults then raise the
+number of variables to probe to 123, and the number to look at in the root
+node to 20.)
+
+\item[\ptt{probing\_root\_idle} -- integer (2).]
+\mysindex{p}{\LPP!probing\_root\_idle}
+In the root node, stop probing after this many calls in a row that give no
+cuts and no bound changes, once probing has taken at least
+\ptt{probing\_root\_idle\_time} seconds and more time than solving the LPs. A
+value of -1 turns this off.
+
+\item[\ptt{probing\_root\_idle\_time} -- double (1).]
+\mysindex{p}{\LPP!probing\_root\_idle\_time}
+See \ptt{probing\_root\_idle}.
+
+\item[\ptt{probing\_max\_seconds} -- double (0).]
+\mysindex{p}{\LPP!probing\_max\_seconds}
+If positive, the time limit in seconds for each call to probing. Since where a
+call stops depends on the machine and its load, runs with this set are not
+reproducible.
+
 \label{fp_enabled}
 \item[\ptt{fp\_enabled} -- integer ({\tt SYM\_FEAS\_PUMP\_DEFAULT}\{1\}).] 
 \mysindex{p}{\LP!fp\_enabled}
