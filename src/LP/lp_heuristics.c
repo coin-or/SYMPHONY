@@ -19,7 +19,7 @@
 #include <string.h>
 
 /* Before SYMPHONY's headers, so that none of their macros reach it */
-#include "feasibilityjump.hh"
+#include "feasibilityjump_adapter.hh"
 
 #include "sym_qsort.h"
 #include "sym_lp.h"
@@ -5175,7 +5175,8 @@ double get_dgap(double obj_ub, double obj_lb, double obj_offset, char obj_sense)
 /*===========================================================================*\
  * Feasibility jump (B. Luteberget and G. Sartor, "Feasibility Jump: an
  * LP-free Lagrangian MIP heuristic", Mathematical Programming Computation 15,
- * 2023), through the reference implementation in feasibilityjump.hh, set up
+ * 2023), through the reference implementation in feasibilityjump.hh
+ * (called through fj_solve() in feasibilityjump_adapter.hh), set up
  * as in Cbc's CbcHeuristicFeasibilityJump: a weighted local search on the
  * base constraints and the current bounds, started from the rounded LP
  * solution. It stops at its first feasible solution, when its effort budget
@@ -5205,6 +5206,7 @@ static char fj_check_solution(lp_prob *p, const double *x, double tol)
    const char *sense = si->getRowSense();
    const double *rhs = si->getRightHandSide();
    const double *range = si->getRowRange();
+   CoinBigIndex k;
    int i, j;
 
    for (j = 0; j < n; j++){
@@ -5217,7 +5219,7 @@ static char fj_check_solution(lp_prob *p, const double *x, double tol)
    }
    for (i = 0; i < m; i++){
       double act = 0.0, rtol = tol + 1e-9*fabs(rhs[i]);
-      for (CoinBigIndex k = rmatbeg[i]; k < rmatbeg[i] + rmatlen[i]; k++){
+      for (k = rmatbeg[i]; k < rmatbeg[i] + rmatlen[i]; k++){
 	 act += rmatval[k]*x[rmatind[k]];
       }
       switch (sense[i]){
@@ -5252,7 +5254,16 @@ int feasibility_jump(lp_prob *p, double *solution_value,
    const int n = lp_data->n, m = p->base.cutnum;
    const double tol = 1e-6;   /* Cbc's default for FJ */
    double total_time = 0, timeleft = -1.0, start = wall_clock(NULL);
-   int i, j, found = FALSE, has_continuous = FALSE;
+   int i, j, found = FALSE, fj_found, has_continuous = FALSE;
+   long long nnz = 0, effort = 0, max_effort, stall_limit;
+   char *is_int;
+   double *init, *sol, *polished = NULL;
+   const double *lb, *ub, *obj, *rmatval, *rhs, *range;
+   const double *x = lp_data->x;
+   const int *rmatind, *rmatlen;
+   const CoinBigIndex *rmatbeg;
+   const CoinPackedMatrix *rmat;
+   const char *sense;
 
    used_time(&total_time);
    p->lp_stat.fj_calls++;
@@ -5270,96 +5281,62 @@ int feasibility_jump(lp_prob *p, double *solution_value,
       return FALSE;
    }
 
-   const double *lb = si->getColLower(), *ub = si->getColUpper();
-   const double *obj = si->getObjCoefficients();
-   const double *x = lp_data->x;
-   const CoinPackedMatrix *rmat = si->getMatrixByRow();
-   const double *rmatval = rmat->getElements();
-   const int *rmatind = rmat->getIndices();
-   const CoinBigIndex *rmatbeg = rmat->getVectorStarts();
-   const int *rmatlen = rmat->getVectorLengths();
-   const char *sense = si->getRowSense();
-   const double *rhs = si->getRightHandSide();
-   const double *range = si->getRowRange();
+   lb = si->getColLower();
+   ub = si->getColUpper();
+   obj = si->getObjCoefficients();
+   rmat = si->getMatrixByRow();
+   rmatval = rmat->getElements();
+   rmatind = rmat->getIndices();
+   rmatbeg = rmat->getVectorStarts();
+   rmatlen = rmat->getVectorLengths();
+   sense = si->getRowSense();
+   rhs = si->getRightHandSide();
+   range = si->getRowRange();
 
-   FeasibilityJumpSolver fj(0, 0, 1.0, tol, tol);
-   std::vector<double> init(n);
+   /* Start from the LP solution, with the integer variables rounded */
+   is_int = (char *) malloc(n * CSIZE);
+   init = (double *) malloc(n * DSIZE);
+   sol = (double *) malloc(n * DSIZE);
    for (j = 0; j < n; j++){
+      is_int[j] = vars[j]->is_int ? 1 : 0;
       if (vars[j]->is_int){
-	 fj.addVar(VarType::Integer, lb[j], ub[j], obj[j]);
 	 init[j] = floor(x[j] + 0.5);
       }else{
-	 fj.addVar(VarType::Continuous, lb[j], ub[j], obj[j]);
 	 init[j] = x[j];
 	 has_continuous = TRUE;
       }
       init[j] = MAX(lb[j], MIN(ub[j], init[j]));
    }
-   int64_t nnz = 0;
    for (i = 0; i < m; i++){
-      int len = rmatlen[i];
-      int *ind = const_cast<int *>(rmatind + rmatbeg[i]);
-      double *val = const_cast<double *>(rmatval + rmatbeg[i]);
-      nnz += len;
-      switch (sense[i]){
-       case 'E':
-	 fj.addConstraint(RowType::Equal, rhs[i], len, ind, val, 0);
-	 break;
-       case 'L':
-	 fj.addConstraint(RowType::Lte, rhs[i], len, ind, val, 0);
-	 break;
-       case 'G':
-	 fj.addConstraint(RowType::Gte, rhs[i], len, ind, val, 0);
-	 break;
-       case 'R':
-	 fj.addConstraint(RowType::Lte, rhs[i], len, ind, val, 0);
-	 fj.addConstraint(RowType::Gte, rhs[i] - range[i], len, ind, val, 0);
-	 break;
-       default:
-	 break;
-      }
+      nnz += rmatlen[i];
    }
+   max_effort = nnz*(long long)p->par.fj_effort_mult;
+   stall_limit = nnz*(long long)p->par.fj_stall_mult;
 
-   const int64_t max_effort = nnz*(int64_t)p->par.fj_effort_mult;
-   const int64_t stall_limit = nnz*(int64_t)p->par.fj_stall_mult;
-   std::vector<double> sol;
-   int64_t effort = 0;
-   fj.solve(init.data(), [&](FJStatus status) -> CallbackControlFlow {
-      effort = status.totalEffort;
-      if (status.solution != nullptr){
-	 sol.assign(status.solution, status.solution + status.numVars);
-	 return CallbackControlFlow::Terminate;
-      }
-      if (timeleft >= 0.0 && wall_clock(NULL) - start >= timeleft){
-	 return CallbackControlFlow::Terminate;
-      }
-      if (status.totalEffort >= max_effort){
-	 return CallbackControlFlow::Terminate;
-      }
-      if (stall_limit > 0 && status.effortSinceLastImprovement > stall_limit){
-	 return CallbackControlFlow::Terminate;
-      }
-      return CallbackControlFlow::Continue;
-   });
+   fj_found = fj_solve(n, is_int, lb, ub, obj, m, rmatbeg, rmatlen, rmatind,
+		       rmatval, sense, rhs, range, init, tol, max_effort,
+		       stall_limit,
+		       timeleft >= 0.0 ? timeleft - (wall_clock(NULL) - start) :
+		       -1.0, sol, &effort);
 
-   if (!sol.empty()){
+   if (fj_found){
       for (j = 0; j < n; j++){
 	 if (vars[j]->is_int){
 	    sol[j] = floor(sol[j] + 0.5);
 	 }
       }
-      std::vector<double> polished;
       if (has_continuous){
 	 /* Re-optimize the continuous variables with the integer ones fixed,
 	  * on a copy of the LP without the cuts */
 	 OsiSolverInterface *lp = si->clone();
 	 int nrows = lp->getNumRows();
 	 if (nrows > m){
-	    std::vector<int> del(nrows - m);
+	    int *del = (int *) malloc((nrows - m) * ISIZE);
 	    for (i = m; i < nrows; i++){
 	       del[i - m] = i;
 	    }
-	    lp->deleteRows(nrows - m, del.data());
+	    lp->deleteRows(nrows - m, del);
+	    FREE(del);
 	 }
 	 for (j = 0; j < n; j++){
 	    if (vars[j]->is_int){
@@ -5369,7 +5346,8 @@ int feasibility_jump(lp_prob *p, double *solution_value,
 	 lp->messageHandler()->setLogLevel(0);
 	 lp->resolve();
 	 if (lp->isProvenOptimal()){
-	    polished.assign(lp->getColSolution(), lp->getColSolution() + n);
+	    polished = (double *) malloc(n * DSIZE);
+	    memcpy(polished, lp->getColSolution(), n * DSIZE);
 	    for (j = 0; j < n; j++){
 	       if (vars[j]->is_int){
 		  polished[j] = sol[j];
@@ -5378,10 +5356,10 @@ int feasibility_jump(lp_prob *p, double *solution_value,
 	 }
 	 delete lp;
       }
-      if (!polished.empty() && fj_check_solution(p, polished.data(), tol)){
-	 sol = polished;
+      if (polished && fj_check_solution(p, polished, tol)){
+	 memcpy(sol, polished, n * DSIZE);
 	 found = TRUE;
-      }else if (fj_check_solution(p, sol.data(), tol)){
+      }else if (fj_check_solution(p, sol, tol)){
 	 found = TRUE;
       }
    }
@@ -5391,16 +5369,20 @@ int feasibility_jump(lp_prob *p, double *solution_value,
       for (j = 0; j < n; j++){
 	 objval += obj[j]*sol[j];
       }
-      memcpy(better_solution, sol.data(), DSIZE*n);
+      memcpy(better_solution, sol, DSIZE*n);
       *solution_value = objval;
       p->lp_stat.fj_num_sols++;
    }
    PRINT(p->par.verbosity, 1,
 	 ("Feasibility jump: %s after %.2f s, effort %lld of %lld\n",
 	  found ? "found a solution" :
-	  (sol.empty() ? "no solution" : "solution failed the check"),
-	  wall_clock(NULL) - start, (long long)effort, (long long)max_effort));
+	  (fj_found ? "solution failed the check" : "no solution"),
+	  wall_clock(NULL) - start, effort, max_effort));
 
+   FREE(is_int);
+   FREE(init);
+   FREE(sol);
+   FREE(polished);
    p->comp_times.fj += used_time(&total_time);
    return found;
 }
