@@ -80,6 +80,7 @@ typedef struct CGL_PARAMS{
    int               probing_max_depth;
    int               flowcover_max_depth;
    int               twomir_max_depth;
+   int               mir_max_depth;
    int               clique_max_depth;
    int               oddhole_max_depth;
    int               knapsack_max_depth;

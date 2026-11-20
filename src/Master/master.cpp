@@ -412,6 +412,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->cgl.probing_max_depth = 40;
    lp_par->cgl.flowcover_max_depth = 50;
    lp_par->cgl.twomir_max_depth = 50;
+   lp_par->cgl.mir_max_depth = 50;
    lp_par->cgl.clique_max_depth = 50;
    lp_par->cgl.oddhole_max_depth = 50;
    lp_par->cgl.knapsack_max_depth = 50;
@@ -8057,6 +8058,12 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    else if (strcmp(key, "twomir_max_depth") == 0 ||
 	    strcmp(key, "LP_twomir_max_depth") == 0){
       READ_INT_PAR(lp_par->cgl.twomir_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "mir_max_depth") == 0 ||
+	    strcmp(key, "LP_mir_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.mir_max_depth);
       return(0);
    }
 
