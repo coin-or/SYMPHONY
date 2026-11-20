@@ -425,8 +425,6 @@ OPENMP_ATOMIC_UPDATE
          }
       }
       switch (termcode){
-       case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
-	 return(ERROR__DUAL_INFEASIBLE);
        case LP_D_ITLIM:
        case LP_TIME_LIMIT:
 	 /* now, we set time limit - solver returns the same termcode with itlim */
@@ -436,18 +434,31 @@ OPENMP_ATOMIC_UPDATE
 	 }else{
 	    return(FUNCTION_TERMINATED_ABNORMALLY);
 	 }
+       case LP_D_INFEASIBLE:
+	 /* The LP is primal unbounded. For the root's first LP, that means the
+	  * LP relaxation is unbounded. After that, the LP has the same or
+	  * tighter bounds and constraints, so it can't be, and the LP solver
+	  * is wrong: treat it like an abandoned LP. */
+	 if (p->bc_index < 1 && p->iter_num < 2){
+	    return(ERROR__DUAL_INFEASIBLE);
+	 }
        case LP_ABANDONED:
+	 /* The LP solver has already solved the LP again from scratch
+	  * (dual_simplex()). Cuts are the usual cause of numerical trouble, so
+	  * delete them and solve the LP once more. The LP without them is still
+	  * a valid relaxation. */
 	 if (!rs_mode_enabled){
 	    printf("####### Unexpected termcode: %i \n", termcode);
 	 }
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
-	    /* Try to resolve it from scratch */
+	    int deleted = delete_all_cut_rows(p);
 	    if (!rs_mode_enabled){
-	       printf("####### Trying to recover by resolving from scratch...\n");
+	       printf("####### Trying to recover by deleting the %i cuts in the "
+		      "LP and resolving...\n", deleted);
 	    }
 	    continue;
 	 }else{
-	    if (!rs_mode_enabled){   
+	    if (!rs_mode_enabled){
 	       char name[50] = "";
 	       printf("####### Recovery failed. %s%s",
 		      "LP solver is having numerical difficulties :(.\n",
@@ -455,7 +466,8 @@ OPENMP_ATOMIC_UPDATE
 	       sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
 	       write_mps(lp_data, name);
 	    }
-	    return(ERROR__NUMERICAL_INSTABILITY);
+	    return(termcode == LP_D_INFEASIBLE ? ERROR__DUAL_INFEASIBLE :
+		   ERROR__NUMERICAL_INSTABILITY);
 	 }
 
        case LP_D_UNBOUNDED: //the primal problem is infeasible 

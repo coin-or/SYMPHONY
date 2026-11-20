@@ -456,6 +456,60 @@ int compute_violations(lp_prob *p, int new_row_num, waiting_row **new_rows)
    return(new_row_num);
 }
 
+/*===========================================================================*\
+ * Delete every cut from the LP except the cuts that were branched on, so
+ * that only the base constraints remain. Used when the LP solver can't
+ * solve a node LP: without the cuts the LP is still a valid relaxation.
+ * Returns the number of rows deleted.
+\*===========================================================================*/
+
+int delete_all_cut_rows(lp_prob *p)
+{
+   LPdata *lp_data = p->lp_data;
+   row_data *row, *rows = lp_data->rows;
+   int m = lp_data->m, bcutnum = p->base.cutnum;
+   int *free_rows = lp_data->tmp.i1; /* m */
+   int deletable = 0, i, k;
+
+   for (i = bcutnum; i < m; i++){
+      if (!(rows[i].cut->branch & CUT_BRANCHED_ON)){
+	 deletable++;
+      }
+   }
+   if (deletable == 0){
+      return(0);
+   }
+   if (p->par.branch_on_cuts){
+      p->slack_cuts = (cut_data **) realloc(p->slack_cuts,
+		      (p->slack_cut_num + deletable) * sizeof(cut_data *));
+   }
+   if (bcutnum > 0){
+      memset(free_rows, FALSE, bcutnum * ISIZE);
+   }
+   for (k = i = bcutnum; i < m; i++){
+      row = rows + i;
+      if (!(row->cut->branch & CUT_BRANCHED_ON)){
+	 free_rows[i] = TRUE;
+	 if (row->cut->branch & CANDIDATE_FOR_BRANCH){
+	    p->slack_cuts[p->slack_cut_num++] = row->cut;
+	    row->cut = NULL;
+	 }else{
+#ifdef SYM_COMPILE_IN_LP /* rows with a name are still in use when the LP
+			    shares memory with the tree manager */
+	    if (row->cut->name < 0)
+#endif
+	       free_cut(&(row->cut));
+	 }
+      }else{
+	 free_rows[i] = FALSE;
+	 rows[k++] = rows[i];
+      }
+   }
+   delete_rows(lp_data, deletable, free_rows);
+   p->lp_stat.cuts_deleted_from_lps += deletable;
+   return(deletable);
+}
+
 /*===========================================================================*/
 
 void compress_slack_cuts(lp_prob *p)
