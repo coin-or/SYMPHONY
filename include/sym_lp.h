@@ -253,6 +253,7 @@ int waiting_row_comp PROTO((const void *wr0, const void *wr1));
 int compute_violations PROTO((lp_prob *p,
 			      int new_row_num, waiting_row **new_rows));
 void compress_slack_cuts PROTO((lp_prob *p));
+int delete_all_cut_rows PROTO((lp_prob *p));
 
 /*===========================================================================*/
 /*================= LP branching functions (lp_branch.c) ====================*/

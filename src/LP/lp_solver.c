@@ -2616,6 +2616,117 @@ void change_col(LPdata *lp_data, int col_ind,
 
 /*===========================================================================*/
 
+#ifdef __OSI_CLP__
+/*===========================================================================*\
+ * Clp's wall-clock limit is a deadline (set_timelim() passes the time left,
+ * and Clp adds the current time). Return TRUE if it has passed.
+\*===========================================================================*/
+
+static int clp_deadline_passed(OsiXSolverInterface *si)
+{
+   double deadline = -1.0;
+   si->getModelPtr()->getDblParam(ClpMaxWallSeconds, deadline);
+   return(deadline >= 0.0 && CoinWallclockTime() >= deadline);
+}
+
+/*===========================================================================*\
+ * Return TRUE if Clp ended with a result that SYMPHONY can't trust:
+ * - optimal after giving up in primal with flagged variables (secondary
+ *   status 5). On rocII-5-11 an infeasible node LP came back "optimal" with
+ *   376 columns outside their bounds, one binary at 2.91.
+ * - optimal with a column outside its bounds by more than 100 times the
+ *   primal tolerance (atlanta-ip and neos17 in MIPLIB 2017: an integer
+ *   variable at -1e-4 with its lower bound at 0).
+ * - primal unbounded. A node LP can't be once the root LP is bounded, but
+ *   Clp reported it on glass4.
+ * - abandoned.
+\*===========================================================================*/
+
+static int clp_result_is_suspect(LPdata *lp_data)
+{
+   OsiXSolverInterface *si = lp_data->si;
+
+   if (si->isProvenOptimal()){
+      if (si->getModelPtr()->secondaryStatus() == 5){
+	 return(TRUE);
+      }
+      const double *x = si->getColSolution();
+      const double *lb = si->getColLower();
+      const double *ub = si->getColUpper();
+      const double bndtol = 100*lp_data->lpetol;
+      for (int j = si->getNumCols() - 1; j >= 0; j--){
+	 if (x[j] < lb[j] - bndtol || x[j] > ub[j] + bndtol){
+	    return(TRUE);
+	 }
+      }
+      return(FALSE);
+   }
+   return(si->isProvenDualInfeasible() || si->isAbandoned());
+}
+
+/*===========================================================================*\
+ * Solve the LP again from scratch after a result that can't be trusted:
+ * first with the dual simplex from an all-slack basis, then, if the result
+ * is still suspect, with the primal simplex from an all-slack basis and no
+ * scaling. Returns TRUE if the result is still suspect.
+\*===========================================================================*/
+
+static int clp_solve_from_scratch(LPdata *lp_data)
+{
+   OsiXSolverInterface *si = lp_data->si;
+   ClpSimplex *clp = si->getModelPtr();
+   bool presolve, use_dual;
+   OsiHintStrength presolve_strength, dual_strength;
+   int suspect = TRUE;
+
+   if (clp_deadline_passed(si)){
+      return(suspect);
+   }
+   si->getHintParam(OsiDoPresolveInInitial, presolve, presolve_strength);
+   si->getHintParam(OsiDoDualInInitial, use_dual, dual_strength);
+   si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
+
+   clp->allSlackBasis(true);
+   si->setHintParam(OsiDoDualInInitial, true, OsiHintDo);
+   si->initialSolve();
+   suspect = clp_result_is_suspect(lp_data);
+
+   if (suspect && !clp_deadline_passed(si)){
+      int scaling = clp->scalingFlag();
+      clp->allSlackBasis(true);
+      clp->scaling(0);
+      si->setHintParam(OsiDoDualInInitial, false, OsiHintDo);
+      si->initialSolve();
+      suspect = clp_result_is_suspect(lp_data);
+      clp->scaling(scaling);
+   }
+
+   si->setHintParam(OsiDoPresolveInInitial, presolve, presolve_strength);
+   si->setHintParam(OsiDoDualInInitial, use_dual, dual_strength);
+   return(suspect);
+}
+
+/*===========================================================================*\
+ * If Clp ended with a result that can't be trusted, solve the LP again from
+ * scratch. Returns TRUE if the result still can't be trusted and Clp still
+ * calls it optimal, so the caller should treat the LP as abandoned. A
+ * result that stays primal unbounded or abandoned is reported as such.
+\*===========================================================================*/
+
+static int clp_check_and_recover(LPdata *lp_data)
+{
+   OsiXSolverInterface *si = lp_data->si;
+
+   if (!clp_result_is_suspect(lp_data) || clp_deadline_passed(si)){
+      return(FALSE);
+   }
+   if (!clp_solve_from_scratch(lp_data)){
+      return(FALSE);
+   }
+   return(si->isProvenOptimal());
+}
+#endif
+
 /*===========================================================================*\
  * Solve the lp specified in lp_data->lp with dual simplex. The number of
  * iterations is returned in 'iterd'. The return value of the function is
@@ -2624,15 +2735,20 @@ void change_col(LPdata *lp_data, int col_ind,
 
 int initial_lp_solve (LPdata *lp_data, int *iterd)
 {
-   
+
    //int term = LP_ABANDONED;
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 
    si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
-    
+
    si->initialSolve();
-   
+
+#ifdef __OSI_CLP__
+   if (clp_check_and_recover(lp_data)){
+      term = LP_ABANDONED;
+   }else
+#endif
    if (si->isProvenDualInfeasible()){
       term = LP_D_INFEASIBLE;
    }else if (si->isProvenPrimalInfeasible()){
@@ -2723,6 +2839,9 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    }
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
+      if (term == LP_D_INFEASIBLE){
+	 printf("OSI: the LP solver reports the LP primal unbounded\n\n");
+      }else
 #ifdef __OSI_CLP__
       if (si->getModelPtr()->secondaryStatus() != 10)
 #endif
@@ -2762,20 +2881,10 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    si->resolve();
 
 #ifdef __OSI_CLP__
-   /* Clp can give up in primal with flagged variables and still report the
-    * LP optimal (secondary status 5). The solution can then be far from
-    * feasible: on rocII-5-11 a node LP that is infeasible came back "optimal"
-    * with 376 columns outside their bounds, one binary at 2.91. Solve such
-    * an LP again from an all-slack basis, and give up on it if that doesn't
-    * help either. */
-   char clp_gave_up = FALSE;
-   if (si->isProvenOptimal() && si->getModelPtr()->secondaryStatus() == 5){
-      si->getModelPtr()->allSlackBasis(true);
-      si->setHintParam(OsiDoPresolveInInitial, false, OsiHintDo);
-      si->initialSolve();
-      clp_gave_up = (si->isProvenOptimal() &&
-		     si->getModelPtr()->secondaryStatus() == 5);
-   }
+   /* If Clp's result can't be trusted (see clp_result_is_suspect()), solve
+    * the LP again from scratch, and give up on it if that doesn't help
+    * either. */
+   char clp_gave_up = clp_check_and_recover(lp_data);
 #endif
 
 #ifdef __OSI_CLP__
@@ -2873,6 +2982,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }   
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
+      if (term == LP_D_INFEASIBLE){
+	 printf("OSI: the LP solver reports the LP primal unbounded\n\n");
+      }else
 #ifdef __OSI_CLP__
       if (si->getModelPtr()->secondaryStatus() != 10)
 #endif
