@@ -1176,6 +1176,11 @@ void print_statistics(node_times *tim, problem_stat *stat,
 	    // printf ("%12i %12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols, lp_stat->fp_num_iter);
 	    printf ("%12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols);
 	 printf ("\n");	
+
+	 printf ("%-22s %10.2f ", "Feasibility Jump", tim->fj);
+	 if (lp_stat->fj_calls > 0)
+	    printf ("%12i %12i",lp_stat->fj_calls, lp_stat->fj_num_sols);
+	 printf ("\n");	
 	 
 	 printf ("%-22s %10.2f ", "Local Search", tim->ls);
 	 if (lp_stat->ls_calls > 0)

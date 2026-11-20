@@ -339,6 +339,7 @@ typedef struct NODE_TIMES{
    double        dupes_and_bad_coeffs_in_cuts;
 
    double        fp;                            /* feasibility pump */
+   double        fj;                            /* feasibility jump */
    double        ls;                            /* local search */
    double        ds;                            /* diving search */
    double        ds_type[DIVING_HEURS_CNT];
@@ -542,6 +543,10 @@ typedef struct LP_STAT{
    int         fp_lp_total_iter_num;
    int         fp_num_iter;
    int         fp_last_call_ind;  
+
+   /* feasibility jump */
+   int         fj_calls;
+   int         fj_num_sols;
 
    /* rounding heuristic*/
    int         rh_calls;

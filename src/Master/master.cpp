@@ -517,6 +517,11 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->fp_min_gap          = 0.5;                   /* 1% gap */
    lp_par->fp_fix_ratio        = 0.0;                   /* 1% gap */
 
+   /* feasibility jump */
+   lp_par->fj_enabled          = TRUE;
+   lp_par->fj_effort_mult      = 1024;
+   lp_par->fj_stall_mult       = 256;
+
    /* restricted search */
    lp_par->fr_enabled   = TRUE;
    lp_par->fr_frequency   = 10;
@@ -6073,6 +6078,18 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
       *value = lp_par->fp_enabled;
       return(0);
    }
+   else if (strcmp(key, "fj_enabled") == 0) {
+      *value = lp_par->fj_enabled;
+      return(0);
+   }
+   else if (strcmp(key, "fj_effort_mult") == 0) {
+      *value = lp_par->fj_effort_mult;
+      return(0);
+   }
+   else if (strcmp(key, "fj_stall_mult") == 0) {
+      *value = lp_par->fj_stall_mult;
+      return(0);
+   }
    else if (strcmp(key, "fp_frequency") == 0) {
       *value = lp_par->fp_frequency;
       return(0);
@@ -8251,6 +8268,21 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "fp_enabled") == 0) {
       READ_INT_PAR(lp_par->fp_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fj_enabled") == 0 ||
+	    strcmp(key, "LP_fj_enabled") == 0) {
+      READ_INT_PAR(lp_par->fj_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fj_effort_mult") == 0 ||
+	    strcmp(key, "LP_fj_effort_mult") == 0) {
+      READ_INT_PAR(lp_par->fj_effort_mult);
+      return(0);
+   }
+   else if (strcmp(key, "fj_stall_mult") == 0 ||
+	    strcmp(key, "LP_fj_stall_mult") == 0) {
+      READ_INT_PAR(lp_par->fj_stall_mult);
       return(0);
    }
    else if (strcmp(key, "fp_frequency") == 0) {

@@ -268,6 +268,13 @@ typedef struct LP_PARAMS{
    double            fp_min_gap;
    double            fp_fix_ratio;  
 
+   /* feasibility jump (Luteberget and Sartor 2023): once, at the root, while
+    * there is no incumbent. Its effort budget and stall limit are these
+    * multiples of the number of nonzeros in the base constraints, as in Cbc. */
+   int               fj_enabled;
+   int               fj_effort_mult;
+   int               fj_stall_mult;
+
    /* rounding */
    int               rounding_enabled; 
    int               rounding_frequency; 

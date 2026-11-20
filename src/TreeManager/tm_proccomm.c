@@ -1296,6 +1296,7 @@ int receive_lp_timing(tm_prob *tm)
 	       tm->comp_times.pricing          += tim.pricing;
 	       tm->comp_times.strong_branching += tim.strong_branching;
 	       tm->comp_times.fp               += tim.fp;
+	       tm->comp_times.fj               += tim.fj;
 	       tm->comp_times.rh               += tim.rh;
 	       tm->comp_times.sh               += tim.sh;
 	       tm->comp_times.ls               += tim.ls;
@@ -1403,6 +1404,8 @@ int receive_lp_timing(tm_prob *tm)
                tm->lp_stat.fp_num_sols           += lp_stat.fp_num_sols;
 	       tm->lp_stat.fp_num_iter           += lp_stat.fp_num_iter;
 	       tm->lp_stat.fp_last_call_ind       = lp_stat.fp_last_call_ind;
+               tm->lp_stat.fj_calls              += lp_stat.fj_calls;
+               tm->lp_stat.fj_num_sols           += lp_stat.fj_num_sols;
 
                tm->lp_stat.rh_calls              += lp_stat.rh_calls;
                tm->lp_stat.rh_num_sols           += lp_stat.rh_num_sols;

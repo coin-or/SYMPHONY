@@ -1083,6 +1083,22 @@ parameter \texttt{cgl\_generate\_xxx\_cuts} for the
 corresponding class is set to \texttt{GENERATE\_PERIODICALLY}.
 
 \label{fp_enabled}
+\item[\ptt{fj\_enabled} -- boolean ({\tt TRUE}).]
+\mysindex{p}{\LP!fj\_enabled}
+Whether to run the feasibility jump heuristic (Luteberget and Sartor,
+\emph{Mathematical Programming Computation} 15, 2023), an LP-free local search
+for a first feasible solution. It runs once, in the root node, while there is no
+feasible solution, starting from the rounded LP solution. If the problem has
+continuous variables, they are optimized again with the integer variables fixed
+at the values it finds.
+
+\item[\ptt{fj\_effort\_mult, fj\_stall\_mult} -- integer (1024, 256).]
+\mysindex{p}{\LP!fj\_effort\_mult}
+\mysindex{p}{\LP!fj\_stall\_mult}
+Limits on the feasibility jump heuristic, as multiples of the number of nonzeros
+in the constraint matrix: the total effort, and the effort without an
+improvement after which it stops. It also stops at the time limit.
+
 \item[\ptt{fp\_enabled} -- integer ({\tt SYM\_FEAS\_PUMP\_DEFAULT}\{1\}).] 
 \mysindex{p}{\LP!fp\_enabled}
 Determines the overall policy of using the feasibility pump heuristic to find

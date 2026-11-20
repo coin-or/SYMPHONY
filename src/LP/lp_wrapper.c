@@ -1010,6 +1010,25 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	    check_ls = FALSE; 
 	 }
       }      
+
+      /* Feasibility jump: once, at the root, while there is no incumbent
+       * (rounding and shifting found none), as in Cbc. */
+      if (feasible != IP_HEUR_FEASIBLE && p->par.fj_enabled && !branching &&
+	  !p->has_ub && p->bc_index < 1 && p->lp_stat.fj_calls < 1){
+	 if (feasibility_jump(p, &true_objval, heur_solution)){
+	    feasible = IP_HEUR_FEASIBLE;
+	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+	    if(true_objval > t_lb + lpetol100){
+	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset,
+				p->mip->obj_sense);
+	    }else{
+	       dual_gap = 1e-4;
+	    }
+	    apply_local_search(p, &true_objval, col_sol, heur_solution,
+			       &dual_gap, t_lb);
+	    check_ls = FALSE;
+	 }
+      }
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.ds_enabled && dual_gap > p->par.ds_min_gap && !branching && 

@@ -18,6 +18,9 @@
 #include <math.h>
 #include <string.h>
 
+/* Before SYMPHONY's headers, so that none of their macros reach it */
+#include "feasibilityjump_adapter.hpp"
+
 #include "sym_qsort.h"
 #include "sym_lp.h"
 #include "sym_constants.h"
@@ -5168,3 +5171,218 @@ double get_dgap(double obj_ub, double obj_lb, double obj_offset, char obj_sense)
 }
 #endif
 
+/*===========================================================================*/
+/*===========================================================================*\
+ * Feasibility jump (B. Luteberget and G. Sartor, "Feasibility Jump: an
+ * LP-free Lagrangian MIP heuristic", Mathematical Programming Computation 15,
+ * 2023), through the reference implementation in feasibilityjump.hpp
+ * (called through fj_solve() in feasibilityjump_adapter.hpp), set up
+ * as in Cbc's CbcHeuristicFeasibilityJump: a weighted local search on the
+ * base constraints and the current bounds, started from the rounded LP
+ * solution. It stops at its first feasible solution, when its effort budget
+ * or stall limit runs out (fj_effort_mult and fj_stall_mult times the number
+ * of nonzeros), or at the time limit.
+ *
+ * If the problem has continuous variables, they are then re-optimized with
+ * the integer variables fixed, as Cbc does when it accepts a solution. The
+ * result is checked against the bounds and the base constraints before it is
+ * returned, since nothing downstream checks a heuristic solution.
+ *
+ * Returns TRUE and the solution in better_solution (LP column order) and its
+ * objective value (without the offset) in solution_value if it finds one.
+\*===========================================================================*/
+
+static char fj_check_solution(lp_prob *p, const double *x, double tol)
+{
+   LPdata *lp_data = p->lp_data;
+   OsiXSolverInterface *si = lp_data->si;
+   const int n = lp_data->n, m = p->base.cutnum;
+   const double *lb = si->getColLower(), *ub = si->getColUpper();
+   const CoinPackedMatrix *rmat = si->getMatrixByRow();
+   const double *rmatval = rmat->getElements();
+   const int *rmatind = rmat->getIndices();
+   const CoinBigIndex *rmatbeg = rmat->getVectorStarts();
+   const int *rmatlen = rmat->getVectorLengths();
+   const char *sense = si->getRowSense();
+   const double *rhs = si->getRightHandSide();
+   const double *range = si->getRowRange();
+   CoinBigIndex k;
+   int i, j;
+
+   for (j = 0; j < n; j++){
+      if (x[j] < lb[j] - tol || x[j] > ub[j] + tol){
+	 return FALSE;
+      }
+      if (lp_data->vars[j]->is_int && fabs(x[j] - floor(x[j] + 0.5)) > 1e-9){
+	 return FALSE;
+      }
+   }
+   for (i = 0; i < m; i++){
+      double act = 0.0, rtol = tol + 1e-9*fabs(rhs[i]);
+      for (k = rmatbeg[i]; k < rmatbeg[i] + rmatlen[i]; k++){
+	 act += rmatval[k]*x[rmatind[k]];
+      }
+      switch (sense[i]){
+       case 'E':
+	 if (fabs(act - rhs[i]) > rtol) return FALSE;
+	 break;
+       case 'L':
+	 if (act > rhs[i] + rtol) return FALSE;
+	 break;
+       case 'G':
+	 if (act < rhs[i] - rtol) return FALSE;
+	 break;
+       case 'R':
+	 if (act > rhs[i] + rtol || act < rhs[i] - range[i] - rtol)
+	    return FALSE;
+	 break;
+       default:
+	 break;
+      }
+   }
+   return TRUE;
+}
+
+/*===========================================================================*/
+
+int feasibility_jump(lp_prob *p, double *solution_value,
+		     double *better_solution)
+{
+   LPdata *lp_data = p->lp_data;
+   OsiXSolverInterface *si = lp_data->si;
+   var_desc **vars = lp_data->vars;
+   const int n = lp_data->n, m = p->base.cutnum;
+   const double tol = 1e-6;   /* Cbc's default for FJ */
+   double total_time = 0, timeleft = -1.0, start = wall_clock(NULL);
+   int i, j, found = FALSE, fj_found, has_continuous = FALSE;
+   long long nnz = 0, effort = 0, max_effort, stall_limit;
+   char *is_int;
+   double *init, *sol, *polished = NULL;
+   const double *lb, *ub, *obj, *rmatval, *rhs, *range;
+   const double *x = lp_data->x;
+   const int *rmatind, *rmatlen;
+   const CoinBigIndex *rmatbeg;
+   const CoinPackedMatrix *rmat;
+   const char *sense;
+
+   used_time(&total_time);
+   p->lp_stat.fj_calls++;
+
+#ifdef SYM_COMPILE_IN_LP
+   if (p->tm->par.time_limit >= 0.0 &&
+       (timeleft = p->tm->par.time_limit - start + p->tm->start_time) <= 0.0){
+      p->comp_times.fj += used_time(&total_time);
+      return FALSE;
+   }
+#endif
+   /* All the variables must be in the LP (no column generation) */
+   if (n != p->mip->n || m <= 0 || m > lp_data->m){
+      p->comp_times.fj += used_time(&total_time);
+      return FALSE;
+   }
+
+   lb = si->getColLower();
+   ub = si->getColUpper();
+   obj = si->getObjCoefficients();
+   rmat = si->getMatrixByRow();
+   rmatval = rmat->getElements();
+   rmatind = rmat->getIndices();
+   rmatbeg = rmat->getVectorStarts();
+   rmatlen = rmat->getVectorLengths();
+   sense = si->getRowSense();
+   rhs = si->getRightHandSide();
+   range = si->getRowRange();
+
+   /* Start from the LP solution, with the integer variables rounded */
+   is_int = (char *) malloc(n * CSIZE);
+   init = (double *) malloc(n * DSIZE);
+   sol = (double *) malloc(n * DSIZE);
+   for (j = 0; j < n; j++){
+      is_int[j] = vars[j]->is_int ? 1 : 0;
+      if (vars[j]->is_int){
+	 init[j] = floor(x[j] + 0.5);
+      }else{
+	 init[j] = x[j];
+	 has_continuous = TRUE;
+      }
+      init[j] = MAX(lb[j], MIN(ub[j], init[j]));
+   }
+   for (i = 0; i < m; i++){
+      nnz += rmatlen[i];
+   }
+   max_effort = nnz*(long long)p->par.fj_effort_mult;
+   stall_limit = nnz*(long long)p->par.fj_stall_mult;
+
+   fj_found = fj_solve(n, is_int, lb, ub, obj, m, rmatbeg, rmatlen, rmatind,
+		       rmatval, sense, rhs, range, init, tol, max_effort,
+		       stall_limit,
+		       timeleft >= 0.0 ? timeleft - (wall_clock(NULL) - start) :
+		       -1.0, sol, &effort);
+
+   if (fj_found){
+      for (j = 0; j < n; j++){
+	 if (vars[j]->is_int){
+	    sol[j] = floor(sol[j] + 0.5);
+	 }
+      }
+      if (has_continuous){
+	 /* Re-optimize the continuous variables with the integer ones fixed,
+	  * on a copy of the LP without the cuts */
+	 OsiSolverInterface *lp = si->clone();
+	 int nrows = lp->getNumRows();
+	 if (nrows > m){
+	    int *del = (int *) malloc((nrows - m) * ISIZE);
+	    for (i = m; i < nrows; i++){
+	       del[i - m] = i;
+	    }
+	    lp->deleteRows(nrows - m, del);
+	    FREE(del);
+	 }
+	 for (j = 0; j < n; j++){
+	    if (vars[j]->is_int){
+	       lp->setColBounds(j, sol[j], sol[j]);
+	    }
+	 }
+	 lp->messageHandler()->setLogLevel(0);
+	 lp->resolve();
+	 if (lp->isProvenOptimal()){
+	    polished = (double *) malloc(n * DSIZE);
+	    memcpy(polished, lp->getColSolution(), n * DSIZE);
+	    for (j = 0; j < n; j++){
+	       if (vars[j]->is_int){
+		  polished[j] = sol[j];
+	       }
+	    }
+	 }
+	 delete lp;
+      }
+      if (polished && fj_check_solution(p, polished, tol)){
+	 memcpy(sol, polished, n * DSIZE);
+	 found = TRUE;
+      }else if (fj_check_solution(p, sol, tol)){
+	 found = TRUE;
+      }
+   }
+
+   if (found){
+      double objval = 0.0;
+      for (j = 0; j < n; j++){
+	 objval += obj[j]*sol[j];
+      }
+      memcpy(better_solution, sol, DSIZE*n);
+      *solution_value = objval;
+      p->lp_stat.fj_num_sols++;
+   }
+   PRINT(p->par.verbosity, 1,
+	 ("Feasibility jump: %s after %.2f s, effort %lld of %lld\n",
+	  found ? "found a solution" :
+	  (fj_found ? "solution failed the check" : "no solution"),
+	  wall_clock(NULL) - start, effort, max_effort));
+
+   FREE(is_int);
+   FREE(init);
+   FREE(sol);
+   FREE(polished);
+   p->comp_times.fj += used_time(&total_time);
+   return found;
+}
