@@ -14,18 +14,18 @@
 
 /*===========================================================================*\
  * A C-style entry point to the feasibility jump reference implementation in
- * feasibilityjump.hh, which is kept unchanged. Everything C++ about
+ * feasibilityjump.hpp, which is kept unchanged. Everything C++ about
  * feasibility jump (its classes, std::vector, the callback) stays in these
  * two files; SYMPHONY's own code calls fj_solve() with plain arrays.
 \*===========================================================================*/
 
-#ifndef FEASIBILITYJUMP_ADAPTER_HH
-#define FEASIBILITYJUMP_ADAPTER_HH
+#ifndef FEASIBILITYJUMP_ADAPTER_HPP
+#define FEASIBILITYJUMP_ADAPTER_HPP
 
 #include <chrono>
 
 #include "CoinHelperFunctions.hpp" /* for CoinBigIndex */
-#include "feasibilityjump.hh"
+#include "feasibilityjump.hpp"
 
 /*===========================================================================*\
  * Run feasibility jump on

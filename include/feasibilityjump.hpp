@@ -4,7 +4,8 @@
 //
 // Taken from Cbc (src/feasibilityjump.hh, master 4ff7c87a), which carries the
 // SINTEF reference implementation (https://github.com/sintef/feasibilityjump)
-// unmodified. SYMPHONY calls it from feasibility_jump() in lp_heuristics.c.
+// unmodified; only the file name differs. SYMPHONY calls it through fj_solve()
+// in feasibilityjump_adapter.hpp.
 //
 // MIT License
 //

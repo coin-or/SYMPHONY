@@ -19,7 +19,7 @@
 #include <string.h>
 
 /* Before SYMPHONY's headers, so that none of their macros reach it */
-#include "feasibilityjump_adapter.hh"
+#include "feasibilityjump_adapter.hpp"
 
 #include "sym_qsort.h"
 #include "sym_lp.h"
@@ -5175,8 +5175,8 @@ double get_dgap(double obj_ub, double obj_lb, double obj_offset, char obj_sense)
 /*===========================================================================*\
  * Feasibility jump (B. Luteberget and G. Sartor, "Feasibility Jump: an
  * LP-free Lagrangian MIP heuristic", Mathematical Programming Computation 15,
- * 2023), through the reference implementation in feasibilityjump.hh
- * (called through fj_solve() in feasibilityjump_adapter.hh), set up
+ * 2023), through the reference implementation in feasibilityjump.hpp
+ * (called through fj_solve() in feasibilityjump_adapter.hpp), set up
  * as in Cbc's CbcHeuristicFeasibilityJump: a weighted local search on the
  * base constraints and the current bounds, started from the rounded LP
  * solution. It stops at its first feasible solution, when its effort budget
