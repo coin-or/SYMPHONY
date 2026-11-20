@@ -164,6 +164,7 @@ int start_node PROTO((tm_prob *tm, int thread_num));
 bc_node *del_best_node PROTO((tm_prob *tm));
 void insert_new_node PROTO((tm_prob *tm, bc_node *new_node));
 int node_compar PROTO((tm_prob * tm, int rule, bc_node *node0, bc_node *node1));
+void change_node_selection_rule PROTO((tm_prob *tm, int rule));
 int assign_pool PROTO((tm_prob *tm, int oldpool, process_set *pools,
 		       int *active_nodes_per_pool, int *nodes_per_pool));
 int generate_children PROTO((tm_prob *tm, bc_node *node, branch_obj *bobj,
