@@ -3332,8 +3332,11 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    }
    *num_cuts = k;
    // TODO: short circuit the copying to row data and si */
-   for (i=0; i<num_row_cuts; i++) {
-      cutlist->eraseRowCut(0);
+   /* OsiCuts keeps its row cuts in a vector, so erasing the first one moves
+    * all the others; erase from the back to make this linear, not
+    * quadratic, in the number of cuts. */
+   for (i=num_row_cuts-1; i>=0; i--) {
+      cutlist->eraseRowCut(i);
    }
 
    //FREE(hashes);
