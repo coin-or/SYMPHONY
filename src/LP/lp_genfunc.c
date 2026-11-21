@@ -2685,8 +2685,35 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 	       probing->setMaxElementsRoot(200);
 	    }
 	 }
-	 if (p->par.cgl.probing_max_seconds > 0) {
-	    probing->setMaxSeconds(p->par.cgl.probing_max_seconds);
+	 /* Time limit for each call (0 for none), never more than the time
+	  * left in the run */
+	 {
+	    double max_seconds = p->par.cgl.probing_max_seconds;
+	    double timeleft = 0.0;
+	    int has_time_limit = FALSE;
+#ifdef SYM_COMPILE_IN_LP
+	    if (p->tm->par.time_limit >= 0.0) {
+	       has_time_limit = TRUE;
+	       timeleft = p->tm->par.time_limit - wall_clock(NULL) +
+		  p->tm->start_time;
+	    }
+#else
+	    if (p->par.time_limit >= 0.0) {
+	       has_time_limit = TRUE;
+	       timeleft = p->par.time_limit - wall_clock(NULL) + p->start_time;
+	    }
+#endif
+	    if (has_time_limit) {
+	       if (timeleft < 0.01) {
+		  /* No time left */
+		  *should_generate = FALSE;
+		  break;
+	       }
+	       if (max_seconds <= 0.0 || timeleft < max_seconds) {
+		  max_seconds = timeleft;
+	       }
+	    }
+	    probing->setMaxSeconds(max_seconds > 0.0 ? max_seconds : 0.0);
 	 }
          *should_generate = TRUE;
          p->lp_stat.probing_calls++;

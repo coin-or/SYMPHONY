@@ -411,7 +411,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->cgl.probing_root_idle = 2;
    lp_par->cgl.probing_root_idle_time = 1.0;
    lp_par->cgl.probing_root_idle_count = 0;
-   lp_par->cgl.probing_max_seconds = 0.0;
+   lp_par->cgl.probing_max_seconds = 10.0;
 
    lp_par->cgl.gomory_max_depth = 200;
    lp_par->cgl.probing_max_depth = 40;

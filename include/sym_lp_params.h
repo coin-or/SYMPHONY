@@ -88,7 +88,9 @@ typedef struct CGL_PARAMS{
 					     (default 1) */
    int               probing_root_idle_count; /* calls in a row with nothing */
    double            probing_max_seconds; /* CglProbing's time limit for each
-					     call; 0: none (default) */
+					     call, never more than the time
+					     left; 0: only the time left
+					     (default 10) */
 
    int               gomory_max_depth;
    int               probing_max_depth;

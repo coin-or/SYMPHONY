@@ -1102,11 +1102,13 @@ value of -1 turns this off.
 \mysindex{p}{\LPP!probing\_root\_idle\_time}
 See \ptt{probing\_root\_idle}.
 
-\item[\ptt{probing\_max\_seconds} -- double (0).]
+\item[\ptt{probing\_max\_seconds} -- double (10).]
 \mysindex{p}{\LPP!probing\_max\_seconds}
-If positive, the time limit in seconds for each call to probing. Since where a
-call stops depends on the machine and its load, runs with this set are not
-reproducible.
+If positive, the time limit in seconds for each call to probing. A call is
+never given more than the time left in the run, even when this is 0. Where a
+call stops depends on the machine and its load, so a run in which a call
+reaches its limit is not reproducible. Set this to 0 for reproducible runs
+(apart from runs that reach the overall time limit).
 
 \label{fp_enabled}
 \item[\ptt{fp\_enabled} -- integer ({\tt SYM\_FEAS\_PUMP\_DEFAULT}\{1\}).] 
