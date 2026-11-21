@@ -410,7 +410,10 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->cgl.probing_limits = 1;
    lp_par->cgl.probing_root_idle = 2;
    lp_par->cgl.probing_root_idle_time = 1.0;
+   lp_par->cgl.probing_root_idle_gain = 1e-4;
    lp_par->cgl.probing_root_idle_count = 0;
+   lp_par->cgl.probing_root_pending = FALSE;
+   lp_par->cgl.probing_root_last_obj = 0.0;
    lp_par->cgl.probing_max_seconds = 10.0;
 
    lp_par->cgl.gomory_max_depth = 200;
@@ -6430,6 +6433,11 @@ SYMPHONYLIB_EXPORT int sym_get_dbl_param(sym_environment *env, const char *key,
       *value = lp_par->cgl.probing_root_idle_time;
       return(0);
    }
+   else if (strcmp(key, "probing_root_idle_gain") == 0 ||
+	    strcmp(key, "LP_probing_root_idle_gain") == 0){
+      *value = lp_par->cgl.probing_root_idle_gain;
+      return(0);
+   }
    else if (strcmp(key, "probing_max_seconds") == 0 ||
 	    strcmp(key, "LP_probing_max_seconds") == 0){
       *value = lp_par->cgl.probing_max_seconds;
@@ -8088,6 +8096,11 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    else if (strcmp(key, "probing_root_idle_time") == 0 ||
 	    strcmp(key, "LP_probing_root_idle_time") == 0){
       READ_DBL_PAR(lp_par->cgl.probing_root_idle_time);
+      return(0);
+   }
+   else if (strcmp(key, "probing_root_idle_gain") == 0 ||
+	    strcmp(key, "LP_probing_root_idle_gain") == 0){
+      READ_DBL_PAR(lp_par->cgl.probing_root_idle_gain);
       return(0);
    }
 

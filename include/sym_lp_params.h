@@ -79,14 +79,24 @@ typedef struct CGL_PARAMS{
 					     above, 1 based on Cbc's
 					     (default) */
    int               probing_root_idle;   /* stop probing at the root after
-					     this many calls in a row with no
-					     cuts and no bound changes (default
-					     2); -1: never */
+					     this many calls in a row that were
+					     not useful (default 2); -1: never.
+					     A call is useful if it tightens a
+					     bound, or if it returns row cuts
+					     and the root LP bound has risen by
+					     the next call by more than
+					     probing_root_idle_gain (relative) */
    double            probing_root_idle_time; /* ... but only once probing at
 					     the root has taken at least this
 					     many seconds and more than the LP
 					     (default 1) */
-   int               probing_root_idle_count; /* calls in a row with nothing */
+   double            probing_root_idle_gain; /* (default 1e-4) */
+   int               probing_root_idle_count; /* calls in a row that were
+					     not useful */
+   int               probing_root_pending; /* the last call returned only
+					     row cuts and is still to be
+					     judged */
+   double            probing_root_last_obj; /* root LP bound at that call */
    double            probing_max_seconds; /* CglProbing's time limit for each
 					     call, never more than the time
 					     left; 0: only the time left
