@@ -18,6 +18,7 @@
 #include "omp.h"
 #endif
 #include <stdlib.h>
+#include <limits.h>
 #include <math.h>
 #include <string.h>
 
@@ -3023,6 +3024,53 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 
    num_row_cuts = cutlist->sizeRowCuts();
 
+   /* A generator can return far more row cuts than the LP can use: one
+    * CglProbing call has returned over a million (sorrell3), and checking
+    * them took most of the run. At most max_cut_num_per_iter[_root] cuts
+    * are added to the LP in a round, so keep only the
+    * max_cut_num_per_call most violated ones and count the rest as
+    * insufficiently violated. */
+   char *keep = NULL;
+   int num_capped = 0;
+   if (p->par.max_cut_num_per_call > 0 &&
+       num_row_cuts > p->par.max_cut_num_per_call) {
+      double *viol = (double *) malloc(num_row_cuts * DSIZE);
+      int *order = (int *) malloc(num_row_cuts * ISIZE);
+      for (i = 0; i < num_row_cuts; i++) {
+	 OsiRowCut *cut = cutlist->rowCutPtr(i);
+	 const int *ind = cut->row().getIndices();
+	 const double *val = cut->row().getElements();
+	 double lhs = 0;
+	 for (k = 0; k < cut->row().getNumElements(); k++) {
+	    lhs += val[k] * x[vars[ind[k]]->userind];
+	 }
+	 switch (cut->sense()) {
+	  case 'L':
+	    violation = lhs - cut->rhs();
+	    break;
+	  case 'G':
+	    violation = cut->rhs() - lhs;
+	    break;
+	  case 'E':
+	    violation = fabs(cut->rhs() - lhs);
+	    break;
+	  default: /* ranged cuts are thrown out below */
+	    violation = 0;
+	    break;
+	 }
+	 viol[i] = -violation;
+	 order[i] = i;
+      }
+      qsort_di(viol, order, num_row_cuts);
+      keep = (char *) calloc(num_row_cuts, CSIZE);
+      for (i = 0; i < p->par.max_cut_num_per_call; i++) {
+	 keep[order[i]] = TRUE;
+      }
+      num_capped = num_row_cuts - p->par.max_cut_num_per_call;
+      FREE(viol);
+      FREE(order);
+   }
+
    //if(num_row_cuts > 0){
    // hashes       = (double *) malloc(num_row_cuts*DSIZE);
    //is_deleted   = (int *) calloc(num_row_cuts, ISIZE);
@@ -3030,14 +3078,19 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    // cut_size     = (int *) calloc(num_row_cuts, ISIZE);
    //}
    
+   /* realloc, not malloc: the first *num_cuts hashes are those of the cuts
+    * already accepted from the other generators, and the old arrays would
+    * leak */
    if(lp_data->hashes_num < num_row_cuts + *num_cuts){
-      lp_data->hashes_num = 5000 + (num_row_cuts + *num_cuts); 
-      lp_data->hashes = (double *)malloc(DSIZE*lp_data->hashes_num);
+      lp_data->hashes_num = 5000 + (num_row_cuts + *num_cuts);
+      lp_data->hashes = (double *)realloc(lp_data->hashes,
+					  DSIZE*lp_data->hashes_num);
    }
 
    if(lp_data->accepted_num < num_row_cuts){
       lp_data->accepted_num = 5000 + num_row_cuts;
-      lp_data->accepted_ind = (int *)malloc(ISIZE*lp_data->accepted_num);
+      lp_data->accepted_ind = (int *)realloc(lp_data->accepted_ind,
+					     ISIZE*lp_data->accepted_num);
    }
 
    hashes = lp_data->hashes;
@@ -3050,6 +3103,9 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    //int v_level; 
    double coeff_ratio; 
    for (i=0; i<num_row_cuts; i++) {
+      if (keep && !keep[i]) {
+	 continue;
+      }
       /* check for violation, duplicacy, quality of coefficients, length */
       row_cut = cutlist->rowCut(i);
       num_elements = row_cut.row().getNumElements();
@@ -3178,10 +3234,12 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       if(p->bc_index < 1 && p->mip->mip_inf && ( generator == CGL_PROBING_GENERATOR || 
 						 generator == CGL_CLIQUE_GENERATOR ||
 						 generator == CGL_KNAPSACK_GENERATOR)){	 
-	 add_cut_to_mip_inf(p, num_elements, indices, elements, rhs, row_cut.sense());	 
-      }      
+	 add_cut_to_mip_inf(p, num_elements, indices, elements, rhs, row_cut.sense());
+      }
 #endif
    }
+   FREE(keep);
+   num_unviolated += num_capped;
 
    /* check for duplicates */
    hashes += *num_cuts; 
@@ -3470,14 +3528,22 @@ int add_cut_to_mip_inf(lp_prob *p, int cut_n, int *cut_ind, double *cut_val, dou
       mip_inf->c_alloc_num = alloc_num; 
       mip_inf->c_beg[0] = 0;
    }else{      
+      /* Grow the store geometrically. It used to grow by a fixed amount
+       * (often a few dozen entries), so storing n cuts cost O(n^2), which
+       * mattered when a generator returned millions of cuts. */
       if(alloc_size < mip_inf->c_beg[mip_inf->c_num] + cut_n){
-	 alloc_size += MAX(10*cut_n, (int)(10.0*p->lp_data->nz/p->lp_data->m));
-	 mip_inf->c_ind = (int *)realloc(mip_inf->c_ind, ISIZE*alloc_size);	       
+	 alloc_size = (int) MIN(MAX(2.0*alloc_size,
+				    (double)mip_inf->c_beg[mip_inf->c_num] +
+				    cut_n +
+				    10.0*p->lp_data->nz/p->lp_data->m),
+				INT_MAX);
+	 mip_inf->c_ind = (int *)realloc(mip_inf->c_ind, ISIZE*alloc_size);
 	 mip_inf->c_val = (double *)realloc(mip_inf->c_val, DSIZE*alloc_size);
 	 mip_inf->c_alloc_size = alloc_size;
       }
       if(mip_inf->c_num >= alloc_num){
-	 alloc_num += 1000;
+	 alloc_num = (int) MIN(MAX(2.0*alloc_num, alloc_num + 1000.0),
+			       INT_MAX - 1);
 	 mip_inf->c_beg = (int *)realloc(mip_inf->c_beg, ISIZE*(alloc_num + 1));
 	 mip_inf->c_sense = (char *)realloc(mip_inf->c_sense, CSIZE*alloc_num);
 	 mip_inf->c_rhs = (double *)realloc(mip_inf->c_rhs, DSIZE*alloc_num);

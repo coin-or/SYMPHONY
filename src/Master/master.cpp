@@ -379,6 +379,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    lp_par->later_lp.all_cuts_time_out = 0;
    lp_par->max_cut_num_per_iter = 50;
    lp_par->max_cut_num_per_iter_root = 500;
+   lp_par->max_cut_num_per_call = 20000;
    lp_par->min_root_cut_rounds = 100;
    lp_par->tried_long_cuts = FALSE;
    lp_par->max_cut_length = 100;
@@ -5806,6 +5807,11 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
       *value = lp_par->max_cut_num_per_iter_root;
       return(0);
    }
+   else if (strcmp(key, "max_cut_num_per_call") == 0 ||
+	    strcmp(key, "LP_max_cut_num_per_call") == 0){
+      *value = lp_par->max_cut_num_per_call;
+      return(0);
+   }
    else if (strcmp(key, "min_root_cut_rounds") == 0) {
       *value = lp_par->min_root_cut_rounds;
       return(0);
@@ -7821,6 +7827,12 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    else if (strcmp(key, "max_cut_num_per_iter_root") == 0 ||
 	    strcmp(key, "LP_max_cut_num_per_iter_root") == 0){
       READ_INT_PAR(lp_par->max_cut_num_per_iter_root);
+      return(0);
+   }
+
+   else if (strcmp(key, "max_cut_num_per_call") == 0 ||
+	    strcmp(key, "LP_max_cut_num_per_call") == 0){
+      READ_INT_PAR(lp_par->max_cut_num_per_call);
       return(0);
    }
    
