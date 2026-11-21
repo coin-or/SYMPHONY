@@ -2536,6 +2536,19 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             *should_generate = FALSE;
             break;
          } 
+	 /* At the root, stop probing after probing_root_idle calls in a row
+	  * that gave no cuts and no bound changes, once probing has taken at
+	  * least probing_root_idle_time seconds and more than the LP. Without
+	  * the time condition, the rule would also stop probing on instances
+	  * where it is cheap and useful in the tree. */
+	 if (bc_level < 1 && p->par.cgl.probing_root_idle > 0 &&
+	     data_par->probing_root_idle_count >=
+	     p->par.cgl.probing_root_idle &&
+	     p->comp_times.probing_cuts >=
+	     MAX(p->par.cgl.probing_root_idle_time, p->comp_times.lp)) {
+	    *should_generate = FALSE;
+	    break;
+	 }
 
 
 #ifdef SYM_COMPILE_IN_LP
@@ -2649,6 +2662,61 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 #ifdef SYM_COMPILE_IN_LP
 	 }
 #endif
+	 /* Limits based on Cbc's (CbcSolverCutSetup.cpp): one pass, and skip
+	  * rows longer than 300 at the root and 200 in the tree. The numbers
+	  * of variables to probe (50 at the root, 10 in the tree) and to look
+	  * at (10) are set as in Cbc, but CglProbing doesn't use them in mode
+	  * 2: setMaxProbe() only matters with Cbc's special value 123, and
+	  * probe() fixes the number to look at. So every root call probes
+	  * every integer variable. SYMPHONY calls CglProbing without a
+	  * CglTreeInfo, so CglProbing always uses its root settings, and in
+	  * the tree they are set to the tree values. */
+	 if (p->par.cgl.probing_limits == 1) {
+	    probing->setMaxPass(1);
+	    probing->setMaxPassRoot(1);
+	    probing->setMaxProbe(10);
+	    probing->setMaxLook(10);
+	    probing->setMaxElements(200);
+	    if (bc_level < 1) {
+	       probing->setMaxProbeRoot(50);
+	       probing->setMaxLookRoot(10);
+	       probing->setMaxElementsRoot(300);
+	    } else {
+	       probing->setMaxProbeRoot(10);
+	       probing->setMaxLookRoot(10);
+	       probing->setMaxElementsRoot(200);
+	    }
+	 }
+	 /* Time limit for each call (0 for none), never more than the time
+	  * left in the run */
+	 {
+	    double max_seconds = p->par.cgl.probing_max_seconds;
+	    double timeleft = 0.0;
+	    int has_time_limit = FALSE;
+#ifdef SYM_COMPILE_IN_LP
+	    if (p->tm->par.time_limit >= 0.0) {
+	       has_time_limit = TRUE;
+	       timeleft = p->tm->par.time_limit - wall_clock(NULL) +
+		  p->tm->start_time;
+	    }
+#else
+	    if (p->par.time_limit >= 0.0) {
+	       has_time_limit = TRUE;
+	       timeleft = p->par.time_limit - wall_clock(NULL) + p->start_time;
+	    }
+#endif
+	    if (has_time_limit) {
+	       if (timeleft < 0.01) {
+		  /* No time left */
+		  *should_generate = FALSE;
+		  break;
+	       }
+	       if (max_seconds <= 0.0 || timeleft < max_seconds) {
+		  max_seconds = timeleft;
+	       }
+	    }
+	    probing->setMaxSeconds(max_seconds > 0.0 ? max_seconds : 0.0);
+	 }
          *should_generate = TRUE;
          p->lp_stat.probing_calls++;
          break;
@@ -2887,8 +2955,24 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
 	  CglProbing *probing = new CglProbing;
 	  should_use_cgl_generator(p, &should_generate, i, (void *)probing);
          if (should_generate == TRUE) {
+	    int row_cuts = cutlist.sizeRowCuts();
+	    int col_cuts = cutlist.sizeColCuts();
             probing->generateCuts(*(p->lp_data->si), cutlist);
             *was_tried = TRUE;
+	    /* Count the calls in a row at the root that give nothing, for
+	     * probing_root_idle */
+	    if (p->bc_level < 1) {
+	       int bounds = 0;
+	       for (int k = col_cuts; k < cutlist.sizeColCuts(); k++) {
+		  bounds += cutlist.colCut(k).lbs().getNumElements() +
+		     cutlist.colCut(k).ubs().getNumElements();
+	       }
+	       if (cutlist.sizeRowCuts() > row_cuts || bounds > 0) {
+		  p->lp_data->cgl.probing_root_idle_count = 0;
+	       } else {
+		  p->lp_data->cgl.probing_root_idle_count++;
+	       }
+	    }
          }
          delete probing;
          cut_time     = used_time(&total_time);
