@@ -1085,11 +1085,14 @@ corresponding class is set to \texttt{GENERATE\_PERIODICALLY}.
 \item[\ptt{probing\_limits} -- integer (1).]
 \mysindex{p}{\LPP!probing\_limits}
 The limits on probing (\texttt{CglProbing}). With 0, SYMPHONY's own rules set
-them. With 1, limits based on Cbc's are used: in the root node, probe at most
-50 variables, look at 10, and skip rows with more than 300 nonzeros; in the
-tree, 10, 10 and 200; one pass each time. (Cbc's defaults then raise the
-number of variables to probe to 123, and the number to look at in the root
-node to 20.)
+them. With 1, limits based on Cbc's are used: one pass each time, and rows
+with more than 300 nonzeros in the root node, or 200 in the tree, are skipped.
+The numbers of variables to probe (50 in the root node, 10 in the tree) and to
+look at (10) are set as in Cbc too, but \texttt{CglProbing} doesn't use them in
+the mode SYMPHONY calls it in: the number to probe only matters with Cbc's
+special value 123, and the number to look at is fixed inside
+\texttt{CglProbing}. So each call in the root node probes every integer
+variable.
 
 \item[\ptt{probing\_root\_idle} -- integer (2).]
 \mysindex{p}{\LPP!probing\_root\_idle}

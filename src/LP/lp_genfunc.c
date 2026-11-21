@@ -2662,13 +2662,15 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 #ifdef SYM_COMPILE_IN_LP
 	 }
 #endif
-	 /* Limits based on Cbc's (CbcSolverCutSetup.cpp): at the root, probe
-	  * at most 50 variables, look at 10 and skip rows longer than 300; in
-	  * the tree, 10, 10 and 200; one pass. These are the values Cbc sets
-	  * first; by default it then raises the variables to probe to 123 and
-	  * the variables to look at in the root to 20. SYMPHONY calls
-	  * CglProbing without a CglTreeInfo, so CglProbing always uses its root
-	  * settings, and in the tree they are set to the tree values. */
+	 /* Limits based on Cbc's (CbcSolverCutSetup.cpp): one pass, and skip
+	  * rows longer than 300 at the root and 200 in the tree. The numbers
+	  * of variables to probe (50 at the root, 10 in the tree) and to look
+	  * at (10) are set as in Cbc, but CglProbing doesn't use them in mode
+	  * 2: setMaxProbe() only matters with Cbc's special value 123, and
+	  * probe() fixes the number to look at. So every root call probes
+	  * every integer variable. SYMPHONY calls CglProbing without a
+	  * CglTreeInfo, so CglProbing always uses its root settings, and in
+	  * the tree they are set to the tree values. */
 	 if (p->par.cgl.probing_limits == 1) {
 	    probing->setMaxPass(1);
 	    probing->setMaxPassRoot(1);
