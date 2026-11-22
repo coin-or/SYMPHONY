@@ -180,6 +180,10 @@ typedef struct LP_PARAMS{
 
    int               max_cut_num_per_iter;
    int               max_cut_num_per_iter_root;
+   int               max_cut_num_per_call; /* keep at most this many of the
+					     row cuts from one call to a Cgl
+					     generator, the most violated;
+					     0: all (default 20000) */
    int               min_root_cut_rounds;
    int               max_cut_length;
    int               tried_long_cuts;

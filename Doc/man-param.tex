@@ -839,6 +839,13 @@ The maximum number of cuts that can be added to the LP in an
 iteration. The remaining cuts stay in the local pool to be added in
 subsequent iterations, if they are strong enough.
 
+\item[\ptt{max\_cut\_num\_per\_call} -- integer (20000).]
+\mysindex{p}{\LPP!max\_cut\_num\_per\_call}
+The maximum number of cuts kept from one call to a cut generator from
+the Cut Generation Library: if a call returns more, only this many of the
+most violated ones are checked and kept, and the others are counted as
+insufficiently violated. A value of 0 keeps them all.
+
 \item[\ptt{do\_reduced\_cost\_fixing} -- boolean ({\tt FALSE}).]
 \mysindex{p}{\LPP!do\_reduced\_cost\_fixing}
 Whether or not to attempt to fix variables by reduced cost. This
