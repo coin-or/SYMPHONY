@@ -31,6 +31,8 @@ typedef struct FP_VARS {
    char          is_int;
    int           xplus;
    int           xminus;
+   int           xplus_row;     /* the first of the two rows that bound
+                                   xplus (general integers) */
 }FPvars;
 
 typedef struct FP_DATA {

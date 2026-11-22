@@ -48,6 +48,12 @@
  * make independent of solver
  */
 
+static double fp_time_left(lp_prob *p);
+static int fp_fix_and_solve(LPdata *new_lp_data, FPdata *fp_data,
+			    int obj_row, double obj_row_rhs);
+static int fp_flip(lp_prob *p, FPdata *fp_data, char small);
+
+/*===========================================================================*/
 int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_value, 
 		      double *colSolution, double *betterSolution)
    
@@ -82,6 +88,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
    int                      total_iter_cnt = 0;
    fp_time                                = used_time(&total_time);
    char                     fp_abandoned = FALSE;
+   /* the objective cutoff row of the pump's LP, if there is one */
+   int                      obj_row = -1;
+   double                   obj_row_rhs = 0.0;
    *found_better_solution = FALSE;
 
    if (p->lp_stat.fp_calls < 1) {
@@ -155,6 +164,8 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
          (p->mip->mip_inf->obj_size <= p->mip->mip_inf->max_row_size || 
           p->mip->mip_inf->obj_size < n/10)) {
       fp_add_obj_row(new_lp_data, n, mip_obj, p->ub-p->par.granularity);
+      obj_row = new_lp_data->m - 1;
+      obj_row_rhs = p->ub - p->par.granularity;
    } 
    /* round the x_lp and store as x_ip, it will usually become infeasible */
    vars = fp_data->fp_vars;
@@ -183,6 +194,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
    for (iter=0; (iter<max_iter && fp_time<p->par.fp_time_limit &&
 		 fp_time + p->comp_times.fp < p->par.fp_max_initial_time) ||
 	   fp_override_cnt > 0; iter++) {
+      if (fp_time_left(p) <= 0.0) {
+         break;
+      }
       if (fp_time - last_fp_time > fp_display_interval || verbosity > 5) {
          PRINT(verbosity, 0, 
                ("feasibility pump: starting iteration %d, time used = %.2f\n",
@@ -203,6 +217,28 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
          break;
       }
       fp_is_feasible (lp_data,matrix,lp_r_low,lp_r_up,fp_data,&is_feasible);
+
+      if (!is_feasible && fp_data->numInts < n) {
+         /* The rounded point breaks some rows. If it is the rounding of the
+          * node's LP solution, or the pump's LP solution was integral, the
+          * continuous variables may be at fault: fix the integer variables
+          * and solve for the continuous ones. */
+         char lp_integral = TRUE;
+         if (iter > 0) {
+            for (i = 0; i < n; i++) {
+               if (fp_data->fp_vars[i]->is_int &&
+                   fabs(x_lp[i] - x_ip[i]) > lpetol) {
+                  lp_integral = FALSE;
+                  break;
+               }
+            }
+         }
+         if (lp_integral &&
+             fp_fix_and_solve(new_lp_data, fp_data, obj_row, obj_row_rhs)) {
+            fp_is_feasible(lp_data, matrix, lp_r_low, lp_r_up, fp_data,
+                           &is_feasible);
+         }
+      }
 
       if (is_feasible == TRUE) {
          new_solution_value = 0;
@@ -243,6 +279,8 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
                   r = new_lp_data->m-1;
                   change_rhs(new_lp_data, 1, &r, &target_ub);
                }
+               obj_row = new_lp_data->m - 1;
+               obj_row_rhs = target_ub;
             }
             *found_better_solution = TRUE;
             fp_poor_sol_lim = p->par.fp_poor_sol_lim_fac *
@@ -549,7 +587,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
    fp_data->fp_vars         = (FPvars **) malloc(sizeof(FPvars *)*n);
    fp_data->x_ip            = (double *) calloc(n,DSIZE);
    fp_data->x_lp            = (double *) calloc(n,DSIZE);
-   fp_data->index_list      = (int *)    calloc(n,DSIZE);
+   fp_data->index_list      = (int *)    malloc(n*ISIZE);
    fp_data->x_bar_ind       = (int **)   calloc(p->par.fp_max_cycles,
                                                 sizeof(int*));
    fp_data->x_bar_val       = (double **)calloc(p->par.fp_max_cycles,
@@ -586,6 +624,14 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
 
    fp_data->n       = n+fp_data->numNonBinInts;
    fp_data->m       = m+2*fp_data->numNonBinInts;
+   /* the objective is set for all the columns of the pump's LP, including
+    * the xplus columns of the general integers */
+   fp_data->index_list = (int *) realloc(fp_data->index_list,
+                                         fp_data->n*ISIZE);
+   index_list = fp_data->index_list;
+   for (i=n;i<fp_data->n;i++) {
+      index_list[i]=i;
+   }
    fp_data->obj     = (double *)malloc(fp_data->n*DSIZE);
    new_lp_data->x   = (double *)calloc(fp_data->n,DSIZE);
    memcpy(fp_data->x_lp,p->lp_data->x,DSIZE*n);
@@ -633,6 +679,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
 	 add_cols(new_lp_data, 1, 0, &one, cmatbeg, cmatind, cmatval, &lb, &ub, 
                &where_to_move);
          fp_vars[i]->xplus = col_number;
+         fp_vars[i]->xplus_row = new_lp_data->m;
 
          /* now add two rows */
          /* d_i - x_i >= -x_i^0 */
@@ -696,8 +743,12 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
 	       objcoeff[i] = -10.0;
             }
          } else {
+            /* xplus >= |x_i - x_ip[i]|: the distance from the rounded
+             * point, not from the LP solution the pump started from */
             objcoeff[i] = 0.0;
-            objcoeff[fp_vars[i]->xplus] = 1.0;
+            objcoeff[fp_vars[i]->xplus] = 10.0;
+            lp_data->si->setRowLower(fp_vars[i]->xplus_row, -x_ip[i]);
+            lp_data->si->setRowLower(fp_vars[i]->xplus_row + 1, x_ip[i]);
          }
       } else {
          objcoeff[i] = 0.0;
@@ -723,6 +774,9 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
       objcoeff[i] = 
       one_minus_alpha*objcoeff[i]+alpha*mip_obj[i]*norm;
    }
+   for (i=n0;i<n;i++) {
+      objcoeff[i] = one_minus_alpha*objcoeff[i];
+   }
   /*
    for (i=fp_data->n0;i<fp_data->n;i++) {
       objcoeff[i] = (1-alpha)*objcoeff[i];
@@ -735,7 +789,7 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    }
    */
 
-   change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
+   change_objcoeff(lp_data, index_list, index_list + n, objcoeff);
    if (fp_data->iter > 0) { 
      set_itlim(lp_data, fp_data->single_iter_limit);   
      termstatus = dual_simplex(lp_data, &fp_data->iterd);
@@ -826,11 +880,12 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
    int **x_bar_ind_p = fp_data->x_bar_ind;
    int *x_bar_ind;
    int *x_bar_len = fp_data->x_bar_len;
-   double flip_fraction = fp_data->flip_fraction;
    FPvars **vars = fp_data->fp_vars;
    int fp_iter = fp_data->iter;
    double *alpha_p = fp_data->alpha_p;
    int sos_row_filled_cnt = 0;
+   char tried_flip = FALSE;
+   int num_perturbed = 0;
  
    if(fp_data->can_check_sos){
       memset(fp_data->sos_row_filled, 0, CSIZE*p->mip->m);
@@ -893,41 +948,21 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
       }
 
       if (i<fp_iter) {
-         /* flip some vars in x_ip */	 
-	 //if(fp_data->can_check_sos){
-	 //  memset(fp_data->sos_row_filled, 0, CSIZE*p->mip->m); 
-	 //  sos_row_filled_cnt = 0;	 
-	 //}
-	 
+         /* The rounded point repeats an earlier one. As in Cbc's pump: if it
+          * repeats the last one, flip the integer variables farthest from
+          * x_lp; otherwise, or if none is far enough, perturb the point. */
          int num_flipped = 0;
-	 
          has_changed = FALSE;
-         PRINT(fp_data->verbosity,5,("fp: flipping\n"));
-
-	 for (j=0; j<n; j++) {
-	    if (vars[j]->is_bin) {
-	       
-	       if (CoinDrand48()<flip_fraction) {
-		  x_ip[j] = 1-x_ip[j];
-		  num_flipped++;
-	       }
-	       // if(fp_data->can_check_sos && x_ip[j] == 1.0 && 
-	       //  p->mip->mip_inf->cols[j].sos_num){
-		  //if(!(fp_can_sos_var_fix(p, fp_data, j, &sos_row_filled_cnt))){
-		  //   x_ip[j] = 0.0;
-		  // }
-	       // }	       
-	    } else if (vars[j]->is_int) {
-	       if (CoinDrand48()<flip_fraction) {
-		  x_ip[j] = floor(x_lp[j] + lpetol) + 
-		     floor(ceil(x_lp[j] - lpetol) - x_lp[j] + 0.5); /*round and flip*/
-	       }
-	    }	    
-	 }
-
-	 PRINT(fp_data->verbosity,5,("fp: flipping %d\n", num_flipped));
+         if (i == fp_iter - 1 && !tried_flip) {
+            tried_flip = TRUE;
+            num_flipped = fp_flip(p, fp_data, TRUE);
+         }
+         if (num_flipped == 0 && num_perturbed < 10) {
+            num_perturbed++;
+            num_flipped = fp_flip(p, fp_data, FALSE);
+         }
+         PRINT(fp_data->verbosity,5,("fp: flipping %d\n", num_flipped));
          if (num_flipped==0) {
-            // TODO: dont know what to do
             break;
          }
       } else {
@@ -977,6 +1012,183 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
    }
    return termcode;
 }
+/*===========================================================================*/
+/* The time left before the time limit, or SYM_INFINITY if there is none. */
+static double fp_time_left(lp_prob *p)
+{
+#ifdef SYM_COMPILE_IN_LP
+   if (p->tm->par.time_limit >= 0.0) {
+      return(p->tm->par.time_limit - wall_clock(NULL) + p->tm->start_time);
+   }
+#else
+   if (p->par.time_limit >= 0.0) {
+      return(p->par.time_limit - wall_clock(NULL) + p->start_time);
+   }
+#endif
+   return(SYM_INFINITY);
+}
+
+/*===========================================================================*/
+/* Fix the integer variables of the pump's LP at the rounded point and solve
+ * it again for the continuous variables, as Cbc's pump does. The LP keeps its
+ * objective, so its basis stays dual feasible, and its objective cutoff row,
+ * if any, is relaxed meanwhile. If the LP is solved, the continuous values go
+ * into x_ip. The LP is then restored. Returns TRUE if the LP was solved. */
+static int fp_fix_and_solve(LPdata *new_lp_data, FPdata *fp_data,
+			    int obj_row, double obj_row_rhs)
+{
+   OsiSolverInterface *si = new_lp_data->si;
+   FPvars **vars = fp_data->fp_vars;
+   double *x_ip = fp_data->x_ip;
+   int n = fp_data->n0, i, solved;
+   double *save_lb = (double *) malloc(n * DSIZE);
+   double *save_ub = (double *) malloc(n * DSIZE);
+   const double *x;
+   CoinWarmStart *ws = si->getWarmStart();
+
+   memcpy(save_lb, si->getColLower(), n * DSIZE);
+   memcpy(save_ub, si->getColUpper(), n * DSIZE);
+   for (i = 0; i < n; i++) {
+      if (vars[i]->is_int) {
+	 si->setColBounds(i, x_ip[i], x_ip[i]);
+      }
+   }
+   if (obj_row >= 0) {
+      si->setRowUpper(obj_row, si->getInfinity());
+   }
+   set_itlim(new_lp_data, fp_data->single_iter_limit);
+   si->resolve();
+   solved = si->isProvenOptimal();
+   if (solved) {
+      x = si->getColSolution();
+      for (i = 0; i < n; i++) {
+	 if (!vars[i]->is_int) {
+	    x_ip[i] = x[i];
+	 }
+      }
+   }
+   for (i = 0; i < n; i++) {
+      if (vars[i]->is_int) {
+	 si->setColBounds(i, save_lb[i], save_ub[i]);
+      }
+   }
+   if (obj_row >= 0) {
+      si->setRowUpper(obj_row, obj_row_rhs);
+   }
+   si->setWarmStart(ws);
+   delete ws;
+   FREE(save_lb);
+   FREE(save_ub);
+   return(solved);
+}
+
+/*===========================================================================*/
+/* Change the rounded point x_ip, as Cbc's pump does. small: flip the 10 to 30
+ * integer variables farthest from x_lp, if farther than 0.001. Otherwise
+ * perturb: a variable is a candidate if its distance from x_lp plus a random
+ * number in [0, 0.7] exceeds 0.5. If there are more than 200 candidates, flip
+ * max(200, min(5% of them, 1000)), preferring those far from x_lp. Returns
+ * the number of variables changed. */
+static int fp_flip(lp_prob *p, FPdata *fp_data, char small)
+{
+   double *x_ip = fp_data->x_ip;
+   double *x_lp = fp_data->x_lp;
+   FPvars **vars = fp_data->fp_vars;
+   var_desc **lp_vars = p->lp_data->vars;
+   double lpetol = p->lp_data->lpetol;
+   int n = fp_data->n0, i, j, k, cnt = 0;
+   int nn, nnv = 0, ncand = 0, target, *list, *ind;
+   double d, r, *val, *key;
+
+   if (small) {
+      nn = 10 + (int) (CoinDrand48() * 20.0);
+      list = (int *) calloc(nn + 1, ISIZE);
+      val = (double *) malloc((nn + 1) * DSIZE);
+      for (k = 0; k <= nn; k++) {
+	 val[k] = 0.001;
+      }
+      /* keep the nn largest distances, in decreasing order */
+      for (i = 0; i < n; i++) {
+	 if (!vars[i]->is_int) {
+	    continue;
+	 }
+	 d = fabs(x_lp[i] - x_ip[i]);
+	 for (k = 0; k < nn; k++) {
+	    if (d > val[k]) {
+	       nnv++;
+	       for (j = nn - 2; j >= k; j--) {
+		  val[j + 1] = val[j];
+		  list[j + 1] = list[j];
+	       }
+	       val[k] = d;
+	       list[k] = i;
+	       break;
+	    }
+	 }
+      }
+      if (nnv > nn) {
+	 nnv = nn;
+      }
+      for (k = 0; k < nnv; k++) {
+	 i = list[k];
+	 if (x_ip[i] > x_lp[i] && x_ip[i] - 1 >= lp_vars[i]->lb - lpetol) {
+	    x_ip[i] -= 1;
+	 } else if (x_ip[i] + 1 <= lp_vars[i]->ub + lpetol) {
+	    x_ip[i] += 1;
+	 } else {
+	    x_ip[i] -= 1;
+	 }
+	 cnt++;
+      }
+      FREE(list);
+      FREE(val);
+      return(cnt);
+   }
+
+   key = (double *) malloc(n * DSIZE);
+   ind = (int *) malloc(n * ISIZE);
+   for (i = 0; i < n; i++) {
+      if (!vars[i]->is_int) {
+	 continue;
+      }
+      r = MAX(0.0, CoinDrand48() - 0.3);
+      d = fabs(x_lp[i] - x_ip[i]);
+      /* flipped with the factor f if d + r * f > 0.5; the key is the
+       * smallest such f, and candidates are those flipped with f = 1 */
+      if (d > 0.5) {
+	 key[ncand] = -1.0;
+      } else if (r > 0.0) {
+	 key[ncand] = (0.5 - d) / r;
+      } else {
+	 continue;
+      }
+      if (key[ncand] < 1.0) {
+	 ind[ncand++] = i;
+      }
+   }
+   target = ncand;
+   if (ncand > 200) {
+      target = (int) MAX(200.0, MIN(0.05 * ncand, 1000.0));
+      qsort_di(key, ind, ncand);
+   }
+   for (k = 0; k < target; k++) {
+      i = ind[k];
+      if (x_ip[i] < lp_vars[i]->lb + lpetol) {
+	 x_ip[i] += 1;
+      } else if (x_ip[i] > lp_vars[i]->ub - lpetol) {
+	 x_ip[i] -= 1;
+      } else if (x_lp[i] > x_ip[i]) {
+	 x_ip[i] += 1;
+      } else {
+	 x_ip[i] -= 1;
+      }
+      cnt++;
+   }
+   FREE(key);
+   FREE(ind);
+   return(cnt);
+}
+
 /*===========================================================================*/
 
 int fp_fix_sos_var(lp_prob *p, FPdata *fp_data, int ind)
