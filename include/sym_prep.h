@@ -302,6 +302,10 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
 /*presolve the desc */
 int prep_solve_desc(PREPdesc *P);
 
+/* extend the rows that are cliques of binary variables with the conflict
+ * graph and remove the rows that the larger cliques dominate */
+int prep_strengthen_cliques(PREPdesc *P);
+
 /* initialize the presolve description */
 int prep_initialize_mipinfo(PREPdesc *P);
 

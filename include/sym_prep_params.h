@@ -45,6 +45,7 @@ typedef struct PREP_PARAMS{
    int               write_mps;
    int               write_lp; 
    int               time_limit;
+   int               clique_strengthening;
 }prep_params;
 
 #endif
