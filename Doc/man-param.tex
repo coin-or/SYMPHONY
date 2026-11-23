@@ -1126,12 +1126,12 @@ been found, the parameter \ptt{fp\_time\_limit} is used.
 If the relative (\%) gap between the lower and the upper bounds falls below the
 value of this parameter, feasibility pump is not called.
 
-\item[\ptt{fp\_flip\_fraction} -- double (0.1).] 
+\item[\ptt{fp\_flip\_fraction} -- double (0.1).]
 \mysindex{p}{\LP!fp\_flip\_fraction}
-When the feasibility pump gets stuck in a cycle, this fraction of binary
-variables are flipped. The variables are selected randomly. Increasing the
-value of this parameter may result in the pump getting stuck fewer number of
-times, but the time to solve LPs after flipping may increase substantially.
+No longer used. When the feasibility pump's rounded point repeats the last
+one, the pump flips the 10 to 30 integer variables farthest from its LP
+solution; when it repeats an earlier one, it perturbs more of them, preferring
+those far from the LP solution, as Cbc's pump does.
 
 \item[\ptt{fp\_poor\_sol\_lim\_fac} -- integer (10).] 
 \mysindex{p}{\LP!fp\_poor\_sol\_lim\_fac}
