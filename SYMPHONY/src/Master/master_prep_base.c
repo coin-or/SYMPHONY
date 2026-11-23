@@ -1228,7 +1228,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 						0.0, 
 						etol))){
 		  rhs_obj = rhs[obj_ind] - rows[obj_ind].fixed_lhs_offset;
-		  rhs_row = rhs[row_ind] + rows[row_ind].fixed_lhs_offset;
+		  rhs_row = rhs[row_ind] - rows[row_ind].fixed_lhs_offset;
 		  delete_row = TRUE;
 		  if (sense[obj_ind] == 'E'){
 		     if (sense[row_ind] == 'E'){
@@ -1272,7 +1272,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 		  }
 	       } else if (diff_cnt == 1){
 		  rhs_obj = rhs[obj_ind] - rows[obj_ind].fixed_lhs_offset;
-		  rhs_row = rhs[row_ind] + rows[row_ind].fixed_lhs_offset;
+		  rhs_row = rhs[row_ind] - rows[row_ind].fixed_lhs_offset;
 		  diff_val = diff_obj_val - diff_row_val;
 		  new_bound = (rhs_obj - rhs_row)/diff_val;
 		  
