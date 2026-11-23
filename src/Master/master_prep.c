@@ -18,10 +18,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "sym_master.h"
 #include "sym_macros.h"
 #include "sym_prep.h"
+
+#if defined(USE_CGL_CUTS) && \
+   (defined(__OSI_CPLEX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
+    || defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) \
+    || defined(__OSI_VOL__) || defined(__OSI_DYLP__) || defined(__OSI_GLPK__))
+#define PREP_CLIQUE_STRENGTHENING
+#include "sym_lp_solver.h"
+#include "CglCliqueStrengthening.hpp"
+#include "CoinStaticConflictGraph.hpp"
+#endif
 
 int sym_presolve(sym_environment *env)
 {
@@ -57,6 +68,16 @@ int sym_presolve(sym_environment *env)
    P->params = env->par.prep_par;
    P->has_ub = env->has_ub;
    P->ub = env->ub;
+
+   /*
+    * Clique strengthening changes the rows. A warm start and sensitivity
+    * analysis refer to rows by their index, so leave the rows as they are.
+    */
+   if (env->par.tm_par.warm_start ||
+       env->par.tm_par.keep_description_of_pruned == KEEP_IN_MEMORY ||
+       env->par.tm_par.sensitivity_analysis){
+      P->params.clique_strengthening = FALSE;
+   }
 
    if (P->mip){
       termcode = prep_solve_desc(P);
@@ -172,6 +193,17 @@ int prep_solve_desc (PREPdesc * P)
 
    double start_time = wall_clock(NULL);
 
+   /*
+    * Strengthen the cliques first, as Cbc does before its first LP. This
+    * changes the number of rows and nonzeros. It needs a copy of the
+    * original problem (orig_mip), since the user's problem must stay as it
+    * is, and the root description is updated only if reduce_mip is set.
+    */
+   if (p_level > 2 && P->orig_mip && params.reduce_mip &&
+       params.clique_strengthening){
+      prep_strengthen_cliques(P);
+   }
+
    /* Start with Basic Preprocessing */
    P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
    int max_mn = MAX(mip->n, mip->m);
@@ -217,7 +249,176 @@ int prep_solve_desc (PREPdesc * P)
 
    return termcode; 
 }
- 
+
+/*===========================================================================*/
+/*
+   Strengthen the rows that are cliques of binary variables (set packing rows
+   and rows like them), as Cbc does before its first LP. CglCliqueStrengthening
+   builds the conflict graph, extends each such row to a larger clique and
+   removes the rows that the new cliques dominate. The binaries the conflict
+   graph fixes are fixed first, as in Cbc. Otherwise, the clique in a row
+   such as 48 x1 + 48 x2 + 53 x3 <= 48 can replace the row, and x3 = 1
+   becomes feasible. The columns and their order stay the same, so solutions
+   need no mapping. Returns PREP_MODIFIED if the rows changed,
+   PREP_UNMODIFIED otherwise.
+*/
+/*===========================================================================*/
+
+int prep_strengthen_cliques(PREPdesc *P)
+{
+#ifdef PREP_CLIQUE_STRENGTHENING
+   MIPdesc *mip = P->mip;
+   int n = mip->n, m = mip->m;
+   int i, j, k, new_m, new_nz, extended, dominated, fixed = 0;
+   double start_time = wall_clock(NULL), max_seconds = P->params.time_limit;
+
+   if (n == 0 || m == 0 || !mip->matbeg){
+      return(PREP_UNMODIFIED);
+   }
+
+   /* the conflict graph only has binary variables */
+   for (j = 0; j < n; j++){
+      if (mip->is_int[j] && mip->lb[j] > -1.0 && mip->ub[j] < 2.0){
+	 break;
+      }
+   }
+   if (j == n){
+      return(PREP_UNMODIFIED);
+   }
+
+   CoinMessageHandler handler;
+   OsiXSolverInterface si;
+   handler.setLogLevel(0);
+   si.passInMessageHandler(&handler);
+   si.loadProblem(n, m, mip->matbeg, mip->matind, mip->matval, mip->lb,
+		  mip->ub, mip->obj, mip->sense, mip->rhs, mip->rngval);
+   for (j = 0; j < n; j++){
+      if (mip->is_int[j]){
+	 si.setInteger(j);
+      }
+   }
+   si.getColType(true);
+
+   /*
+    * The time limit of the conflict graph is a deadline on
+    * CoinWallclockTime(), the time of day. A graph cut short by it has fewer
+    * conflicts but is valid.
+    */
+   si.checkCGraph(&handler,
+		  max_seconds > 0 ? CoinWallclockTime() + max_seconds : -1.0);
+   const CoinStaticConflictGraph *cgraph = si.getCGraph();
+   if (!cgraph){
+      return(PREP_UNMODIFIED);
+   }
+
+   /*
+    * Fix the binaries the conflict graph fixes. A binary fixed both ways
+    * means the problem is infeasible: leave it as it is; the search finds the
+    * infeasibility.
+    */
+   const std::vector< std::pair< size_t, std::pair< double, double > > >
+      &bounds = cgraph->updatedBounds();
+   for (k = 0; k < (int) bounds.size(); k++){
+      j = (int) bounds[k].first;
+      double lb = MAX(bounds[k].second.first, si.getColLower()[j]);
+      double ub = MIN(bounds[k].second.second, si.getColUpper()[j]);
+      if (lb > ub){
+	 return(PREP_UNMODIFIED);
+      }
+      if (lb != si.getColLower()[j] || ub != si.getColUpper()[j]){
+	 si.setColLower(j, lb);
+	 si.setColUpper(j, ub);
+	 fixed++;
+      }
+   }
+
+   CglCliqueStrengthening clqstr(&si, &handler);
+   if (max_seconds > 0){
+      max_seconds -= wall_clock(NULL) - start_time;
+      if (max_seconds <= 0){
+	 return(PREP_UNMODIFIED);
+      }
+      clqstr.setMaximumSeconds(max_seconds);
+   }
+   clqstr.strengthenCliques(2);
+
+   extended = clqstr.constraintsExtended();
+   dominated = clqstr.constraintsDominated();
+   new_m = si.getNumRows();
+   if (extended + dominated == 0 || new_m == 0){
+      return(PREP_UNMODIFIED);
+   }
+
+   /*
+    * If a new clique contains both a variable and its complement for two
+    * variables, the problem is infeasible. CglCliqueStrengthening then adds
+    * the empty row 1 <= 0 instead of the cliques. Leave the rows as they
+    * were; the search finds the infeasibility.
+    */
+   if (si.getMatrixByRow()->getVectorSize(new_m - 1) == 0 &&
+       si.getRowLower()[new_m - 1] > si.getRowUpper()[new_m - 1]){
+      return(PREP_UNMODIFIED);
+   }
+
+   /* copy the rows back; the solver's matrix may have gaps */
+   const CoinPackedMatrix *matrix = si.getMatrixByCol();
+   const CoinBigIndex *start = matrix->getVectorStarts();
+   const int *length = matrix->getVectorLengths();
+   const int *index = matrix->getIndices();
+   const double *value = matrix->getElements();
+   const char *sense = si.getRowSense();
+   const double *rhs = si.getRightHandSide();
+   const double *range = si.getRowRange();
+
+   new_nz = 0;
+   for (j = 0; j < n; j++){
+      new_nz += length[j];
+   }
+
+   FREE(mip->matind);
+   FREE(mip->matval);
+   FREE(mip->rhs);
+   FREE(mip->rngval);
+   FREE(mip->sense);
+   mip->matind = (int *) malloc(MAX(new_nz, 1) * ISIZE);
+   mip->matval = (double *) malloc(MAX(new_nz, 1) * DSIZE);
+   mip->rhs = (double *) malloc(new_m * DSIZE);
+   mip->rngval = (double *) malloc(new_m * DSIZE);
+   mip->sense = (char *) malloc(new_m * CSIZE);
+
+   for (j = 0, k = 0; j < n; j++){
+      mip->matbeg[j] = k;
+      for (i = start[j]; i < start[j] + length[j]; i++, k++){
+	 mip->matind[k] = index[i];
+	 mip->matval[k] = value[i];
+      }
+   }
+   mip->matbeg[n] = k;
+
+   if (fixed){
+      memcpy(mip->lb, si.getColLower(), n * DSIZE);
+      memcpy(mip->ub, si.getColUpper(), n * DSIZE);
+   }
+
+   memcpy(mip->sense, sense, new_m * CSIZE);
+   memcpy(mip->rhs, rhs, new_m * DSIZE);
+   memcpy(mip->rngval, range, new_m * DSIZE);
+
+   mip->m = mip->alloc_m = new_m;
+   mip->nz = mip->alloc_nz = new_nz;
+
+   PRINT(P->params.verbosity, -2,
+	 ("Clique strengthening: %i rows extended, %i rows removed, "
+	  "%i rows added, %i binaries fixed in %.2f s\n", extended,
+	  dominated, new_m - m + dominated, fixed,
+	  wall_clock(NULL) - start_time));
+
+   return(PREP_MODIFIED);
+#else
+   return(PREP_UNMODIFIED);
+#endif
+}
+
 /*===========================================================================*/
 /* Load a MIP model with arrays */
 /*===========================================================================*/

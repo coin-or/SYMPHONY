@@ -262,6 +262,17 @@ preprocessed instance.
 \mysindex{p}{\MP!prep\_time\_limit}
 Determines the maximum time in seconds that can be spent in preprocessing.
 
+\item[\ptt{prep\_clique\_strengthening} -- boolean ({\tt 1}).]
+\mysindex{p}{\MP!prep\_clique\_strengthening}
+If $1$, preprocessing starts by strengthening the constraints that are
+cliques of binary variables, such as set packing constraints. The conflict
+graph of the binary variables is built, each such constraint is extended to a
+larger clique, and the constraints that the larger cliques dominate are
+removed. This is done only when \ptt{prep\_level} is greater than $2$ and
+\ptt{prep\_reduce\_mip} is $1$, and not when warm starting or sensitivity
+analysis is used, since these refer to the original constraints. It is limited
+by \ptt{prep\_time\_limit}.
+
    %double            etol; 
    %double            single_row_rlx_ratio;
    %char              do_aggregate_row_rlx; 

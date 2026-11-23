@@ -653,6 +653,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    prep_par->keep_row_ordered = 1;
    prep_par->keep_track = 0;
    prep_par->time_limit = 500;
+   prep_par->clique_strengthening = TRUE;
 
    return(termcode);
 }
@@ -6209,6 +6210,10 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
    else if (strcmp(key, "prep_time_limit") == 0){
       *value = env->par.prep_par.time_limit;
    }
+   else if (strcmp(key, "prep_clique_strengthening") == 0){
+      *value = env->par.prep_par.clique_strengthening;
+      return(0);
+   }
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
@@ -8652,6 +8657,10 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "prep_time_limit") == 0){
       READ_INT_PAR(prep_par->time_limit);
+      return(0);
+   }
+   else if (strcmp(key, "prep_clique_strengthening") == 0){
+      READ_INT_PAR(prep_par->clique_strengthening);
       return(0);
    }
 
