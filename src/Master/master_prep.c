@@ -31,6 +31,7 @@
 #define PREP_CLIQUE_STRENGTHENING
 #include "sym_lp_solver.h"
 #include "CglCliqueStrengthening.hpp"
+#include "CoinStaticConflictGraph.hpp"
 #endif
 
 int sym_presolve(sym_environment *env)
@@ -254,10 +255,12 @@ int prep_solve_desc (PREPdesc * P)
    Strengthen the rows that are cliques of binary variables (set packing rows
    and rows like them), as Cbc does before its first LP. CglCliqueStrengthening
    builds the conflict graph, extends each such row to a larger clique and
-   removes the rows that the new cliques dominate. Only the rows change: the
-   columns, their bounds and their order stay the same, so solutions need no
-   mapping. Returns PREP_MODIFIED if the rows changed, PREP_UNMODIFIED
-   otherwise.
+   removes the rows that the new cliques dominate. The binaries the conflict
+   graph fixes are fixed first, as in Cbc. Otherwise, the clique in a row
+   such as 48 x1 + 48 x2 + 53 x3 <= 48 can replace the row, and x3 = 1
+   becomes feasible. The columns and their order stay the same, so solutions
+   need no mapping. Returns PREP_MODIFIED if the rows changed,
+   PREP_UNMODIFIED otherwise.
 */
 /*===========================================================================*/
 
@@ -266,7 +269,7 @@ int prep_strengthen_cliques(PREPdesc *P)
 #ifdef PREP_CLIQUE_STRENGTHENING
    MIPdesc *mip = P->mip;
    int n = mip->n, m = mip->m;
-   int i, j, k, new_m, new_nz, extended, dominated;
+   int i, j, k, new_m, new_nz, extended, dominated, fixed = 0;
    double start_time = wall_clock(NULL), max_seconds = P->params.time_limit;
 
    if (n == 0 || m == 0 || !mip->matbeg){
@@ -303,8 +306,30 @@ int prep_strengthen_cliques(PREPdesc *P)
     */
    si.checkCGraph(&handler,
 		  max_seconds > 0 ? CoinWallclockTime() + max_seconds : -1.0);
-   if (!si.getCGraph()){
+   const CoinStaticConflictGraph *cgraph = si.getCGraph();
+   if (!cgraph){
       return(PREP_UNMODIFIED);
+   }
+
+   /*
+    * Fix the binaries the conflict graph fixes. A binary fixed both ways
+    * means the problem is infeasible: leave it as it is; the search finds the
+    * infeasibility.
+    */
+   const std::vector< std::pair< size_t, std::pair< double, double > > >
+      &bounds = cgraph->updatedBounds();
+   for (k = 0; k < (int) bounds.size(); k++){
+      j = (int) bounds[k].first;
+      double lb = MAX(bounds[k].second.first, si.getColLower()[j]);
+      double ub = MIN(bounds[k].second.second, si.getColUpper()[j]);
+      if (lb > ub){
+	 return(PREP_UNMODIFIED);
+      }
+      if (lb != si.getColLower()[j] || ub != si.getColUpper()[j]){
+	 si.setColLower(j, lb);
+	 si.setColUpper(j, ub);
+	 fixed++;
+      }
    }
 
    CglCliqueStrengthening clqstr(&si, &handler);
@@ -370,6 +395,11 @@ int prep_strengthen_cliques(PREPdesc *P)
    }
    mip->matbeg[n] = k;
 
+   if (fixed){
+      memcpy(mip->lb, si.getColLower(), n * DSIZE);
+      memcpy(mip->ub, si.getColUpper(), n * DSIZE);
+   }
+
    memcpy(mip->sense, sense, new_m * CSIZE);
    memcpy(mip->rhs, rhs, new_m * DSIZE);
    memcpy(mip->rngval, range, new_m * DSIZE);
@@ -379,8 +409,9 @@ int prep_strengthen_cliques(PREPdesc *P)
 
    PRINT(P->params.verbosity, -2,
 	 ("Clique strengthening: %i rows extended, %i rows removed, "
-	  "%i rows added in %.2f s\n", extended, dominated,
-	  new_m - m + dominated, wall_clock(NULL) - start_time));
+	  "%i rows added, %i binaries fixed in %.2f s\n", extended,
+	  dominated, new_m - m + dominated, fixed,
+	  wall_clock(NULL) - start_time));
 
    return(PREP_MODIFIED);
 #else
