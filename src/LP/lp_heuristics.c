@@ -72,6 +72,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
    int                     *indices;
    double                  *values;
    double                   fp_time, last_fp_time, real_obj_value, target_ub;
+   double                   lp_time_left;
    FPvars                 **vars;
    double                   gap           = model->getInfinity();
    double                   obj_lb        = lp_data->objval;
@@ -194,9 +195,16 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
    for (iter=0; (iter<max_iter && fp_time<p->par.fp_time_limit &&
 		 fp_time + p->comp_times.fp < p->par.fp_max_initial_time) ||
 	   fp_override_cnt > 0; iter++) {
-      if (fp_time_left(p) <= 0.0) {
+      /* The pump's time is checked only here, between passes, and one of its
+       * LPs can take minutes on a large problem: give them the time left. */
+      fp_time += used_time(&total_time);
+      lp_time_left = MIN(p->par.fp_time_limit - fp_time,
+			 p->par.fp_max_initial_time - p->comp_times.fp - fp_time);
+      lp_time_left = MIN(lp_time_left, fp_time_left(p));
+      if (lp_time_left <= 0.0) {
          break;
       }
+      set_timelim(new_lp_data, lp_time_left);
       if (fp_time - last_fp_time > fp_display_interval || verbosity > 5) {
          PRINT(verbosity, 0, 
                ("feasibility pump: starting iteration %d, time used = %.2f\n",
