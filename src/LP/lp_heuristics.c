@@ -52,6 +52,8 @@ static double fp_time_left(lp_prob *p);
 static int fp_fix_and_solve(LPdata *new_lp_data, FPdata *fp_data,
 			    int obj_row, double obj_row_rhs);
 static int fp_flip(lp_prob *p, FPdata *fp_data, char small);
+static int fp_small_bab(lp_prob *p, FPdata *fp_data, const int *last_moved,
+			double *solution_value, double *betterSolution);
 
 /*===========================================================================*/
 int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_value, 
@@ -73,6 +75,10 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
    double                  *values;
    double                   fp_time, last_fp_time, real_obj_value, target_ub;
    double                   lp_time_left;
+   /* for the small branch and bound after the pump: the last pass in which
+    * each column of the pump's LP solution moved (-1: never) */
+   int                     *last_moved = NULL;
+   double                  *x_prev = NULL;
    FPvars                 **vars;
    double                   gap           = model->getInfinity();
    double                   obj_lb        = lp_data->objval;
@@ -153,6 +159,12 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
 			   (solution_value < SYM_INFINITY/2 ? colSolution : NULL));
    x_ip = fp_data->x_ip;
    x_lp = fp_data->x_lp;
+   last_moved = (int *) malloc(n*ISIZE);
+   x_prev = (double *) malloc(n*DSIZE);
+   for (i = 0; i < n; i++) {
+      last_moved[i] = -1;
+   }
+   memcpy(x_prev, x_lp, n*DSIZE);
 
    if (p->has_ub) {
       solution_value = p->ub-p->par.granularity;
@@ -325,6 +337,13 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
       if (fp_solve_lp(new_lp_data, fp_data, &is_feasible) != 
             FUNCTION_TERMINATED_NORMALLY) {
 	fp_abandoned = TRUE;
+      } else {
+         for (i = 0; i < n; i++) {
+            if (fabs(x_lp[i] - x_prev[i]) > 1e-8) {
+               last_moved[i] = iter;
+               x_prev[i] = x_lp[i];
+            }
+         }
       }
 
       fp_data->iter++;
@@ -333,6 +352,19 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
       //if(fp_abandoned) break;
       if(fp_abandoned || total_iter_cnt > fp_data->total_iter_limit) break;
    }
+
+   /* As Cbc's pump does, try a small branch and bound with the columns fixed
+    * that the pump didn't move. Only at the root for now. */
+   if (*found_better_solution != TRUE && p->bc_level < 1 && fp_data->iter > 0 &&
+       fp_time_left(p) > 0.0) {
+      if (fp_small_bab(p, fp_data, last_moved, &solution_value,
+		       betterSolution)) {
+         *found_better_solution = TRUE;
+         p->lp_stat.fp_num_sols++;
+      }
+   }
+   FREE(last_moved);
+   FREE(x_prev);
 
    p->lp_stat.fp_poor_sols = num_poor_sols;
    p->lp_stat.fp_lp_total_iter_num += total_iter_cnt;
@@ -1034,6 +1066,181 @@ static double fp_time_left(lp_prob *p)
    }
 #endif
    return(SYM_INFINITY);
+}
+
+/*===========================================================================*/
+/* After the pump finds no solution, do as Cbc's pump does: fix the integer
+ * variables whose value in the pump's LP solutions never moved (last_moved[i]
+ * < 0) and is integral, and solve the rest with a small branch and bound (with
+ * preprocessing and cuts, at most 1000 nodes and 30 s). Unlike Cbc, the
+ * continuous variables are left free. It is skipped if fewer than half of the
+ * integer variables are fixed, or if the fixed values break a row with no free
+ * variable. Returns TRUE if it finds a better solution, which it puts in
+ * betterSolution and *solution_value. */
+static int fp_small_bab(lp_prob *p, FPdata *fp_data, const int *last_moved,
+			double *solution_value, double *betterSolution)
+{
+   LPdata *lp_data = p->lp_data;
+   OsiSolverInterface *si = lp_data->si;
+   int n = lp_data->n, m = lp_data->m;
+   double lpetol = lp_data->lpetol;
+   const double *x_lp = fp_data->x_lp;
+   const double *obj = si->getObjCoefficients();
+   const double *r_low = si->getRowLower();
+   const double *r_up = si->getRowUpper();
+   const CoinPackedMatrix *matrix = si->getMatrixByCol();
+   const int *matbeg = matrix->getVectorStarts();
+   const int *matlen = matrix->getVectorLengths();
+   const int *matind = matrix->getIndices();
+   const double *matval = matrix->getElements();
+   int node_limit = 1000;
+   double time_limit = 30.0, start_time = wall_clock(NULL), min_fix = 0.5;
+   int i, j, fixed_cnt = 0, int_cnt = 0, free_m = 0;
+   int unfix_nz = 0, nodes = 0, found = FALSE, rows_checked = FALSE;
+   double offset = 0.0, value = 0.0, v;
+   const char *status = "";
+   char *type;
+   double *val, *row_act, *sol;
+   int *new_ind, *row_free;
+   sym_environment *env;
+
+   time_limit = MIN(time_limit, fp_time_left(p));
+   if (time_limit <= 0.0) {
+      return(FALSE);
+   }
+
+   type = (char *) malloc(n*CSIZE);
+   val = (double *) malloc(n*DSIZE);
+   new_ind = (int *) malloc(n*ISIZE);
+   sol = (double *) malloc(n*DSIZE);
+   row_act = (double *) calloc(m, DSIZE);
+   row_free = (int *) calloc(m, ISIZE);
+
+   for (i = 0; i < n; i++) {
+      type[i] = 'N';
+      val[i] = 0.0;
+      if (!lp_data->vars[i]->is_int) {
+	 continue;
+      }
+      int_cnt++;
+      if (last_moved[i] >= 0) {
+	 continue;
+      }
+      v = floor(x_lp[i] + 0.5);
+      if (fabs(x_lp[i] - v) < 1e-7) {
+	 type[i] = 'F';
+	 val[i] = v;
+	 fixed_cnt++;
+      }
+   }
+
+   if (fixed_cnt == 0 || fixed_cnt < min_fix*int_cnt) {
+      status = "too few fixed";
+      goto done;
+   }
+
+   /* rows left without a free variable must hold at the fixed values */
+   for (i = 0; i < n; i++) {
+      for (j = matbeg[i]; j < matbeg[i] + matlen[i]; j++) {
+	 if (type[i] == 'F') {
+	    row_act[matind[j]] += matval[j]*val[i];
+	 } else {
+	    row_free[matind[j]]++;
+	 }
+      }
+   }
+   for (j = 0; j < m; j++) {
+      if (row_free[j] > 0) {
+	 free_m++;
+      } else if (row_act[j] < r_low[j] - lpetol ||
+		 row_act[j] > r_up[j] + lpetol) {
+	 status = "fixing infeasible";
+	 goto done;
+      }
+   }
+   rows_checked = TRUE;
+
+   env = lp_to_sym(p, lp_data, FALSE, fixed_cnt, type, val, &offset,
+		   &unfix_nz, new_ind);
+
+   /* as for restricted search: no heuristics that solve a sub-MIP */
+   sym_set_int_param(env, "verbosity", -5);
+   sym_set_dbl_param(env, "time_limit", time_limit);
+   sym_set_int_param(env, "node_limit", node_limit);
+   sym_set_int_param(env, "fr_dive_level", -1);
+   sym_set_int_param(env, "fp_enabled", -1);
+   sym_set_int_param(env, "rs_dive_level", -1);
+   sym_set_int_param(env, "lb_dive_level", -1);
+   sym_set_dbl_param(env, "ds_min_gap", 5.0);
+   sym_set_int_param(env, "ds_frequency", 10000);
+   sym_set_int_param(env, "ds_guided_enabled", FALSE);
+   sym_set_int_param(env, "ds_vlength_enabled", FALSE);
+   sym_set_int_param(env, "ds_crossover_enabled", FALSE);
+   sym_set_int_param(env, "ds_rank_enabled", FALSE);
+   sym_set_int_param(env, "ds_fractional_enabled", FALSE);
+   sym_set_int_param(env, "ds_euc_enabled", FALSE);
+   sym_set_int_param(env, "generate_cgl_cuts", TRUE);
+   sym_set_int_param(env, "prep_level", 5);
+   sym_set_int_param(env, "rs_mode_enabled", TRUE);
+   sym_set_int_param(env, "rs_lp_iter_limit", (int)(5e8/MAX(unfix_nz, 1)));
+   if (*solution_value < SYM_INFINITY/2) {
+      sym_set_dbl_param(env, "upper_bound", *solution_value - offset + lpetol);
+   }
+
+   sym_solve(env);
+   if (env->warm_start) {
+      nodes = env->warm_start->stat.analyzed;
+   }
+   status = "no solution";
+   if (env->best_sol.has_sol &&
+       sym_get_col_solution(env, sol) == FUNCTION_TERMINATED_NORMALLY) {
+      double *x = fp_data->x_ip;
+      for (i = 0; i < n; i++) {
+	 x[i] = new_ind[i] < 0 ? val[i] : sol[new_ind[i]];
+      }
+      for (i = 0; i < n; i++) {
+	 value += obj[i]*x[i];
+      }
+      if (!prep_check_feasible(p->mip, x, lpetol)) {
+	 status = "solution infeasible";
+      } else if (value < *solution_value + lpetol) {
+	 memcpy(betterSolution, x, n*DSIZE);
+	 *solution_value = value;
+	 found = TRUE;
+	 status = "solution";
+      } else {
+	 status = "no better solution";
+      }
+   }
+   sym_close_environment(env);
+
+ done:
+   if (p->bc_index < 1) {
+      PRINT(fp_data->verbosity, 0,
+	    ("feasibility pump: branch and bound with %d of %d integers "
+	     "fixed", fixed_cnt, int_cnt));
+      if (rows_checked) {
+	 PRINT(fp_data->verbosity, 0, (", %d of %d rows left", free_m, m));
+      }
+      PRINT(fp_data->verbosity, 0, (": %s", status));
+      if (found) {
+	 PRINT(fp_data->verbosity, 0,
+	       (" of value %.10g", p->mip->obj_sense == SYM_MAXIMIZE ?
+		-value + p->mip->obj_offset : value + p->mip->obj_offset));
+      }
+      if (rows_checked) {
+	 PRINT(fp_data->verbosity, 0, (" (%d nodes, %.2f s)", nodes,
+				       wall_clock(NULL) - start_time));
+      }
+      PRINT(fp_data->verbosity, 0, ("\n"));
+   }
+   FREE(type);
+   FREE(val);
+   FREE(new_ind);
+   FREE(sol);
+   FREE(row_act);
+   FREE(row_free);
+   return(found);
 }
 
 /*===========================================================================*/

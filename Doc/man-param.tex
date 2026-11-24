@@ -1095,6 +1095,10 @@ adjusted through the \ptt{fp\_frequency} parameter.  {\tt
 SYM\_FEAS\_PUMP\_TILL\_SOL}\{3\} indicates that the heuristic is used only
 until the first feasible solution is found. {\tt
 SYM\_FEAS\_PUMP\_DISABLE}\{-1\} indicates that the heuristic is not used.
+When the pump ends at the root without a solution, the integer variables
+whose values the pump's LP solutions left unchanged are fixed and a small
+branch and bound (at most 1000 nodes and 30 seconds) solves for the rest, as
+in Cbc's pump, if at least half of the integer variables are fixed.
 
 \item[\ptt{fp\_frequency} -- integer (10).] 
 \mysindex{p}{\LP!fp\_frequency}
