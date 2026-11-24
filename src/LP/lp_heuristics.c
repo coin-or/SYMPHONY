@@ -53,7 +53,9 @@ static int fp_fix_and_solve(LPdata *new_lp_data, FPdata *fp_data,
 			    int obj_row, double obj_row_rhs);
 static int fp_flip(lp_prob *p, FPdata *fp_data, char small);
 static int fp_small_bab(lp_prob *p, FPdata *fp_data, const int *last_moved,
+			const double *fix_val,
 			double *solution_value, double *betterSolution);
+static char fp_wide_general(var_desc *v, double etol);
 
 /*===========================================================================*/
 int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_value, 
@@ -260,6 +262,40 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
          }
       }
 
+      if (is_feasible == TRUE && fp_data->bin_only) {
+	 /* As in Cbc's pump: the point satisfies the rows, but the general
+	  * integers that are continuous in the pump may be fractional. Fix the
+	  * rounded integers at the point and solve for the rest. */
+	 for (i = 0; i < n; i++) {
+	    if (lp_data->vars[i]->is_int && !fp_data->fp_vars[i]->is_int &&
+		fabs(x_ip[i] - floor(x_ip[i] + 0.5)) > lpetol) {
+	       break;
+	    }
+	 }
+	 if (i < n) {
+	    double sub_value = solution_value;
+	    double *fix_x = (double *) malloc(n*DSIZE);
+	    double *sub_x = (double *) malloc(n*DSIZE);
+	    memcpy(fix_x, x_ip, n*DSIZE);
+	    is_feasible = fp_small_bab(p, fp_data, NULL, fix_x, &sub_value,
+				       sub_x);
+	    if (is_feasible) {
+	       memcpy(x_ip, sub_x, n*DSIZE);
+	    } else {
+	       memcpy(x_ip, fix_x, n*DSIZE);
+	    }
+	    FREE(fix_x);
+	    FREE(sub_x);
+	    if (!is_feasible) {
+	       /* Cbc's pump ends its round after this branch and bound whether
+		* or not it finds a solution; stop the pump if it finds none.
+		* Count the pass, for the branch and bound after the pump. */
+	       fp_data->iter++;
+	       break;
+	    }
+	 }
+      }
+
       if (is_feasible == TRUE) {
          new_solution_value = 0;
          for (i=0;i<n;i++) {
@@ -357,7 +393,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
     * that the pump didn't move. Only at the root for now. */
    if (*found_better_solution != TRUE && p->bc_level < 1 && fp_data->iter > 0 &&
        fp_time_left(p) > 0.0) {
-      if (fp_small_bab(p, fp_data, last_moved, &solution_value,
+      if (fp_small_bab(p, fp_data, last_moved, NULL, &solution_value,
 		       betterSolution)) {
          *found_better_solution = TRUE;
          p->lp_stat.fp_num_sols++;
@@ -470,6 +506,14 @@ int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix,
    }
 
    return termcode;
+}
+
+/*===========================================================================*/
+/* A general integer variable whose range is larger than 2: with
+ * fp_binaries_only, the pump treats it as continuous. */
+static char fp_wide_general(var_desc *v, double etol)
+{
+   return v->is_int && v->ub - v->lb > 2 + etol;
 }
 
 /*===========================================================================*/
@@ -638,11 +682,36 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
    fp_data->numNonBinInts   = 0;
    fp_data->numInts         = 0;
 
+   /* As Cbc's pump: round only the binaries, and treat the general integers
+    * as continuous, unless more than 2/3 of the integers are general. Unlike
+    * Cbc, integers whose range is at most 2 are rounded too: preprocessing
+    * merges two identical binary columns into one integer column of range 2,
+    * and the pump does better rounding them. */
+   fp_data->bin_only = FALSE;
+   if (p->par.fp_binaries_only) {
+      int ints = 0, gens = 0;
+      for (i = 0; i < n; i++) {
+	 if (lp_data->vars[i]->is_int) {
+	    ints++;
+	    if (fp_wide_general(lp_data->vars[i], lpetol)) {
+	       gens++;
+	    }
+	 }
+      }
+      fp_data->bin_only = gens > 0 && 3*gens <= 2*ints;
+      if (fp_data->bin_only && p->bc_index < 1) {
+	 PRINT(fp_data->verbosity, 0,
+	       ("feasibility pump: %d of %d integer variables are continuous "
+		"in the pump\n", gens, ints));
+      }
+   }
    index_list = fp_data->index_list;
    for (i=0;i<n;i++) {
       index_list[i]=i;
       fp_vars[i] = (FPvars *)malloc(sizeof(FPvars));
-      if (lp_data->vars[i]->is_int) {
+      if (fp_data->bin_only && fp_wide_general(lp_data->vars[i], lpetol)) {
+	 fp_vars[i]->is_int = fp_vars[i]->is_bin = FALSE;
+      } else if (lp_data->vars[i]->is_int) {
          fp_data->numInts++;
          fp_vars[i]->is_int = TRUE;
          if (lp_data->vars[i]->lb<-lpetol||lp_data->vars[i]->ub>1+lpetol) {
@@ -1076,8 +1145,13 @@ static double fp_time_left(lp_prob *p)
  * continuous variables are left free. It is skipped if fewer than half of the
  * integer variables are fixed, or if the fixed values break a row with no free
  * variable. Returns TRUE if it finds a better solution, which it puts in
- * betterSolution and *solution_value. */
+ * betterSolution and *solution_value.
+ * With fix_val (when the pump rounds only some of the integers,
+ * fp_binaries_only), it instead fixes the integers the pump rounds at fix_val
+ * and solves for the other integers and the continuous variables; last_moved
+ * is then not used. */
 static int fp_small_bab(lp_prob *p, FPdata *fp_data, const int *last_moved,
+			const double *fix_val,
 			double *solution_value, double *betterSolution)
 {
    LPdata *lp_data = p->lp_data;
@@ -1123,6 +1197,14 @@ static int fp_small_bab(lp_prob *p, FPdata *fp_data, const int *last_moved,
 	 continue;
       }
       int_cnt++;
+      if (fix_val) {
+	 if (fp_data->fp_vars[i]->is_int) {
+	    type[i] = 'F';
+	    val[i] = fix_val[i];
+	    fixed_cnt++;
+	 }
+	 continue;
+      }
       if (last_moved[i] >= 0) {
 	 continue;
       }
@@ -1134,7 +1216,7 @@ static int fp_small_bab(lp_prob *p, FPdata *fp_data, const int *last_moved,
       }
    }
 
-   if (fixed_cnt == 0 || fixed_cnt < min_fix*int_cnt) {
+   if (!fix_val && (fixed_cnt == 0 || fixed_cnt < min_fix*int_cnt)) {
       status = "too few fixed";
       goto done;
    }
@@ -1217,8 +1299,8 @@ static int fp_small_bab(lp_prob *p, FPdata *fp_data, const int *last_moved,
  done:
    if (p->bc_index < 1) {
       PRINT(fp_data->verbosity, 0,
-	    ("feasibility pump: branch and bound with %d of %d integers "
-	     "fixed", fixed_cnt, int_cnt));
+	    ("feasibility pump: %sbranch and bound with %d of %d integers "
+	     "fixed", fix_val ? "general integers: " : "", fixed_cnt, int_cnt));
       if (rows_checked) {
 	 PRINT(fp_data->verbosity, 0, (", %d of %d rows left", free_m, m));
       }

@@ -1113,6 +1113,19 @@ Determines the maximum number of LPs that can be solved in a call to the
 feasibility pump heuristic. A higher number might be helpful in finding a
 better feasible solution but may result in more time spent in the heuristic.
 
+\item[\ptt{fp\_binaries\_only} -- boolean ({\tt TRUE}).]
+\mysindex{p}{\LP!fp\_binaries\_only}
+If set to {\tt TRUE}, the feasibility pump rounds only the binary variables
+and the integer variables whose range is at most 2 (preprocessing merges two
+identical binary columns into one such variable), and treats the other general
+integer variables as continuous, as Cbc's pump does. When the pump finds a
+point that satisfies the constraints but has fractional general integer
+variables, the rounded variables are fixed at that point and a small branch
+and bound solves for the rest; if it finds no solution, the pump stops, as
+Cbc's pump ends its round. It has no effect if more than two thirds of the
+integer variables are general integers with a range larger than 2. If set to
+{\tt FALSE}, the pump rounds all integer variables.
+
 \item[\ptt{fp\_time\_limit} -- double (50).] 
 \mysindex{p}{\LP!fp\_time\_limit}
 If a feasible solution has been found, this parameter determines the time in
