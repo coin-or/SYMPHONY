@@ -508,6 +508,7 @@ SYMPHONYLIB_EXPORT int sym_set_defaults(sym_environment *env)
    /* feasibility pump */
    lp_par->fp_enabled          = SYM_FEAS_PUMP_DISABLE;//SYM_FEAS_PUMP_DEFAULT;
    lp_par->fp_max_cycles       = 100;
+   lp_par->fp_binaries_only    = TRUE;
    lp_par->fp_time_limit       = 50;
    lp_par->fp_display_interval = 10;
    lp_par->fp_poor_sol_lim_fac = 10;
@@ -6081,6 +6082,10 @@ SYMPHONYLIB_EXPORT int sym_get_int_param(sym_environment *env, const char *key,
       *value = lp_par->fp_max_cycles;
       return(0);
    }
+   else if (strcmp(key, "fp_binaries_only") == 0) {
+      *value = lp_par->fp_binaries_only;
+      return(0);
+   }
    
    /***********************************************************************
     ***                     cut_gen params                          ***
@@ -8259,6 +8264,10 @@ SYMPHONYLIB_EXPORT int sym_set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "fp_max_cycles") == 0) {
       READ_INT_PAR(lp_par->fp_max_cycles);
+      return(0);
+   }
+   else if (strcmp(key, "fp_binaries_only") == 0) {
+      READ_INT_PAR(lp_par->fp_binaries_only);
       return(0);
    }
    else if (strcmp(key, "fp_time_limit") == 0) {

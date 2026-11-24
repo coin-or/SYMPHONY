@@ -31,6 +31,8 @@ typedef struct FP_VARS {
    char          is_int;
    int           xplus;
    int           xminus;
+   int           xplus_row;     /* the first of the two rows that bound
+                                   xplus (general integers) */
 }FPvars;
 
 typedef struct FP_DATA {
@@ -41,6 +43,7 @@ typedef struct FP_DATA {
    int           m;             /* no. of constraints in pumping lp */
    int           iter;
    int           numNonBinInts;
+   char          bin_only;      /* general integers are continuous */
    int           numInts;
    int          *index_list;
    int         **x_bar_ind;     /* array containing previous x_bars */

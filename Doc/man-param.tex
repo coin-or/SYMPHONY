@@ -1095,6 +1095,10 @@ adjusted through the \ptt{fp\_frequency} parameter.  {\tt
 SYM\_FEAS\_PUMP\_TILL\_SOL}\{3\} indicates that the heuristic is used only
 until the first feasible solution is found. {\tt
 SYM\_FEAS\_PUMP\_DISABLE}\{-1\} indicates that the heuristic is not used.
+When the pump ends at the root without a solution, the integer variables
+whose values the pump's LP solutions left unchanged are fixed and a small
+branch and bound (at most 1000 nodes and 30 seconds) solves for the rest, as
+in Cbc's pump, if at least half of the integer variables are fixed.
 
 \item[\ptt{fp\_frequency} -- integer (10).] 
 \mysindex{p}{\LP!fp\_frequency}
@@ -1108,6 +1112,19 @@ the frequency is determined automatically based on some preset rules.
 Determines the maximum number of LPs that can be solved in a call to the
 feasibility pump heuristic. A higher number might be helpful in finding a
 better feasible solution but may result in more time spent in the heuristic.
+
+\item[\ptt{fp\_binaries\_only} -- boolean ({\tt TRUE}).]
+\mysindex{p}{\LP!fp\_binaries\_only}
+If set to {\tt TRUE}, the feasibility pump rounds only the binary variables
+and the integer variables whose range is at most 2 (preprocessing merges two
+identical binary columns into one such variable), and treats the other general
+integer variables as continuous, as Cbc's pump does. When the pump finds a
+point that satisfies the constraints but has fractional general integer
+variables, the rounded variables are fixed at that point and a small branch
+and bound solves for the rest; if it finds no solution, the pump stops, as
+Cbc's pump ends its round. It has no effect if more than two thirds of the
+integer variables are general integers with a range larger than 2. If set to
+{\tt FALSE}, the pump rounds all integer variables.
 
 \item[\ptt{fp\_time\_limit} -- double (50).] 
 \mysindex{p}{\LP!fp\_time\_limit}
@@ -1126,12 +1143,12 @@ been found, the parameter \ptt{fp\_time\_limit} is used.
 If the relative (\%) gap between the lower and the upper bounds falls below the
 value of this parameter, feasibility pump is not called.
 
-\item[\ptt{fp\_flip\_fraction} -- double (0.1).] 
+\item[\ptt{fp\_flip\_fraction} -- double (0.1).]
 \mysindex{p}{\LP!fp\_flip\_fraction}
-When the feasibility pump gets stuck in a cycle, this fraction of binary
-variables are flipped. The variables are selected randomly. Increasing the
-value of this parameter may result in the pump getting stuck fewer number of
-times, but the time to solve LPs after flipping may increase substantially.
+No longer used. When the feasibility pump's rounded point repeats the last
+one, the pump flips the 10 to 30 integer variables farthest from its LP
+solution; when it repeats an earlier one, it perturbs more of them, preferring
+those far from the LP solution, as Cbc's pump does.
 
 \item[\ptt{fp\_poor\_sol\_lim\_fac} -- integer (10).] 
 \mysindex{p}{\LP!fp\_poor\_sol\_lim\_fac}
